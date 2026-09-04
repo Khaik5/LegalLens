@@ -29,5 +29,5 @@ See [requirements.md](docs/project_notes/requirements.md) for acceptance-oriente
 
 ## Current status
 
-- Mobile register and home screen files exist in the working tree but were not reviewed or changed while creating this memory system.
+- Mobile home, register, and forgot-password UI screens are implemented in the working tree; authentication actions remain placeholders until the backend contract is available.
 - No backend/API contract is present in this repository yet. Treat endpoint shapes, authentication flows, AI response schemas, and legal-reference schema as open integration work.
