@@ -2,4 +2,10 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="legal_lens_background">#FAF9F6</color>
+    <color name="legal_lens_primary">#1A2D42</color>
+    <color name="legal_lens_status_text">#1C2434</color>
+    <color name="legal_lens_secondary_text">#4E5C6E</color>
+    <color name="legal_lens_input_stroke">#E1E8F0</color>
+    <color name="legal_lens_link">#008B8B</color>
 </resources>
