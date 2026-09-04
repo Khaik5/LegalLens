@@ -1,3 +1,25 @@
 <resources>
-    <string name="app_name">LagalLens</string>
+    <string name="app_name">LegalLens</string>
+    <string name="legal_lens_logo_description">LegalLens</string>
+    <string name="home_tagline">Số hóa, phân tích và hiểu rõ hợp đồng của bạn bằng trí tuệ nhân tạo.</string>
+    <string name="login">Đăng nhập</string>
+    <string name="register_new_account">Đăng ký tài khoản mới</string>
+    <string name="back">Quay lại</string>
+    <string name="create_account">Tạo tài khoản</string>
+    <string name="register_legal_lens">Đăng ký LegalLens</string>
+    <string name="register_subtitle">Trải nghiệm công cụ phân tích hợp đồng AI tối tân.</string>
+    <string name="full_name">Họ và tên</string>
+    <string name="full_name_hint">Nguyễn Văn A</string>
+    <string name="email_address">Địa chỉ Email</string>
+    <string name="email_hint">nguyenvana@gmail.com</string>
+    <string name="password">Mật khẩu</string>
+    <string name="confirm_password">Xác nhận mật khẩu</string>
+    <string name="password_hint">••••••••••••</string>
+    <string name="register_terms">Bằng việc đăng ký, bạn đồng ý với Điều khoản dịch vụ và Chính sách bảo mật của LegalLens.</string>
+    <string name="terms_of_service">Điều khoản dịch vụ</string>
+    <string name="privacy_policy">Chính sách bảo mật</string>
+    <string name="register_account">Đăng ký tài khoản</string>
+    <string name="register_login_prompt">Đã có tài khoản? Đăng nhập</string>
+    <string name="register_coming_soon">Chức năng đăng ký sẽ được triển khai sau</string>
+    <string name="login_coming_soon">Chức năng đăng nhập sẽ được triển khai sau</string>
 </resources>

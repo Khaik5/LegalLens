@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/registerRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/legal_lens_background"
+    tools:context=".presentation.feature.register.RegisterActivity">
+
+    <ScrollView
+        android:id="@+id/registerScroll"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        android:overScrollMode="never"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/dp_24"
+            android:paddingTop="@dimen/dp_53"
+            android:paddingBottom="@dimen/dp_48">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp_56"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/backButton"
+                    android:layout_width="@dimen/dp_40"
+                    android:layout_height="@dimen/dp_40"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/back"
+                    android:padding="@dimen/dp_8"
+                    android:src="@drawable/ic_chevron_left"
+                    app:tint="@color/legal_lens_status_text" />
+
+                <TextView
+                    android:id="@+id/headerTitleText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/dp_16"
+                    android:layout_weight="1"
+                    android:includeFontPadding="false"
+                    android:text="@string/create_account"
+                    android:textColor="@color/legal_lens_status_text"
+                    android:textSize="@dimen/sp_20"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/registerTitleText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_16"
+                android:includeFontPadding="false"
+                android:text="@string/register_legal_lens"
+                android:textColor="@color/legal_lens_primary"
+                android:textSize="@dimen/sp_24"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/registerSubtitleText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_4"
+                android:includeFontPadding="false"
+                android:text="@string/register_subtitle"
+                android:textColor="@color/legal_lens_secondary_text"
+                android:textSize="@dimen/sp_14" />
+
+            <TextView
+                android:id="@+id/fullNameLabel"
+                style="@style/AuthFieldLabel"
+                android:layout_marginTop="@dimen/dp_28"
+                android:text="@string/full_name" />
+
+            <EditText
+                android:id="@+id/fullNameInput"
+                style="@style/AuthInput"
+                android:hint="@string/full_name_hint"
+                android:inputType="textPersonName" />
+
+            <TextView
+                android:id="@+id/emailLabel"
+                style="@style/AuthFieldLabel"
+                android:layout_marginTop="@dimen/dp_12"
+                android:text="@string/email_address" />
+
+            <EditText
+                android:id="@+id/emailInput"
+                style="@style/AuthInput"
+                android:hint="@string/email_hint"
+                android:inputType="textEmailAddress" />
+
+            <TextView
+                android:id="@+id/passwordLabel"
+                style="@style/AuthFieldLabel"
+                android:layout_marginTop="@dimen/dp_12"
+                android:text="@string/password" />
+
+            <EditText
+                android:id="@+id/passwordInput"
+                style="@style/AuthInput"
+                android:hint="@string/password_hint"
+                android:inputType="textPassword" />
+
+            <TextView
+                android:id="@+id/confirmPasswordLabel"
+                style="@style/AuthFieldLabel"
+                android:layout_marginTop="@dimen/dp_12"
+                android:text="@string/confirm_password" />
+
+            <EditText
+                android:id="@+id/confirmPasswordInput"
+                style="@style/AuthInput"
+                android:hint="@string/password_hint"
+                android:inputType="textPassword" />
+
+            <TextView
+                android:id="@+id/termsText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_24"
+                android:includeFontPadding="false"
+                android:lineSpacingExtra="@dimen/dp_0"
+                android:lineSpacingMultiplier="1.4"
+                android:text="@string/register_terms"
+                android:textColor="@color/legal_lens_secondary_text"
+                android:textSize="@dimen/sp_12" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/submitButton"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp_54"
+                android:layout_marginTop="@dimen/dp_49"
+                android:elevation="@dimen/dp_0"
+                android:fontFamily="sans-serif"
+                android:insetLeft="@dimen/dp_0"
+                android:insetTop="@dimen/dp_0"
+                android:insetRight="@dimen/dp_0"
+                android:insetBottom="@dimen/dp_0"
+                android:text="@string/register_account"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="@dimen/sp_16"
+                android:textStyle="bold"
+                app:backgroundTint="@color/legal_lens_primary"
+                app:cornerRadius="@dimen/dp_14" />
+
+            <TextView
+                android:id="@+id/loginText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_20"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:text="@string/register_login_prompt"
+                android:textColor="@color/legal_lens_secondary_text"
+                android:textSize="@dimen/sp_15" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

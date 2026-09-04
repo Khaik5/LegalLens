@@ -1,0 +1,29 @@
+# Keep generated, binary, IDE, and local-secret artifacts out of routine context.
+# Deliberately do not ignore app source, Gradle build scripts, AGENTS.md, PROJECT_MEMO.md, or docs/project_notes.
+
+.gradle/
+**/build/
+.idea/
+.cursor/
+*.iml
+
+local.properties
+*.keystore
+*.jks
+*.p12
+*.pem
+*.key
+.env
+.env.*
+!.env.example
+
+*.apk
+*.aab
+*.hprof
+*.log
+coverage/
+**/test-results/
+**/reports/
+captures/
+.externalNativeBuild/
+.cxx/
