@@ -22,4 +22,11 @@
     <string name="register_login_prompt">Đã có tài khoản? Đăng nhập</string>
     <string name="register_coming_soon">Chức năng đăng ký sẽ được triển khai sau</string>
     <string name="login_coming_soon">Chức năng đăng nhập sẽ được triển khai sau</string>
+    <string name="forgot_password">Quên mật khẩu</string>
+    <string name="reset_password_icon_description">Đặt lại mật khẩu</string>
+    <string name="reset_password_title">Đặt lại mật khẩu</string>
+    <string name="reset_password_subtitle">Đừng lo lắng, hãy cung cấp email đăng ký, chúng tôi sẽ gửi liên kết để bạn tạo lại mật khẩu mới.</string>
+    <string name="send_reset_link">Gửi liên kết đặt lại</string>
+    <string name="back_to_login">Quay lại Đăng nhập</string>
+    <string name="reset_password_coming_soon">Chức năng đặt lại mật khẩu sẽ được triển khai sau</string>
 </resources>

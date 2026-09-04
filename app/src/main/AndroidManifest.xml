@@ -12,6 +12,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.LagalLens">
         <activity
+            android:name=".presentation.feature.forgotpassword.ForgotPasswordActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
             android:name=".presentation.feature.register.RegisterActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
