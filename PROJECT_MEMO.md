@@ -30,4 +30,5 @@ See [requirements.md](docs/project_notes/requirements.md) for acceptance-oriente
 ## Current status
 
 - Mobile home, login, register, forgot-password, OTP verification, and success UI screens are implemented in the working tree. Registration and password-reset paths currently simulate OTP delivery and verification until the backend contract is available. Auth/OTP package migration is ready for owner testing on `khai/auth` and follows the feature-first Clean Architecture layout in `AGENTS.md`.
+- The post-auth dashboard is implemented on `khai/home` as a separate `MainActivity` navigation host with a Home dashboard Fragment and independent bottom-navigation resources. Contract, calendar, profile, and add-contract entries currently use shared integration placeholders until their assigned feature flows are available.
 - No backend/API contract is present in this repository yet. Treat endpoint shapes, authentication flows, AI response schemas, and legal-reference schema as open integration work.

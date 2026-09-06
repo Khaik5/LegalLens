@@ -12,7 +12,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.lagallens.databinding.ActivitySuccessBinding
-import com.example.lagallens.presentation.feature.home.ui.HomeActivity
+import com.example.lagallens.presentation.feature.main.ui.MainActivity
 import com.example.lagallens.presentation.feature.success.contract.SuccessUiEffect
 import com.example.lagallens.presentation.feature.success.contract.SuccessUiEvent
 import com.example.lagallens.presentation.assets.animation.SuccessPulseAnimation
@@ -46,8 +46,8 @@ class SuccessActivity : AppCompatActivity() {
                     when (effect) {
                         SuccessUiEffect.NavigateToHome -> {
                             startActivity(
-                                Intent(this@SuccessActivity, HomeActivity::class.java).apply {
-                                    flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                                Intent(this@SuccessActivity, MainActivity::class.java).apply {
+                                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                                 }
                             )
                         }

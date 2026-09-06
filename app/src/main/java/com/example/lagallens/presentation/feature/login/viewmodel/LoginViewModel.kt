@@ -62,7 +62,7 @@ class LoginViewModel(
 
         if (authenticateUser(username, password)) {
             _uiState.update { it.copy(usernameError = null, passwordError = null) }
-            sendEffect(LoginUiEffect.NavigateToHome)
+            sendEffect(LoginUiEffect.NavigateToMain)
         } else {
             _uiState.update {
                 it.copy(usernameError = null, passwordError = "Tên đăng nhập hoặc mật khẩu không đúng")

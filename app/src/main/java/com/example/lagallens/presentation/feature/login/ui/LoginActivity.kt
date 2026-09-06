@@ -25,6 +25,7 @@ import com.example.lagallens.LegalLensApplication
 import com.example.lagallens.databinding.ActivityLoginBinding
 import com.example.lagallens.presentation.feature.forgotpassword.ui.ForgotPasswordActivity
 import com.example.lagallens.presentation.feature.register.ui.RegisterActivity
+import com.example.lagallens.presentation.feature.main.ui.MainActivity
 import com.example.lagallens.presentation.feature.login.contract.LoginUiEffect
 import com.example.lagallens.presentation.feature.login.contract.LoginUiEvent
 import com.example.lagallens.presentation.feature.login.contract.LoginUiState
@@ -148,10 +149,10 @@ class LoginActivity : AppCompatActivity() {
                         LoginUiEffect.NavigateToRegister -> {
                             startActivity(Intent(this@LoginActivity, RegisterActivity::class.java))
                         }
-                        LoginUiEffect.NavigateToHome -> {
+                        LoginUiEffect.NavigateToMain -> {
                             startActivity(
-                                Intent(this@LoginActivity, LoginActivity::class.java).apply {
-                                    flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                                Intent(this@LoginActivity, MainActivity::class.java).apply {
+                                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                                 }
                             )
                         }

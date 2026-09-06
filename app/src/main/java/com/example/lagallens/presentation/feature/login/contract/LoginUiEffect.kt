@@ -4,5 +4,5 @@ sealed interface LoginUiEffect {
     data object CloseScreen : LoginUiEffect
     data object NavigateToForgotPassword : LoginUiEffect
     data object NavigateToRegister : LoginUiEffect
-    data object NavigateToHome : LoginUiEffect
+    data object NavigateToMain : LoginUiEffect
 }

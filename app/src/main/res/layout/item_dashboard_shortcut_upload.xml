@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_weight="1"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <ImageView
+        android:layout_width="@dimen/dp_52"
+        android:layout_height="@dimen/dp_52"
+        android:background="@drawable/bg_dashboard_icon_green"
+        android:contentDescription="@string/dashboard_upload"
+        android:padding="@dimen/dp_14"
+        android:src="@drawable/ic_dashboard_upload" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dp_8"
+        android:includeFontPadding="false"
+        android:text="@string/dashboard_upload"
+        android:textColor="@color/dashboard_primary_text"
+        android:textSize="@dimen/sp_12" />
+</LinearLayout>
