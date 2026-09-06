@@ -14,4 +14,21 @@
     <color name="upload_green_surface">#FFF0FDF4</color>
     <color name="upload_amber">#FFF59E0B</color>
     <color name="upload_amber_surface">#FFFEF3C7</color>
+    <color name="splash_background">#FFFAF9F6</color>
+    <color name="splash_teal">#FF0D7A80</color>
+    <color name="splash_surface">#FFF1F5F3</color>
+    <color name="splash_progress_track">#FFE1E8F0</color>
+    <color name="splash_text">#FF4E5C6E</color>
+    <color name="splash_nav_handle">#FFC4CBD0</color>
+    <color name="onboarding_background">#FFFAF9F6</color>
+    <color name="onboarding_navy">#FF1A2D42</color>
+    <color name="onboarding_teal">#FF0D7A80</color>
+    <color name="onboarding_gold">#FFE6A100</color>
+    <color name="onboarding_text">#FF4E5C6E</color>
+    <color name="onboarding_gray">#FFE1E8F0</color>
+    <color name="onboarding_white">#FFFFFFFF</color>
+    <color name="onboarding_teal_04">#0A0D7A80</color>
+    <color name="onboarding_teal_10">#1A0D7A80</color>
+    <color name="onboarding_navy_02">#051A2D42</color>
+    <color name="onboarding_navy_04">#0A1A2D42</color>
 </resources>

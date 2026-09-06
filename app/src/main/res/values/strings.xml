@@ -13,4 +13,17 @@
     <string name="upload_back_content_description">Quay lại</string>
     <string name="upload_source_selected">Đã chọn tệp. Bước xử lý tệp sẽ được bổ sung trong luồng tải lên.</string>
     <string name="upload_camera_unavailable">Màn quét bằng camera sẽ được bổ sung trong luồng Camera/Scan.</string>
+    <string name="splash_initializing_security">ĐANG KHỞI TẠO BẢO MẬT</string>
+    <string name="onboarding_skip">Bỏ qua</string>
+    <string name="onboarding_time">09:41</string>
+    <string name="onboarding_status_icons">▰ ︿ ▰</string>
+    <string name="onboarding_logo">● LEGALLENS</string>
+    <string name="onboarding_title_search">TRA CỨU PHÁP LUẬT DỄ DÀNG</string>
+    <string name="onboarding_description_search">Tìm kiếm và tiếp cận các thông tin pháp luật cần thiết một cách nhanh chóng, rõ ràng và thuận tiện.</string>
+    <string name="onboarding_title_assistant">TRỢ LÝ PHÁP LÝ THÔNG MINH</string>
+    <string name="onboarding_description_assistant">Đặt câu hỏi và nhận thông tin pháp lý được trình bày dễ hiểu, giúp bạn nhanh chóng tìm được hướng giải quyết phù hợp.</string>
+    <string name="onboarding_title_manage">QUẢN LÝ THÔNG TIN PHÁP LÝ</string>
+    <string name="onboarding_description_manage">Lưu trữ và quản lý các thông tin pháp lý quan trọng để dễ dàng theo dõi và sử dụng khi cần.</string>
+    <string name="onboarding_start">Bắt đầu</string>
+    <string name="onboarding_next">Tiếp theo</string>
 </resources>

@@ -86,4 +86,5 @@ dependencies {
         "com.android.tools:desugar_jdk_libs:2.0.4"
     )
     implementation("androidx.fragment:fragment-ktx:1.8.5")
+    implementation("androidx.viewpager2:viewpager2:1.1.0")
 }

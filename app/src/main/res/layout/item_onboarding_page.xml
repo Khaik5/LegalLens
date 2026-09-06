@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/onboarding_illustration"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/onboarding_illustration_height"
+        android:importantForAccessibility="no"
+        android:scaleType="fitCenter"
+        android:translationY="@dimen/onboarding_illustration_top"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/onboarding_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/onboarding_text_horizontal_padding"
+        android:layout_marginTop="@dimen/onboarding_title_top"
+        android:layout_marginEnd="@dimen/onboarding_text_horizontal_padding"
+        android:fontFamily="sans-serif"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:textColor="@color/onboarding_navy"
+        android:textSize="@dimen/onboarding_title_text_size"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/onboarding_illustration" />
+
+    <TextView
+        android:id="@+id/onboarding_description"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/onboarding_text_horizontal_padding"
+        android:layout_marginTop="@dimen/onboarding_description_top"
+        android:layout_marginEnd="@dimen/onboarding_text_horizontal_padding"
+        android:fontFamily="sans-serif"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:lineSpacingExtra="@dimen/onboarding_description_line_spacing"
+        android:textColor="@color/onboarding_text"
+        android:textSize="@dimen/onboarding_description_text_size"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/onboarding_title" />
+</androidx.constraintlayout.widget.ConstraintLayout>
