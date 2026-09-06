@@ -5,7 +5,7 @@ plugins {
 android {
     namespace = "com.example.lagallens"
     compileSdk {
-        version = release(36) {
+        version = release(37) {
             minorApiLevel = 1
         }
     }
@@ -13,7 +13,7 @@ android {
     defaultConfig {
         applicationId = "com.example.lagallens"
         minSdk = 28
-        targetSdk = 36
+        targetSdk = 37
         versionCode = 1
         versionName = "1.0"
 
@@ -83,4 +83,5 @@ dependencies {
         "com.android.tools:desugar_jdk_libs:2.0.4"
     )
     implementation("androidx.fragment:fragment-ktx:1.8.5")
+    implementation("androidx.viewpager2:viewpager2:1.1.0")
 }
