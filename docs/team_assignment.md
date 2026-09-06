@@ -245,7 +245,7 @@ Current table:
 | Owner | Feature                  | Status      | Notes                                                                                                      |
 | ----- | ------------------------ | ----------- | ---------------------------------------------------------------------------------------------------------- |
 | Khải  | Email Verification / OTP | READY_FOR_OWNER_TEST | Branch `khai/auth`; Login/Register/Forgot Password → OTP → Success flow implemented; build/test/lint pass |
-| Khải  | Home / Dashboard         | TODO        | Branch `khai/home`                                                                                         |
+| Khải  | Home / Dashboard         | READY_FOR_OWNER_TEST | Branch `khai/home`; Figma dashboard, main navigation host, and bottom navigation build successfully          |
 | Khải  | Important Dates          | TODO        | Same Home flow if it remains grouped in `khai/home`                                                        |
 | Khải  | Contract Management      | TODO        | Includes List/Search/Filter/Detail/History/Delete; branch `khai/contracts`                                 |
 | Phước | Onboarding Flow          | IN_PROGRESS | Splash + 2 Onboarding Fragments already exist; branch `phuoc/onboarding`                                   |

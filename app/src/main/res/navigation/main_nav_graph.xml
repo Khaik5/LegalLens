@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_nav_graph"
+    app:startDestination="@id/homeDashboardFragment">
+
+    <fragment
+        android:id="@+id/homeDashboardFragment"
+        android:name="com.example.lagallens.presentation.feature.dashboard.ui.HomeDashboardFragment"
+        android:label="@string/menu_home" />
+
+    <fragment
+        android:id="@+id/contractsPlaceholder"
+        android:name="com.example.lagallens.presentation.common.ui.FeatureUnavailableFragment"
+        android:label="@string/menu_contracts" />
+
+    <fragment
+        android:id="@+id/calendarPlaceholder"
+        android:name="com.example.lagallens.presentation.common.ui.FeatureUnavailableFragment"
+        android:label="@string/menu_calendar" />
+
+    <fragment
+        android:id="@+id/profilePlaceholder"
+        android:name="com.example.lagallens.presentation.common.ui.FeatureUnavailableFragment"
+        android:label="@string/menu_profile" />
+
+    <fragment
+        android:id="@+id/addContractPlaceholder"
+        android:name="com.example.lagallens.presentation.common.ui.FeatureUnavailableFragment"
+        android:label="@string/add_contract" />
+</navigation>
