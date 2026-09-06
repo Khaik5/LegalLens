@@ -12,15 +12,18 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.LagalLens">
         <activity
-            android:name=".MainActivity"
+            android:name=".presentation.feature.splash.ui.SplashActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".presentation.feature.onboarding.ui.OnboardingActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
     </application>
 
 </manifest>
