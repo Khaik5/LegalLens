@@ -1,186 +1,482 @@
-# LegalLens Agent Guide
+# LEGALLENS AGENT GUIDE
 
-## Project
+## 1. Rules & Context
 
-Android Kotlin project using Clean Architecture.
+Architecture: **Clean Architecture + MVVM + UiState/UiEvent/UiEffect + DI**.
 
-Preferred structure:
+Read before significant work:
+
+1. `AGENTS.md`
+2. `PROJECT_MEMO.md`
+3. `docs/team_assignment.md`
+4. only relevant `docs/project_notes/*`
+
+Priority:
+
+- architecture/Git/build/UI → `AGENTS.md`
+- current owner/status/branch → latest owner-approved `team_assignment.md`
+- conflict → **STOP, REPORT, DO NOT GUESS**
+
+Do not change architecture, package name, base branch, framework, or another owner's feature without approval.
+
+---
+
+## 2. Project Structure
 
 ```text
 com.example.lagallens
+│
 ├── core/
+│   ├── error/
+│   ├── extension/
+│   ├── constants/
+│   ├── network/
+│   └── utils/
+│
 ├── data/
 │   ├── datasource/
-│   ├── mapper/
+│   │   ├── remote/
+│   │   │   ├── api/
+│   │   │   ├── AuthRemoteDataSource.kt
+│   │   │   ├── ContractRemoteDataSource.kt
+│   │   │   ├── UploadRemoteDataSource.kt
+│   │   │   └── AnalysisRemoteDataSource.kt
+│   │   │
+│   │   └── local/
+│   │       ├── datastore/
+│   │       └── database/
+│   │           ├── dao/
+│   │           └── entity/
+│   │
 │   ├── model/
+│   │   ├── request/
+│   │   ├── response/
+│   │   └── dto/      # create only when actually needed
+│   │
+│   ├── mapper/
 │   └── repository/
+│
 ├── domain/
 │   ├── model/
 │   ├── repository/
 │   └── usecase/
-└── presentation/
-    └── feature/
-        └── <feature>/
-            ├── <Feature>Activity.kt
-            ├── <Feature>Contract.kt
-            └── <Feature>ViewModel.kt
+│
+├── presentation/
+│   ├── common/
+│   │   ├── adapter/
+│   │   ├── view/
+│   │   ├── dialog/
+│   │   └── utils/
+│   │
+│   └── feature/
+│       └── <feature>/
+│           ├── ui/
+│           ├── viewmodel/
+│           ├── contract/
+│           ├── adapter/
+│           ├── view/
+│           └── utils/
+│
+└── di/
+    ├── NetworkModule.kt
+    ├── DatabaseModule.kt
+    ├── RepositoryModule.kt
+    └── UseCaseModule.kt
 ```
 
-Keep small features inside `app`. Do not create extra Gradle modules unless necessary.
+Structure rules:
 
-## Architecture Rules
+- organize `presentation` by **feature**, never global `fragment/`, `viewmodel/`, `state/`, etc.
+- no `FeatureContract.kt`; `UiState`, `UiEvent`, `UiEffect` are separate files.
+- no empty package just to match the tree.
+- feature-only UI code stays inside its feature.
+- move to `presentation/common/` only when reused by multiple features.
+- same UI, only title/image/text/data differs → reuse one Fragment + args/UiState.
+- different behavior/flow → separate screen/feature.
 
-- `presentation` → `domain`, `core`
-- `data` → `domain`, `core`
-- `domain` must remain pure Kotlin.
-- UI must not access DTOs, entities, Retrofit responses, DataStore keys, database, or API directly.
-- Repository interfaces → `domain.repository`
-- Repository implementations → `data.repository`
-- Mapping DTO/entity → domain model happens in `data`.
-- Reusable/non-trivial business logic → UseCase.
-- Follow existing architecture instead of introducing a new pattern unnecessarily.
+---
 
-`AGENTS.md` is the current architecture source of truth.
+## 3. Layer Rules
 
-`docs/project_notes/decisions.md` records architecture history/reasoning. If memory conflicts with `AGENTS.md`, report the conflict instead of silently changing architecture.
-
-## Screen Pattern
-
-Non-trivial screens use:
+Dependency direction:
 
 ```text
-State + Event + Effect + ViewModel
+presentation → domain, core
+data         → domain, core
+di           → wires dependencies
+domain       → pure Kotlin only
 ```
 
-- `State`: persistent UI state.
-- `Event`: user/UI input.
-- `Effect`: one-time actions such as navigation, toast, dialog, permissions.
+### `core`
 
-Use `StateFlow` for state and `SharedFlow` for effects.
+Shared technical code only: errors, extensions, constants, network helpers/results, date/file/validation utilities. No feature business logic.
 
-Activities/Fragments:
+### `data`
 
-- render `State`
-- send `Event`
-- collect `Effect`
-- contain no business logic
+Real data access: API, DataStore, Room, files/cache, transport models, mapping, repository implementations.
 
-Prefer:
+Rules:
+
+- Retrofit API → `data/datasource/remote/api/`
+- remote source → `<Feature>RemoteDataSource`
+- Room DAO/entity → `data/datasource/local/database/`
+- request/response models → `data/model/request|response/`
+- `dto/` only when a distinct transport model is truly needed
+- mapper → `data/mapper/`
+- repository implementation → `data/repository/`
+- never expose Request/Response/DTO/Entity to UI
+- Mapper transforms shape only; no business logic
+- do not create duplicate transport models for the same data
+
+### `domain`
+
+Pure Kotlin only: domain models, repository interfaces, UseCases.
+
+Forbidden dependencies:
+`android.*`, Activity, Fragment, View, Retrofit, Room, DataStore.
+
+Rules:
+
+- repository interface → `domain/repository/`
+- business/data operation → UseCase
+- simple UI-only logic → ViewModel directly
+- do not create fake UseCases for trivial UI actions
+
+### `presentation`
+
+Contains UI, ViewModel, UiState, UiEvent, UiEffect, Adapter, Dialog, Component, UI helpers.
+
+Activity/Fragment only:
+
+```text
+render UiState
+send UiEvent
+collect UiEffect
+handle Android UI behavior
+```
+
+Never put Retrofit/DAO/DataStore/DTO mapping/RepositoryImpl/business logic in Activity, Fragment, Adapter, or ViewModel.
+
+---
+
+## 4. UI State Pattern
+
+Standard feature:
+
+```text
+<Feature>Fragment.kt
+<Feature>ViewModel.kt
+<Feature>UiState.kt
+<Feature>UiEvent.kt
+<Feature>UiEffect.kt
+```
+
+Meaning:
+
+- `UiState` = persistent/renderable screen state
+- `UiEvent` = UI/user input sent to ViewModel
+- `UiEffect` = one-shot UI action
+
+Use:
+
+```text
+UiEvent → ViewModel → UseCase when needed → UiState / UiEffect
+```
+
+Flow convention:
 
 ```kotlin
-_state.update { it.copy(isLoading = true) }
+private val _uiState = MutableStateFlow(FeatureUiState())
+val uiState = _uiState.asStateFlow()
+
+private val _uiEffect = MutableSharedFlow<FeatureUiEffect>()
+val uiEffect = _uiEffect.asSharedFlow()
+
+fun onEvent(event: FeatureUiEvent) { ... }
 ```
 
-Avoid putting one-time navigation/toast flags inside `State`.
+Use `StateFlow` for state; `SharedFlow` for effects.
 
-## Clean Code
+Effects include navigation, toast/snackbar, dialog, permission, file/gallery picker, opening another app. Never store one-shot actions as UiState flags.
 
-- Keep responsibilities small and clear.
-- Avoid duplicated code and unnecessary abstractions.
-- Avoid unnecessary `!!` and mutable state.
-- Use descriptive names.
-- Remove unused imports, dead code, debug code, and commented-out code.
-- Handle expected failures.
-- Never use empty `catch`.
-- Rethrow `CancellationException` before generic coroutine exception handling.
-- Do not refactor unrelated code unless required.
+---
 
-## Android Resources
-
-Use resources instead of hardcoding user-visible values.
+## 5. Data Flow
 
 ```text
-strings → strings.xml
-colors  → colors.xml
-dimens  → dimens.xml
+UI
+→ UiEvent
+→ ViewModel
+→ UseCase
+→ Repository interface
+→ RepositoryImpl
+→ Remote/LocalDataSource
+→ API/DataStore/Room/File
 ```
 
-Naming:
+Return:
 
 ```text
-ic_*        icons
-img_*       images
-bg_*        backgrounds
-shape_*     shapes
-selector_*  selectors
-anim_*      animations
+API/Local
+→ Response/DTO/Entity
+→ Mapper
+→ Domain Model
+→ Repository
+→ UseCase
+→ ViewModel
+→ UiState/UiEffect
+→ UI
 ```
 
-Examples:
+Do not bypass a required layer merely for speed.
+
+---
+
+## 6. Naming
+
+### Packages
+
+Lowercase, feature-oriented:
 
 ```text
-ic_camera
-img_home_banner
-bg_camera_capture_button
-shape_rounded_rectangle
+auth home contracts camera analysis importantdates
 ```
 
-Prefer XML + ViewBinding/DataBinding unless the project intentionally migrates to Compose.
+Avoid: `misc`, `temp`, `others`.
 
-## Verification
+### Kotlin
 
-During development, a quick Kotlin check may use:
+```text
+<Feature>Activity
+<Feature>Fragment
+<Feature>ViewModel
+<Feature>UiState
+<Feature>UiEvent
+<Feature>UiEffect
+
+<Feature>Adapter
+<Feature>ViewPagerAdapter
+<Feature>Dialog
+<Feature>OverlayView
+
+<Feature>Repository
+<Feature>RepositoryImpl
+<Feature>RemoteDataSource
+<Feature>LocalDataSource
+
+<Action><Feature>UseCase
+<Feature>Request
+<Feature>Response
+<Feature>Dto
+<Feature>Entity
+<Feature>Mapper
+```
+
+Style:
+
+```text
+Class/Interface/Object/Enum → PascalCase
+function/variable/property  → lowerCamelCase
+constant                    → UPPER_SNAKE_CASE
+```
+
+Boolean prefix: `is`, `has`, `can`, `should`.
+
+Event names describe what happened:
+`LoginClicked`, `QueryChanged`, `RetryClicked`, `ContractClicked`.
+
+Effect names describe one action:
+`NavigateToHome`, `ShowMessage`, `ShowDeleteDialog`, `RequestCameraPermission`, `OpenGallery`.
+
+Use descriptive names; avoid `data1`, `temp`, `obj`, `item2`, `test123`.
+
+### Android resources
+
+```text
+text  → strings.xml
+color → colors.xml
+size  → dimens.xml
+```
+
+Prefixes:
+
+```text
+ic_*        icon
+img_*       image
+bg_*        background
+shape_*     shape
+selector_*  selector
+anim_*      animation
+```
+
+Prefer feature prefix:
+
+```text
+auth_* home_* contract_* camera_* upload_* analysis_*
+```
+
+Layouts:
+
+```text
+activity_<feature>.xml
+fragment_<feature>.xml
+item_<feature>.xml
+dialog_<feature>.xml
+bottom_sheet_<feature>.xml
+```
+
+View IDs: lowerCamelCase, e.g. `tvTitle`, `ivIcon`, `btnSubmit`, `etEmail`, `rvContracts`, `vpOnboarding`, `pbLoading`.
+
+Prefer XML + ViewBinding/DataBinding unless Compose migration is approved.
+
+---
+
+## 7. Adapter / Component / Dialog
+
+```text
+adapter/   → RecyclerView/ListAdapter/ViewPager2 Adapter
+component/ → feature Custom View/UI component
+dialog/    → feature Dialog/BottomSheet
+utils/     → feature UI helper only
+```
+
+No business logic in these classes.
+
+If reused by multiple features, move to matching `presentation/common/*`. Do not move to common for hypothetical future reuse.
+
+---
+
+## 8. DI
+
+Use the project's existing DI framework.
+
+Typical modules:
+
+```text
+NetworkModule
+DatabaseModule
+RepositoryModule
+```
+
+Prefer constructor injection when supported. Do not manually build dependency chains in UI, add another DI framework, or create empty modules.
+
+---
+
+## 9. Figma / Team / Shared Files
+
+Approved Figma is UI source of truth for layout, spacing, typography, colors, assets, component size, state, dialog/bottom sheet, and navigation flow.
+
+Do not redesign or "improve" Figma without approval. Material ambiguity → **STOP → REPORT**.
+
+Current ownership/branches:
+
+```text
+docs/team_assignment.md
+```
+
+Rules:
+
+- modify only assigned features
+- do not implement/refactor another owner's feature
+- cross-feature work changes only the agreed boundary
+- missing destination causing build failure → smallest agreed skeleton or report dependency
+
+High-conflict files:
+
+```text
+AndroidManifest.xml
+strings.xml
+colors.xml
+dimens.xml
+themes.xml
+navigation graph
+Gradle files
+presentation/common/*
+```
+
+Edit minimally; do not reformat whole files, rename/delete unrelated resources, or overwrite another member's entries.
+
+---
+
+## 10. Clean Code
+
+- clear single responsibility
+- descriptive names
+- avoid duplication and unnecessary abstraction
+- avoid unnecessary mutable state and `!!`
+- expose read-only Flow
+- remove unused imports, dead/debug/commented-out legacy code
+- no empty `catch`; handle expected failures
+- rethrow `CancellationException` before generic coroutine exceptions
+- do not refactor outside task scope
+- never store/commit secrets, tokens, keys, credentials
+
+---
+
+## 11. Verification
+
+Quick compile:
 
 ```powershell
-gradlew.bat :app:compileDebugKotlin
+.\gradlew.bat :app:compileDebugKotlin
 ```
 
-Before commit/push, always run:
+Required before owner test/commit:
 
 ```powershell
-gradlew.bat :app:assembleDebug
+.\gradlew.bat :app:assembleDebug
 ```
 
-Also run applicable:
+When applicable:
 
 ```powershell
-gradlew.bat :app:testDebugUnitTest
-gradlew.bat :app:lintDebug
+.\gradlew.bat :app:testDebugUnitTest
+.\gradlew.bat :app:lintDebug
 ```
 
-If a task name differs, find and use the correct equivalent.
-
-For UI/instrumentation tests:
+UI/instrumentation when applicable:
 
 ```powershell
 adb devices
-gradlew.bat :app:connectedDebugAndroidTest
+.\gradlew.bat :app:connectedDebugAndroidTest
 ```
 
-Run UI tests only when an emulator/device and applicable tests exist.
+UI work: build → open screen if possible → compare Figma → test main interaction/navigation + loading/error/empty + crash/scroll → report tested/not-tested items.
 
-Never claim a skipped test passed.
+Never claim skipped tests passed.
 
-If verification fails:
+Failure:
 
 ```text
 READ ERROR → FIX ROOT CAUSE → RUN AGAIN
 ```
 
-Do not commit or push while required verification is failing.
+No commit/push while required verification fails.
 
-## Git Workflow
+---
 
-Base branch:
+## 12. Git — Khải
+
+Repository:
+
+```text
+https://github.com/Khaik5/LegalLens
+```
+
+Base:
 
 ```text
 khai_develop
 ```
 
-Every new feature uses:
+Branch:
 
 ```text
-khai/<feature-name>
+1 LARGE FEATURE/FLOW = 1 BRANCH
+khai/<feature-or-flow-name>
 ```
 
-Examples:
-
-```text
-khai/login
-khai/register
-khai/camera
-khai/crop-image
-```
+Do not branch per Activity/Fragment/Dialog/UI state/sub-screen. Exact current branches come from `docs/team_assignment.md`.
 
 Before new work:
 
@@ -190,14 +486,18 @@ git branch --show-current
 git fetch origin
 git switch khai_develop
 git pull --ff-only origin khai_develop
-git switch -c khai/<feature-name>
+git switch -c khai/<feature-or-flow-name>
 ```
 
-If the correct feature branch already exists, continue using it.
+If feature branch exists, reuse it.
 
-Never discard unrelated local changes automatically.
+Never develop a new feature directly on:
 
-Never automatically use:
+```text
+main master develop khai_develop phuoc_develop
+```
+
+Never run automatically:
 
 ```text
 git reset --hard
@@ -206,34 +506,20 @@ git push --force
 git push -f
 ```
 
-Never develop a new feature directly on:
+Do not change base branch automatically.
+
+### Commits
 
 ```text
-main
-master
-develop
-khai_develop
-```
-
-## Commit Convention
-
-```text
-[Feat]     new feature
-[Fix]      bug fix
-[Update]   improve existing feature
-[Delete]   remove code/feature
+[Feat] new feature
+[Fix] bug fix
+[Update] improvement
+[Delete] removal
 [Refactor] internal refactor
-[Test]     tests
-[Docs]     documentation
-[Merge]    actual branch merge
-```
-
-Examples:
-
-```powershell
-git commit -m "[Feat] Add login feature"
-git commit -m "[Fix] Prevent duplicate login requests"
-git commit -m "[Update] Improve login UI"
+[Test] tests
+[Docs] documentation
+[Merge] actual merge
+[Chore] tooling/config
 ```
 
 Before commit:
@@ -242,95 +528,83 @@ Before commit:
 git status
 git diff
 git diff --check
+git branch --show-current
 ```
 
-Commit only intended files.
+Commit only intended files. Feature branch must start with `khai/`.
 
-Never commit passwords, tokens, API keys, signing keys, private credentials, or secrets.
-
-## Push Rules
-
-After verification and commit:
+First push:
 
 ```powershell
-git push -u origin khai/<feature-name>
+git push -u origin khai/<feature-or-flow-name>
 ```
 
-For an already tracked branch:
+Later:
 
 ```powershell
 git push
 ```
 
-Never automatically push directly to:
+Never direct-push/auto-merge protected/shared branches.
+
+---
+
+## 13. Approval / Memory / Done
+
+Required workflow:
 
 ```text
-main
-master
-develop
-khai_develop
-```
-
-Do not automatically merge into `khai_develop` unless explicitly requested.
-
-GitHub CLI (`gh`) may be used for repository, PR, and Actions operations when needed.
-
-## Project Memory
-
-Use project memory when available:
-
-```text
-PROJECT_MEMO.md
-docs/project_notes/
-├── bugs.md
-├── decisions.md
-├── key_facts.md
-└── issues.md
-```
-
-Before substantial work:
-
-- read `PROJECT_MEMO.md`
-- read relevant project notes when needed
-
-After meaningful work, update memory when useful:
-
-- important bug/fix → `bugs.md`
-- architecture decision → `decisions.md`
-- stable project fact → `key_facts.md`
-- completed/in-progress work → `issues.md`
-
-Keep memory concise.
-
-Never store secrets in project memory.
-
-## Definition of Done
-
-A feature is done only after:
-
-```text
-UNDERSTAND
-→ CHECK GIT
-→ SYNC khai_develop
-→ CREATE/USE khai/<feature>
+READ RULES
+→ CHECK FIGMA + ASSIGNMENT
+→ CHECK/SYNC GIT
 → IMPLEMENT
-→ REVIEW UI + LOGIC
-→ CLEAN CODE
-→ BUILD
-→ TEST/LINT
+→ REVIEW/CLEAN
+→ BUILD/TEST
+→ TEST UI
+→ REPORT OWNER
+→ OWNER TEST
+→ WAIT "OK"
 → REVIEW DIFF
 → COMMIT
 → PUSH FEATURE BRANCH
 ```
 
-Never:
+Before owner says `OK`: **no completed-feature commit, push, or merge**. Automated tests do not replace owner approval.
+
+Project memory when available:
+
+````text
+PROJECT_MEMO.md
+docs/
+├── team_assignment.md
+└── project_notes/
+    ├── requirements.md
+    ├── decisions.md
+    ├── bugs.md
+    ├── key_facts.md
+    └── issues.md
+
+Read/update only relevant notes; never store secrets.
+
+Definition of Done:
 
 ```text
-IMPLEMENT → COMMIT → TEST LATER
-```
+ASSIGNED
+→ FIGMA UNDERSTOOD
+→ CORRECT BRANCH
+→ IMPLEMENTED
+→ ARCHITECTURE/NAMING CLEAN
+→ BUILD PASS
+→ RELEVANT TEST/LINT
+→ UI TESTED
+→ OWNER OK
+→ DIFF REVIEWED
+→ COMMITTED
+→ PUSHED FEATURE BRANCH
+````
 
 Always:
 
 ```text
-IMPLEMENT → VERIFY → COMMIT → PUSH
+IMPLEMENT → VERIFY → OWNER OK → COMMIT → PUSH
 ```

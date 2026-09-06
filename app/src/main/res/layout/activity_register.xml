@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/legal_lens_background"
-    tools:context=".presentation.feature.register.RegisterActivity">
+    tools:context=".presentation.feature.register.ui.RegisterActivity">
 
     <ScrollView
         android:id="@+id/registerScroll"

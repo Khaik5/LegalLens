@@ -28,4 +28,18 @@
         <item name="android:textColorHint">@color/legal_lens_status_text</item>
         <item name="android:textSize">@dimen/sp_15</item>
     </style>
+
+    <style name="OtpDigitInput">
+        <item name="android:layout_width">@dimen/dp_48</item>
+        <item name="android:layout_height">@dimen/dp_56</item>
+        <item name="android:gravity">center</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:inputType">number</item>
+        <item name="android:maxLength">1</item>
+        <item name="android:padding">@dimen/dp_0</item>
+        <item name="android:selectAllOnFocus">true</item>
+        <item name="android:textColor">@color/legal_lens_status_text</item>
+        <item name="android:textSize">@dimen/sp_24</item>
+        <item name="android:textStyle">bold</item>
+    </style>
 </resources>

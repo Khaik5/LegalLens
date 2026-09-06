@@ -3,6 +3,15 @@
     <string name="legal_lens_logo_description">LegalLens</string>
     <string name="home_tagline">Số hóa, phân tích và hiểu rõ hợp đồng của bạn bằng trí tuệ nhân tạo.</string>
     <string name="login">Đăng nhập</string>
+    <string name="username">Tên đăng nhập</string>
+    <string name="login_username_hint">Admin</string>
+    <string name="login_welcome_back">Chào mừng trở lại</string>
+    <string name="login_subtitle">Vui lòng đăng nhập để tiếp tục truy cập dữ liệu bảo mật.</string>
+    <string name="show_password">HIỆN</string>
+    <string name="hide_password">ẨN</string>
+    <string name="show_or_hide_password">Hiện hoặc ẩn mật khẩu</string>
+    <string name="login_register_prompt">Chưa có tài khoản? Đăng ký ngay</string>
+    <string name="register_now">Đăng ký ngay</string>
     <string name="register_new_account">Đăng ký tài khoản mới</string>
     <string name="back">Quay lại</string>
     <string name="create_account">Tạo tài khoản</string>
@@ -29,4 +38,21 @@
     <string name="send_reset_link">Gửi liên kết đặt lại</string>
     <string name="back_to_login">Quay lại Đăng nhập</string>
     <string name="reset_password_coming_soon">Chức năng đặt lại mật khẩu sẽ được triển khai sau</string>
+    <string name="otp_verification">Xác thực email</string>
+    <string name="otp_title">Nhập mã xác thực</string>
+    <string name="otp_subtitle">Mã xác thực 6 số đã được gửi đến email của bạn</string>
+    <string name="otp_invalid">Mã không hợp lệ. Vui lòng thử lại.</string>
+    <string name="otp_not_received">Bạn chưa nhận được mã?</string>
+    <string name="otp_resend_after">Gửi lại mã sau %1$s</string>
+    <string name="otp_resend">Gửi lại mã</string>
+    <string name="confirm">Xác nhận</string>
+    <string name="otp_security_icon_description">Xác thực bảo mật</string>
+    <string name="otp_alert_icon_description">Cảnh báo mã không hợp lệ</string>
+    <string name="otp_countdown_icon_description">Thời gian gửi lại mã</string>
+    <string name="success_title">Thành công!</string>
+    <string name="success_message">Tài khoản của bạn đã được khởi tạo và bảo mật thành công. Hãy bắt đầu hành trình đơn giản hóa pháp lý cùng LegalLens.</string>
+    <string name="success_security_title">THÔNG TIN BẢO MẬT</string>
+    <string name="success_security_message">Tài khoản đã mã hóa đầu cuối với máy chủ đám mây LegalLens.</string>
+    <string name="start_using">Bắt đầu sử dụng</string>
+    <string name="success_icon_description">Hoàn tất thành công</string>
 </resources>

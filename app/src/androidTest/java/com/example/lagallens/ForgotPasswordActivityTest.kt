@@ -8,7 +8,7 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
-import com.example.lagallens.presentation.feature.forgotpassword.ForgotPasswordActivity
+import com.example.lagallens.presentation.feature.forgotpassword.ui.ForgotPasswordActivity
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
