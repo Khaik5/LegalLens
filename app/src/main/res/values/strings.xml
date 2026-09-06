@@ -1,3 +1,16 @@
 <resources>
     <string name="app_name">LagalLens</string>
+    <string name="upload_source_title">Thêm hợp đồng</string>
+    <string name="upload_source_heading">CHỌN PHƯƠNG THỨC TẢI LÊN</string>
+    <string name="upload_pdf_title">Tải lên tài liệu PDF</string>
+    <string name="upload_pdf_description">Định dạng tối ưu nhất cho văn bản pháp lý</string>
+    <string name="upload_docx_title">Tải lên tệp DOCX</string>
+    <string name="upload_docx_description">Hỗ trợ các định dạng Microsoft Word</string>
+    <string name="upload_gallery_title">Chọn ảnh từ thư viện</string>
+    <string name="upload_gallery_description">Hỗ trợ JPEG, PNG, HEIC</string>
+    <string name="upload_camera_title">Chụp ảnh tài liệu mới</string>
+    <string name="upload_camera_description">Sử dụng camera quét văn bản tự động căn chỉnh</string>
+    <string name="upload_back_content_description">Quay lại</string>
+    <string name="upload_source_selected">Đã chọn tệp. Bước xử lý tệp sẽ được bổ sung trong luồng tải lên.</string>
+    <string name="upload_camera_unavailable">Màn quét bằng camera sẽ được bổ sung trong luồng Camera/Scan.</string>
 </resources>

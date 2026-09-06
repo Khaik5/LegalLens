@@ -12,6 +12,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.LagalLens">
         <activity
+            android:name=".presentation.feature.upload.ui.UploadSourceActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
             android:name=".MainActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustResize">

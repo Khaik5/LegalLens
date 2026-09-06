@@ -5,7 +5,7 @@ plugins {
 android {
     namespace = "com.example.lagallens"
     compileSdk {
-        version = release(36) {
+        version = release(37) {
             minorApiLevel = 1
         }
     }
@@ -13,7 +13,7 @@ android {
     defaultConfig {
         applicationId = "com.example.lagallens"
         minSdk = 28
-        targetSdk = 36
+        targetSdk = 37
         versionCode = 1
         versionName = "1.0"
 
@@ -49,6 +49,9 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     implementation(
         "androidx.lifecycle:lifecycle-viewmodel-ktx:2.10.0"
+    )
+    implementation(
+        "androidx.lifecycle:lifecycle-runtime-ktx:2.10.0"
     )
 
     implementation(

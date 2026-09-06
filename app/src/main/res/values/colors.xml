@@ -2,4 +2,16 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="upload_background">#FFFAF9F6</color>
+    <color name="upload_navy">#FF1A2D42</color>
+    <color name="upload_body">#FF4E5C6E</color>
+    <color name="upload_border">#FFE1E8F0</color>
+    <color name="upload_teal">#FF0D7A80</color>
+    <color name="upload_teal_surface">#FFEBF6F6</color>
+    <color name="upload_blue">#FF3B82F6</color>
+    <color name="upload_blue_surface">#FFEFF6FF</color>
+    <color name="upload_green">#FF10B981</color>
+    <color name="upload_green_surface">#FFF0FDF4</color>
+    <color name="upload_amber">#FFF59E0B</color>
+    <color name="upload_amber_surface">#FFFEF3C7</color>
 </resources>
