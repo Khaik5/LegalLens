@@ -1,7 +1,7 @@
-package com.example.lagallens.presentation.feature.forgotpassword
+package com.example.lagallens.presentation.feature.forgotpassword.ui
 
+import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -11,8 +11,12 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.example.lagallens.R
 import com.example.lagallens.databinding.ActivityForgotPasswordBinding
+import com.example.lagallens.presentation.feature.login.ui.LoginActivity
+import com.example.lagallens.presentation.feature.otp.ui.OtpVerificationActivity
+import com.example.lagallens.presentation.feature.forgotpassword.contract.ForgotPasswordUiEffect
+import com.example.lagallens.presentation.feature.forgotpassword.contract.ForgotPasswordUiEvent
+import com.example.lagallens.presentation.feature.forgotpassword.viewmodel.ForgotPasswordViewModel
 import kotlinx.coroutines.launch
 
 class ForgotPasswordActivity : AppCompatActivity() {
@@ -35,27 +39,28 @@ class ForgotPasswordActivity : AppCompatActivity() {
 
     private fun bindView() {
         binding.backButton.setOnClickListener {
-            viewModel.onEvent(ForgotPasswordContract.Event.BackClicked)
+            viewModel.onEvent(ForgotPasswordUiEvent.BackClicked)
         }
         binding.emailInput.doAfterTextChanged { text ->
-            viewModel.onEvent(ForgotPasswordContract.Event.EmailChanged(text?.toString().orEmpty()))
+            viewModel.onEvent(ForgotPasswordUiEvent.EmailChanged(text?.toString().orEmpty()))
         }
         binding.submitButton.setOnClickListener {
-            viewModel.onEvent(ForgotPasswordContract.Event.SubmitClicked)
+            viewModel.onEvent(ForgotPasswordUiEvent.SubmitClicked)
         }
         binding.loginText.setOnClickListener {
-            viewModel.onEvent(ForgotPasswordContract.Event.LoginClicked)
+            viewModel.onEvent(ForgotPasswordUiEvent.LoginClicked)
         }
     }
 
     private fun collectState() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.state.collect { state ->
+                viewModel.uiState.collect { state ->
                     if (binding.emailInput.text?.toString() != state.email) {
                         binding.emailInput.setText(state.email)
                         binding.emailInput.setSelection(state.email.length)
                     }
+                    binding.emailInput.error = state.emailError
                     binding.submitButton.isEnabled = !state.isLoading
                 }
             }
@@ -65,15 +70,19 @@ class ForgotPasswordActivity : AppCompatActivity() {
     private fun collectEffect() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.effect.collect { effect ->
+                viewModel.uiEffect.collect { effect ->
                     when (effect) {
-                        ForgotPasswordContract.Effect.CloseScreen -> finish()
-                        ForgotPasswordContract.Effect.ShowResetLinkComingSoon -> {
-                            Toast.makeText(
-                                this@ForgotPasswordActivity,
-                                getString(R.string.reset_password_coming_soon),
-                                Toast.LENGTH_SHORT
-                            ).show()
+                        ForgotPasswordUiEffect.CloseScreen -> finish()
+                        ForgotPasswordUiEffect.NavigateToLogin -> {
+                            startActivity(
+                                Intent(this@ForgotPasswordActivity, LoginActivity::class.java).apply {
+                                    flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                                }
+                            )
+                            finish()
+                        }
+                        is ForgotPasswordUiEffect.NavigateToOtp -> {
+                            startActivity(OtpVerificationActivity.createIntent(this@ForgotPasswordActivity, effect.email))
                         }
                     }
                 }

@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/loginRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/legal_lens_background"
+    tools:context=".presentation.feature.login.ui.LoginActivity">
+
+    <ScrollView
+        android:id="@+id/loginScroll"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        android:overScrollMode="never"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/dp_24"
+            android:paddingTop="@dimen/dp_101"
+            android:paddingBottom="@dimen/dp_48">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp_56"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/backButton"
+                    android:layout_width="@dimen/dp_40"
+                    android:layout_height="@dimen/dp_40"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/back"
+                    android:padding="@dimen/dp_8"
+                    android:src="@drawable/ic_chevron_left"
+                    app:tint="@color/legal_lens_status_text" />
+
+                <TextView
+                    android:id="@+id/headerTitleText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/dp_16"
+                    android:layout_weight="1"
+                    android:includeFontPadding="false"
+                    android:text="@string/login"
+                    android:textColor="@color/legal_lens_status_text"
+                    android:textSize="@dimen/sp_20"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/loginTitleText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_24"
+                android:includeFontPadding="false"
+                android:text="@string/login_welcome_back"
+                android:textColor="@color/legal_lens_primary"
+                android:textSize="@dimen/sp_24"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/loginSubtitleText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_4"
+                android:includeFontPadding="false"
+                android:text="@string/login_subtitle"
+                android:textColor="@color/legal_lens_secondary_text"
+                android:textSize="@dimen/sp_14" />
+
+            <TextView
+                android:id="@+id/emailLabel"
+                style="@style/AuthFieldLabel"
+                android:layout_marginTop="@dimen/dp_24"
+                android:text="@string/username" />
+
+            <EditText
+                android:id="@+id/emailInput"
+                style="@style/AuthInput"
+                android:hint="@string/login_username_hint"
+                android:inputType="text" />
+
+            <TextView
+                android:id="@+id/passwordLabel"
+                style="@style/AuthFieldLabel"
+                android:layout_marginTop="@dimen/dp_16"
+                android:text="@string/password" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp_54"
+                android:layout_marginTop="@dimen/dp_8"
+                android:background="@drawable/bg_auth_input"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="@dimen/dp_16"
+                android:paddingEnd="@dimen/dp_16">
+
+                <EditText
+                    android:id="@+id/passwordInput"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@android:color/transparent"
+                    android:includeFontPadding="false"
+                    android:inputType="textPassword"
+                    android:padding="@dimen/dp_0"
+                    android:singleLine="true"
+                    android:textColor="@color/legal_lens_status_text"
+                    android:textSize="@dimen/sp_15" />
+
+                <TextView
+                    android:id="@+id/passwordVisibilityText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/show_or_hide_password"
+                    android:gravity="center"
+                    android:paddingStart="@dimen/dp_8"
+                    android:text="@string/show_password"
+                    android:textColor="@color/legal_lens_auth_accent"
+                    android:textSize="@dimen/sp_14"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/forgotPasswordText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_24"
+                android:gravity="end"
+                android:includeFontPadding="false"
+                android:text="@string/forgot_password"
+                android:textColor="@color/legal_lens_auth_accent"
+                android:textSize="@dimen/sp_14"
+                android:textStyle="bold" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp_0"
+                android:layout_weight="1" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/submitButton"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp_54"
+                android:elevation="@dimen/dp_0"
+                android:fontFamily="sans-serif"
+                android:insetLeft="@dimen/dp_0"
+                android:insetTop="@dimen/dp_0"
+                android:insetRight="@dimen/dp_0"
+                android:insetBottom="@dimen/dp_0"
+                android:text="@string/login"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="@dimen/sp_16"
+                android:textStyle="bold"
+                app:backgroundTint="@color/legal_lens_primary"
+                app:cornerRadius="@dimen/dp_14" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp_2"
+                android:layout_marginTop="@dimen/dp_24"
+                android:background="@color/legal_lens_input_stroke" />
+
+            <TextView
+                android:id="@+id/registerText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_20"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:text="@string/login_register_prompt"
+                android:textColor="@color/legal_lens_secondary_text"
+                android:textSize="@dimen/sp_15" />
+        </LinearLayout>
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

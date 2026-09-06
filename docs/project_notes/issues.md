@@ -4,6 +4,18 @@ Track meaningful work status. Do not use this file as a replacement for issue tr
 
 ## Active
 
+### 2026-09-04 - AUTH-LOGIN: Implement login, OTP, and success presentation flows
+
+- **Status**: In Progress
+- **Description**: Added Figma-aligned login, OTP verification, and success screens. Registration and password-reset requests now open OTP; six entered digits continue to Success.
+- **Notes**: Sending and validating OTP remains a UI placeholder until the backend API contract is available.
+
+### 2026-09-04 - AUTH-LOCAL: Add local auth validation and success animation
+
+- **Status**: In Progress
+- **Description**: Added local login through the data/domain repository boundary, per-field validation for login, registration, and password reset, and a reusable success-seal pulse animation.
+- **Notes**: The local authentication path is for development only and must be replaced before release.
+
 ### 2026-09-04 - DOCS-001: Initialize LegalLens project memory
 
 - **Status**: Completed

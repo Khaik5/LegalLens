@@ -47,3 +47,28 @@
 
 - The backend API contract needs explicit, structured fields for citations and analysis status.
 - The Android UI must distinguish AI analysis from verified legal advice.
+
+## ADR-004: Isolate local authentication behind the repository boundary (2026-09-04)
+
+**Context:** Authentication API contracts are not available, but the mobile UI needs a deterministic local login path for development and visual verification.
+
+**Decision:** Keep the fixed development account in `data.repository.LocalAuthRepository`, expose it through the domain `AuthRepository` interface and `AuthenticateUserUseCase`, and construct it at the application composition root. Field validation remains in the corresponding ViewModels.
+
+**Consequences:**
+
+- Presentation does not import data implementations directly.
+- The local repository must be replaced by the backend-backed implementation before production authentication.
+
+## ADR-005: Keep Auth/OTP feature packages aligned with the project architecture (2026-09-06)
+
+**Context:** The Auth/OTP flow had been implemented in flat feature folders while the project guide requires
+feature-first packages with separate UI contracts and explicit data/domain boundaries.
+
+**Decision:** Group each Auth/OTP screen under `presentation/feature/<feature>` with separate `ui`, `viewmodel`,
+and `contract` files. Centralize repository and use-case construction in `di`; keep the local account source in
+`data/datasource/local/datastore`.
+
+**Consequences:**
+
+- Activities only render state, send events, and handle effects/navigation.
+- The Auth/OTP flow can be replaced by backend data sources without changing the presentation contract.

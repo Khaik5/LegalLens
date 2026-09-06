@@ -8,5 +8,10 @@
     <color name="legal_lens_secondary_text">#4E5C6E</color>
     <color name="legal_lens_input_stroke">#E1E8F0</color>
     <color name="legal_lens_link">#008B8B</color>
+    <color name="legal_lens_auth_accent">#0D7A80</color>
+    <color name="legal_lens_auth_icon_background">#EBF6F6</color>
+    <color name="legal_lens_error">#E05A5D</color>
+    <color name="legal_lens_error_background">#FDF2F2</color>
+    <color name="legal_lens_error_stroke">#33E05A5D</color>
     <color name="legal_lens_icon_background">#E9F7F5</color>
 </resources>
