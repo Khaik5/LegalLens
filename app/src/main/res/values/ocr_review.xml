@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="ocr_review_background">#FFFAF9F6</color>
+    <color name="ocr_review_navy">#FF1A2D42</color>
+    <color name="ocr_review_teal">#FF0D7A80</color>
+    <color name="ocr_review_text">#FF1C2434</color>
+    <color name="ocr_review_border">#FFE1E8F0</color>
+    <color name="ocr_review_green">#FF10B981</color>
+    <color name="ocr_review_green_surface">#FFECFDF5</color>
+    <color name="ocr_review_amber">#FFD97706</color>
+    <color name="ocr_review_white">#FFFFFFFF</color>
+    <color name="ocr_review_nav_handle">#FF4E5C6E</color>
+
+    <dimen name="ocr_review_app_bar_height">56dp</dimen>
+    <dimen name="ocr_review_app_bar_side_padding">16dp</dimen>
+    <dimen name="ocr_review_back_button_size">40dp</dimen>
+    <dimen name="ocr_review_back_icon_inset">10dp</dimen>
+    <dimen name="ocr_review_title_margin_start">12dp</dimen>
+    <dimen name="ocr_review_title_text_size">18sp</dimen>
+    <dimen name="ocr_review_side_padding">24dp</dimen>
+    <dimen name="ocr_review_toolbar_height">36dp</dimen>
+    <dimen name="ocr_review_badge_height">24dp</dimen>
+    <dimen name="ocr_review_badge_horizontal_padding">8dp</dimen>
+    <dimen name="ocr_review_badge_corner_radius">6dp</dimen>
+    <dimen name="ocr_review_badge_text_size">12sp</dimen>
+    <dimen name="ocr_review_toolbar_button_size">24dp</dimen>
+    <dimen name="ocr_review_toolbar_button_margin">4dp</dimen>
+    <dimen name="ocr_review_toolbar_icon_inset">4dp</dimen>
+    <dimen name="ocr_review_editor_height">416dp</dimen>
+    <dimen name="ocr_review_editor_top_margin">4dp</dimen>
+    <dimen name="ocr_review_editor_padding">18dp</dimen>
+    <dimen name="ocr_review_editor_corner_radius">16dp</dimen>
+    <dimen name="ocr_review_editor_text_size">14sp</dimen>
+    <dimen name="ocr_review_editor_line_spacing">8dp</dimen>
+    <dimen name="ocr_review_border_width">1dp</dimen>
+    <dimen name="ocr_review_footer_height">180dp</dimen>
+    <dimen name="ocr_review_footer_top_padding">24dp</dimen>
+    <dimen name="ocr_review_footer_bottom_padding">24dp</dimen>
+    <dimen name="ocr_review_warning_height">22dp</dimen>
+    <dimen name="ocr_review_warning_icon_size">16dp</dimen>
+    <dimen name="ocr_review_warning_icon_margin_end">8dp</dimen>
+    <dimen name="ocr_review_warning_text_size">13sp</dimen>
+    <dimen name="ocr_review_actions_top_margin">12dp</dimen>
+    <dimen name="ocr_review_action_height">50dp</dimen>
+    <dimen name="ocr_review_action_gap">12dp</dimen>
+    <dimen name="ocr_review_action_corner_radius">12dp</dimen>
+    <dimen name="ocr_review_action_text_size">15sp</dimen>
+    <dimen name="ocr_review_secondary_action_stroke_width">2dp</dimen>
+    <dimen name="ocr_review_nav_area_height">36dp</dimen>
+    <dimen name="ocr_review_nav_area_top_margin">12dp</dimen>
+    <dimen name="ocr_review_nav_handle_width">108dp</dimen>
+    <dimen name="ocr_review_nav_handle_height">4dp</dimen>
+    <dimen name="ocr_review_nav_handle_corner_radius">2dp</dimen>
+
+    <string name="ocr_review_title">Chỉnh sửa văn bản OCR</string>
+    <string name="ocr_review_edited_revision">Phiên bản đã chỉnh sửa</string>
+    <string name="ocr_review_original_revision">Bản gốc</string>
+    <string name="ocr_review_warning">Các vùng tô màu vàng có độ chính xác nhận diện thấp</string>
+    <string name="ocr_review_restore">Khôi phục bản gốc</string>
+    <string name="ocr_review_save">Lưu</string>
+    <string name="ocr_review_back_content_description">Quay lại</string>
+    <string name="ocr_review_bold_content_description">In đậm văn bản đã chọn</string>
+    <string name="ocr_review_italic_content_description">In nghiêng văn bản đã chọn</string>
+    <string name="ocr_review_list_content_description">Thêm gạch đầu dòng</string>
+    <string name="ocr_review_saved">Đã lưu văn bản OCR đã chỉnh sửa.</string>
+</resources>

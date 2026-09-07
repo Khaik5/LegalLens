@@ -12,22 +12,32 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.LagalLens">
         <activity
-            android:name=".presentation.feature.upload.ui.UploadSourceActivity"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
+            android:name=".presentation.feature.upload.error.ui.UploadErrorActivity"
+            android:exported="false" />
         <activity
-            android:name=".presentation.feature.splash.ui.SplashActivity"
+            android:name=".presentation.feature.upload.progress.ui.UploadProgressActivity"
+            android:exported="false" />
+        <activity
+            android:name=".presentation.feature.upload.ui.UploadSourceActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-            android:name=".presentation.feature.onboarding.ui.OnboardingActivity"
+            android:name=".presentation.feature.ocr.ui.OcrReviewActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".presentation.feature.splash.ui.SplashActivity"
+            android:exported="false">
+        </activity>
+        <activity
+            android:name=".presentation.feature.onboarding.ui.OnboardingActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

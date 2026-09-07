@@ -2,6 +2,8 @@ package com.example.lagallens.presentation.feature.upload.ui
 
 import android.graphics.Color
 import android.os.Bundle
+import android.provider.OpenableColumns
+import android.text.format.Formatter
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -18,6 +20,7 @@ import com.example.lagallens.databinding.ActivityUploadSourceBinding
 import com.example.lagallens.presentation.feature.upload.contract.UploadSourceEffect
 import com.example.lagallens.presentation.feature.upload.contract.UploadSourceEvent
 import com.example.lagallens.presentation.feature.upload.contract.UploadSourceUiState
+import com.example.lagallens.presentation.feature.upload.progress.ui.UploadProgressActivity
 import com.example.lagallens.presentation.feature.upload.viewmodel.UploadSourceViewModel
 import kotlinx.coroutines.launch
 
@@ -25,10 +28,10 @@ class UploadSourceActivity : AppCompatActivity() {
     private lateinit var binding: ActivityUploadSourceBinding
     private val viewModel by viewModels<UploadSourceViewModel>()
     private val documentPicker = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
-        if (uri != null) viewModel.onEvent(UploadSourceEvent.FileSelected)
+        uri?.let(::openUploadProgress)
     }
     private val imagePicker = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-        if (uri != null) viewModel.onEvent(UploadSourceEvent.FileSelected)
+        uri?.let(::openUploadProgress)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -93,5 +96,32 @@ class UploadSourceActivity : AppCompatActivity() {
 
     private fun showMessage(messageRes: Int) {
         Toast.makeText(this, messageRes, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun openUploadProgress(uri: android.net.Uri) {
+        val fileMetadata = contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+            val nameColumn = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+            val sizeColumn = cursor.getColumnIndex(OpenableColumns.SIZE)
+            if (cursor.moveToFirst()) {
+                val fileName = if (nameColumn >= 0) cursor.getString(nameColumn) else null
+                val fileSize = if (sizeColumn >= 0 && !cursor.isNull(sizeColumn)) cursor.getLong(sizeColumn) else null
+                fileName to fileSize
+            } else {
+                null
+            }
+        }
+        val fileName = fileMetadata?.first ?: getString(R.string.upload_source_selected_file)
+        val fileSize = fileMetadata?.second?.let { Formatter.formatShortFileSize(this, it) }
+        val fileType = contentResolver.getType(uri)?.let(::formatFileType).orEmpty()
+        val fileDetails = listOfNotNull(fileSize, fileType.takeIf { it.isNotBlank() }).joinToString(" · ")
+        startActivity(UploadProgressActivity.newIntent(this, fileName, fileDetails))
+    }
+
+    private fun formatFileType(mimeType: String): String {
+        return when (mimeType) {
+            "application/pdf" -> getString(R.string.upload_file_type_pdf)
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document" -> getString(R.string.upload_file_type_docx)
+            else -> mimeType.substringAfterLast('/').uppercase()
+        }
     }
 }

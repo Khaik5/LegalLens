@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="upload_progress_background">#FFFAF9F6</color>
+    <color name="upload_progress_navy">#FF1A2D42</color>
+    <color name="upload_progress_body">#FF4E5C6E</color>
+    <color name="upload_progress_teal">#FF0D7A80</color>
+    <color name="upload_progress_track">#FFD7E5E5</color>
+    <color name="upload_progress_file_surface">#FFEBF6F6</color>
+
+    <dimen name="upload_progress_app_bar_height">56dp</dimen>
+    <dimen name="upload_progress_side_padding">24dp</dimen>
+    <dimen name="upload_progress_back_button_size">40dp</dimen>
+    <dimen name="upload_progress_back_icon_inset">10dp</dimen>
+    <dimen name="upload_progress_title_margin_start">12dp</dimen>
+    <dimen name="upload_progress_title_text_size">18sp</dimen>
+    <dimen name="upload_progress_content_top_padding">56dp</dimen>
+    <dimen name="upload_progress_indicator_size">100dp</dimen>
+    <dimen name="upload_progress_indicator_thickness">6dp</dimen>
+    <dimen name="upload_progress_percentage_text_size">24sp</dimen>
+    <dimen name="upload_progress_status_margin_top">2dp</dimen>
+    <dimen name="upload_progress_status_text_size">12sp</dimen>
+    <dimen name="upload_progress_file_card_margin_top">40dp</dimen>
+    <dimen name="upload_progress_file_card_padding">16dp</dimen>
+    <dimen name="upload_progress_file_icon_container_size">48dp</dimen>
+    <dimen name="upload_progress_file_icon_inset">12dp</dimen>
+    <dimen name="upload_progress_file_icon_corner_radius">12dp</dimen>
+    <dimen name="upload_progress_file_text_margin_start">16dp</dimen>
+    <dimen name="upload_progress_file_name_text_size">15sp</dimen>
+    <dimen name="upload_progress_file_details_margin_top">4dp</dimen>
+    <dimen name="upload_progress_file_details_text_size">13sp</dimen>
+    <dimen name="upload_progress_description_margin_top">20dp</dimen>
+    <dimen name="upload_progress_description_text_size">13sp</dimen>
+    <dimen name="upload_progress_cancel_height">48dp</dimen>
+    <dimen name="upload_progress_cancel_bottom_margin">32dp</dimen>
+    <dimen name="upload_progress_cancel_stroke_width">1dp</dimen>
+    <dimen name="upload_progress_cancel_corner_radius">8dp</dimen>
+    <dimen name="upload_progress_cancel_text_size">14sp</dimen>
+    <dimen name="upload_progress_ring_size">105dp</dimen>
+    <string name="upload_progress_title">Đang tải lên tệp</string>
+    <string name="upload_progress_back_content_description">Hủy tải lên</string>
+    <string name="upload_progress_percentage">%1$d%%</string>
+    <string name="upload_progress_status">Đang xử lý</string>
+    <string name="upload_progress_description">Trợ lý AI đang thực hiện OCR và quét rủi ro sơ bộ. Vui lòng không đóng ứng dụng lúc này.</string>
+    <string name="upload_progress_cancel">Hủy tải lên</string>
+</resources>

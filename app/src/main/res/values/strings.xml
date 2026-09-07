@@ -12,6 +12,9 @@
     <string name="upload_camera_description">Sử dụng camera quét văn bản tự động căn chỉnh</string>
     <string name="upload_back_content_description">Quay lại</string>
     <string name="upload_source_selected">Đã chọn tệp. Bước xử lý tệp sẽ được bổ sung trong luồng tải lên.</string>
+    <string name="upload_source_selected_file">Tài liệu đã chọn</string>
+    <string name="upload_file_type_pdf">PDF Document</string>
+    <string name="upload_file_type_docx">DOCX Document</string>
     <string name="upload_camera_unavailable">Màn quét bằng camera sẽ được bổ sung trong luồng Camera/Scan.</string>
     <string name="splash_initializing_security">ĐANG KHỞI TẠO BẢO MẬT</string>
     <string name="onboarding_skip">Bỏ qua</string>

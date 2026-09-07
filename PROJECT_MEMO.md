@@ -38,3 +38,10 @@ See [requirements.md](docs/project_notes/requirements.md) for acceptance-oriente
 - Splash and three onboarding pages are implemented on `phuoc/onboarding` from Figma frames `auth-01-splash` through `auth-04-onboarding-03`. Onboarding now uses one activity with `ViewPager2`; its header, buttons, and dots remain fixed while page content changes.
 - Onboarding completion is stored locally with DataStore after Start or Skip. Splash checks the completion state before opening onboarding; the completed-user destination remains the pending Auth/OTP integration point.
 - App build, instrumentation test compilation, unit tests, and lint pass. Runtime instrumentation remains pending until an Android emulator or device is connected.
+
+## 2026-09-06 status
+
+- The canonical Phuoc working tree is `D:\legallens\LegalLens` on `phuoc/add-contract`. Splash and onboarding source/assets remain available alongside the Add Contract work.
+- Add Contract source selection and the OCR text-review screen are implemented in the same flow. OCR review supports editing, basic text formatting, restoring the generated text, and local save feedback; the backend OCR/upload integration remains pending.
+- The Add Contract flow now routes a locally selected document to the Figma-aligned upload-progress UI. It presents local file metadata and a cancellable placeholder processing state; it does not upload or perform OCR until the backend contract is available.
+- The Figma-aligned upload failure state is available with a retry path back to file selection and a return-to-caller path. The backend must provide a typed upload/OCR failure before this state can be reached from live processing.

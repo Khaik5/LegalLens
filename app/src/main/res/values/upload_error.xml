@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="upload_error_app_bar_height">56dp</dimen>
+    <dimen name="upload_error_app_bar_horizontal_padding">16dp</dimen>
+    <dimen name="upload_error_back_button_size">40dp</dimen>
+    <dimen name="upload_error_back_icon_inset">10dp</dimen>
+    <dimen name="upload_error_title_margin_start">12dp</dimen>
+    <dimen name="upload_error_title_text_size">20sp</dimen>
+    <dimen name="upload_error_side_padding">24dp</dimen>
+    <dimen name="upload_error_seal_size">100dp</dimen>
+    <dimen name="upload_error_seal_top_margin">64dp</dimen>
+    <dimen name="upload_error_seal_icon_padding">28dp</dimen>
+    <dimen name="upload_error_seal_stroke_width">3dp</dimen>
+    <dimen name="upload_error_heading_top_margin">32dp</dimen>
+    <dimen name="upload_error_heading_text_size">22sp</dimen>
+    <dimen name="upload_error_message_top_margin">12dp</dimen>
+    <dimen name="upload_error_message_text_size">15sp</dimen>
+    <dimen name="upload_error_message_line_spacing">7dp</dimen>
+    <dimen name="upload_error_details_top_margin">26dp</dimen>
+    <dimen name="upload_error_details_padding">16dp</dimen>
+    <dimen name="upload_error_details_corner_radius">16dp</dimen>
+    <dimen name="upload_error_stroke_width">1dp</dimen>
+    <dimen name="upload_error_code_text_size">13sp</dimen>
+    <dimen name="upload_error_detail_message_top_margin">8dp</dimen>
+    <dimen name="upload_error_detail_message_text_size">14sp</dimen>
+    <dimen name="upload_error_detail_message_line_spacing">4dp</dimen>
+    <dimen name="upload_error_button_height">54dp</dimen>
+    <dimen name="upload_error_button_corner_radius">14dp</dimen>
+    <dimen name="upload_error_button_text_size">16sp</dimen>
+    <dimen name="upload_error_retry_icon_margin_end">8dp</dimen>
+    <dimen name="upload_error_secondary_button_top_margin">12dp</dimen>
+    <dimen name="upload_error_secondary_stroke_width">2dp</dimen>
+    <dimen name="upload_error_actions_bottom_margin">24dp</dimen>
+
+    <string name="upload_error_title">Lỗi tải lên</string>
+    <string name="upload_error_back_content_description">Quay lại chọn tệp</string>
+    <string name="upload_error_heading">Tải lên thất bại</string>
+    <string name="upload_error_detail_message">Tệp PDF quét (Scan) có chất lượng hình ảnh quá thấp, mờ hoặc bị mất góc chữ không thể chuyển đổi số.</string>
+    <string name="upload_error_code">MÃ LỖI: %1$s</string>
+    <string name="upload_error_retry">Thử lại</string>
+    <string name="upload_error_back_to_list">Quay lại danh sách</string>
+</resources>

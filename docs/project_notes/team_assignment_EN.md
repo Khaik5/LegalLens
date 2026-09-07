@@ -249,7 +249,7 @@ Current table:
 | Khai | Important Dates | TODO | Same Home flow if it continues to stay in `khai/home` |
 | Khai | Contract Management | TODO | Includes List/Search/Filter/Detail/History/Delete; branch `khai/contracts` |
 | Phuoc | Onboarding Flow | READY_FOR_OWNER_TEST | Splash + 3 Figma onboarding pages implemented; branch `phuoc/onboarding` |
-| Phuoc | Add Contract Flow | TODO | Includes Add Contract + source selection + Upload Progress/Error/List/Success; branch `phuoc/add-contract` |
+| Phuoc | Add Contract Flow | IN_PROGRESS | Source selection, upload progress, upload error, and OCR text review are implemented; upload list and success states remain; branch `phuoc/add-contract` |
 | Phuoc | Camera / Scan Flow | TODO | Permission/Capture/Manage Pages; branch `phuoc/camera-scan` |
 | Phuoc | AI Analysis Flow | TODO | Currently only Analysis Complete is confirmed; branch `phuoc/analysis` |
 
