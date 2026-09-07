@@ -10,14 +10,14 @@
         android:label="@string/menu_home" />
 
     <fragment
-        android:id="@+id/contractsPlaceholder"
-        android:name="com.example.lagallens.presentation.common.ui.FeatureUnavailableFragment"
+        android:id="@+id/contractListFragment"
+        android:name="com.example.lagallens.presentation.feature.contracts.ui.ContractListFragment"
         android:label="@string/menu_contracts" />
 
     <fragment
-        android:id="@+id/calendarPlaceholder"
+        android:id="@+id/notificationsPlaceholder"
         android:name="com.example.lagallens.presentation.common.ui.FeatureUnavailableFragment"
-        android:label="@string/menu_calendar" />
+        android:label="@string/menu_notifications" />
 
     <fragment
         android:id="@+id/profilePlaceholder"

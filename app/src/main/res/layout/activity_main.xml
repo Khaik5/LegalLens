@@ -4,7 +4,7 @@
     android:id="@+id/mainRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/dashboard_background">
+    android:background="@color/white">
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/mainNavHost"
@@ -12,24 +12,167 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:defaultNavHost="true"
-        app:layout_constraintBottom_toTopOf="@id/bottomNavigation"
+        app:layout_constraintBottom_toTopOf="@id/bottomNavigationContainer"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:navGraph="@navigation/main_nav_graph" />
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNavigation"
+    <FrameLayout
+        android:id="@+id/bottomNavigationContainer"
         android:layout_width="0dp"
-        android:layout_height="@dimen/dp_76"
+        android:layout_height="@dimen/dp_52"
         android:background="@color/dashboard_surface"
-        app:itemIconTint="@color/bottom_navigation_item_tint"
-        app:itemTextColor="@color/bottom_navigation_item_tint"
-        app:labelVisibilityMode="labeled"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:menu="@menu/bottom_navigation_menu" />
+        app:layout_constraintStart_toStartOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_52">
+
+            <LinearLayout
+                android:id="@+id/navHome"
+                android:layout_width="@dimen/dp_64"
+                android:layout_height="@dimen/dp_39"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/navContracts"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:layout_width="@dimen/dp_22"
+                    android:layout_height="@dimen/dp_22"
+                    android:contentDescription="@null"
+                    android:duplicateParentState="true"
+                    android:src="@drawable/ic_dashboard_home"
+                    android:tint="@color/bottom_navigation_item_tint" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dp_2"
+                    android:duplicateParentState="true"
+                    android:includeFontPadding="false"
+                    android:text="@string/menu_home"
+                    android:textColor="@color/bottom_navigation_item_tint"
+                    android:textSize="@dimen/sp_11" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/navContracts"
+                android:layout_width="@dimen/dp_64"
+                android:layout_height="@dimen/dp_39"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/navCenterSpace"
+                app:layout_constraintStart_toEndOf="@id/navHome"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:layout_width="@dimen/dp_22"
+                    android:layout_height="@dimen/dp_22"
+                    android:contentDescription="@null"
+                    android:duplicateParentState="true"
+                    android:src="@drawable/ic_dashboard_contract"
+                    android:tint="@color/bottom_navigation_item_tint" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dp_2"
+                    android:duplicateParentState="true"
+                    android:includeFontPadding="false"
+                    android:text="@string/menu_contracts"
+                    android:textColor="@color/bottom_navigation_item_tint"
+                    android:textSize="@dimen/sp_11" />
+            </LinearLayout>
+
+            <Space
+                android:id="@+id/navCenterSpace"
+                android:layout_width="@dimen/dp_56"
+                android:layout_height="@dimen/dp_1"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/navNotifications"
+                app:layout_constraintStart_toEndOf="@id/navContracts"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <LinearLayout
+                android:id="@+id/navNotifications"
+                android:layout_width="@dimen/dp_64"
+                android:layout_height="@dimen/dp_39"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/navProfile"
+                app:layout_constraintStart_toEndOf="@id/navCenterSpace"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:layout_width="@dimen/dp_22"
+                    android:layout_height="@dimen/dp_22"
+                    android:contentDescription="@null"
+                    android:duplicateParentState="true"
+                    android:src="@drawable/ic_dashboard_notification"
+                    android:tint="@color/bottom_navigation_item_tint" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dp_2"
+                    android:duplicateParentState="true"
+                    android:includeFontPadding="false"
+                    android:text="@string/menu_notifications"
+                    android:textColor="@color/bottom_navigation_item_tint"
+                    android:textSize="@dimen/sp_11" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/navProfile"
+                android:layout_width="@dimen/dp_64"
+                android:layout_height="@dimen/dp_39"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/navNotifications"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:layout_width="@dimen/dp_22"
+                    android:layout_height="@dimen/dp_22"
+                    android:contentDescription="@null"
+                    android:duplicateParentState="true"
+                    android:src="@drawable/ic_dashboard_profile"
+                    android:tint="@color/bottom_navigation_item_tint" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dp_2"
+                    android:duplicateParentState="true"
+                    android:includeFontPadding="false"
+                    android:text="@string/menu_profile"
+                    android:textColor="@color/bottom_navigation_item_tint"
+                    android:textSize="@dimen/sp_11" />
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </FrameLayout>
 
     <ImageButton
         android:id="@+id/btnAddContract"
@@ -40,7 +183,8 @@
         android:elevation="@dimen/dp_8"
         android:padding="@dimen/dp_14"
         android:src="@drawable/ic_dashboard_add"
-        app:layout_constraintBottom_toTopOf="@id/bottomNavigation"
+        app:layout_constraintBottom_toTopOf="@id/bottomNavigationContainer"
+        android:layout_marginBottom="-32dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintVertical_bias="1" />

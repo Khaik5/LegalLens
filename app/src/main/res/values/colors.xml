@@ -30,4 +30,10 @@
     <color name="dashboard_blue_light">#EDF4FF</color>
     <color name="dashboard_nav_inactive">#84909B</color>
     <color name="dashboard_border">#E9EEF0</color>
+    <color name="contract_complete">#10B981</color>
+    <color name="contract_complete_background">#ECFDF5</color>
+    <color name="contract_pending">#F59E0B</color>
+    <color name="contract_pending_background">#FEF3C7</color>
+    <color name="contract_risk_high">#EF4444</color>
+    <color name="contract_risk_high_background">#FEE2E2</color>
 </resources>
