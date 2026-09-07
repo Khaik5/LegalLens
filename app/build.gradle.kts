@@ -5,8 +5,8 @@ plugins {
 android {
     namespace = "com.example.lagallens"
     compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
+        version = release(37) {
+            minorApiLevel = 0
         }
     }
 
@@ -42,6 +42,7 @@ dependencies {
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.recyclerview)
     implementation(libs.androidx.core.ktx)
     implementation(libs.material)
     testImplementation(libs.junit)
@@ -49,6 +50,9 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     implementation(
         "androidx.lifecycle:lifecycle-viewmodel-ktx:2.10.0"
+    )
+    implementation(
+        "androidx.lifecycle:lifecycle-runtime-ktx:2.10.0"
     )
 
     implementation(
@@ -83,4 +87,6 @@ dependencies {
         "com.android.tools:desugar_jdk_libs:2.0.4"
     )
     implementation("androidx.fragment:fragment-ktx:1.8.5")
+    implementation("androidx.navigation:navigation-fragment-ktx:2.8.9")
+    implementation("androidx.navigation:navigation-ui-ktx:2.8.9")
 }
