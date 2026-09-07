@@ -1,0 +1,7 @@
+package com.example.lagallens.presentation.feature.contracts.contract
+
+sealed interface ContractListUiEvent {
+    data class QueryChanged(val query: String) : ContractListUiEvent
+    data class FilterSelected(val filter: ContractFilter) : ContractListUiEvent
+    data class ContractClicked(val contract: ContractListItem) : ContractListUiEvent
+}

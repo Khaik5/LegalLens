@@ -247,7 +247,7 @@ Current table:
 | Khải  | Email Verification / OTP | READY_FOR_OWNER_TEST | Branch `khai/auth`; Login/Register/Forgot Password → OTP → Success flow implemented; build/test/lint pass |
 | Khải  | Home / Dashboard         | READY_FOR_OWNER_TEST | Branch `khai/home`; Figma dashboard, main navigation host, and bottom navigation build successfully          |
 | Khải  | Important Dates          | TODO        | Same Home flow if it remains grouped in `khai/home`                                                        |
-| Khải  | Contract Management      | TODO        | Includes List/Search/Filter/Detail/History/Delete; branch `khai/contracts`                                 |
+| Khải  | Contract Management      | READY_FOR_OWNER_TEST | Contract List/Search/Filter implemented locally; Detail/History/Delete remain; branch `khai/contracts`      |
 | Phước | Onboarding Flow          | IN_PROGRESS | Splash + 2 Onboarding Fragments already exist; branch `phuoc/onboarding`                                   |
 | Phước | Add Contract Flow        | TODO        | Includes Add Contract + source selection + Upload Progress/Error/List/Success; branch `phuoc/add-contract` |
 | Phước | Camera / Scan Flow       | TODO        | Permission/Capture/Manage Pages; branch `phuoc/camera-scan`                                                |
