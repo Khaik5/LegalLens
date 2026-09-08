@@ -38,3 +38,10 @@ See [requirements.md](docs/project_notes/requirements.md) for acceptance-oriente
 - Splash and three onboarding pages are implemented on `phuoc/onboarding` from Figma frames `auth-01-splash` through `auth-04-onboarding-03`. Onboarding now uses one activity with `ViewPager2`; its header, buttons, and dots remain fixed while page content changes.
 - Onboarding completion is stored locally with DataStore after Start or Skip. Splash checks the completion state before opening onboarding; the completed-user destination remains the pending Auth/OTP integration point.
 - App build, instrumentation test compilation, unit tests, and lint pass. Runtime instrumentation remains pending until an Android emulator or device is connected.
+
+## 2026-09-07 status
+
+- Camera intake now routes from the upload-source Camera card to a dedicated permission screen. Granting Android Camera permission opens the Figma-aligned capture UI; declining or choosing to return keeps the user on the safe upload path.
+- Camera capture uses CameraX preview and on-device OpenCV edge detection. It guides the user with green, yellow, or hidden document framing before capture, and captures pages only into the app cache.
+- Quality Check runs locally after each capture or gallery import. It combines OpenCV image checks with bundled ML Kit text bounds to report blur, exposure, shake, document size, missing-document, and probable crop risks. Warnings may be kept by the user; missing-document and crop-risk captures are rejected.
+- Captured pages move through the Figma-aligned multi-page manager into the OCR processing UI. Backend OCR/analysis remains pending its API contract; the app does not simulate an OCR result.

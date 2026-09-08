@@ -2,6 +2,18 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="upload_background">#FFFAF9F6</color>
+    <color name="upload_navy">#FF1A2D42</color>
+    <color name="upload_body">#FF4E5C6E</color>
+    <color name="upload_border">#FFE1E8F0</color>
+    <color name="upload_teal">#FF0D7A80</color>
+    <color name="upload_teal_surface">#FFEBF6F6</color>
+    <color name="upload_blue">#FF3B82F6</color>
+    <color name="upload_blue_surface">#FFEFF6FF</color>
+    <color name="upload_green">#FF10B981</color>
+    <color name="upload_green_surface">#FFF0FDF4</color>
+    <color name="upload_amber">#FFF59E0B</color>
+    <color name="upload_amber_surface">#FFFEF3C7</color>
     <color name="splash_background">#FFFAF9F6</color>
     <color name="splash_teal">#FF0D7A80</color>
     <color name="splash_surface">#FFF1F5F3</color>
@@ -19,4 +31,20 @@
     <color name="onboarding_teal_10">#1A0D7A80</color>
     <color name="onboarding_navy_02">#051A2D42</color>
     <color name="onboarding_navy_04">#0A1A2D42</color>
+    <color name="camera_permission_icon_surface">#FFF1F8F7</color>
+    <color name="camera_permission_border">#FF0D7A80</color>
+    <color name="camera_preview_background">#FF172D33</color>
+    <color name="camera_preview_overlay">#A61A2D42</color>
+    <color name="camera_preview_frame">#FFF9FCFB</color>
+    <color name="camera_preview_chip">#FF0D7A80</color>
+    <color name="camera_preview_control">#E61A2D42</color>
+    <color name="camera_preview_muted">#FFC6D1D4</color>
+    <color name="camera_preview_count">#FF00AFA5</color>
+    <color name="camera_preview_gradient_start">#FF1A2D42</color>
+    <color name="camera_preview_gradient_center">#FF34504C</color>
+    <color name="camera_scan_ready">#FF10B981</color>
+    <color name="camera_scan_warning">#FFF59E0B</color>
+    <color name="camera_page_surface">#FFFFFFFF</color>
+    <color name="camera_page_warning_surface">#FFFFF4D5</color>
+    <color name="camera_processing_surface">#FFF4FBFA</color>
 </resources>
