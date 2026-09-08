@@ -30,7 +30,7 @@ class UploadSourceViewModel : ViewModel() {
                 )
             )
             UploadSourceEvent.GalleryClicked -> emitEffect(UploadSourceEffect.OpenImagePicker)
-            UploadSourceEvent.CameraClicked -> emitEffect(UploadSourceEffect.ShowCameraUnavailable)
+            UploadSourceEvent.CameraClicked -> emitEffect(UploadSourceEffect.NavigateToCameraPermission)
             UploadSourceEvent.FileSelected -> emitEffect(UploadSourceEffect.ShowFileSelected)
         }
     }

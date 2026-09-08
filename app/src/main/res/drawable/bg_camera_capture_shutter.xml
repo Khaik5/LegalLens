@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="@color/camera_preview_frame" />
+        </shape>
+    </item>
+    <item
+        android:bottom="@dimen/camera_capture_shutter_inset"
+        android:left="@dimen/camera_capture_shutter_inset"
+        android:right="@dimen/camera_capture_shutter_inset"
+        android:top="@dimen/camera_capture_shutter_inset">
+        <shape android:shape="oval">
+            <solid android:color="@android:color/transparent" />
+            <stroke android:width="@dimen/camera_capture_shutter_stroke_width" android:color="@color/camera_preview_control" />
+        </shape>
+    </item>
+</layer-list>

@@ -15,6 +15,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.lagallens.R
 import com.example.lagallens.databinding.ActivityUploadSourceBinding
+import com.example.lagallens.presentation.feature.camera.permission.ui.CameraPermissionActivity
 import com.example.lagallens.presentation.feature.upload.contract.UploadSourceEffect
 import com.example.lagallens.presentation.feature.upload.contract.UploadSourceEvent
 import com.example.lagallens.presentation.feature.upload.contract.UploadSourceUiState
@@ -84,10 +85,12 @@ class UploadSourceActivity : AppCompatActivity() {
     private fun handleEffect(effect: UploadSourceEffect) {
         when (effect) {
             UploadSourceEffect.NavigateBack -> finish()
+            UploadSourceEffect.NavigateToCameraPermission -> startActivity(
+                CameraPermissionActivity.createIntent(this)
+            )
             is UploadSourceEffect.OpenDocumentPicker -> documentPicker.launch(effect.mimeTypes)
             UploadSourceEffect.OpenImagePicker -> imagePicker.launch("image/*")
             UploadSourceEffect.ShowFileSelected -> showMessage(R.string.upload_source_selected)
-            UploadSourceEffect.ShowCameraUnavailable -> showMessage(R.string.upload_camera_unavailable)
         }
     }
 

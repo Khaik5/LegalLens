@@ -1,0 +1,14 @@
+package com.example.lagallens.presentation.feature.camera.core
+
+sealed interface DocumentDetection {
+    data class Ready(
+        val areaRatio: Double,
+        val centerX: Double,
+        val centerY: Double
+    ) : DocumentDetection
+
+    data class Partial(val areaRatio: Double) : DocumentDetection
+    data object Unstable : DocumentDetection
+    data object NotFound : DocumentDetection
+    data object Unavailable : DocumentDetection
+}

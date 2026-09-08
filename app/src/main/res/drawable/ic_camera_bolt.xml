@@ -1,0 +1,9 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="@dimen/camera_permission_safety_icon_size"
+    android:height="@dimen/camera_permission_safety_icon_size"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="@color/upload_teal"
+        android:pathData="M13,2L5,13h6l-1,9 8,-12h-6z" />
+</vector>

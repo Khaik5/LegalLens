@@ -1,0 +1,19 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="@dimen/camera_capture_library_icon_size"
+    android:height="@dimen/camera_capture_library_icon_size"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="@android:color/transparent"
+        android:pathData="M4,5h16v14L4,19z"
+        android:strokeColor="@color/white"
+        android:strokeLineJoin="round"
+        android:strokeWidth="1.6" />
+    <path
+        android:fillColor="@android:color/transparent"
+        android:pathData="M6,16l4,-4 3,3 2,-2 3,3M8,9.2a1.2,1.2 0,1 1,0,2.4a1.2,1.2 0,1 1,0,-2.4"
+        android:strokeColor="@color/white"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="1.6" />
+</vector>
