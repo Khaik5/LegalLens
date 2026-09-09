@@ -36,4 +36,5 @@
     <color name="contract_pending_background">#FEF3C7</color>
     <color name="contract_risk_high">#EF4444</color>
     <color name="contract_risk_high_background">#FEE2E2</color>
+    <color name="contract_delete_overlay">#661A2D42</color>
 </resources>
