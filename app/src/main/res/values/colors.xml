@@ -81,4 +81,5 @@
     <color name="camera_page_surface">#FFFFFFFF</color>
     <color name="camera_page_warning_surface">#FFFFF4D5</color>
     <color name="camera_processing_surface">#FFF4FBFA</color>
+    <color name="contract_delete_overlay">#661A2D42</color>
 </resources>

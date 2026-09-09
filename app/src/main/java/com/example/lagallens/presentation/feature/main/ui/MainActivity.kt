@@ -3,6 +3,7 @@ package com.example.lagallens.presentation.feature.main.ui
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.fragment.NavHostFragment
@@ -40,8 +41,12 @@ class MainActivity : AppCompatActivity() {
         binding.navNotifications.setOnClickListener { navigateTo(navController, R.id.notificationsPlaceholder) }
         binding.navProfile.setOnClickListener { navigateTo(navController, R.id.profilePlaceholder) }
         navController.addOnDestinationChangedListener { _, destination, _ ->
+            val isContractDetail = destination.id == R.id.contractDetailFragment
+            binding.bottomNavigationContainer.isVisible = !isContractDetail
+            binding.btnAddContract.isVisible = !isContractDetail
             binding.navHome.isSelected = destination.id == R.id.homeDashboardFragment
-            binding.navContracts.isSelected = destination.id == R.id.contractListFragment
+            binding.navContracts.isSelected = destination.id == R.id.contractListFragment ||
+                destination.id == R.id.contractSearchFragment || isContractDetail
             binding.navNotifications.isSelected = destination.id == R.id.notificationsPlaceholder
             binding.navProfile.isSelected = destination.id == R.id.profilePlaceholder
         }

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="@dimen/dp_110"
+    android:layout_height="@dimen/dp_84"
+    android:layout_marginEnd="@dimen/dp_12"
+    android:background="@drawable/bg_contract_detail_assistant"
+    android:clickable="true"
+    android:focusable="true"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:paddingTop="@dimen/dp_12"
+    android:paddingBottom="@dimen/dp_12">
+
+    <FrameLayout
+        android:layout_width="@dimen/dp_36"
+        android:layout_height="@dimen/dp_36"
+        android:background="@drawable/bg_contract_detail_icon">
+
+        <ImageView
+            android:id="@+id/ivIcon"
+            android:layout_width="@dimen/dp_18"
+            android:layout_height="@dimen/dp_18"
+            android:layout_gravity="center"
+            android:contentDescription="@null" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_16"
+        android:layout_marginTop="@dimen/dp_8"
+        android:ellipsize="end"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:maxLines="1"
+        android:textColor="@color/legal_lens_status_text"
+        android:textSize="@dimen/sp_12"
+        android:textStyle="bold" />
+</LinearLayout>

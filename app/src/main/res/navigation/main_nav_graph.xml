@@ -12,7 +12,33 @@
     <fragment
         android:id="@+id/contractListFragment"
         android:name="com.example.lagallens.presentation.feature.contracts.ui.ContractListFragment"
-        android:label="@string/menu_contracts" />
+        android:label="@string/menu_contracts">
+        <action
+            android:id="@+id/action_contractListFragment_to_contractSearchFragment"
+            app:destination="@id/contractSearchFragment" />
+        <action
+            android:id="@+id/action_contractListFragment_to_contractDetailFragment"
+            app:destination="@id/contractDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/contractSearchFragment"
+        android:name="com.example.lagallens.presentation.feature.contracts.search.ui.ContractSearchFragment"
+        android:label="@string/menu_contracts">
+        <action
+            android:id="@+id/action_contractSearchFragment_to_contractDetailFragment"
+            app:destination="@id/contractDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/contractDetailFragment"
+        android:name="com.example.lagallens.presentation.feature.contracts.detail.ui.ContractDetailFragment"
+        android:label="@string/contract_detail_title">
+        <argument
+            android:name="contractId"
+            app:argType="string"
+            android:defaultValue="office-lease" />
+    </fragment>
 
     <fragment
         android:id="@+id/notificationsPlaceholder"
