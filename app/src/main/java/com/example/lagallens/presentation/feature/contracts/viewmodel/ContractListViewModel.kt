@@ -3,14 +3,15 @@ package com.example.lagallens.presentation.feature.contracts.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.lagallens.R
 import com.example.lagallens.presentation.feature.contracts.contract.ContractFilter
+import com.example.lagallens.presentation.feature.contracts.contract.ContractFilterSelection
 import com.example.lagallens.presentation.feature.contracts.contract.ContractListItem
 import com.example.lagallens.presentation.feature.contracts.contract.ContractListUiEffect
 import com.example.lagallens.presentation.feature.contracts.contract.ContractListUiEvent
 import com.example.lagallens.presentation.feature.contracts.contract.ContractListUiState
 import com.example.lagallens.presentation.feature.contracts.contract.ContractProcessingStatus
 import com.example.lagallens.presentation.feature.contracts.contract.ContractRiskLevel
+import com.example.lagallens.presentation.feature.contracts.contract.ContractStatusFilter
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -29,20 +30,24 @@ class ContractListViewModel(application: Application) : AndroidViewModel(applica
         when (event) {
             is ContractListUiEvent.QueryChanged -> updateContracts(query = event.query)
             is ContractListUiEvent.FilterSelected -> updateContracts(filter = event.filter)
-            is ContractListUiEvent.ContractClicked -> showDetailUnavailable()
+            ContractListUiEvent.FilterClicked -> showFilterBottomSheet()
+            is ContractListUiEvent.FiltersApplied -> updateContracts(filterSelection = event.filterSelection)
+            is ContractListUiEvent.ContractClicked -> navigateToDetail(event.contract.id)
         }
     }
 
     private fun updateContracts(
         query: String = _uiState.value.query,
-        filter: ContractFilter = _uiState.value.selectedFilter
+        filter: ContractFilter = _uiState.value.selectedFilter,
+        filterSelection: ContractFilterSelection = _uiState.value.filterSelection
     ) {
         _uiState.update {
             it.copy(
                 query = query,
                 selectedFilter = filter,
+                filterSelection = filterSelection,
                 contracts = ContractListItem.samples.filter { item ->
-                    item.matches(filter) && item.matches(query)
+                    item.matches(filter) && item.matches(filterSelection) && item.matches(query)
                 }
             )
         }
@@ -55,6 +60,18 @@ class ContractListViewModel(application: Application) : AndroidViewModel(applica
         ContractFilter.HIGH_RISK -> riskLevel == ContractRiskLevel.HIGH
     }
 
+    private fun ContractListItem.matches(filterSelection: ContractFilterSelection): Boolean {
+        val typeMatches = filterSelection.contractTypes.isEmpty() || contractType in filterSelection.contractTypes
+        val statusMatches = when (filterSelection.status) {
+            ContractStatusFilter.ALL -> true
+            ContractStatusFilter.COMPLETE -> processingStatus == ContractProcessingStatus.COMPLETE
+            ContractStatusFilter.PROCESSING -> processingStatus == ContractProcessingStatus.PROCESSING
+            ContractStatusFilter.DRAFT -> processingStatus == ContractProcessingStatus.DRAFT
+        }
+        val riskMatches = filterSelection.riskLevel == null || riskLevel == filterSelection.riskLevel
+        return typeMatches && statusMatches && riskMatches
+    }
+
     private fun ContractListItem.matches(query: String): Boolean {
         val normalizedQuery = query.trim().lowercase()
         return normalizedQuery.isBlank() || getApplication<Application>()
@@ -63,9 +80,15 @@ class ContractListViewModel(application: Application) : AndroidViewModel(applica
             .contains(normalizedQuery)
     }
 
-    private fun showDetailUnavailable() {
+    private fun navigateToDetail(contractId: String) {
         viewModelScope.launch {
-            _uiEffect.emit(ContractListUiEffect.ShowMessage(R.string.contract_detail_unavailable))
+            _uiEffect.emit(ContractListUiEffect.NavigateToDetail(contractId))
+        }
+    }
+
+    private fun showFilterBottomSheet() {
+        viewModelScope.launch {
+            _uiEffect.emit(ContractListUiEffect.ShowFilterBottomSheet)
         }
     }
 }
