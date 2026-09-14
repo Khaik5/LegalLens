@@ -4,5 +4,3 @@ sealed interface ProfileEditUiEffect {
     data object ShowPhotoPickerUnavailable : ProfileEditUiEffect
     data class ProfileSaved(val name: String, val phone: String) : ProfileEditUiEffect
 }
-
-

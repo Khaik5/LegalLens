@@ -7,5 +7,3 @@ sealed interface ProfileEditUiEvent {
     data object ChangePhotoClicked : ProfileEditUiEvent
     data object SaveClicked : ProfileEditUiEvent
 }
-
-

@@ -10,5 +10,3 @@ class UpdateProfileLanguageUseCase(
         profileSettingsRepository.updateLanguage(language)
     }
 }
-
-

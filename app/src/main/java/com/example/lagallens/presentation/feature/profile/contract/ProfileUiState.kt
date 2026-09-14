@@ -12,5 +12,3 @@ data class ProfileUiState(
     @StringRes val analysisCountRes: Int = R.string.profile_analysis_count,
     @StringRes val chatCountRes: Int = R.string.profile_chat_count
 )
-
-

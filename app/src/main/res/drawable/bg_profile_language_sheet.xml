@@ -6,5 +6,3 @@
         android:topLeftRadius="@dimen/dp_24"
         android:topRightRadius="@dimen/dp_24" />
 </shape>
-
-

@@ -4,5 +4,3 @@
     <solid android:color="@color/profile_toggle_off" />
     <corners android:radius="@dimen/dp_16" />
 </shape>
-
-

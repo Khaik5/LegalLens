@@ -86,5 +86,3 @@ class ProfileSettingsViewModel(
         return ProfileLanguage.entries.find { it.name == value } ?: ProfileLanguage.VIETNAMESE
     }
 }
-
-

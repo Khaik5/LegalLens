@@ -5,5 +5,3 @@ sealed interface ProfilePasswordUiEffect {
 
     data object ShowBackendUnavailable : ProfilePasswordUiEffect
 }
-
-

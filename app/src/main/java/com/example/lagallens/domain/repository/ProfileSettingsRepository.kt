@@ -12,5 +12,3 @@ interface ProfileSettingsRepository {
 
     suspend fun updateLanguage(language: ProfileLanguage)
 }
-
-

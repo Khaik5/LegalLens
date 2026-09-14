@@ -10,5 +10,3 @@ data class ProfileEditUiState(
     @StringRes val nameErrorRes: Int? = null,
     @StringRes val phoneErrorRes: Int? = null
 )
-
-

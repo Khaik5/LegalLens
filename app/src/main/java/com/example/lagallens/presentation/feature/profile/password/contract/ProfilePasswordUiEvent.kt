@@ -11,5 +11,3 @@ sealed interface ProfilePasswordUiEvent {
 
     data object BackClicked : ProfilePasswordUiEvent
 }
-
-

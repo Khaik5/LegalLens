@@ -9,5 +9,3 @@ class ObserveProfileSettingsUseCase(
 ) {
     operator fun invoke(): Flow<ProfileSettings> = profileSettingsRepository.observeSettings()
 }
-
-

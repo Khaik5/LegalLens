@@ -19,5 +19,3 @@ enum class ProfileLanguage {
     CHINESE,
     KOREAN
 }
-
-

@@ -3,5 +3,3 @@
     <size android:width="@dimen/dp_28" android:height="@dimen/dp_28" />
     <solid android:color="@color/white" />
 </shape>
-
-

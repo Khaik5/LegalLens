@@ -36,5 +36,3 @@
         android:contentDescription="@null"
         android:src="@drawable/ic_contract_search_chevron_right" />
 </LinearLayout>
-
-

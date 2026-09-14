@@ -3,5 +3,3 @@
     <solid android:color="@color/legal_lens_background" />
     <corners android:radius="@dimen/dp_8" />
 </shape>
-
-

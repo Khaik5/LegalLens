@@ -6,5 +6,3 @@
     android:viewportHeight="20">
     <path android:fillColor="@android:color/transparent" android:pathData="M10,13.3336V10M10,6.6664H10.0083M18.334,10C18.334,14.6028 14.6028,18.334 10,18.334C5.3973,18.334 1.666,14.6028 1.666,10C1.666,5.3973 5.3973,1.666 10,1.666C14.6028,1.666 18.334,5.3973 18.334,10Z" android:strokeColor="@color/legal_lens_primary" android:strokeLineCap="round" android:strokeWidth="2" />
 </vector>
-
-

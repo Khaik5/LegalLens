@@ -171,5 +171,3 @@ class ProfileFragment : Fragment() {
         super.onDestroyView()
     }
 }
-
-

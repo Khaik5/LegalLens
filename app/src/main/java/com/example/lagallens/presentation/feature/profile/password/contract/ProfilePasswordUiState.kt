@@ -26,5 +26,3 @@ data class ProfilePasswordUiState(
         const val MINIMUM_PASSWORD_LENGTH = 8
     }
 }
-
-

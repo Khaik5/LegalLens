@@ -11,5 +11,3 @@ sealed interface ProfileUiEvent {
     data object LogoutClicked : ProfileUiEvent
     data object LogoutConfirmed : ProfileUiEvent
 }
-
-

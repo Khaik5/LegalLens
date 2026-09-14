@@ -10,5 +10,3 @@ class UpdateProfileAppearanceUseCase(
         profileSettingsRepository.updateAppearance(appearance)
     }
 }
-
-

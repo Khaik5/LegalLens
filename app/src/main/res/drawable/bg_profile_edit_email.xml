@@ -4,5 +4,3 @@
     <corners android:radius="@dimen/dp_12" />
     <stroke android:width="@dimen/dp_1" android:color="@color/legal_lens_input_stroke" />
 </shape>
-
-

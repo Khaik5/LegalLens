@@ -41,5 +41,3 @@
         android:thumb="@drawable/bg_profile_settings_toggle_thumb"
         app:track="@drawable/selector_profile_settings_toggle_track" />
 </LinearLayout>
-
-

@@ -10,5 +10,3 @@ sealed interface ProfileUiEffect {
     data object ShowLogoutConfirmation : ProfileUiEffect
     data object NavigateToAuthentication : ProfileUiEffect
 }
-
-

@@ -86,5 +86,3 @@
             android:textSize="@dimen/sp_15" />
     </RadioGroup>
 </LinearLayout>
-
-

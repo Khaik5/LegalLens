@@ -143,5 +143,3 @@ class ProfileEditFragment : Fragment() {
         super.onDestroyView()
     }
 }
-
-

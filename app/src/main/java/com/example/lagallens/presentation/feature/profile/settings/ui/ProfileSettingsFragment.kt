@@ -186,5 +186,3 @@ class ProfileSettingsFragment : Fragment() {
         super.onDestroyView()
     }
 }
-
-

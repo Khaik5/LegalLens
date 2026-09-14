@@ -23,5 +23,3 @@ class ProfileSettingsViewModelFactory(
         throw IllegalArgumentException("Unsupported ViewModel class: ${modelClass.name}")
     }
 }
-
-

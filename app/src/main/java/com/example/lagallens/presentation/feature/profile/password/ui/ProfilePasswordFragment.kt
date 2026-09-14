@@ -129,5 +129,3 @@ class ProfilePasswordFragment : Fragment() {
         super.onDestroyView()
     }
 }
-
-

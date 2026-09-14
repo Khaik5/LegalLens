@@ -80,5 +80,3 @@ class ProfileEditViewModel : ViewModel() {
         const val MIN_PHONE_DIGITS = 9
     }
 }
-
-

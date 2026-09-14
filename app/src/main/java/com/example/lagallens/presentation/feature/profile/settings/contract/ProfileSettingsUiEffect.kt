@@ -4,5 +4,3 @@ sealed interface ProfileSettingsUiEffect {
     data object NavigateBack : ProfileSettingsUiEffect
     data class ShowLanguagePicker(val language: ProfileLanguage) : ProfileSettingsUiEffect
 }
-
-

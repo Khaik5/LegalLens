@@ -10,5 +10,3 @@ sealed interface ProfileSettingsUiEvent {
     data class LanguageSelected(val language: ProfileLanguage) : ProfileSettingsUiEvent
     data object BackClicked : ProfileSettingsUiEvent
 }
-
-

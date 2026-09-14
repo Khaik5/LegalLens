@@ -3,5 +3,3 @@
     <item android:state_checked="true" android:drawable="@drawable/bg_profile_settings_toggle_on" />
     <item android:drawable="@drawable/bg_profile_settings_toggle_off" />
 </selector>
-
-
