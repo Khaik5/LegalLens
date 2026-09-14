@@ -46,9 +46,34 @@
         android:label="@string/menu_notifications" />
 
     <fragment
-        android:id="@+id/profilePlaceholder"
-        android:name="com.example.lagallens.presentation.common.ui.FeatureUnavailableFragment"
-        android:label="@string/menu_profile" />
+        android:id="@+id/profileFragment"
+        android:name="com.example.lagallens.presentation.feature.profile.ui.ProfileFragment"
+        android:label="@string/menu_profile">
+        <action
+            android:id="@+id/action_profileFragment_to_profileEditFragment"
+            app:destination="@id/profileEditFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_profileSettingsFragment"
+            app:destination="@id/profileSettingsFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_profilePasswordFragment"
+            app:destination="@id/profilePasswordFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/profileEditFragment"
+        android:name="com.example.lagallens.presentation.feature.profile.edit.ui.ProfileEditFragment"
+        android:label="@string/profile_edit_title" />
+
+    <fragment
+        android:id="@+id/profileSettingsFragment"
+        android:name="com.example.lagallens.presentation.feature.profile.settings.ui.ProfileSettingsFragment"
+        android:label="@string/profile_settings_title" />
+
+    <fragment
+        android:id="@+id/profilePasswordFragment"
+        android:name="com.example.lagallens.presentation.feature.profile.password.ui.ProfilePasswordFragment"
+        android:label="@string/profile_password_title" />
 
     <fragment
         android:id="@+id/addContractPlaceholder"

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_profile_language_sheet"
+    android:orientation="vertical"
+    android:paddingStart="@dimen/dp_24"
+    android:paddingTop="@dimen/dp_8"
+    android:paddingEnd="@dimen/dp_24"
+    android:paddingBottom="@dimen/dp_24">
+
+    <View
+        android:layout_width="@dimen/dp_40"
+        android:layout_height="@dimen/dp_4"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/bg_contract_filter_handle" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dp_24"
+        android:includeFontPadding="false"
+        android:text="@string/profile_settings_language_picker_title"
+        android:textColor="@color/legal_lens_primary"
+        android:textSize="@dimen/sp_20"
+        android:textStyle="bold" />
+
+    <RadioGroup
+        android:id="@+id/rgLanguages"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dp_16">
+
+        <androidx.appcompat.widget.AppCompatRadioButton
+            android:id="@+id/rbVietnamese"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_44"
+            android:buttonTint="@color/legal_lens_auth_accent"
+            android:text="@string/profile_settings_language_vietnamese"
+            android:textColor="@color/legal_lens_primary"
+            android:textSize="@dimen/sp_15" />
+
+        <androidx.appcompat.widget.AppCompatRadioButton
+            android:id="@+id/rbEnglish"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_44"
+            android:buttonTint="@color/legal_lens_auth_accent"
+            android:text="@string/profile_settings_language_english"
+            android:textColor="@color/legal_lens_primary"
+            android:textSize="@dimen/sp_15" />
+
+        <androidx.appcompat.widget.AppCompatRadioButton
+            android:id="@+id/rbJapanese"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_44"
+            android:buttonTint="@color/legal_lens_auth_accent"
+            android:text="@string/profile_settings_language_japanese"
+            android:textColor="@color/legal_lens_primary"
+            android:textSize="@dimen/sp_15" />
+
+        <androidx.appcompat.widget.AppCompatRadioButton
+            android:id="@+id/rbFrench"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_44"
+            android:buttonTint="@color/legal_lens_auth_accent"
+            android:text="@string/profile_settings_language_french"
+            android:textColor="@color/legal_lens_primary"
+            android:textSize="@dimen/sp_15" />
+
+        <androidx.appcompat.widget.AppCompatRadioButton
+            android:id="@+id/rbChinese"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_44"
+            android:buttonTint="@color/legal_lens_auth_accent"
+            android:text="@string/profile_settings_language_chinese"
+            android:textColor="@color/legal_lens_primary"
+            android:textSize="@dimen/sp_15" />
+
+        <androidx.appcompat.widget.AppCompatRadioButton
+            android:id="@+id/rbKorean"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_44"
+            android:buttonTint="@color/legal_lens_auth_accent"
+            android:text="@string/profile_settings_language_korean"
+            android:textColor="@color/legal_lens_primary"
+            android:textSize="@dimen/sp_15" />
+    </RadioGroup>
+</LinearLayout>
+
+

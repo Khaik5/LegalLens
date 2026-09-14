@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/legal_lens_background"
+    android:clipToPadding="false"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/dp_24">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_56"
+            android:gravity="center_vertical"
+            android:includeFontPadding="false"
+            android:paddingStart="@dimen/dp_16"
+            android:paddingEnd="@dimen/dp_16"
+            android:text="@string/menu_profile"
+            android:textColor="@color/legal_lens_primary"
+            android:textSize="@dimen/sp_20"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:paddingTop="@dimen/dp_20"
+            android:paddingBottom="@dimen/dp_20">
+
+            <FrameLayout
+                android:layout_width="@dimen/dp_84"
+                android:layout_height="@dimen/dp_84">
+
+                <TextView
+                    android:id="@+id/tvProfileAvatar"
+                    android:layout_width="@dimen/dp_80"
+                    android:layout_height="@dimen/dp_80"
+                    android:layout_gravity="center"
+                    android:background="@drawable/bg_dashboard_fab"
+                    android:contentDescription="@string/profile_avatar_description"
+                    android:gravity="center"
+                    android:text="@string/profile_initials"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/sp_28"
+                    android:textStyle="bold" />
+
+                <ImageButton
+                    android:id="@+id/btnAvatarEdit"
+                    android:layout_width="@dimen/dp_28"
+                    android:layout_height="@dimen/dp_28"
+                    android:layout_gravity="bottom|end"
+                    android:background="@drawable/bg_profile_avatar_edit"
+                    android:contentDescription="@string/profile_camera_description"
+                    android:padding="@dimen/dp_7"
+                    android:src="@drawable/ic_profile_camera" />
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/tvProfileName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_16"
+                android:includeFontPadding="false"
+                android:textColor="@color/legal_lens_primary"
+                android:textSize="@dimen/sp_20"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvProfileEmail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_4"
+                android:includeFontPadding="false"
+                android:textColor="@color/legal_lens_secondary_text"
+                android:textSize="@dimen/sp_13" />
+
+            <TextView
+                android:id="@+id/tvProfileStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_16"
+                android:background="@drawable/bg_contract_detail_status"
+                android:includeFontPadding="false"
+                android:paddingStart="@dimen/dp_10"
+                android:paddingTop="@dimen/dp_4"
+                android:paddingEnd="@dimen/dp_10"
+                android:paddingBottom="@dimen/dp_4"
+                android:textColor="@color/contract_complete"
+                android:textSize="@dimen/sp_11"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_66"
+            android:orientation="horizontal"
+            android:paddingStart="@dimen/dp_20"
+            android:paddingEnd="@dimen/dp_20">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/bg_profile_stat"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvProfileContractCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:includeFontPadding="false"
+                    android:textColor="@color/legal_lens_primary"
+                    android:textSize="@dimen/sp_18"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dp_2"
+                    android:includeFontPadding="false"
+                    android:text="@string/profile_contracts"
+                    android:textColor="@color/legal_lens_secondary_text"
+                    android:textSize="@dimen/sp_11"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <Space
+                android:layout_width="@dimen/dp_12"
+                android:layout_height="@dimen/dp_1" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/bg_profile_stat"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvProfileAnalysisCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:includeFontPadding="false"
+                    android:textColor="@color/legal_lens_auth_accent"
+                    android:textSize="@dimen/sp_18"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dp_2"
+                    android:includeFontPadding="false"
+                    android:text="@string/profile_analyses"
+                    android:textColor="@color/legal_lens_secondary_text"
+                    android:textSize="@dimen/sp_11"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <Space
+                android:layout_width="@dimen/dp_12"
+                android:layout_height="@dimen/dp_1" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/bg_profile_stat"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvProfileChatCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:includeFontPadding="false"
+                    android:textColor="@color/profile_blue"
+                    android:textSize="@dimen/sp_18"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dp_2"
+                    android:includeFontPadding="false"
+                    android:text="@string/profile_chat_sessions"
+                    android:textColor="@color/legal_lens_secondary_text"
+                    android:textSize="@dimen/sp_11"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_20"
+            android:layout_marginTop="@dimen/dp_16"
+            android:layout_marginEnd="@dimen/dp_20"
+            android:background="@drawable/bg_dashboard_card"
+            android:clipToOutline="true"
+            android:orientation="vertical">
+
+            <include android:id="@+id/actionEditProfile" layout="@layout/item_profile_action" />
+
+            <View android:layout_width="match_parent" android:layout_height="@dimen/dp_1" android:background="@color/legal_lens_input_stroke" />
+
+            <include android:id="@+id/actionChangePassword" layout="@layout/item_profile_action" />
+
+            <View android:layout_width="match_parent" android:layout_height="@dimen/dp_1" android:background="@color/legal_lens_input_stroke" />
+
+            <include android:id="@+id/actionNotificationSettings" layout="@layout/item_profile_action" />
+
+            <View android:layout_width="match_parent" android:layout_height="@dimen/dp_1" android:background="@color/legal_lens_input_stroke" />
+
+            <include android:id="@+id/actionPrivacy" layout="@layout/item_profile_action" />
+
+            <View android:layout_width="match_parent" android:layout_height="@dimen/dp_1" android:background="@color/legal_lens_input_stroke" />
+
+            <include android:id="@+id/actionAppearance" layout="@layout/item_profile_action" />
+
+            <View android:layout_width="match_parent" android:layout_height="@dimen/dp_1" android:background="@color/legal_lens_input_stroke" />
+
+            <include android:id="@+id/actionAbout" layout="@layout/item_profile_action" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/btnSignOut"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/dp_44"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/dp_20"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingStart="@dimen/dp_12"
+            android:paddingEnd="@dimen/dp_12">
+
+            <ImageView
+                android:layout_width="@dimen/dp_18"
+                android:layout_height="@dimen/dp_18"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_profile_logout" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/dp_8"
+                android:includeFontPadding="false"
+                android:text="@string/profile_sign_out"
+                android:textColor="@color/contract_risk_high"
+                android:textSize="@dimen/sp_15"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>
+
+

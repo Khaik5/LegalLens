@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="legal_lens_background">#121A24</color>
+    <color name="legal_lens_primary">#E8EEF5</color>
+    <color name="legal_lens_status_text">#E8EEF5</color>
+    <color name="legal_lens_secondary_text">#AEBBC8</color>
+    <color name="legal_lens_input_stroke">#334455</color>
+    <color name="legal_lens_link">#53C9CD</color>
+    <color name="legal_lens_auth_accent">#16959B</color>
+    <color name="legal_lens_auth_icon_background">#1A3A3E</color>
+    <color name="legal_lens_error">#FF8A8D</color>
+    <color name="legal_lens_error_background">#3A2228</color>
+    <color name="legal_lens_error_stroke">#80FF8A8D</color>
+    <color name="legal_lens_icon_background">#173A38</color>
+    <color name="dashboard_background">#121A24</color>
+    <color name="dashboard_surface">#1C2733</color>
+    <color name="dashboard_primary_text">#E8EEF5</color>
+    <color name="dashboard_secondary_text">#AEBBC8</color>
+    <color name="dashboard_teal">#38B7AC</color>
+    <color name="dashboard_teal_light">#173A38</color>
+    <color name="dashboard_green">#45C987</color>
+    <color name="dashboard_green_light">#1C3A30</color>
+    <color name="dashboard_yellow">#F2C45C</color>
+    <color name="dashboard_yellow_light">#40351B</color>
+    <color name="dashboard_red">#FF858B</color>
+    <color name="dashboard_red_light">#41252B</color>
+    <color name="dashboard_blue">#82B5F5</color>
+    <color name="dashboard_blue_light">#1F344F</color>
+    <color name="dashboard_nav_inactive">#AAB7C4</color>
+    <color name="dashboard_border">#334455</color>
+    <color name="contract_complete">#45C987</color>
+    <color name="contract_complete_background">#1C3A30</color>
+    <color name="contract_pending">#F2C45C</color>
+    <color name="contract_pending_background">#40351B</color>
+    <color name="contract_risk_high">#FF858B</color>
+    <color name="contract_risk_high_background">#41252B</color>
+    <color name="profile_blue">#82B5F5</color>
+    <color name="profile_edit_disabled">#273442</color>
+    <color name="profile_toggle_off">#5D6D7E</color>
+    <color name="contract_delete_overlay">#99121A24</color>
+</resources>
+
+
