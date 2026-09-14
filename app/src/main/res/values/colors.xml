@@ -39,6 +39,9 @@
     <color name="notification_system_surface">#F1F5F9</color>
     <color name="contract_risk_high">#EF4444</color>
     <color name="contract_risk_high_background">#FEE2E2</color>
+    <color name="profile_blue">#3B82F6</color>
+    <color name="profile_edit_disabled">#F1F5F9</color>
+    <color name="profile_toggle_off">#CBD5E1</color>
     <color name="upload_background">#FFFAF9F6</color>
     <color name="upload_navy">#FF1A2D42</color>
     <color name="upload_body">#FF4E5C6E</color>

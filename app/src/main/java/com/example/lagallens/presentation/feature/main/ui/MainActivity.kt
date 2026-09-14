@@ -39,16 +39,20 @@ class MainActivity : AppCompatActivity() {
         binding.navHome.setOnClickListener { navigateTo(navController, R.id.homeDashboardFragment) }
         binding.navContracts.setOnClickListener { navigateTo(navController, R.id.contractListFragment) }
         binding.navNotifications.setOnClickListener { navigateTo(navController, R.id.notificationFragment) }
-        binding.navProfile.setOnClickListener { navigateTo(navController, R.id.profilePlaceholder) }
+        binding.navProfile.setOnClickListener { navigateTo(navController, R.id.profileFragment) }
         navController.addOnDestinationChangedListener { _, destination, _ ->
             val isContractDetail = destination.id == R.id.contractDetailFragment
-            binding.bottomNavigationContainer.isVisible = !isContractDetail
-            binding.btnAddContract.isVisible = !isContractDetail
+            val hidesBottomNavigation = isContractDetail ||
+                destination.id == R.id.profileEditFragment ||
+                destination.id == R.id.profileSettingsFragment ||
+                destination.id == R.id.profilePasswordFragment
+            binding.bottomNavigationContainer.isVisible = !hidesBottomNavigation
+            binding.btnAddContract.isVisible = !hidesBottomNavigation
             binding.navHome.isSelected = destination.id == R.id.homeDashboardFragment
             binding.navContracts.isSelected = destination.id == R.id.contractListFragment ||
                 destination.id == R.id.contractSearchFragment || isContractDetail
             binding.navNotifications.isSelected = destination.id == R.id.notificationFragment
-            binding.navProfile.isSelected = destination.id == R.id.profilePlaceholder
+            binding.navProfile.isSelected = destination.id == R.id.profileFragment
         }
     }
 

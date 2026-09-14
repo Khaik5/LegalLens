@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/legal_lens_background">
+
+    <LinearLayout
+        android:id="@+id/profileEditAppBar"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/dp_56"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="@dimen/dp_16"
+        android:paddingEnd="@dimen/dp_16"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="@dimen/dp_40"
+            android:layout_height="@dimen/dp_40"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/profile_edit_back_description"
+            android:padding="@dimen/dp_10"
+            android:src="@drawable/ic_contract_search_back"
+            android:tint="@color/legal_lens_primary" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_8"
+            android:includeFontPadding="false"
+            android:text="@string/profile_edit_title"
+            android:textColor="@color/legal_lens_primary"
+            android:textSize="@dimen/sp_20"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:fillViewport="true"
+        app:layout_constraintBottom_toTopOf="@id/btnSaveProfile"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/profileEditAppBar">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp_168"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:paddingTop="@dimen/dp_24">
+
+                <TextView
+                    android:id="@+id/tvProfileEditAvatar"
+                    android:layout_width="@dimen/dp_80"
+                    android:layout_height="@dimen/dp_80"
+                    android:background="@drawable/bg_dashboard_fab"
+                    android:contentDescription="@string/profile_avatar_description"
+                    android:gravity="center"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/sp_28"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/btnChangePhoto"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/dp_28"
+                    android:layout_marginTop="@dimen/dp_12"
+                    android:background="@drawable/bg_profile_edit_input"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:includeFontPadding="false"
+                    android:paddingStart="@dimen/dp_14"
+                    android:paddingEnd="@dimen/dp_14"
+                    android:text="@string/profile_edit_change_photo"
+                    android:textColor="@color/legal_lens_secondary_text"
+                    android:textSize="@dimen/sp_12"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingStart="@dimen/dp_24"
+                android:paddingEnd="@dimen/dp_24">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:includeFontPadding="false"
+                    android:text="@string/profile_edit_name_label"
+                    android:textColor="@color/legal_lens_secondary_text"
+                    android:textSize="@dimen/sp_13"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/etProfileName"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/dp_44"
+                    android:layout_marginTop="@dimen/dp_6"
+                    android:background="@drawable/bg_profile_edit_input"
+                    android:inputType="textCapWords"
+                    android:paddingStart="@dimen/dp_16"
+                    android:paddingEnd="@dimen/dp_16"
+                    android:singleLine="true"
+                    android:textColor="@color/legal_lens_primary"
+                    android:textSize="@dimen/sp_15" />
+
+                <TextView
+                    android:id="@+id/tvProfileNameError"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dp_4"
+                    android:includeFontPadding="false"
+                    android:textColor="@color/contract_risk_high"
+                    android:textSize="@dimen/sp_12"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dp_16"
+                    android:includeFontPadding="false"
+                    android:text="@string/profile_edit_email_label"
+                    android:textColor="@color/legal_lens_secondary_text"
+                    android:textSize="@dimen/sp_13"
+                    android:textStyle="bold" />
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/dp_44"
+                    android:layout_marginTop="@dimen/dp_6">
+
+                    <EditText
+                        android:id="@+id/etProfileEmail"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/bg_profile_edit_email"
+                        android:clickable="false"
+                        android:cursorVisible="false"
+                        android:focusable="false"
+                        android:paddingStart="@dimen/dp_16"
+                        android:paddingEnd="@dimen/dp_44"
+                        android:singleLine="true"
+                        android:textColor="@color/legal_lens_secondary_text"
+                        android:textSize="@dimen/sp_15" />
+
+                    <ImageView
+                        android:layout_width="@dimen/dp_16"
+                        android:layout_height="@dimen/dp_16"
+                        android:layout_gravity="center_vertical|end"
+                        android:layout_marginEnd="@dimen/dp_16"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ic_profile_edit_lock" />
+                </FrameLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dp_16"
+                    android:includeFontPadding="false"
+                    android:text="@string/profile_edit_phone_label"
+                    android:textColor="@color/legal_lens_secondary_text"
+                    android:textSize="@dimen/sp_13"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/etProfilePhone"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/dp_44"
+                    android:layout_marginTop="@dimen/dp_6"
+                    android:background="@drawable/bg_profile_edit_input"
+                    android:inputType="phone"
+                    android:paddingStart="@dimen/dp_16"
+                    android:paddingEnd="@dimen/dp_16"
+                    android:singleLine="true"
+                    android:textColor="@color/legal_lens_primary"
+                    android:textSize="@dimen/sp_15" />
+
+                <TextView
+                    android:id="@+id/tvProfilePhoneError"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dp_4"
+                    android:includeFontPadding="false"
+                    android:textColor="@color/contract_risk_high"
+                    android:textSize="@dimen/sp_12"
+                    android:visibility="gone" />
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <TextView
+        android:id="@+id/btnSaveProfile"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/dp_54"
+        android:layout_marginStart="@dimen/dp_24"
+        android:layout_marginEnd="@dimen/dp_24"
+        android:layout_marginBottom="@dimen/dp_24"
+        android:background="@drawable/bg_profile_edit_save"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:text="@string/profile_edit_save"
+        android:textColor="@color/white"
+        android:textSize="@dimen/sp_16"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>
