@@ -6,9 +6,6 @@ import com.example.lagallens.di.RepositoryModule
 import com.example.lagallens.di.UseCaseModule
 import com.example.lagallens.domain.model.ProfileAppearance
 import com.example.lagallens.domain.repository.AuthRepository
-<<<<<<< Updated upstream
-import com.example.lagallens.domain.usecase.AuthenticateUserUseCase
-=======
 import com.example.lagallens.domain.repository.OnboardingRepository
 import com.example.lagallens.domain.repository.ProfileSettingsRepository
 import com.example.lagallens.domain.usecase.AuthenticateUserUseCase
@@ -22,10 +19,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
->>>>>>> Stashed changes
 
 class LegalLensApplication : Application() {
     private val authRepository: AuthRepository by lazy { RepositoryModule.provideAuthRepository() }
+    private val onboardingRepository: OnboardingRepository by lazy {
+        RepositoryModule.provideOnboardingRepository(applicationContext)
+    }
     private val profileSettingsRepository: ProfileSettingsRepository by lazy {
         RepositoryModule.provideProfileSettingsRepository(applicationContext)
     }
@@ -33,11 +32,6 @@ class LegalLensApplication : Application() {
 
     val authenticateUserUseCase: AuthenticateUserUseCase by lazy {
         UseCaseModule.provideAuthenticateUserUseCase(authRepository)
-    }
-<<<<<<< Updated upstream
-=======
-    private val onboardingRepository: OnboardingRepository by lazy {
-        RepositoryModule.provideOnboardingRepository(applicationContext)
     }
     val completeOnboardingUseCase: CompleteOnboardingUseCase by lazy {
         UseCaseModule.provideCompleteOnboardingUseCase(onboardingRepository)
@@ -71,5 +65,4 @@ class LegalLensApplication : Application() {
             ProfileAppearance.DARK -> AppCompatDelegate.MODE_NIGHT_YES
         }
     }
->>>>>>> Stashed changes
 }

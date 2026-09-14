@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="@dimen/camera_page_thumbnail_width"
+    android:layout_height="@dimen/camera_page_thumbnail_height"
+    android:layout_marginEnd="@dimen/camera_page_thumbnail_spacing"
+    android:background="@drawable/bg_camera_page_thumbnail">
+
+    <ImageView
+        android:id="@+id/camera_page_preview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToOutline="true"
+        android:scaleType="centerCrop" />
+
+    <TextView
+        android:id="@+id/camera_page_number"
+        android:layout_width="@dimen/camera_page_number_size"
+        android:layout_height="@dimen/camera_page_number_size"
+        android:layout_gravity="start|top"
+        android:background="@drawable/bg_camera_capture_count"
+        android:gravity="center"
+        android:textColor="@color/white"
+        android:textSize="@dimen/camera_capture_control_text_size"
+        android:textStyle="bold" />
+
+    <ImageButton
+        android:id="@+id/camera_page_delete"
+        android:layout_width="@dimen/camera_page_delete_size"
+        android:layout_height="@dimen/camera_page_delete_size"
+        android:layout_gravity="end|top"
+        android:background="@drawable/bg_camera_page_warning"
+        android:contentDescription="@string/camera_page_delete_description"
+        android:padding="@dimen/camera_permission_button_stroke_width"
+        android:src="@drawable/ic_camera_delete" />
+
+    <ImageView
+        android:id="@+id/camera_page_warning"
+        android:layout_width="@dimen/camera_page_number_size"
+        android:layout_height="@dimen/camera_page_number_size"
+        android:layout_gravity="end|bottom"
+        android:contentDescription="@string/camera_page_warning_description"
+        android:src="@drawable/ic_camera_warning" />
+</FrameLayout>

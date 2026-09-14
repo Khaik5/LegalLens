@@ -34,10 +34,11 @@
     <color name="contract_complete_background">#ECFDF5</color>
     <color name="contract_pending">#F59E0B</color>
     <color name="contract_pending_background">#FEF3C7</color>
+    <color name="notification_blue">#3B82F6</color>
+    <color name="notification_blue_surface">#EFF6FF</color>
+    <color name="notification_system_surface">#F1F5F9</color>
     <color name="contract_risk_high">#EF4444</color>
     <color name="contract_risk_high_background">#FEE2E2</color>
-<<<<<<< Updated upstream
-=======
     <color name="profile_blue">#3B82F6</color>
     <color name="profile_edit_disabled">#F1F5F9</color>
     <color name="profile_toggle_off">#CBD5E1</color>
@@ -86,6 +87,5 @@
     <color name="camera_page_surface">#FFFFFFFF</color>
     <color name="camera_page_warning_surface">#FFFFF4D5</color>
     <color name="camera_processing_surface">#FFF4FBFA</color>
->>>>>>> Stashed changes
     <color name="contract_delete_overlay">#661A2D42</color>
 </resources>

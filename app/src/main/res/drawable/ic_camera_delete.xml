@@ -1,0 +1,7 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="@dimen/camera_page_delete_size"
+    android:height="@dimen/camera_page_delete_size"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path android:fillColor="@android:color/transparent" android:pathData="M5,7h14M10,7V4h4v3M8,7l1,13h6l1,-13M10,11v5M14,11v5" android:strokeColor="@color/upload_navy" android:strokeLineCap="round" android:strokeWidth="1.8" />
+</vector>

@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/upload_source_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/upload_background">
+
+    <LinearLayout
+        android:id="@+id/upload_source_app_bar"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/upload_app_bar_height"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="@dimen/upload_card_padding"
+        android:paddingEnd="@dimen/upload_card_padding"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageButton
+            android:id="@+id/upload_source_back"
+            android:layout_width="@dimen/upload_back_button_size"
+            android:layout_height="@dimen/upload_back_button_size"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/upload_back_content_description"
+            android:padding="@dimen/upload_back_icon_inset"
+            android:src="@drawable/ic_upload_back" />
+
+        <TextView
+            android:id="@+id/upload_source_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/upload_title_margin_start"
+            android:layout_weight="1"
+            android:text="@string/upload_source_title"
+            android:textColor="@color/upload_navy"
+            android:textSize="@dimen/upload_title_text_size"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        android:scrollbars="none"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/upload_source_app_bar">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="@dimen/upload_content_side_padding"
+            android:paddingTop="@dimen/upload_content_top_padding"
+            android:paddingEnd="@dimen/upload_content_side_padding"
+            android:paddingBottom="@dimen/upload_card_bottom_padding">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:letterSpacing="0.036"
+                android:text="@string/upload_source_heading"
+                android:textColor="@color/upload_body"
+                android:textSize="@dimen/upload_section_title_text_size"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:id="@+id/upload_source_pdf"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/upload_card_height"
+                android:layout_marginTop="@dimen/upload_card_top_margin"
+                android:background="@drawable/bg_upload_card"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="@dimen/upload_card_padding">
+
+                <ImageView
+                    android:layout_width="@dimen/upload_icon_container_size"
+                    android:layout_height="@dimen/upload_icon_container_size"
+                    android:background="@drawable/bg_upload_icon_teal"
+                    android:padding="@dimen/upload_icon_inset"
+                    android:src="@drawable/ic_upload_pdf" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/upload_card_text_margin_start"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/upload_pdf_title"
+                        android:textColor="@color/upload_navy"
+                        android:textSize="@dimen/upload_card_title_text_size"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/upload_card_description_margin_top"
+                        android:text="@string/upload_pdf_description"
+                        android:textColor="@color/upload_body"
+                        android:textSize="@dimen/upload_card_description_text_size" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/upload_source_docx"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/upload_card_height"
+                android:layout_marginTop="@dimen/upload_card_spacing"
+                android:background="@drawable/bg_upload_card"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="@dimen/upload_card_padding">
+
+                <ImageView
+                    android:layout_width="@dimen/upload_icon_container_size"
+                    android:layout_height="@dimen/upload_icon_container_size"
+                    android:background="@drawable/bg_upload_icon_blue"
+                    android:padding="@dimen/upload_icon_inset"
+                    android:src="@drawable/ic_upload_docx" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/upload_card_text_margin_start"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/upload_docx_title"
+                        android:textColor="@color/upload_navy"
+                        android:textSize="@dimen/upload_card_title_text_size"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/upload_card_description_margin_top"
+                        android:text="@string/upload_docx_description"
+                        android:textColor="@color/upload_body"
+                        android:textSize="@dimen/upload_card_description_text_size" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/upload_source_gallery"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/upload_card_height"
+                android:layout_marginTop="@dimen/upload_card_spacing"
+                android:background="@drawable/bg_upload_card"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="@dimen/upload_card_padding">
+
+                <ImageView
+                    android:layout_width="@dimen/upload_icon_container_size"
+                    android:layout_height="@dimen/upload_icon_container_size"
+                    android:background="@drawable/bg_upload_icon_green"
+                    android:padding="@dimen/upload_icon_inset"
+                    android:src="@drawable/ic_upload_gallery" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/upload_card_text_margin_start"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/upload_gallery_title"
+                        android:textColor="@color/upload_navy"
+                        android:textSize="@dimen/upload_card_title_text_size"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/upload_card_description_margin_top"
+                        android:text="@string/upload_gallery_description"
+                        android:textColor="@color/upload_body"
+                        android:textSize="@dimen/upload_card_description_text_size" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/upload_source_camera"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/upload_camera_card_height"
+                android:layout_marginTop="@dimen/upload_card_spacing"
+                android:background="@drawable/bg_upload_card"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="@dimen/upload_card_padding">
+
+                <ImageView
+                    android:layout_width="@dimen/upload_icon_container_size"
+                    android:layout_height="@dimen/upload_icon_container_size"
+                    android:background="@drawable/bg_upload_icon_amber"
+                    android:padding="@dimen/upload_icon_inset"
+                    android:src="@drawable/ic_upload_camera" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/upload_card_text_margin_start"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/upload_camera_title"
+                        android:textColor="@color/upload_navy"
+                        android:textSize="@dimen/upload_card_title_text_size"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/upload_card_description_margin_top"
+                        android:text="@string/upload_camera_description"
+                        android:textColor="@color/upload_body"
+                        android:textSize="@dimen/upload_card_description_text_size" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

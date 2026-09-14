@@ -4,6 +4,12 @@ Track meaningful work status. Do not use this file as a replacement for issue tr
 
 ## Active
 
+### 2026-09-08 - ONBOARDING-FLOW: Integrate splash launch into authentication entry
+
+- **Status**: Ready for owner testing
+- **Description**: Splash is now the launcher. It opens onboarding for a first-time user and opens `HomeActivity` after onboarding has completed.
+- **Notes**: This preserves the existing authentication entry point while making onboarding available on first launch.
+
 ### 2026-09-04 - AUTH-LOGIN: Implement login, OTP, and success presentation flows
 
 - **Status**: In Progress
