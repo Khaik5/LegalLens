@@ -41,8 +41,8 @@
     </fragment>
 
     <fragment
-        android:id="@+id/notificationsPlaceholder"
-        android:name="com.example.lagallens.presentation.common.ui.FeatureUnavailableFragment"
+        android:id="@+id/notificationFragment"
+        android:name="com.example.lagallens.presentation.feature.notifications.ui.NotificationFragment"
         android:label="@string/menu_notifications" />
 
     <fragment

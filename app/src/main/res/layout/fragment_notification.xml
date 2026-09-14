@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/legal_lens_background">
+
+    <LinearLayout
+        android:id="@+id/notificationAppBar"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/dp_56"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="@dimen/dp_16"
+        android:paddingEnd="@dimen/dp_16"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:includeFontPadding="false"
+            android:text="@string/menu_notifications"
+            android:textColor="@color/legal_lens_primary"
+            android:textSize="@dimen/sp_20"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvMarkAllRead"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/dp_40"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:paddingStart="@dimen/dp_8"
+            android:paddingEnd="@dimen/dp_8"
+            android:text="@string/notification_mark_all_read"
+            android:textColor="@color/legal_lens_auth_accent"
+            android:textSize="@dimen/sp_13"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <HorizontalScrollView
+        android:id="@+id/filterScrollView"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/dp_54"
+        android:fillViewport="false"
+        android:scrollbars="none"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/notificationAppBar">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="@dimen/dp_16"
+            android:paddingEnd="@dimen/dp_16">
+
+            <TextView
+                android:id="@+id/tvFilterAll"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/dp_34"
+                android:background="@drawable/bg_contract_filter_active"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:paddingStart="@dimen/dp_14"
+                android:paddingEnd="@dimen/dp_14"
+                android:text="@string/contract_filter_all"
+                android:textColor="@color/white"
+                android:textSize="@dimen/sp_13"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvFilterAnalysis"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/dp_34"
+                android:layout_marginStart="@dimen/dp_8"
+                android:background="@drawable/bg_contract_filter_inactive"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:paddingStart="@dimen/dp_14"
+                android:paddingEnd="@dimen/dp_14"
+                android:text="@string/notification_filter_analysis"
+                android:textColor="@color/legal_lens_secondary_text"
+                android:textSize="@dimen/sp_13"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvFilterOcr"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/dp_34"
+                android:layout_marginStart="@dimen/dp_8"
+                android:background="@drawable/bg_contract_filter_inactive"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:paddingStart="@dimen/dp_14"
+                android:paddingEnd="@dimen/dp_14"
+                android:text="@string/notification_filter_ocr"
+                android:textColor="@color/legal_lens_secondary_text"
+                android:textSize="@dimen/sp_13"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvFilterReminder"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/dp_34"
+                android:layout_marginStart="@dimen/dp_8"
+                android:background="@drawable/bg_contract_filter_inactive"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:paddingStart="@dimen/dp_14"
+                android:paddingEnd="@dimen/dp_14"
+                android:text="@string/notification_filter_reminder"
+                android:textColor="@color/legal_lens_secondary_text"
+                android:textSize="@dimen/sp_13"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvNotifications"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:overScrollMode="never"
+        android:paddingStart="@dimen/dp_16"
+        android:paddingTop="@dimen/dp_8"
+        android:paddingEnd="@dimen/dp_16"
+        android:paddingBottom="@dimen/dp_16"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/filterScrollView" />
+
+    <LinearLayout
+        android:id="@+id/emptyNotificationState"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/notificationAppBar">
+
+        <ImageView
+            android:layout_width="@dimen/dp_64"
+            android:layout_height="@dimen/dp_64"
+            android:background="@drawable/bg_notification_empty_icon"
+            android:contentDescription="@null"
+            android:padding="@dimen/dp_20"
+            android:src="@drawable/ic_notification_empty"
+            android:tint="@color/legal_lens_auth_accent" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_16"
+            android:includeFontPadding="false"
+            android:text="@string/notification_empty_title"
+            android:textColor="@color/legal_lens_primary"
+            android:textSize="@dimen/sp_14"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_40"
+            android:layout_marginTop="@dimen/dp_8"
+            android:layout_marginEnd="@dimen/dp_40"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:text="@string/notification_empty_description"
+            android:textColor="@color/legal_lens_secondary_text"
+            android:textSize="@dimen/sp_12" />
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

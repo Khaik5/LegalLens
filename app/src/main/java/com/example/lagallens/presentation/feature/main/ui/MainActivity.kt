@@ -38,7 +38,7 @@ class MainActivity : AppCompatActivity() {
     private fun bindBottomNavigation(navController: NavController) {
         binding.navHome.setOnClickListener { navigateTo(navController, R.id.homeDashboardFragment) }
         binding.navContracts.setOnClickListener { navigateTo(navController, R.id.contractListFragment) }
-        binding.navNotifications.setOnClickListener { navigateTo(navController, R.id.notificationsPlaceholder) }
+        binding.navNotifications.setOnClickListener { navigateTo(navController, R.id.notificationFragment) }
         binding.navProfile.setOnClickListener { navigateTo(navController, R.id.profilePlaceholder) }
         navController.addOnDestinationChangedListener { _, destination, _ ->
             val isContractDetail = destination.id == R.id.contractDetailFragment
@@ -47,7 +47,7 @@ class MainActivity : AppCompatActivity() {
             binding.navHome.isSelected = destination.id == R.id.homeDashboardFragment
             binding.navContracts.isSelected = destination.id == R.id.contractListFragment ||
                 destination.id == R.id.contractSearchFragment || isContractDetail
-            binding.navNotifications.isSelected = destination.id == R.id.notificationsPlaceholder
+            binding.navNotifications.isSelected = destination.id == R.id.notificationFragment
             binding.navProfile.isSelected = destination.id == R.id.profilePlaceholder
         }
     }
