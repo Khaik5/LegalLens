@@ -995,7 +995,7 @@ BLOCKED
 | Khải  | Notification Flow          | TODO        | `khai/notifications`   | Notification Fragment + danh sách thông báo + navigation    |
 | Khải  | Profile / Account          | TODO        | `khai/profile`         | Các màn profile/settings trong Figma                        |
 | Phước | Onboarding                 | MERGED      | `phuoc/onboarding`     | Đã merge vào `phuoc_develop` theo trạng thái owner cung cấp |
-| Phước | Add Contract               | IN_PROGRESS | `phuoc/add-contract`   | Feature đang có code, chưa hoàn tất Git flow                |
+| Phước | Add Contract               | PUSHED | `phuoc/add-contract`   | Source selection → upload progress → OCR processing/review/edit/result/saved/failure đã build và unit-test pass |
 | Phước | Camera / Scan              | IN_PROGRESS | `phuoc/camera-scan`    | Camera flow đang triển khai                                 |
 | Phước | OCR                        | TODO        | `phuoc/ocr`            | Processing + Result + Edit OCR                              |
 | Phước | AI Analysis                | TODO        | `phuoc/analysis`       | Analysis processing/result/complete theo Figma              |

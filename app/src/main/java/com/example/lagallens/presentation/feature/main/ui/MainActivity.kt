@@ -1,5 +1,6 @@
 package com.example.lagallens.presentation.feature.main.ui
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -11,6 +12,7 @@ import androidx.navigation.navOptions
 import com.example.lagallens.R
 import com.example.lagallens.databinding.ActivityMainBinding
 import com.example.lagallens.presentation.common.utils.applySystemBarInsets
+import com.example.lagallens.presentation.feature.upload.ui.UploadSourceActivity
 
 class MainActivity : AppCompatActivity() {
     private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
@@ -31,7 +33,7 @@ class MainActivity : AppCompatActivity() {
 
         bindBottomNavigation(navController)
         binding.btnAddContract.setOnClickListener {
-            navController.navigate(R.id.addContractPlaceholder)
+            startActivity(Intent(this, UploadSourceActivity::class.java))
         }
     }
 

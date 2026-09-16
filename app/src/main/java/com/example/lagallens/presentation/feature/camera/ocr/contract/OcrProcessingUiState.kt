@@ -1,5 +1,6 @@
 package com.example.lagallens.presentation.feature.camera.ocr.contract
 
 data class OcrProcessingUiState(
-    val pageCount: Int = 0
+    val documentName: String = "",
+    val documentDetails: String = ""
 )
