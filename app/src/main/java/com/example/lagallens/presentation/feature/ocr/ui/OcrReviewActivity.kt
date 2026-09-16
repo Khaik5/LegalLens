@@ -1,13 +1,11 @@
 package com.example.lagallens.presentation.feature.ocr.ui
 
+import android.content.Context
+import android.content.Intent
 import android.graphics.Color
-import android.graphics.Typeface
 import android.os.Bundle
-import android.text.Editable
 import android.text.Spannable
-import android.text.TextWatcher
 import android.text.style.StyleSpan
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -22,6 +20,7 @@ import com.example.lagallens.databinding.ActivityOcrReviewBinding
 import com.example.lagallens.presentation.feature.ocr.contract.OcrReviewEffect
 import com.example.lagallens.presentation.feature.ocr.contract.OcrReviewEvent
 import com.example.lagallens.presentation.feature.ocr.contract.OcrReviewUiState
+import com.example.lagallens.presentation.feature.ocr.contract.OcrReviewWarning
 import com.example.lagallens.presentation.feature.ocr.viewmodel.OcrReviewViewModel
 import kotlinx.coroutines.launch
 
@@ -42,29 +41,23 @@ class OcrReviewActivity : AppCompatActivity() {
         setContentView(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(binding.ocrReviewRoot) { view, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            view.setPadding(systemBars.left, systemBars.top, systemBars.right, 0)
+            val ime = insets.getInsets(WindowInsetsCompat.Type.ime())
+            view.setPadding(
+                systemBars.left,
+                systemBars.top,
+                systemBars.right,
+                maxOf(systemBars.bottom, ime.bottom)
+            )
             insets
         }
+        ViewCompat.requestApplyInsets(binding.ocrReviewRoot)
         bindEvents()
         observeViewModel()
     }
 
     private fun bindEvents() = with(binding) {
         ocrReviewBack.setOnClickListener { viewModel.onEvent(OcrReviewEvent.BackClicked) }
-        ocrReviewRestore.setOnClickListener { viewModel.onEvent(OcrReviewEvent.RestoreOriginalClicked) }
-        ocrReviewSave.setOnClickListener { viewModel.onEvent(OcrReviewEvent.SaveClicked) }
-        ocrReviewBold.setOnClickListener { applyStyle(Typeface.BOLD) }
-        ocrReviewItalic.setOnClickListener { applyStyle(Typeface.ITALIC) }
-        ocrReviewList.setOnClickListener { insertBullet() }
-        ocrReviewText.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                viewModel.onEvent(OcrReviewEvent.TextChanged(s?.toString().orEmpty()))
-            }
-
-            override fun afterTextChanged(s: Editable?) = Unit
-        })
+        ocrReviewConfirm.setOnClickListener { viewModel.onEvent(OcrReviewEvent.ConfirmClicked) }
     }
 
     private fun observeViewModel() {
@@ -77,34 +70,61 @@ class OcrReviewActivity : AppCompatActivity() {
     }
 
     private fun render(state: OcrReviewUiState) = with(binding) {
-        ocrReviewRevision.setText(
-            if (state.isOriginalText) R.string.ocr_review_original_revision else R.string.ocr_review_edited_revision
-        )
-        if (ocrReviewText.text.toString() != state.text) {
-            ocrReviewText.setText(state.text)
-            ocrReviewText.setSelection(state.text.length)
+        state.warnings.getOrNull(0)?.let { warning ->
+            renderWarning(
+                warning,
+                ocrReviewWarningOneSection,
+                ocrReviewWarningOneConfidence,
+                ocrReviewWarningOneRecognized,
+                ocrReviewWarningOneSource
+            )
         }
+        state.warnings.getOrNull(1)?.let { warning ->
+            renderWarning(
+                warning,
+                ocrReviewWarningTwoSection,
+                ocrReviewWarningTwoConfidence,
+                ocrReviewWarningTwoRecognized,
+                ocrReviewWarningTwoSource
+            )
+        }
+    }
+
+    private fun renderWarning(
+        warning: OcrReviewWarning,
+        section: android.widget.TextView,
+        confidence: android.widget.TextView,
+        recognized: android.widget.TextView,
+        source: android.widget.TextView
+    ) {
+        section.setText(warning.sectionRes)
+        confidence.setText(warning.confidenceRes)
+        val recognizedValue = getString(warning.recognizedValueRes)
+        val renderedRecognized = getString(R.string.ocr_review_recognized_text, recognizedValue)
+        recognized.text = Spannable.Factory.getInstance().newSpannable(renderedRecognized).apply {
+            setSpan(
+                StyleSpan(android.graphics.Typeface.BOLD),
+                renderedRecognized.length - recognizedValue.length,
+                renderedRecognized.length,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+        source.setText(warning.sourceRes)
     }
 
     private fun handleEffect(effect: OcrReviewEffect) {
         when (effect) {
             OcrReviewEffect.NavigateBack -> finish()
-            OcrReviewEffect.ShowSaved -> Toast.makeText(this, R.string.ocr_review_saved, Toast.LENGTH_SHORT).show()
+            OcrReviewEffect.FinishWithConfirmedReview -> {
+                setResult(RESULT_OK, Intent().putExtra(EXTRA_REVIEW_CONFIRMED, true))
+                finish()
+            }
         }
     }
 
-    private fun applyStyle(style: Int) = with(binding.ocrReviewText) {
-        if (selectionStart != selectionEnd) {
-            text.setSpan(StyleSpan(style), selectionStart, selectionEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-        }
-    }
+    companion object {
+        const val EXTRA_REVIEW_CONFIRMED = "extra_review_confirmed"
 
-    private fun insertBullet() = with(binding.ocrReviewText) {
-        val insertionIndex = selectionStart.coerceAtLeast(0)
-        text.insert(insertionIndex, BULLET_PREFIX)
-    }
-
-    private companion object {
-        const val BULLET_PREFIX = "• "
+        fun createIntent(context: Context): Intent = Intent(context, OcrReviewActivity::class.java)
     }
 }

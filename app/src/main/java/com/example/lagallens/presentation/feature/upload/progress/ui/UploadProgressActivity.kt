@@ -14,6 +14,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.lagallens.databinding.ActivityUploadProgressBinding
+import com.example.lagallens.presentation.feature.camera.ocr.ui.OcrProcessingActivity
 import com.example.lagallens.presentation.feature.upload.progress.contract.UploadProgressEffect
 import com.example.lagallens.presentation.feature.upload.progress.contract.UploadProgressEvent
 import com.example.lagallens.presentation.feature.upload.progress.contract.UploadProgressUiState
@@ -78,6 +79,17 @@ class UploadProgressActivity : AppCompatActivity() {
     private fun handleEffect(effect: UploadProgressEffect) {
         when (effect) {
             UploadProgressEffect.NavigateBack -> finish()
+            is UploadProgressEffect.NavigateToOcrProcessing -> {
+                startActivity(
+                    OcrProcessingActivity.createIntent(
+                        this,
+                        effect.fileName,
+                        effect.fileDetails,
+                        true
+                    )
+                )
+                finish()
+            }
         }
     }
 

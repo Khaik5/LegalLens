@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="ocr_result_confidence_height">44dp</dimen>
+    <dimen name="ocr_result_confidence_top_margin">12dp</dimen>
+    <dimen name="ocr_result_confidence_horizontal_padding">12dp</dimen>
+    <dimen name="ocr_result_confidence_corner_radius">12dp</dimen>
+    <dimen name="ocr_result_confidence_icon_size">16dp</dimen>
+    <dimen name="ocr_result_confidence_label_margin_start">8dp</dimen>
+    <dimen name="ocr_result_document_top_margin">8dp</dimen>
+    <dimen name="ocr_result_document_line_spacing">7dp</dimen>
+    <dimen name="ocr_result_subtitle_top_margin">16dp</dimen>
+    <dimen name="ocr_result_divider_top_margin">16dp</dimen>
+    <dimen name="ocr_result_contract_title_top_margin">16dp</dimen>
+    <dimen name="ocr_result_document_body_top_margin">16dp</dimen>
+    <dimen name="ocr_result_footer_height">146dp</dimen>
+    <dimen name="ocr_result_footer_vertical_padding">24dp</dimen>
+
+    <string name="ocr_result_title">Kết quả OCR</string>
+    <string name="ocr_result_confidence_label">Độ tin cậy OCR rất cao</string>
+    <string name="ocr_result_review_confirmed">Đã xác nhận kết quả OCR</string>
+    <string name="ocr_result_back_content_description">Quay lại</string>
+    <string name="ocr_result_edit">Chỉnh sửa</string>
+    <string name="ocr_result_review">Cần xem lại</string>
+    <string name="ocr_result_national_title">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</string>
+    <string name="ocr_result_national_subtitle">Độc lập - Tự do - Hạnh phúc</string>
+    <string name="ocr_result_contract_title">HỢP ĐỒNG THUÊ VĂN PHÒNG</string>
+</resources>

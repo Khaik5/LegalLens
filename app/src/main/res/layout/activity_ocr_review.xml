@@ -55,70 +55,165 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/ocr_review_toolbar_height"
+                android:layout_height="@dimen/ocr_review_alert_height"
+                android:layout_marginStart="@dimen/ocr_review_side_padding"
+                android:layout_marginTop="@dimen/ocr_review_alert_vertical_margin"
+                android:layout_marginEnd="@dimen/ocr_review_side_padding"
+                android:layout_marginBottom="@dimen/ocr_review_alert_vertical_margin"
+                android:background="@drawable/bg_ocr_review_alert"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:paddingStart="@dimen/ocr_review_side_padding"
-                android:paddingEnd="@dimen/ocr_review_side_padding">
+                android:paddingStart="@dimen/ocr_review_alert_horizontal_padding"
+                android:paddingEnd="@dimen/ocr_review_alert_horizontal_padding">
+
+                <ImageView
+                    android:layout_width="@dimen/ocr_review_alert_icon_size"
+                    android:layout_height="@dimen/ocr_review_alert_icon_size"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_ocr_review_warning" />
 
                 <TextView
-                    android:id="@+id/ocr_review_revision"
                     android:layout_width="0dp"
-                    android:layout_height="@dimen/ocr_review_badge_height"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/ocr_review_alert_icon_margin_end"
                     android:layout_weight="1"
-                    android:background="@drawable/bg_ocr_review_badge"
-                    android:gravity="center"
-                    android:paddingStart="@dimen/ocr_review_badge_horizontal_padding"
-                    android:paddingEnd="@dimen/ocr_review_badge_horizontal_padding"
-                    android:textColor="@color/ocr_review_green"
-                    android:textSize="@dimen/ocr_review_badge_text_size"
+                    android:text="@string/ocr_review_alert"
+                    android:textColor="@color/ocr_review_amber"
+                    android:textSize="@dimen/ocr_review_alert_text_size"
                     android:textStyle="bold" />
-
-                <ImageButton
-                    android:id="@+id/ocr_review_bold"
-                    android:layout_width="@dimen/ocr_review_toolbar_button_size"
-                    android:layout_height="@dimen/ocr_review_toolbar_button_size"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/ocr_review_bold_content_description"
-                    android:padding="@dimen/ocr_review_toolbar_icon_inset"
-                    android:src="@drawable/ic_ocr_review_bold" />
-
-                <ImageButton
-                    android:id="@+id/ocr_review_italic"
-                    android:layout_width="@dimen/ocr_review_toolbar_button_size"
-                    android:layout_height="@dimen/ocr_review_toolbar_button_size"
-                    android:layout_marginStart="@dimen/ocr_review_toolbar_button_margin"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/ocr_review_italic_content_description"
-                    android:padding="@dimen/ocr_review_toolbar_icon_inset"
-                    android:src="@drawable/ic_ocr_review_italic" />
-
-                <ImageButton
-                    android:id="@+id/ocr_review_list"
-                    android:layout_width="@dimen/ocr_review_toolbar_button_size"
-                    android:layout_height="@dimen/ocr_review_toolbar_button_size"
-                    android:layout_marginStart="@dimen/ocr_review_toolbar_button_margin"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/ocr_review_list_content_description"
-                    android:padding="@dimen/ocr_review_toolbar_icon_inset"
-                    android:src="@drawable/ic_ocr_review_list" />
             </LinearLayout>
 
-            <EditText
-                android:id="@+id/ocr_review_text"
+            <TextView
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/ocr_review_editor_height"
+                android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/ocr_review_side_padding"
-                android:layout_marginTop="@dimen/ocr_review_editor_top_margin"
                 android:layout_marginEnd="@dimen/ocr_review_side_padding"
-                android:background="@drawable/bg_ocr_review_editor"
-                android:gravity="top|start"
-                android:inputType="textMultiLine|textCapSentences"
-                android:lineSpacingExtra="@dimen/ocr_review_editor_line_spacing"
-                android:padding="@dimen/ocr_review_editor_padding"
-                android:textColor="@color/ocr_review_text"
-                android:textCursorDrawable="@null"
-                android:textSize="@dimen/ocr_review_editor_text_size" />
+                android:text="@string/ocr_review_section_title"
+                android:textColor="@color/ocr_review_body"
+                android:textSize="@dimen/ocr_review_section_title_text_size"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/ocr_review_warning_card_height"
+                android:layout_marginStart="@dimen/ocr_review_side_padding"
+                android:layout_marginTop="@dimen/ocr_review_warning_card_top_margin"
+                android:layout_marginEnd="@dimen/ocr_review_side_padding"
+                android:background="@drawable/bg_ocr_review_warning_card"
+                android:orientation="vertical"
+                android:padding="@dimen/ocr_review_warning_card_padding">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/ocr_review_warning_header_height"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/ocr_review_warning_one_section"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textColor="@color/ocr_review_body"
+                        android:textSize="@dimen/ocr_review_warning_section_text_size"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/ocr_review_warning_one_confidence"
+                        android:layout_width="wrap_content"
+                        android:layout_height="@dimen/ocr_review_confidence_badge_height"
+                        android:background="@drawable/bg_ocr_review_confidence_badge"
+                        android:gravity="center"
+                        android:paddingStart="@dimen/ocr_review_confidence_badge_horizontal_padding"
+                        android:paddingEnd="@dimen/ocr_review_confidence_badge_horizontal_padding"
+                        android:textColor="@color/ocr_review_amber"
+                        android:textSize="@dimen/ocr_review_confidence_badge_text_size"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/ocr_review_border_width"
+                    android:layout_marginTop="@dimen/ocr_review_warning_divider_top_margin"
+                    android:background="@color/ocr_review_border" />
+
+                <TextView
+                    android:id="@+id/ocr_review_warning_one_recognized"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/ocr_review_warning_recognized_top_margin"
+                    android:textColor="@color/ocr_review_text"
+                    android:textSize="@dimen/ocr_review_warning_recognized_text_size" />
+
+                <TextView
+                    android:id="@+id/ocr_review_warning_one_source"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/ocr_review_warning_source_top_margin"
+                    android:textColor="@color/ocr_review_body"
+                    android:textSize="@dimen/ocr_review_warning_source_text_size" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/ocr_review_warning_card_height"
+                android:layout_marginStart="@dimen/ocr_review_side_padding"
+                android:layout_marginTop="@dimen/ocr_review_warning_card_gap"
+                android:layout_marginEnd="@dimen/ocr_review_side_padding"
+                android:background="@drawable/bg_ocr_review_warning_card"
+                android:orientation="vertical"
+                android:padding="@dimen/ocr_review_warning_card_padding">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/ocr_review_warning_header_height"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/ocr_review_warning_two_section"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textColor="@color/ocr_review_body"
+                        android:textSize="@dimen/ocr_review_warning_section_text_size"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/ocr_review_warning_two_confidence"
+                        android:layout_width="wrap_content"
+                        android:layout_height="@dimen/ocr_review_confidence_badge_height"
+                        android:background="@drawable/bg_ocr_review_confidence_badge"
+                        android:gravity="center"
+                        android:paddingStart="@dimen/ocr_review_confidence_badge_horizontal_padding"
+                        android:paddingEnd="@dimen/ocr_review_confidence_badge_horizontal_padding"
+                        android:textColor="@color/ocr_review_amber"
+                        android:textSize="@dimen/ocr_review_confidence_badge_text_size"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/ocr_review_border_width"
+                    android:layout_marginTop="@dimen/ocr_review_warning_divider_top_margin"
+                    android:background="@color/ocr_review_border" />
+
+                <TextView
+                    android:id="@+id/ocr_review_warning_two_recognized"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/ocr_review_warning_recognized_top_margin"
+                    android:textColor="@color/ocr_review_text"
+                    android:textSize="@dimen/ocr_review_warning_recognized_text_size" />
+
+                <TextView
+                    android:id="@+id/ocr_review_warning_two_source"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/ocr_review_warning_source_top_margin"
+                    android:textColor="@color/ocr_review_body"
+                    android:textSize="@dimen/ocr_review_warning_source_text_size" />
+            </LinearLayout>
         </LinearLayout>
     </ScrollView>
 
@@ -129,78 +224,37 @@
         android:background="@drawable/bg_ocr_review_footer"
         android:orientation="vertical"
         android:paddingTop="@dimen/ocr_review_footer_top_padding"
-        android:paddingBottom="@dimen/ocr_review_footer_bottom_padding"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/ocr_review_warning_height"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingStart="@dimen/ocr_review_side_padding"
-            android:paddingEnd="@dimen/ocr_review_side_padding">
-
-            <ImageView
-                android:layout_width="@dimen/ocr_review_warning_icon_size"
-                android:layout_height="@dimen/ocr_review_warning_icon_size"
-                android:src="@drawable/ic_ocr_review_warning" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/ocr_review_warning_icon_margin_end"
-                android:layout_weight="1"
-                android:text="@string/ocr_review_warning"
-                android:textColor="@color/ocr_review_amber"
-                android:textSize="@dimen/ocr_review_warning_text_size"
-                android:textStyle="bold" />
-        </LinearLayout>
-
-        <LinearLayout
+        <TextView
+            android:id="@+id/ocr_review_confirm"
             android:layout_width="match_parent"
             android:layout_height="@dimen/ocr_review_action_height"
-            android:layout_marginTop="@dimen/ocr_review_actions_top_margin"
-            android:orientation="horizontal"
-            android:paddingStart="@dimen/ocr_review_side_padding"
-            android:paddingEnd="@dimen/ocr_review_side_padding">
-
-            <TextView
-                android:id="@+id/ocr_review_restore"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="@drawable/bg_ocr_review_secondary_action"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?attr/selectableItemBackground"
-                android:gravity="center"
-                android:text="@string/ocr_review_restore"
-                android:textColor="@color/ocr_review_navy"
-                android:textSize="@dimen/ocr_review_action_text_size"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/ocr_review_save"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_marginStart="@dimen/ocr_review_action_gap"
-                android:layout_weight="1"
-                android:background="@drawable/bg_ocr_review_primary_action"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?attr/selectableItemBackground"
-                android:gravity="center"
-                android:text="@string/ocr_review_save"
-                android:textColor="@color/ocr_review_white"
-                android:textSize="@dimen/ocr_review_action_text_size"
-                android:textStyle="bold" />
-        </LinearLayout>
+            android:layout_marginStart="@dimen/ocr_review_side_padding"
+            android:layout_marginEnd="@dimen/ocr_review_side_padding"
+            android:background="@drawable/bg_ocr_review_primary_action"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            android:gravity="center"
+            android:text="@string/ocr_review_confirm"
+            android:textColor="@color/ocr_review_white"
+            android:textSize="@dimen/ocr_review_action_text_size"
+            android:textStyle="bold" />
 
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="@dimen/ocr_review_nav_area_height"
-            android:layout_marginTop="@dimen/ocr_review_nav_area_top_margin"/>
+            android:layout_marginTop="@dimen/ocr_review_nav_area_top_margin">
+
+            <View
+                android:layout_width="@dimen/ocr_review_nav_handle_width"
+                android:layout_height="@dimen/ocr_review_nav_handle_height"
+                android:layout_gravity="center"
+                android:alpha="0.3"
+                android:background="@drawable/bg_ocr_review_nav_handle" />
+        </FrameLayout>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,30 +1,30 @@
 package com.example.lagallens.presentation.feature.ocr.viewmodel
 
+import com.example.lagallens.MainDispatcherRule
 import com.example.lagallens.presentation.feature.ocr.contract.OcrReviewEvent
 import com.example.lagallens.presentation.feature.ocr.contract.OcrReviewSample
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
+import org.junit.Rule
 import org.junit.Test
 
 class OcrReviewViewModelTest {
+    @get:Rule
+    val mainDispatcherRule = MainDispatcherRule()
+
     @Test
-    fun restoreOriginalRestoresTheOriginalOcrText() {
+    fun reviewStateContainsTheTwoLocalWarnings() {
         val viewModel = OcrReviewViewModel()
 
-        viewModel.onEvent(OcrReviewEvent.RestoreOriginalClicked)
-
-        assertEquals(OcrReviewSample.originalText, viewModel.uiState.value.text)
-        assertTrue(viewModel.uiState.value.isOriginalText)
+        assertEquals(OcrReviewSample.warnings, viewModel.uiState.value.warnings)
+        assertEquals(2, viewModel.uiState.value.warnings.size)
     }
 
     @Test
-    fun editingTextMarksTheOcrTextAsChanged() {
+    fun confirmClickDoesNotMutateTheDisplayedWarnings() {
         val viewModel = OcrReviewViewModel()
 
-        viewModel.onEvent(OcrReviewEvent.TextChanged("Nội dung đã chỉnh sửa"))
+        viewModel.onEvent(OcrReviewEvent.ConfirmClicked)
 
-        assertEquals("Nội dung đã chỉnh sửa", viewModel.uiState.value.text)
-        assertFalse(viewModel.uiState.value.isOriginalText)
+        assertEquals(OcrReviewSample.warnings, viewModel.uiState.value.warnings)
     }
 }

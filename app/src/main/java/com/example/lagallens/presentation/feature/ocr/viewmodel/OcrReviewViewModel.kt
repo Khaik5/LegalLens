@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class OcrReviewViewModel : ViewModel() {
@@ -23,13 +22,7 @@ class OcrReviewViewModel : ViewModel() {
     fun onEvent(event: OcrReviewEvent) {
         when (event) {
             OcrReviewEvent.BackClicked -> emitEffect(OcrReviewEffect.NavigateBack)
-            is OcrReviewEvent.TextChanged -> _uiState.update {
-                it.copy(text = event.text, isOriginalText = event.text == OcrReviewSample.originalText)
-            }
-            OcrReviewEvent.RestoreOriginalClicked -> _uiState.update {
-                it.copy(text = OcrReviewSample.originalText, isOriginalText = true)
-            }
-            OcrReviewEvent.SaveClicked -> emitEffect(OcrReviewEffect.ShowSaved)
+            OcrReviewEvent.ConfirmClicked -> emitEffect(OcrReviewEffect.FinishWithConfirmedReview)
         }
     }
 

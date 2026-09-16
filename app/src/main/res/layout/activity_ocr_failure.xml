@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/ocr_failure_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/legal_lens_background">
+
+    <LinearLayout
+        android:id="@+id/ocr_failure_app_bar"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/ocr_failure_app_bar_height"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="@dimen/ocr_failure_app_bar_side_padding"
+        android:paddingEnd="@dimen/ocr_failure_app_bar_side_padding"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageButton
+            android:id="@+id/ocr_failure_back"
+            android:layout_width="@dimen/ocr_failure_back_button_size"
+            android:layout_height="@dimen/ocr_failure_back_button_size"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/ocr_failure_back_content_description"
+            android:padding="@dimen/ocr_failure_back_icon_padding"
+            android:src="@drawable/ic_upload_back" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/ocr_failure_title_margin_start"
+            android:layout_weight="1"
+            android:fontFamily="sans-serif"
+            android:text="@string/ocr_failure_title"
+            android:textColor="@color/legal_lens_primary"
+            android:textSize="@dimen/ocr_failure_title_text_size"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <View
+        android:id="@+id/ocr_failure_alert_seal"
+        android:layout_width="@dimen/ocr_failure_alert_seal_size"
+        android:layout_height="@dimen/ocr_failure_alert_seal_size"
+        android:layout_marginTop="@dimen/ocr_failure_alert_seal_top_margin"
+        android:background="@drawable/bg_ocr_failure_alert_seal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ocr_failure_app_bar" />
+
+    <ImageView
+        android:layout_width="@dimen/ocr_failure_alert_icon_size"
+        android:layout_height="@dimen/ocr_failure_alert_icon_size"
+        android:contentDescription="@null"
+        android:src="@drawable/ic_ocr_failure_alert"
+        app:layout_constraintBottom_toBottomOf="@id/ocr_failure_alert_seal"
+        app:layout_constraintEnd_toEndOf="@id/ocr_failure_alert_seal"
+        app:layout_constraintStart_toStartOf="@id/ocr_failure_alert_seal"
+        app:layout_constraintTop_toTopOf="@id/ocr_failure_alert_seal" />
+
+    <TextView
+        android:id="@+id/ocr_failure_heading"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/ocr_failure_side_padding"
+        android:layout_marginTop="@dimen/ocr_failure_heading_top_margin"
+        android:layout_marginEnd="@dimen/ocr_failure_side_padding"
+        android:fontFamily="sans-serif"
+        android:gravity="center"
+        android:text="@string/ocr_failure_heading"
+        android:textColor="@color/legal_lens_primary"
+        android:textSize="@dimen/ocr_failure_heading_text_size"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ocr_failure_alert_seal" />
+
+    <TextView
+        android:id="@+id/ocr_failure_message"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/ocr_failure_side_padding"
+        android:layout_marginTop="@dimen/ocr_failure_message_top_margin"
+        android:layout_marginEnd="@dimen/ocr_failure_side_padding"
+        android:gravity="center"
+        android:lineSpacingExtra="@dimen/ocr_failure_message_line_spacing"
+        android:text="@string/ocr_failure_message"
+        android:textColor="@color/legal_lens_secondary_text"
+        android:textSize="@dimen/ocr_failure_message_text_size"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ocr_failure_heading" />
+
+    <LinearLayout
+        android:id="@+id/ocr_failure_reasons_card"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/ocr_failure_reasons_card_height"
+        android:layout_marginStart="@dimen/ocr_failure_side_padding"
+        android:layout_marginTop="@dimen/ocr_failure_reasons_card_top_margin"
+        android:layout_marginEnd="@dimen/ocr_failure_side_padding"
+        android:background="@drawable/bg_ocr_failure_reasons_card"
+        android:orientation="vertical"
+        android:padding="@dimen/ocr_failure_reasons_card_padding"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ocr_failure_message">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif"
+            android:text="@string/ocr_failure_reasons_title"
+            android:textColor="@color/legal_lens_primary"
+            android:textSize="@dimen/ocr_failure_reasons_title_text_size"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/ocr_failure_reasons_first_item_margin_top"
+            android:text="@string/ocr_failure_reason_quality"
+            android:textColor="@color/legal_lens_secondary_text"
+            android:textSize="@dimen/ocr_failure_reasons_item_text_size" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/ocr_failure_reasons_item_margin_top"
+            android:text="@string/ocr_failure_reason_lighting"
+            android:textColor="@color/legal_lens_secondary_text"
+            android:textSize="@dimen/ocr_failure_reasons_item_text_size" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/ocr_failure_reasons_item_margin_top"
+            android:text="@string/ocr_failure_reason_format"
+            android:textColor="@color/legal_lens_secondary_text"
+            android:textSize="@dimen/ocr_failure_reasons_item_text_size" />
+    </LinearLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/ocr_failure_footer"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/ocr_failure_footer_height"
+        android:background="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <View
+            android:id="@+id/ocr_failure_footer_divider"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/ocr_failure_footer_divider_height"
+            android:background="@color/legal_lens_input_stroke"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="@dimen/ocr_failure_button_height"
+            android:layout_marginStart="@dimen/ocr_failure_side_padding"
+            android:layout_marginTop="@dimen/ocr_failure_footer_content_top_margin"
+            android:layout_marginEnd="@dimen/ocr_failure_side_padding"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/ocr_failure_return"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/bg_ocr_failure_secondary_action"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                android:gravity="center"
+                android:text="@string/ocr_failure_return"
+                android:textColor="@color/legal_lens_primary"
+                android:textSize="@dimen/ocr_failure_button_text_size"
+                android:textStyle="bold" />
+
+            <View
+                android:layout_width="@dimen/ocr_failure_button_gap"
+                android:layout_height="match_parent" />
+
+            <TextView
+                android:id="@+id/ocr_failure_retry"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/bg_ocr_failure_primary_action"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                android:gravity="center"
+                android:text="@string/ocr_failure_retry"
+                android:textColor="@color/white"
+                android:textSize="@dimen/ocr_failure_button_text_size"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

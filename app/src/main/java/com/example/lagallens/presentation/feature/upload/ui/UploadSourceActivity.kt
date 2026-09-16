@@ -123,7 +123,7 @@ class UploadSourceActivity : AppCompatActivity() {
         val fileName = fileMetadata?.first ?: getString(R.string.upload_source_selected_file)
         val fileSize = fileMetadata?.second?.let { Formatter.formatShortFileSize(this, it) }
         val fileType = contentResolver.getType(uri)?.let(::formatFileType).orEmpty()
-        val fileDetails = listOfNotNull(fileSize, fileType.takeIf { it.isNotBlank() }).joinToString(" · ")
+        val fileDetails = listOfNotNull(fileType.takeIf { it.isNotBlank() }, fileSize).joinToString(" · ")
         startActivity(UploadProgressActivity.newIntent(this, fileName, fileDetails))
     }
 
