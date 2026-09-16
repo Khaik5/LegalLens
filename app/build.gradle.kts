@@ -13,7 +13,7 @@ android {
     defaultConfig {
         applicationId = "com.example.lagallens"
         minSdk = 28
-        targetSdk = 37
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
@@ -42,6 +42,11 @@ dependencies {
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.camera.core)
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
+    implementation(libs.androidx.recyclerview)
     implementation(libs.androidx.core.ktx)
     implementation(libs.material)
     testImplementation(libs.junit)
@@ -86,5 +91,9 @@ dependencies {
         "com.android.tools:desugar_jdk_libs:2.0.4"
     )
     implementation("androidx.fragment:fragment-ktx:1.8.5")
+    implementation("androidx.navigation:navigation-fragment-ktx:2.8.9")
+    implementation("androidx.navigation:navigation-ui-ktx:2.8.9")
+    implementation(libs.opencv)
+    implementation(libs.mlkit.text.recognition)
     implementation("androidx.viewpager2:viewpager2:1.1.0")
 }

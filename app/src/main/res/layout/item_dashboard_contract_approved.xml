@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/dp_14"
+    android:background="@drawable/bg_dashboard_card"
+    android:orientation="vertical"
+    android:padding="@dimen/dp_16">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="@dimen/dp_36"
+            android:layout_height="@dimen/dp_36"
+            android:background="@drawable/bg_dashboard_icon_green"
+            android:contentDescription="@null"
+            android:padding="@dimen/dp_8"
+            android:src="@drawable/ic_dashboard_contract" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_12"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:includeFontPadding="false"
+                android:maxLines="1"
+                android:text="@string/dashboard_office_lease"
+                android:textColor="@color/dashboard_primary_text"
+                android:textSize="@dimen/sp_14"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_4"
+                android:includeFontPadding="false"
+                android:text="@string/dashboard_service_contract"
+                android:textColor="@color/dashboard_secondary_text"
+                android:textSize="@dimen/sp_12" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_dashboard_status_green"
+            android:includeFontPadding="false"
+            android:paddingHorizontal="@dimen/dp_8"
+            android:paddingVertical="@dimen/dp_4"
+            android:text="@string/dashboard_approved"
+            android:textColor="@color/dashboard_green"
+            android:textSize="@dimen/sp_10"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_1"
+        android:layout_marginTop="@dimen/dp_12"
+        android:background="@color/dashboard_border" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dp_12"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="@dimen/dp_20"
+            android:layout_height="@dimen/dp_20"
+            android:contentDescription="@null"
+            android:src="@drawable/ic_dashboard_risk_low" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_8"
+            android:layout_weight="1"
+            android:includeFontPadding="false"
+            android:text="@string/dashboard_low_risk"
+            android:textColor="@color/dashboard_green"
+            android:textSize="@dimen/sp_13"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:includeFontPadding="false"
+            android:text="@string/dashboard_analyze_action"
+            android:textColor="@color/dashboard_teal"
+            android:textSize="@dimen/sp_13"
+            android:textStyle="bold" />
+    </LinearLayout>
+</LinearLayout>

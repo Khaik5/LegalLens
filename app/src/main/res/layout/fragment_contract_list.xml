@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/legal_lens_background">
+
+    <LinearLayout
+        android:id="@+id/contractAppBar"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/dp_56"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="@dimen/dp_16"
+        android:paddingEnd="@dimen/dp_16"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:includeFontPadding="false"
+            android:text="@string/contract_list_title"
+            android:textColor="@color/legal_lens_primary"
+            android:textSize="@dimen/sp_20"
+            android:textStyle="bold" />
+
+        <ImageButton
+            android:id="@+id/btnSearch"
+            android:layout_width="@dimen/dp_40"
+            android:layout_height="@dimen/dp_40"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/contract_search_description"
+            android:padding="@dimen/dp_8"
+            android:src="@drawable/ic_contract_search" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/searchContainer"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/dp_48"
+        android:layout_marginStart="@dimen/dp_24"
+        android:layout_marginEnd="@dimen/dp_24"
+        android:background="@drawable/bg_contract_search"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="@dimen/dp_16"
+        android:paddingEnd="@dimen/dp_8"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/contractAppBar">
+
+        <ImageView
+            android:layout_width="@dimen/dp_18"
+            android:layout_height="@dimen/dp_18"
+            android:contentDescription="@null"
+            android:src="@drawable/ic_contract_search" />
+
+        <EditText
+            android:id="@+id/etSearch"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="@dimen/dp_10"
+            android:layout_weight="1"
+            android:background="@null"
+            android:hint="@string/contract_search_hint"
+            android:imeOptions="actionSearch"
+            android:inputType="text"
+            android:padding="@dimen/dp_0"
+            android:singleLine="true"
+            android:textColor="@color/legal_lens_primary"
+            android:textColorHint="@color/legal_lens_secondary_text"
+            android:textSize="@dimen/sp_14" />
+
+        <ImageButton
+            android:id="@+id/btnFilter"
+            android:layout_width="@dimen/dp_40"
+            android:layout_height="@dimen/dp_40"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/contract_filter_description"
+            android:padding="@dimen/dp_11"
+            android:src="@drawable/ic_contract_filter" />
+    </LinearLayout>
+
+    <HorizontalScrollView
+        android:id="@+id/filterScrollView"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/dp_58"
+        android:fillViewport="false"
+        android:scrollbars="none"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/searchContainer">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="@dimen/dp_24"
+            android:paddingEnd="@dimen/dp_24">
+
+            <TextView
+                android:id="@+id/tvFilterAll"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/dp_34"
+                android:background="@drawable/bg_contract_filter_active"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:paddingStart="@dimen/dp_14"
+                android:paddingEnd="@dimen/dp_14"
+                android:text="@string/contract_filter_all"
+                android:textColor="@color/white"
+                android:textSize="@dimen/sp_13"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvFilterAnalyzed"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/dp_34"
+                android:layout_marginStart="@dimen/dp_8"
+                android:background="@drawable/bg_contract_filter_inactive"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:paddingStart="@dimen/dp_14"
+                android:paddingEnd="@dimen/dp_14"
+                android:text="@string/contract_filter_analyzed"
+                android:textColor="@color/legal_lens_secondary_text"
+                android:textSize="@dimen/sp_13"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvFilterProcessing"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/dp_34"
+                android:layout_marginStart="@dimen/dp_8"
+                android:background="@drawable/bg_contract_filter_inactive"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:paddingStart="@dimen/dp_14"
+                android:paddingEnd="@dimen/dp_14"
+                android:text="@string/contract_filter_processing"
+                android:textColor="@color/legal_lens_secondary_text"
+                android:textSize="@dimen/sp_13"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvFilterHighRisk"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/dp_34"
+                android:layout_marginStart="@dimen/dp_8"
+                android:background="@drawable/bg_contract_filter_inactive"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:paddingStart="@dimen/dp_14"
+                android:paddingEnd="@dimen/dp_14"
+                android:text="@string/contract_filter_high_risk"
+                android:textColor="@color/legal_lens_secondary_text"
+                android:textSize="@dimen/sp_13"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvContracts"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:overScrollMode="never"
+        android:paddingStart="@dimen/dp_24"
+        android:paddingEnd="@dimen/dp_24"
+        android:paddingBottom="@dimen/dp_16"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/filterScrollView" />
+</androidx.constraintlayout.widget.ConstraintLayout>

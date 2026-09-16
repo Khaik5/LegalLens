@@ -2,8 +2,8 @@ package com.example.lagallens.presentation.feature.upload.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.lagallens.presentation.feature.upload.contract.UploadSourceEffect
-import com.example.lagallens.presentation.feature.upload.contract.UploadSourceEvent
+import com.example.lagallens.presentation.feature.upload.contract.UploadSourceUiEffect
+import com.example.lagallens.presentation.feature.upload.contract.UploadSourceUiEvent
 import com.example.lagallens.presentation.feature.upload.contract.UploadSourceUiState
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,27 +15,27 @@ class UploadSourceViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(UploadSourceUiState())
     val uiState = _uiState.asStateFlow()
 
-    private val _effects = MutableSharedFlow<UploadSourceEffect>()
-    val effects = _effects.asSharedFlow()
+    private val _uiEffect = MutableSharedFlow<UploadSourceUiEffect>()
+    val uiEffect = _uiEffect.asSharedFlow()
 
-    fun onEvent(event: UploadSourceEvent) {
+    fun onEvent(event: UploadSourceUiEvent) {
         when (event) {
-            UploadSourceEvent.BackClicked -> emitEffect(UploadSourceEffect.NavigateBack)
-            UploadSourceEvent.PdfClicked -> emitEffect(
-                UploadSourceEffect.OpenDocumentPicker(arrayOf("application/pdf"))
+            UploadSourceUiEvent.BackClicked -> emitEffect(UploadSourceUiEffect.NavigateBack)
+            UploadSourceUiEvent.PdfClicked -> emitEffect(
+                UploadSourceUiEffect.OpenDocumentPicker(arrayOf("application/pdf"))
             )
-            UploadSourceEvent.DocxClicked -> emitEffect(
-                UploadSourceEffect.OpenDocumentPicker(
+            UploadSourceUiEvent.DocxClicked -> emitEffect(
+                UploadSourceUiEffect.OpenDocumentPicker(
                     arrayOf("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
                 )
             )
-            UploadSourceEvent.GalleryClicked -> emitEffect(UploadSourceEffect.OpenImagePicker)
-            UploadSourceEvent.CameraClicked -> emitEffect(UploadSourceEffect.ShowCameraUnavailable)
-            UploadSourceEvent.FileSelected -> emitEffect(UploadSourceEffect.ShowFileSelected)
+            UploadSourceUiEvent.GalleryClicked -> emitEffect(UploadSourceUiEffect.OpenImagePicker)
+            UploadSourceUiEvent.CameraClicked -> emitEffect(UploadSourceUiEffect.NavigateToCameraPermission)
+            UploadSourceUiEvent.FileSelected -> emitEffect(UploadSourceUiEffect.ShowFileSelected)
         }
     }
 
-    private fun emitEffect(effect: UploadSourceEffect) {
-        viewModelScope.launch { _effects.emit(effect) }
+    private fun emitEffect(effect: UploadSourceUiEffect) {
+        viewModelScope.launch { _uiEffect.emit(effect) }
     }
 }

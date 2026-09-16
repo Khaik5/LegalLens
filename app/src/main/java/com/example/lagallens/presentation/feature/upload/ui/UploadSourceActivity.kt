@@ -17,15 +17,16 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.lagallens.R
 import com.example.lagallens.databinding.ActivityUploadSourceBinding
-import com.example.lagallens.presentation.feature.upload.contract.UploadSourceEffect
-import com.example.lagallens.presentation.feature.upload.contract.UploadSourceEvent
+import com.example.lagallens.presentation.feature.camera.permission.ui.CameraPermissionActivity
+import com.example.lagallens.presentation.feature.upload.contract.UploadSourceUiEffect
+import com.example.lagallens.presentation.feature.upload.contract.UploadSourceUiEvent
 import com.example.lagallens.presentation.feature.upload.contract.UploadSourceUiState
 import com.example.lagallens.presentation.feature.upload.progress.ui.UploadProgressActivity
 import com.example.lagallens.presentation.feature.upload.viewmodel.UploadSourceViewModel
 import kotlinx.coroutines.launch
 
 class UploadSourceActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityUploadSourceBinding
+    private val binding by lazy { ActivityUploadSourceBinding.inflate(layoutInflater) }
     private val viewModel by viewModels<UploadSourceViewModel>()
     private val documentPicker = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         uri?.let(::openUploadProgress)
@@ -43,37 +44,44 @@ class UploadSourceActivity : AppCompatActivity() {
             isAppearanceLightStatusBars = true
             isAppearanceLightNavigationBars = true
         }
-        binding = ActivityUploadSourceBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        applyWindowInsets()
+        bindView()
+        collectViewModel()
+    }
+
+    private fun applyWindowInsets() {
         ViewCompat.setOnApplyWindowInsetsListener(binding.uploadSourceRoot) { view, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        bindEvents()
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch { viewModel.uiState.collect(::render) }
-                launch { viewModel.effects.collect(::handleEffect) }
-            }
+    }
+
+    private fun bindView() {
+        binding.uploadSourceBack.setOnClickListener {
+            viewModel.onEvent(UploadSourceUiEvent.BackClicked)
+        }
+        binding.uploadSourcePdf.setOnClickListener {
+            viewModel.onEvent(UploadSourceUiEvent.PdfClicked)
+        }
+        binding.uploadSourceDocx.setOnClickListener {
+            viewModel.onEvent(UploadSourceUiEvent.DocxClicked)
+        }
+        binding.uploadSourceGallery.setOnClickListener {
+            viewModel.onEvent(UploadSourceUiEvent.GalleryClicked)
+        }
+        binding.uploadSourceCamera.setOnClickListener {
+            viewModel.onEvent(UploadSourceUiEvent.CameraClicked)
         }
     }
 
-    private fun bindEvents() {
-        binding.uploadSourceBack.setOnClickListener {
-            viewModel.onEvent(UploadSourceEvent.BackClicked)
-        }
-        binding.uploadSourcePdf.setOnClickListener {
-            viewModel.onEvent(UploadSourceEvent.PdfClicked)
-        }
-        binding.uploadSourceDocx.setOnClickListener {
-            viewModel.onEvent(UploadSourceEvent.DocxClicked)
-        }
-        binding.uploadSourceGallery.setOnClickListener {
-            viewModel.onEvent(UploadSourceEvent.GalleryClicked)
-        }
-        binding.uploadSourceCamera.setOnClickListener {
-            viewModel.onEvent(UploadSourceEvent.CameraClicked)
+    private fun collectViewModel() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch { viewModel.uiState.collect(::render) }
+                launch { viewModel.uiEffect.collect(::handleEffect) }
+            }
         }
     }
 
@@ -84,13 +92,15 @@ class UploadSourceActivity : AppCompatActivity() {
         binding.uploadSourceCamera.isEnabled = state.isSourceSelectionAvailable
     }
 
-    private fun handleEffect(effect: UploadSourceEffect) {
+    private fun handleEffect(effect: UploadSourceUiEffect) {
         when (effect) {
-            UploadSourceEffect.NavigateBack -> finish()
-            is UploadSourceEffect.OpenDocumentPicker -> documentPicker.launch(effect.mimeTypes)
-            UploadSourceEffect.OpenImagePicker -> imagePicker.launch("image/*")
-            UploadSourceEffect.ShowFileSelected -> showMessage(R.string.upload_source_selected)
-            UploadSourceEffect.ShowCameraUnavailable -> showMessage(R.string.upload_camera_unavailable)
+            UploadSourceUiEffect.NavigateBack -> finish()
+            UploadSourceUiEffect.NavigateToCameraPermission -> startActivity(
+                CameraPermissionActivity.createIntent(this)
+            )
+            is UploadSourceUiEffect.OpenDocumentPicker -> documentPicker.launch(effect.mimeTypes)
+            UploadSourceUiEffect.OpenImagePicker -> imagePicker.launch("image/*")
+            UploadSourceUiEffect.ShowFileSelected -> showMessage(R.string.upload_source_selected)
         }
     }
 

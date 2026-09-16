@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_nav_graph"
+    app:startDestination="@id/homeDashboardFragment">
+
+    <fragment
+        android:id="@+id/homeDashboardFragment"
+        android:name="com.example.lagallens.presentation.feature.dashboard.ui.HomeDashboardFragment"
+        android:label="@string/menu_home" />
+
+    <fragment
+        android:id="@+id/contractListFragment"
+        android:name="com.example.lagallens.presentation.feature.contracts.ui.ContractListFragment"
+        android:label="@string/menu_contracts">
+        <action
+            android:id="@+id/action_contractListFragment_to_contractSearchFragment"
+            app:destination="@id/contractSearchFragment" />
+        <action
+            android:id="@+id/action_contractListFragment_to_contractDetailFragment"
+            app:destination="@id/contractDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/contractSearchFragment"
+        android:name="com.example.lagallens.presentation.feature.contracts.search.ui.ContractSearchFragment"
+        android:label="@string/menu_contracts">
+        <action
+            android:id="@+id/action_contractSearchFragment_to_contractDetailFragment"
+            app:destination="@id/contractDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/contractDetailFragment"
+        android:name="com.example.lagallens.presentation.feature.contracts.detail.ui.ContractDetailFragment"
+        android:label="@string/contract_detail_title">
+        <argument
+            android:name="contractId"
+            app:argType="string"
+            android:defaultValue="office-lease" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/notificationFragment"
+        android:name="com.example.lagallens.presentation.feature.notifications.ui.NotificationFragment"
+        android:label="@string/menu_notifications" />
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.example.lagallens.presentation.feature.profile.ui.ProfileFragment"
+        android:label="@string/menu_profile">
+        <action
+            android:id="@+id/action_profileFragment_to_profileEditFragment"
+            app:destination="@id/profileEditFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_profileSettingsFragment"
+            app:destination="@id/profileSettingsFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_profilePasswordFragment"
+            app:destination="@id/profilePasswordFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/profileEditFragment"
+        android:name="com.example.lagallens.presentation.feature.profile.edit.ui.ProfileEditFragment"
+        android:label="@string/profile_edit_title" />
+
+    <fragment
+        android:id="@+id/profileSettingsFragment"
+        android:name="com.example.lagallens.presentation.feature.profile.settings.ui.ProfileSettingsFragment"
+        android:label="@string/profile_settings_title" />
+
+    <fragment
+        android:id="@+id/profilePasswordFragment"
+        android:name="com.example.lagallens.presentation.feature.profile.password.ui.ProfilePasswordFragment"
+        android:label="@string/profile_password_title" />
+
+    <fragment
+        android:id="@+id/addContractPlaceholder"
+        android:name="com.example.lagallens.presentation.common.ui.FeatureUnavailableFragment"
+        android:label="@string/add_contract" />
+</navigation>

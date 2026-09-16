@@ -1,9 +1,62 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
     <style name="Base.Theme.LagalLens" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
     </style>
-
     <style name="Theme.LagalLens" parent="Base.Theme.LagalLens" />
+    <style name="AuthFieldLabel">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:textColor">@color/legal_lens_status_text</item>
+        <item name="android:textSize">@dimen/sp_14</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="AuthInput">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/dp_54</item>
+        <item name="android:layout_marginTop">@dimen/dp_8</item>
+        <item name="android:background">@drawable/bg_auth_input</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:paddingHorizontal">@dimen/dp_16</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textColor">@color/legal_lens_status_text</item>
+        <item name="android:textColorHint">@color/legal_lens_status_text</item>
+        <item name="android:textSize">@dimen/sp_15</item>
+    </style>
+    <style name="OtpDigitInput">
+        <item name="android:layout_width">@dimen/dp_48</item>
+        <item name="android:layout_height">@dimen/dp_56</item>
+        <item name="android:gravity">center</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:inputType">number</item>
+        <item name="android:maxLength">1</item>
+        <item name="android:padding">@dimen/dp_0</item>
+        <item name="android:selectAllOnFocus">true</item>
+        <item name="android:textColor">@color/legal_lens_status_text</item>
+        <item name="android:textSize">@dimen/sp_24</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="ContractFilterOption">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">@dimen/dp_34</item>
+        <item name="android:background">@drawable/bg_contract_filter_option</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:gravity">center</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:paddingStart">@dimen/dp_12</item>
+        <item name="android:paddingEnd">@dimen/dp_12</item>
+        <item name="android:textColor">@color/legal_lens_secondary_text</item>
+        <item name="android:textSize">@dimen/sp_13</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="ContractFilterRiskOption" parent="ContractFilterOption">
+        <item name="android:layout_width">@dimen/dp_85</item>
+        <item name="android:paddingStart">@dimen/dp_0</item>
+        <item name="android:paddingEnd">@dimen/dp_0</item>
+    </style>
 </resources>

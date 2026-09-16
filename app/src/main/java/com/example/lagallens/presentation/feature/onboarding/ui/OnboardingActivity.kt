@@ -1,5 +1,6 @@
 package com.example.lagallens.presentation.feature.onboarding.ui
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -8,46 +9,61 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.viewpager2.widget.ViewPager2
+import com.example.lagallens.LegalLensApplication
 import com.example.lagallens.R
-import com.example.lagallens.data.datasource.local.datastore.OnboardingPreferencesDataSource
 import com.example.lagallens.databinding.ActivityOnboardingBinding
+import com.example.lagallens.presentation.feature.home.ui.HomeActivity
 import com.example.lagallens.presentation.feature.onboarding.adapter.OnboardingPagerAdapter
-import com.example.lagallens.presentation.feature.onboarding.contract.OnboardingEffect
-import com.example.lagallens.presentation.feature.onboarding.contract.OnboardingEvent
+import com.example.lagallens.presentation.feature.onboarding.contract.OnboardingUiEffect
+import com.example.lagallens.presentation.feature.onboarding.contract.OnboardingUiEvent
 import com.example.lagallens.presentation.feature.onboarding.contract.OnboardingUiState
 import com.example.lagallens.presentation.feature.onboarding.viewmodel.OnboardingViewModel
 import kotlinx.coroutines.launch
 
 class OnboardingActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityOnboardingBinding
-    private val viewModel by viewModels<OnboardingViewModel>()
+    private val binding by lazy { ActivityOnboardingBinding.inflate(layoutInflater) }
+    private val viewModel by viewModels<OnboardingViewModel> {
+        OnboardingViewModel.Factory(
+            (application as LegalLensApplication).completeOnboardingUseCase
+        )
+    }
+    private val onboardingAdapter by lazy { OnboardingPagerAdapter(viewModel.uiState.value.pages) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        binding = ActivityOnboardingBinding.inflate(layoutInflater)
         setContentView(binding.root)
         window.statusBarColor = getColor(R.color.onboarding_background)
         window.navigationBarColor = getColor(R.color.onboarding_background)
 
-        binding.onboardingPager.adapter = OnboardingPagerAdapter(viewModel.uiState.value.pages)
-        binding.onboardingSkip.setOnClickListener {
-            viewModel.onEvent(OnboardingEvent.SkipClicked)
-        }
-        binding.onboardingNext.setOnClickListener {
-            viewModel.onEvent(OnboardingEvent.NextClicked)
-        }
-        binding.onboardingPager.registerOnPageChangeCallback(object :
-            ViewPager2.OnPageChangeCallback() {
+        setUpPager()
+        bindView()
+        collectViewModel()
+    }
+
+    private fun setUpPager() {
+        binding.onboardingPager.adapter = onboardingAdapter
+        binding.onboardingPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
-                viewModel.onEvent(OnboardingEvent.PageSelected(position))
+                viewModel.onEvent(OnboardingUiEvent.PageSelected(position))
             }
         })
+    }
 
+    private fun bindView() {
+        binding.onboardingSkip.setOnClickListener {
+            viewModel.onEvent(OnboardingUiEvent.SkipClicked)
+        }
+        binding.onboardingNext.setOnClickListener {
+            viewModel.onEvent(OnboardingUiEvent.NextClicked)
+        }
+    }
+
+    private fun collectViewModel() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch { viewModel.uiState.collect(::render) }
-                launch { viewModel.effects.collect(::handleEffect) }
+                launch { viewModel.uiEffect.collect(::handleEffect) }
             }
         }
     }
@@ -72,15 +88,11 @@ class OnboardingActivity : AppCompatActivity() {
         )
     }
 
-    private fun handleEffect(effect: OnboardingEffect) {
+    private fun handleEffect(effect: OnboardingUiEffect) {
         when (effect) {
-            OnboardingEffect.StartRequested, OnboardingEffect.SkipRequested -> {
-                lifecycleScope.launch {
-                    OnboardingPreferencesDataSource(applicationContext).markCompleted()
-                    setResult(RESULT_OK)
-                    finish()
-                }
-            }
+            OnboardingUiEffect.NavigateToHome -> startActivity(
+                Intent(this, HomeActivity::class.java)
+            ).also { finish() }
         }
     }
 }

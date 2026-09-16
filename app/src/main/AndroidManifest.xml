@@ -2,7 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.CAMERA" />
+
     <application
+        android:name=".LegalLensApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -12,13 +15,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.LagalLens">
         <activity
-            android:name=".presentation.feature.upload.error.ui.UploadErrorActivity"
-            android:exported="false" />
-        <activity
-            android:name=".presentation.feature.upload.progress.ui.UploadProgressActivity"
-            android:exported="false" />
-        <activity
-            android:name=".presentation.feature.upload.ui.UploadSourceActivity"
+            android:name=".presentation.feature.splash.ui.SplashActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
@@ -32,11 +29,56 @@
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".presentation.feature.splash.ui.SplashActivity"
-            android:exported="false">
-        </activity>
+            android:name=".presentation.feature.login.ui.LoginActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".presentation.feature.onboarding.ui.OnboardingActivity"
+            android:name=".presentation.feature.otp.ui.OtpVerificationActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".presentation.feature.success.ui.SuccessActivity"
+            android:exported="false" />
+        <activity
+            android:name=".presentation.feature.forgotpassword.ui.ForgotPasswordActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".presentation.feature.register.ui.RegisterActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".presentation.feature.home.ui.HomeActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".presentation.feature.main.ui.MainActivity"
+            android:exported="false" />
+        <activity
+            android:name=".presentation.feature.upload.ui.UploadSourceActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".presentation.feature.camera.permission.ui.CameraPermissionActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".presentation.feature.camera.capture.ui.CameraCaptureActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".presentation.feature.camera.pages.ui.CameraPageManagerActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".presentation.feature.camera.ocr.ui.OcrProcessingActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".presentation.feature.upload.progress.ui.UploadProgressActivity"
+            android:exported="false" />
+        <activity
+            android:name=".presentation.feature.upload.error.ui.UploadErrorActivity"
             android:exported="false" />
     </application>
 

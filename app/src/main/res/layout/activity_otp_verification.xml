@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/otpRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/legal_lens_background"
+    tools:context=".presentation.feature.otp.ui.OtpVerificationActivity">
+
+    <LinearLayout
+        android:id="@+id/headerLayout"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/dp_56"
+        android:layout_marginTop="@dimen/dp_53"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageButton
+            android:id="@+id/backButton"
+            android:layout_width="@dimen/dp_40"
+            android:layout_height="@dimen/dp_40"
+            android:layout_marginStart="@dimen/dp_16"
+            android:background="@drawable/bg_otp_back_button"
+            android:contentDescription="@string/back"
+            android:padding="@dimen/dp_8"
+            android:src="@drawable/ic_chevron_left"
+            app:tint="@color/legal_lens_status_text" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_12"
+            android:layout_marginEnd="@dimen/dp_16"
+            android:layout_weight="1"
+            android:includeFontPadding="false"
+            android:text="@string/otp_verification"
+            android:textColor="@color/legal_lens_status_text"
+            android:textSize="@dimen/sp_18"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        android:overScrollMode="never"
+        app:layout_constraintBottom_toTopOf="@id/footerLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/headerLayout">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/dp_24"
+            android:paddingTop="@dimen/dp_56">
+
+            <FrameLayout
+                android:layout_width="@dimen/dp_72"
+                android:layout_height="@dimen/dp_72"
+                android:layout_gravity="center_horizontal"
+                android:background="@drawable/bg_otp_security_icon">
+
+                <ImageView
+                    android:layout_width="@dimen/dp_48"
+                    android:layout_height="@dimen/dp_48"
+                    android:layout_gravity="center"
+                    android:contentDescription="@string/otp_security_icon_description"
+                    android:src="@drawable/ic_shield_check" />
+            </FrameLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_16"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:text="@string/otp_title"
+                android:textColor="@color/legal_lens_primary"
+                android:textSize="@dimen/sp_24"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_8"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:text="@string/otp_subtitle"
+                android:textColor="@color/legal_lens_secondary_text"
+                android:textSize="@dimen/sp_14" />
+
+            <TextView
+                android:id="@+id/emailText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="@dimen/dp_4"
+                android:background="@drawable/bg_otp_email_badge"
+                android:includeFontPadding="false"
+                android:paddingHorizontal="@dimen/dp_12"
+                android:paddingVertical="@dimen/dp_4"
+                android:textColor="@color/legal_lens_auth_accent"
+                android:textSize="@dimen/sp_14"
+                android:textStyle="bold"
+                tools:text="ten@gmail.com" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp_56"
+                android:layout_marginTop="@dimen/dp_28"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/otpInput1"
+                    style="@style/OtpDigitInput"
+                    android:background="@drawable/bg_otp_box" />
+
+                <EditText
+                    android:id="@+id/otpInput2"
+                    style="@style/OtpDigitInput"
+                    android:layout_marginStart="@dimen/dp_8"
+                    android:background="@drawable/bg_otp_box" />
+
+                <EditText
+                    android:id="@+id/otpInput3"
+                    style="@style/OtpDigitInput"
+                    android:layout_marginStart="@dimen/dp_8"
+                    android:background="@drawable/bg_otp_box" />
+
+                <EditText
+                    android:id="@+id/otpInput4"
+                    style="@style/OtpDigitInput"
+                    android:layout_marginStart="@dimen/dp_8"
+                    android:background="@drawable/bg_otp_box" />
+
+                <EditText
+                    android:id="@+id/otpInput5"
+                    style="@style/OtpDigitInput"
+                    android:layout_marginStart="@dimen/dp_8"
+                    android:background="@drawable/bg_otp_box" />
+
+                <EditText
+                    android:id="@+id/otpInput6"
+                    style="@style/OtpDigitInput"
+                    android:layout_marginStart="@dimen/dp_8"
+                    android:background="@drawable/bg_otp_box" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/errorMessage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_16"
+                android:background="@drawable/bg_otp_error"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="@dimen/dp_16"
+                android:paddingVertical="@dimen/dp_8"
+                android:visibility="gone">
+
+                <ImageView
+                    android:layout_width="@dimen/dp_16"
+                    android:layout_height="@dimen/dp_16"
+                    android:contentDescription="@string/otp_alert_icon_description"
+                    android:src="@drawable/ic_alert_triangle" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/dp_8"
+                    android:includeFontPadding="false"
+                    android:text="@string/otp_invalid"
+                    android:textColor="@color/legal_lens_error"
+                    android:textSize="@dimen/sp_13" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+    <LinearLayout
+        android:id="@+id/footerLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/dp_24"
+        android:layout_marginBottom="@dimen/dp_32"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:includeFontPadding="false"
+            android:text="@string/otp_not_received"
+            android:textColor="@color/legal_lens_secondary_text"
+            android:textSize="@dimen/sp_14" />
+
+        <LinearLayout
+            android:id="@+id/resendBlock"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_4"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="@dimen/dp_16"
+                android:layout_height="@dimen/dp_16"
+                android:contentDescription="@string/otp_countdown_icon_description"
+                android:src="@drawable/ic_clock" />
+
+            <TextView
+                android:id="@+id/resendText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/dp_4"
+                android:includeFontPadding="false"
+                android:textColor="@color/legal_lens_auth_accent"
+                android:textSize="@dimen/sp_14"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/submitButton"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_54"
+            android:layout_marginTop="@dimen/dp_24"
+            android:elevation="@dimen/dp_0"
+            android:fontFamily="sans-serif"
+            android:insetBottom="@dimen/dp_0"
+            android:insetLeft="@dimen/dp_0"
+            android:insetRight="@dimen/dp_0"
+            android:insetTop="@dimen/dp_0"
+            android:text="@string/confirm"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="@dimen/sp_16"
+            android:textStyle="bold"
+            app:backgroundTint="@color/legal_lens_primary"
+            app:cornerRadius="@dimen/dp_14" />
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

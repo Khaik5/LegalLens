@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/successRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/legal_lens_background"
+    tools:context=".presentation.feature.success.ui.SuccessActivity">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dp_171"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <FrameLayout
+            android:id="@+id/successSeal"
+            android:layout_width="@dimen/dp_120"
+            android:layout_height="@dimen/dp_120"
+            android:background="@drawable/bg_otp_security_icon">
+
+            <FrameLayout
+                android:layout_width="@dimen/dp_96"
+                android:layout_height="@dimen/dp_96"
+                android:layout_gravity="center"
+                android:background="@drawable/bg_success_inner_seal">
+
+                <ImageView
+                    android:layout_width="@dimen/dp_40"
+                    android:layout_height="@dimen/dp_24"
+                    android:layout_gravity="center"
+                    android:contentDescription="@string/success_icon_description"
+                    android:src="@drawable/ic_success_check" />
+            </FrameLayout>
+        </FrameLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_32"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:text="@string/success_title"
+            android:textColor="@color/legal_lens_primary"
+            android:textSize="@dimen/sp_28"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/dp_24"
+            android:layout_marginTop="@dimen/dp_12"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:lineSpacingMultiplier="1.5"
+            android:text="@string/success_message"
+            android:textColor="@color/legal_lens_secondary_text"
+            android:textSize="@dimen/sp_15" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/dp_24"
+            android:layout_marginTop="@dimen/dp_32"
+            android:background="@drawable/bg_success_info"
+            android:orientation="vertical"
+            android:padding="@dimen/dp_16">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:includeFontPadding="false"
+                android:text="@string/success_security_title"
+                android:textColor="@color/legal_lens_auth_accent"
+                android:textSize="@dimen/sp_13"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_16"
+                android:includeFontPadding="false"
+                android:lineSpacingMultiplier="1.5"
+                android:text="@string/success_security_message"
+                android:textColor="@color/legal_lens_status_text"
+                android:textSize="@dimen/sp_14" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/startUsingButton"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/dp_54"
+        android:layout_marginHorizontal="@dimen/dp_24"
+        android:layout_marginBottom="@dimen/dp_120"
+        android:elevation="@dimen/dp_0"
+        android:fontFamily="sans-serif"
+        android:insetBottom="@dimen/dp_0"
+        android:insetLeft="@dimen/dp_0"
+        android:insetRight="@dimen/dp_0"
+        android:insetTop="@dimen/dp_0"
+        android:text="@string/start_using"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="@dimen/sp_16"
+        android:textStyle="bold"
+        app:backgroundTint="@color/legal_lens_primary"
+        app:cornerRadius="@dimen/dp_14"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>
