@@ -48,7 +48,6 @@ See [requirements.md](docs/project_notes/requirements.md) for acceptance-oriente
 - Add Contract source selection and the OCR text-review screen are implemented in the same flow. OCR review supports editing, basic text formatting, restoring the generated text, and local save feedback; the backend OCR/upload integration remains pending.
 - The Add Contract flow now routes a locally selected document to the Figma-aligned upload-progress UI. It presents local file metadata and a cancellable placeholder processing state; it does not upload or perform OCR until the backend contract is available.
 - The Figma-aligned upload failure state is available with a retry path back to file selection and a return-to-caller path. The backend must provide a typed upload/OCR failure before this state can be reached from live processing.
-
 ## 2026-09-12 status
 
 - Add Contract has a local UI-test flow while the backend contract is unavailable: PDF, DOCX, and Gallery selections show metadata on Upload Progress, advance from 68% to 100%, then open OCR Processing with the same metadata. This transition must be replaced with typed backend upload/OCR outcomes before production.

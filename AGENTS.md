@@ -11,6 +11,10 @@ Read before significant work:
 3. `docs/team_assignment.md`
 4. only relevant `docs/project_notes/*`
 
+Session handoff / resume rule:
+
+- At the start of every new, resumed, or handed-off session, reread `PROJECT_MEMO.md` in full before making decisions or changing code, even when continuing the same feature or branch.
+
 Priority:
 
 - architecture/Git/build/UI → `AGENTS.md`

@@ -23,12 +23,11 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         binding.mainNavHost.applySystemBarInsets(top = true, bottom = false)
         binding.bottomNavigationContainer.applySystemBarInsets(
-            top = false,
-            bottom = true,
-            expandHeightForBottomInset = true
+            top = false, bottom = true, expandHeightForBottomInset = true
         )
 
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.mainNavHost) as NavHostFragment
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.mainNavHost) as NavHostFragment
         val navController = navHostFragment.navController
 
         bindBottomNavigation(navController)
@@ -61,15 +60,12 @@ class MainActivity : AppCompatActivity() {
     private fun navigateTo(navController: NavController, destinationId: Int) {
         if (navController.currentDestination?.id == destinationId) return
         navController.navigate(
-            destinationId,
-            null,
-            navOptions {
+            destinationId, null, navOptions {
                 launchSingleTop = true
                 restoreState = true
                 popUpTo(navController.graph.findStartDestination().id) {
                     saveState = true
                 }
-            }
-        )
+            })
     }
 }
