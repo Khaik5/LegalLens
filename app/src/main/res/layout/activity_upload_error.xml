@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/upload_error_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/upload_background">
+
+    <LinearLayout
+        android:id="@+id/upload_error_app_bar"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/upload_error_app_bar_height"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="@dimen/upload_error_app_bar_horizontal_padding"
+        android:paddingEnd="@dimen/upload_error_app_bar_horizontal_padding"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageButton
+            android:id="@+id/upload_error_back"
+            android:layout_width="@dimen/upload_error_back_button_size"
+            android:layout_height="@dimen/upload_error_back_button_size"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/upload_error_back_content_description"
+            android:padding="@dimen/upload_error_back_icon_inset"
+            android:src="@drawable/ic_upload_back" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/upload_error_title_margin_start"
+            android:layout_weight="1"
+            android:text="@string/upload_error_title"
+            android:textColor="@color/upload_navy"
+            android:textSize="@dimen/upload_error_title_text_size"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/upload_error_seal"
+        android:layout_width="@dimen/upload_error_seal_size"
+        android:layout_height="@dimen/upload_error_seal_size"
+        android:layout_marginTop="@dimen/upload_error_seal_top_margin"
+        android:background="@drawable/bg_upload_error_seal"
+        android:contentDescription="@null"
+        android:padding="@dimen/upload_error_seal_icon_padding"
+        android:src="@drawable/ic_upload_error_alert"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/upload_error_app_bar" />
+
+    <TextView
+        android:id="@+id/upload_error_heading"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/upload_error_side_padding"
+        android:layout_marginTop="@dimen/upload_error_heading_top_margin"
+        android:layout_marginEnd="@dimen/upload_error_side_padding"
+        android:gravity="center"
+        android:text="@string/upload_error_heading"
+        android:textColor="@color/upload_navy"
+        android:textSize="@dimen/upload_error_heading_text_size"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/upload_error_seal" />
+
+    <TextView
+        android:id="@+id/upload_error_message"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/upload_error_side_padding"
+        android:layout_marginTop="@dimen/upload_error_message_top_margin"
+        android:layout_marginEnd="@dimen/upload_error_side_padding"
+        android:gravity="center"
+        android:lineSpacingExtra="@dimen/upload_error_message_line_spacing"
+        android:textColor="@color/upload_body"
+        android:textSize="@dimen/upload_error_message_text_size"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/upload_error_heading" />
+
+    <LinearLayout
+        android:id="@+id/upload_error_details"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/upload_error_side_padding"
+        android:layout_marginTop="@dimen/upload_error_details_top_margin"
+        android:layout_marginEnd="@dimen/upload_error_side_padding"
+        android:background="@drawable/bg_upload_error_details"
+        android:orientation="vertical"
+        android:padding="@dimen/upload_error_details_padding"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/upload_error_message">
+
+        <TextView
+            android:id="@+id/upload_error_code"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/upload_body"
+            android:textSize="@dimen/upload_error_code_text_size"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/upload_error_detail_message_top_margin"
+            android:lineSpacingExtra="@dimen/upload_error_detail_message_line_spacing"
+            android:text="@string/upload_error_detail_message"
+            android:textColor="@color/upload_navy"
+            android:textSize="@dimen/upload_error_detail_message_text_size" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/upload_error_side_padding"
+        android:layout_marginEnd="@dimen/upload_error_side_padding"
+        android:layout_marginBottom="@dimen/upload_error_actions_bottom_margin"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <TextView
+            android:id="@+id/upload_error_retry"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/upload_error_button_height"
+            android:background="@drawable/bg_upload_error_primary_action"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            android:gravity="center"
+            android:text="@string/upload_error_retry"
+            android:textColor="@color/white"
+            android:textSize="@dimen/upload_error_button_text_size"
+            android:textStyle="bold"
+            app:drawableStartCompat="@drawable/ic_upload_error_refresh"
+            android:drawablePadding="@dimen/upload_error_retry_icon_margin_end" />
+
+        <TextView
+            android:id="@+id/upload_error_back_to_list"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/upload_error_button_height"
+            android:layout_marginTop="@dimen/upload_error_secondary_button_top_margin"
+            android:background="@drawable/bg_upload_error_secondary_action"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            android:gravity="center"
+            android:text="@string/upload_error_back_to_list"
+            android:textColor="@color/upload_navy"
+            android:textSize="@dimen/upload_error_button_text_size"
+            android:textStyle="bold" />
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/upload_progress_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/upload_progress_background">
+
+    <LinearLayout
+        android:id="@+id/upload_progress_app_bar"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/upload_progress_app_bar_height"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="@dimen/upload_progress_side_padding"
+        android:paddingEnd="@dimen/upload_progress_side_padding"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageButton
+            android:id="@+id/upload_progress_back"
+            android:layout_width="@dimen/upload_progress_back_button_size"
+            android:layout_height="@dimen/upload_progress_back_button_size"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/upload_progress_back_content_description"
+            android:padding="@dimen/upload_progress_back_icon_inset"
+            android:src="@drawable/ic_upload_back" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/upload_progress_title_margin_start"
+            android:layout_weight="1"
+            android:text="@string/upload_progress_title"
+            android:textColor="@color/upload_progress_navy"
+            android:textSize="@dimen/upload_progress_title_text_size"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:paddingStart="@dimen/upload_progress_side_padding"
+        android:paddingTop="@dimen/upload_progress_content_top_padding"
+        android:paddingEnd="@dimen/upload_progress_side_padding"
+        app:layout_constraintBottom_toTopOf="@id/upload_progress_cancel"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/upload_progress_app_bar">
+
+        <FrameLayout
+            android:id="@+id/upload_progress_ring"
+            android:layout_width="@dimen/upload_progress_ring_size"
+            android:layout_height="@dimen/upload_progress_ring_size"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.google.android.material.progressindicator.CircularProgressIndicator
+                android:id="@+id/upload_progress_indicator"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:indeterminate="false"
+                android:progress="68"
+                app:indicatorColor="@color/upload_progress_teal"
+                app:indicatorSize="@dimen/upload_progress_indicator_size"
+                app:trackColor="@color/upload_progress_track"
+                app:trackThickness="@dimen/upload_progress_indicator_thickness" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/upload_progress_percentage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/upload_progress_navy"
+                    android:textSize="@dimen/upload_progress_percentage_text_size"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/upload_progress_status_margin_top"
+                    android:text="@string/upload_progress_status"
+                    android:textColor="@color/upload_progress_body"
+                    android:textSize="@dimen/upload_progress_status_text_size" />
+            </LinearLayout>
+        </FrameLayout>
+
+        <LinearLayout
+            android:id="@+id/upload_progress_file_card"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/upload_progress_file_card_margin_top"
+            android:background="@drawable/bg_upload_card"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="@dimen/upload_progress_file_card_padding"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/upload_progress_ring">
+
+            <ImageView
+                android:layout_width="@dimen/upload_progress_file_icon_container_size"
+                android:layout_height="@dimen/upload_progress_file_icon_container_size"
+                android:background="@drawable/bg_upload_progress_file"
+                android:padding="@dimen/upload_progress_file_icon_inset"
+                android:src="@drawable/ic_upload_pdf" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/upload_progress_file_text_margin_start"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/upload_progress_file_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textColor="@color/upload_progress_navy"
+                    android:textSize="@dimen/upload_progress_file_name_text_size"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/upload_progress_file_details"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/upload_progress_file_details_margin_top"
+                    android:textColor="@color/upload_progress_body"
+                    android:textSize="@dimen/upload_progress_file_details_text_size" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/upload_progress_description_margin_top"
+            android:gravity="center"
+            android:text="@string/upload_progress_description"
+            android:textColor="@color/upload_progress_body"
+            android:textSize="@dimen/upload_progress_description_text_size"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/upload_progress_file_card" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        android:id="@+id/upload_progress_cancel"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/upload_progress_cancel_height"
+        android:layout_marginStart="@dimen/upload_progress_side_padding"
+        android:layout_marginEnd="@dimen/upload_progress_side_padding"
+        android:layout_marginBottom="@dimen/upload_progress_cancel_bottom_margin"
+        android:background="@drawable/bg_upload_progress_cancel"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?attr/selectableItemBackground"
+        android:gravity="center"
+        android:text="@string/upload_progress_cancel"
+        android:textColor="@color/upload_progress_navy"
+        android:textSize="@dimen/upload_progress_cancel_text_size"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

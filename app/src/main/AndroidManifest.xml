@@ -20,7 +20,22 @@
             android:windowSoftInputMode="adjustResize">
         </activity>
         <activity
-            android:name=".presentation.feature.onboarding.ui.OnboardingActivity"
+            android:name=".presentation.feature.ocr.editor.ui.OcrEditorActivity"
+            android:exported="false" />
+        <activity
+            android:name=".presentation.feature.ocr.ui.OcrReviewActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".presentation.feature.ocr.result.ui.OcrResultActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".presentation.feature.ocr.failure.ui.OcrFailureActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".presentation.feature.ocr.saved.ui.OcrSavedActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
@@ -75,6 +90,12 @@
             android:name=".presentation.feature.camera.ocr.ui.OcrProcessingActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".presentation.feature.upload.progress.ui.UploadProgressActivity"
+            android:exported="false" />
+        <activity
+            android:name=".presentation.feature.upload.error.ui.UploadErrorActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

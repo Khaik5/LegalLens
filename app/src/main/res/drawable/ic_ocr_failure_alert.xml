@@ -1,0 +1,12 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="@dimen/ocr_failure_alert_icon_size"
+    android:height="@dimen/ocr_failure_alert_icon_size"
+    android:viewportWidth="100"
+    android:viewportHeight="100">
+    <path
+        android:fillColor="@android:color/transparent"
+        android:pathData="M50,33.3321V50M50,66.6681H50.0418M91.6701,50C91.6701,73.0138 73.0138,91.6701 50,91.6701C26.9864,91.6701 8.3301,73.0138 8.3301,50C8.3301,26.9864 26.9864,8.3301 50,8.3301C73.0138,8.3301 91.6701,26.9864 91.6701,50Z"
+        android:strokeColor="@color/contract_risk_high"
+        android:strokeLineCap="round"
+        android:strokeWidth="3" />
+</vector>

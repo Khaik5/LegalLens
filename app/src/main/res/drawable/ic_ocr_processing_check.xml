@@ -1,0 +1,13 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="@dimen/ocr_processing_check_icon_size"
+    android:height="@dimen/ocr_processing_check_icon_size"
+    android:viewportWidth="14"
+    android:viewportHeight="14">
+    <path
+        android:fillColor="@android:color/transparent"
+        android:pathData="M2.33,7L5.5,10.17L11.67,3.83"
+        android:strokeColor="@color/camera_scan_ready"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="1.8" />
+</vector>
