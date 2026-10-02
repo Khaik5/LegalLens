@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/analysisFailureRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/legal_lens_background">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/analysisFailureHeader"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/analysis_header_height"
+        android:paddingStart="@dimen/analysis_header_side_padding"
+        android:paddingEnd="@dimen/analysis_header_side_padding"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageButton
+            android:id="@+id/analysisFailureBack"
+            android:layout_width="@dimen/analysis_back_button_size"
+            android:layout_height="@dimen/analysis_back_button_size"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/analysis_failure_back_content_description"
+            android:padding="@dimen/analysis_back_icon_padding"
+            android:src="@drawable/ic_upload_back"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif"
+            android:includeFontPadding="false"
+            android:text="@string/analysis_failure_title"
+            android:textColor="@color/legal_lens_primary"
+            android:textSize="@dimen/analysis_header_title_text_size"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:layout_width="@dimen/analysis_back_button_size"
+            android:layout_height="@dimen/analysis_back_button_size"
+            android:contentDescription="@string/analysis_failure_more_content_description"
+            android:padding="@dimen/analysis_back_icon_padding"
+            android:src="@drawable/ic_analysis_risk_overview_more"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <FrameLayout
+        android:id="@+id/analysisFailureAlertOuter"
+        android:layout_width="@dimen/dp_160"
+        android:layout_height="@dimen/dp_160"
+        android:layout_marginTop="@dimen/dp_80"
+        android:background="@drawable/bg_analysis_failure_alert_outer"
+        android:elevation="@dimen/dp_8"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/analysisFailureHeader">
+
+        <FrameLayout
+            android:layout_width="@dimen/dp_120"
+            android:layout_height="@dimen/dp_120"
+            android:layout_gravity="center"
+            android:background="@drawable/bg_analysis_failure_alert_inner">
+
+            <ImageView
+                android:layout_width="@dimen/dp_56"
+                android:layout_height="@dimen/dp_56"
+                android:layout_gravity="center"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_upload_error_alert" />
+        </FrameLayout>
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/analysisFailureHeading"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dp_32"
+        android:layout_marginTop="@dimen/dp_32"
+        android:layout_marginEnd="@dimen/dp_32"
+        android:fontFamily="sans-serif"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:text="@string/analysis_failure_heading"
+        android:textColor="@color/legal_lens_primary"
+        android:textSize="@dimen/sp_22"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/analysisFailureAlertOuter" />
+
+    <TextView
+        android:id="@+id/analysisFailureMessage"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dp_32"
+        android:layout_marginTop="@dimen/dp_12"
+        android:layout_marginEnd="@dimen/dp_32"
+        android:fontFamily="sans-serif"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:lineSpacingExtra="@dimen/dp_2"
+        android:text="@string/analysis_failure_message"
+        android:textColor="@color/legal_lens_secondary_text"
+        android:textSize="@dimen/sp_14"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/analysisFailureHeading" />
+
+    <LinearLayout
+        android:id="@+id/analysisFailureErrorCard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dp_32"
+        android:layout_marginTop="@dimen/dp_32"
+        android:layout_marginEnd="@dimen/dp_32"
+        android:background="@drawable/bg_analysis_failure_error_card"
+        android:minHeight="@dimen/dp_64"
+        android:orientation="vertical"
+        android:padding="@dimen/dp_14"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/analysisFailureMessage">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif"
+            android:includeFontPadding="false"
+            android:text="@string/analysis_failure_error_code_label"
+            android:textColor="@color/legal_lens_secondary_text"
+            android:textSize="@dimen/sp_11"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_6"
+            android:fontFamily="sans-serif"
+            android:includeFontPadding="false"
+            android:singleLine="true"
+            android:text="@string/analysis_failure_error_code"
+            android:textColor="@color/legal_lens_status_text"
+            android:textSize="@dimen/sp_12" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/analysisFailureRetry"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/dp_48"
+        android:layout_marginStart="@dimen/dp_32"
+        android:layout_marginTop="@dimen/dp_32"
+        android:layout_marginEnd="@dimen/dp_32"
+        android:background="@drawable/bg_analysis_primary_action"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?attr/selectableItemBackground"
+        android:fontFamily="sans-serif"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:text="@string/analysis_failure_retry"
+        android:textColor="@color/white"
+        android:textSize="@dimen/sp_15"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/analysisFailureErrorCard" />
+
+    <TextView
+        android:id="@+id/analysisFailureReturnHome"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/dp_48"
+        android:layout_marginStart="@dimen/dp_32"
+        android:layout_marginTop="@dimen/dp_12"
+        android:layout_marginEnd="@dimen/dp_32"
+        android:background="@drawable/bg_analysis_failure_secondary_action"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?attr/selectableItemBackground"
+        android:fontFamily="sans-serif"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:text="@string/analysis_failure_return_home"
+        android:textColor="@color/legal_lens_status_text"
+        android:textSize="@dimen/sp_15"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/analysisFailureRetry" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

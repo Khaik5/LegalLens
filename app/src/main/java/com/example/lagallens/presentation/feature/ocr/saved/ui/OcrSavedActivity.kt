@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -16,6 +15,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.lagallens.R
 import com.example.lagallens.databinding.ActivityOcrSavedBinding
+import com.example.lagallens.presentation.feature.analysis.start.ui.AnalysisStartActivity
 import com.example.lagallens.presentation.feature.ocr.saved.contract.OcrSavedUiEffect
 import com.example.lagallens.presentation.feature.ocr.saved.contract.OcrSavedUiEvent
 import com.example.lagallens.presentation.feature.ocr.saved.contract.OcrSavedUiState
@@ -86,8 +86,8 @@ class OcrSavedActivity : AppCompatActivity() {
     private fun handleEffect(effect: OcrSavedUiEffect) {
         when (effect) {
             OcrSavedUiEffect.NavigateBack -> finish()
-            OcrSavedUiEffect.ShowAnalysisUnavailable -> {
-                Toast.makeText(this, R.string.ocr_saved_analysis_unavailable, Toast.LENGTH_SHORT).show()
+            is OcrSavedUiEffect.NavigateToAnalysis -> {
+                startActivity(AnalysisStartActivity.createIntent(this, effect.documentName))
             }
         }
     }

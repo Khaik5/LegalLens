@@ -96,6 +96,7 @@ PHUOC
 │   └── Chỉnh sửa văn bản OCR
 │
 ├── AI Analysis Flow
+│   ├── Analysis Start
 │   ├── Processing / Analysis state nếu có
 │   ├── Analysis Complete
 │   └── các màn kết quả phân tích AI trong Figma
@@ -999,7 +1000,7 @@ BLOCKED
 | Phước | Camera / Scan              | IN_PROGRESS | `phuoc/camera-scan`    | Camera flow đang triển khai                                 |
 | Phước | OCR                        | TODO        | `phuoc/ocr`            | Processing + Result + Edit OCR                              |
 | Phước | AI Analysis                | TODO        | `phuoc/analysis`       | Analysis processing/result/complete theo Figma              |
-| Phước | AI Chatbot                 | TODO        | `phuoc/chatbot`        | Trò chuyện AI theo hợp đồng                                 |
+| Phước | AI Chatbot                 | IN_PROGRESS | `phuoc/chatbot`        | Màn chat theo Figma đã có local presentation flow           |
 | Phước | Contract Compare           | TODO        | `phuoc/compare`        | So sánh hợp đồng                                            |
 
 Không tự đổi status nếu chưa có bằng chứng từ repo hoặc owner.

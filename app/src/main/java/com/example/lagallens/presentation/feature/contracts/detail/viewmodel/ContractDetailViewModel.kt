@@ -31,7 +31,12 @@ class ContractDetailViewModel : ViewModel() {
         when (event) {
             ContractDetailUiEvent.BackClicked -> emitEffect(ContractDetailUiEffect.NavigateBack)
             is ContractDetailUiEvent.AssistantActionClicked -> {
-                emitEffect(ContractDetailUiEffect.ShowMessage(R.string.contract_detail_feature_unavailable))
+                if (event.action == com.example.lagallens.presentation.feature.contracts.detail.contract.ContractAssistantAction.CHAT) {
+                    val state = _uiState.value
+                    emitEffect(ContractDetailUiEffect.NavigateToChatbot(state.titleRes, state.contractTypeRes))
+                } else {
+                    emitEffect(ContractDetailUiEffect.ShowMessage(R.string.contract_detail_feature_unavailable))
+                }
             }
             ContractDetailUiEvent.RenameClicked -> {
                 emitEffect(ContractDetailUiEffect.ShowMessage(R.string.contract_detail_rename_unavailable))

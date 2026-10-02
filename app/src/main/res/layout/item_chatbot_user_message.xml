@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/chatbot_message_row_spacing">
+
+    <TextView
+        android:id="@+id/chatbotUserMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_marginStart="@dimen/chatbot_user_start_margin"
+        android:background="@drawable/bg_chatbot_user_message"
+        android:fontFamily="sans-serif"
+        android:includeFontPadding="false"
+        android:lineSpacingExtra="@dimen/chatbot_message_line_spacing"
+        android:maxWidth="@dimen/chatbot_message_max_width"
+        android:padding="@dimen/chatbot_message_padding"
+        android:textColor="@color/legal_lens_status_text"
+        android:textSize="@dimen/chatbot_message_text_size" />
+</FrameLayout>

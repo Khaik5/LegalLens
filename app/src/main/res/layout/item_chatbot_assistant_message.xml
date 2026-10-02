@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/chatbot_message_row_spacing">
+
+    <TextView
+        android:id="@+id/chatbotAssistantAvatar"
+        android:layout_width="@dimen/chatbot_avatar_size"
+        android:layout_height="@dimen/chatbot_avatar_size"
+        android:background="@drawable/bg_chatbot_avatar"
+        android:fontFamily="sans-serif"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:text="@string/chatbot_avatar_initials"
+        android:textColor="@color/white"
+        android:textSize="@dimen/chatbot_avatar_text_size"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/chatbotAssistantMessage"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/chatbot_avatar_gap"
+        android:layout_marginEnd="@dimen/chatbot_assistant_end_margin"
+        android:background="@drawable/bg_chatbot_assistant_message"
+        android:fontFamily="sans-serif"
+        android:includeFontPadding="false"
+        android:lineSpacingExtra="@dimen/chatbot_message_line_spacing"
+        android:padding="@dimen/chatbot_message_padding"
+        android:textColor="@color/legal_lens_status_text"
+        android:textSize="@dimen/chatbot_message_text_size"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/chatbotAssistantAvatar"
+        app:layout_constraintTop_toTopOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

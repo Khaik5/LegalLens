@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/analysisLegalReferencesRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/legal_lens_background">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/analysisLegalReferencesHeader"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/analysis_header_height"
+        android:paddingStart="@dimen/analysis_header_side_padding"
+        android:paddingEnd="@dimen/analysis_header_side_padding"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageButton
+            android:id="@+id/analysisLegalReferencesBack"
+            android:layout_width="@dimen/analysis_back_button_size"
+            android:layout_height="@dimen/analysis_back_button_size"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/analysis_legal_references_back_content_description"
+            android:padding="@dimen/analysis_back_icon_padding"
+            android:src="@drawable/ic_upload_back"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif"
+            android:includeFontPadding="false"
+            android:text="@string/analysis_legal_references_title"
+            android:textColor="@color/legal_lens_primary"
+            android:textSize="@dimen/analysis_header_title_text_size"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:layout_width="@dimen/analysis_back_button_size"
+            android:layout_height="@dimen/analysis_back_button_size"
+            android:contentDescription="@string/analysis_legal_references_more_content_description"
+            android:padding="@dimen/analysis_back_icon_padding"
+            android:src="@drawable/ic_analysis_risk_overview_more"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        android:id="@+id/analysisLegalReferencesSectionTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dp_16"
+        android:layout_marginTop="@dimen/dp_16"
+        android:layout_marginEnd="@dimen/dp_16"
+        android:includeFontPadding="false"
+        android:letterSpacing="0.07"
+        android:text="@string/analysis_legal_references_section_title"
+        android:textAllCaps="true"
+        android:textColor="@color/legal_lens_secondary_text"
+        android:textSize="@dimen/sp_14"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/analysisLegalReferencesHeader" />
+
+    <EditText
+        android:id="@+id/analysisLegalReferencesSearch"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/dp_42"
+        android:layout_marginStart="@dimen/dp_16"
+        android:layout_marginTop="@dimen/dp_12"
+        android:layout_marginEnd="@dimen/dp_16"
+        android:background="@drawable/bg_contract_search"
+        android:drawablePadding="@dimen/dp_8"
+        android:drawableStart="@drawable/ic_contract_search"
+        android:fontFamily="sans-serif"
+        android:gravity="center_vertical"
+        android:hint="@string/analysis_legal_references_search_hint"
+        android:includeFontPadding="false"
+        android:inputType="text"
+        android:paddingStart="@dimen/dp_12"
+        android:paddingEnd="@dimen/dp_12"
+        android:singleLine="true"
+        android:textColor="@color/legal_lens_status_text"
+        android:textColorHint="@color/legal_lens_secondary_text"
+        android:textSize="@dimen/sp_13"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/analysisLegalReferencesSectionTitle" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/analysisLegalReferencesList"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="@dimen/dp_16"
+        android:layout_marginTop="@dimen/dp_12"
+        android:layout_marginEnd="@dimen/dp_16"
+        android:clipToPadding="false"
+        android:paddingBottom="@dimen/dp_16"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/analysisLegalReferencesSearch" />
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -3,6 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
 
     <application
         android:name=".LegalLensApplication"
@@ -14,6 +17,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.LagalLens">
+        <activity
+            android:name=".presentation.feature.chatbot.ui.ChatbotActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".presentation.feature.splash.ui.SplashActivity"
             android:exported="true"
@@ -41,6 +48,62 @@
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".presentation.feature.ocr.saved.ui.OcrSavedActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".presentation.feature.analysis.start.ui.AnalysisStartActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".presentation.feature.analysis.processing.ui.AnalysisProcessingActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".presentation.feature.analysis.failure.ui.AnalysisFailureActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".presentation.feature.analysis.parties.ui.AnalysisPartiesActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".presentation.feature.analysis.obligations.ui.AnalysisObligationsActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".presentation.feature.analysis.result.ui.AnalysisResultActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".presentation.feature.analysis.legalreferences.ui.AnalysisLegalReferencesActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".presentation.feature.analysis.legalreferences.detail.ui.AnalysisLegalReferenceDetailActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".presentation.feature.analysis.risk.ui.AnalysisRiskOverviewActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".presentation.feature.analysis.risk.findings.ui.AnalysisRiskFindingsActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".presentation.feature.analysis.risk.detail.ui.AnalysisRiskDetailActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".presentation.feature.analysis.risk.citation.ui.AnalysisRiskCitationActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".presentation.feature.analysis.summary.ui.AnalysisSummaryActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".presentation.feature.analysis.keyfacts.ui.AnalysisKeyFactsActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
@@ -95,6 +158,7 @@
         <activity
             android:name=".presentation.feature.upload.error.ui.UploadErrorActivity"
             android:exported="false" />
+        <activity android:name=".presentation.feature.onboarding.ui.OnboardingActivity" />
     </application>
 
 </manifest>

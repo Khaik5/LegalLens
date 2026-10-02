@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@color/analysis_result_risk_surface" />
+    <corners android:radius="@dimen/analysis_result_item_icon_corner_radius" />
+</shape>

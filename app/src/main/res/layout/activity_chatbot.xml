@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/chatbotRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/legal_lens_background">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/chatbotHeader"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/chatbot_header_height"
+        android:paddingStart="@dimen/chatbot_side_padding"
+        android:paddingEnd="@dimen/chatbot_side_padding"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageButton
+            android:id="@+id/chatbotBack"
+            android:layout_width="@dimen/chatbot_header_action_size"
+            android:layout_height="@dimen/chatbot_header_action_size"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/chatbot_back_content_description"
+            android:padding="@dimen/chatbot_header_action_padding"
+            android:src="@drawable/ic_upload_back"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <LinearLayout
+            android:id="@+id/chatbotHeaderLabels"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/chatbot_header_title_margin"
+            android:layout_marginEnd="@dimen/chatbot_header_title_margin"
+            android:gravity="center_vertical"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/chatbotMore"
+            app:layout_constraintStart_toEndOf="@id/chatbotBack"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/chatbotContractName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFamily="sans-serif"
+                android:includeFontPadding="false"
+                android:maxLines="1"
+                android:textColor="@color/legal_lens_primary"
+                android:textSize="@dimen/chatbot_header_title_text_size"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/chatbotContractType"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/chatbot_header_subtitle_margin_top"
+                android:ellipsize="end"
+                android:fontFamily="sans-serif-medium"
+                android:includeFontPadding="false"
+                android:maxLines="1"
+                android:textColor="@color/legal_lens_auth_accent"
+                android:textSize="@dimen/chatbot_header_subtitle_text_size" />
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/chatbotMore"
+            android:layout_width="@dimen/chatbot_header_action_size"
+            android:layout_height="@dimen/chatbot_header_action_size"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/chatbot_more_content_description"
+            android:padding="@dimen/chatbot_header_action_padding"
+            android:src="@drawable/ic_analysis_risk_overview_more"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/chatbotMessages"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:overScrollMode="never"
+        android:paddingStart="@dimen/chatbot_side_padding"
+        android:paddingTop="@dimen/chatbot_messages_padding_vertical"
+        android:paddingEnd="@dimen/chatbot_side_padding"
+        android:paddingBottom="@dimen/chatbot_messages_padding_vertical"
+        app:layout_constraintBottom_toTopOf="@id/chatbotComposer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/chatbotHeader" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/chatbotComposer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@color/legal_lens_background"
+        android:paddingStart="@dimen/chatbot_side_padding"
+        android:paddingTop="@dimen/chatbot_composer_vertical_padding"
+        android:paddingEnd="@dimen/chatbot_side_padding"
+        android:paddingBottom="@dimen/chatbot_composer_vertical_padding"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <ImageButton
+            android:id="@+id/chatbotAttach"
+            android:layout_width="@dimen/chatbot_attach_size"
+            android:layout_height="@dimen/chatbot_attach_size"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/chatbot_attach_content_description"
+            android:padding="@dimen/dp_2"
+            android:src="@drawable/ic_chatbot_attach"
+            app:layout_constraintBottom_toBottomOf="@id/chatbotInput"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/chatbotInput" />
+
+        <EditText
+            android:id="@+id/chatbotInput"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/chatbot_input_height"
+            android:layout_marginStart="@dimen/chatbot_composer_gap"
+            android:layout_marginEnd="@dimen/chatbot_composer_gap"
+            android:background="@drawable/bg_chatbot_input"
+            android:fontFamily="sans-serif"
+            android:hint="@string/chatbot_input_hint"
+            android:imeOptions="actionSend"
+            android:includeFontPadding="false"
+            android:inputType="textCapSentences"
+            android:singleLine="true"
+            android:paddingStart="@dimen/chatbot_input_padding_horizontal"
+            android:paddingEnd="@dimen/chatbot_input_padding_horizontal"
+            android:textColor="@color/legal_lens_status_text"
+            android:textColorHint="@color/legal_lens_secondary_text"
+            android:textSize="@dimen/chatbot_message_text_size"
+            app:layout_constraintEnd_toStartOf="@id/chatbotSend"
+            app:layout_constraintStart_toEndOf="@id/chatbotAttach"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageButton
+            android:id="@+id/chatbotSend"
+            android:layout_width="@dimen/chatbot_send_size"
+            android:layout_height="@dimen/chatbot_send_size"
+            android:background="@drawable/bg_chatbot_send"
+            android:contentDescription="@string/chatbot_send_content_description"
+            android:padding="@dimen/chatbot_send_icon_padding"
+            android:src="@drawable/ic_chatbot_send"
+            app:layout_constraintBottom_toBottomOf="@id/chatbotInput"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/chatbotInput" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/analysis_parties_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/legal_lens_background">
+
+    <TextView
+        android:id="@+id/analysis_parties_title"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/analysis_header_height"
+        android:gravity="center"
+        android:text="@string/analysis_parties_title"
+        android:textColor="@color/legal_lens_primary"
+        android:textSize="@dimen/analysis_header_title_text_size"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/analysis_parties_back"
+        android:layout_width="@dimen/analysis_back_button_size"
+        android:layout_height="@dimen/analysis_back_button_size"
+        android:layout_marginStart="@dimen/analysis_header_side_padding"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/analysis_parties_back_content_description"
+        android:padding="@dimen/analysis_back_icon_padding"
+        android:src="@drawable/ic_upload_back"
+        app:layout_constraintBottom_toBottomOf="@id/analysis_parties_title"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/analysis_parties_title" />
+
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        android:overScrollMode="never"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/analysis_parties_title">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="@dimen/analysis_summary_content_side_padding"
+            android:paddingTop="@dimen/analysis_parties_content_top_padding"
+            android:paddingEnd="@dimen/analysis_summary_content_side_padding"
+            android:paddingBottom="@dimen/analysis_parties_content_bottom_padding">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/analysis_document_card_height"
+                android:background="@drawable/bg_analysis_summary_section"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="@dimen/analysis_document_card_padding"
+                android:paddingEnd="@dimen/analysis_document_card_padding">
+
+                <FrameLayout
+                    android:layout_width="@dimen/analysis_document_icon_size"
+                    android:layout_height="@dimen/analysis_document_icon_size"
+                    android:background="@drawable/bg_analysis_summary_document_icon">
+
+                    <ImageView
+                        android:layout_width="@dimen/analysis_document_icon_art_size"
+                        android:layout_height="@dimen/analysis_document_icon_art_size"
+                        android:layout_gravity="center"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ic_ocr_saved_document" />
+                </FrameLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/analysis_document_text_margin_start"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/analysis_parties_document_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:textColor="@color/legal_lens_primary"
+                        android:textSize="@dimen/analysis_document_name_text_size"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/analysis_parties_document_metadata"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/analysis_document_metadata_margin_top"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:textColor="@color/legal_lens_secondary_text"
+                        android:textSize="@dimen/analysis_document_metadata_text_size" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/analysis_parties_card_spacing"
+                android:background="@drawable/bg_analysis_summary_section"
+                android:orientation="vertical"
+                android:padding="@dimen/analysis_parties_card_padding">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="@dimen/analysis_parties_badge_size"
+                        android:layout_height="@dimen/analysis_parties_badge_size"
+                        android:background="@drawable/bg_analysis_party_employer_badge"
+                        android:gravity="center"
+                        android:text="@string/analysis_parties_employer_badge"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/analysis_parties_badge_text_size"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/analysis_parties_employer_title"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/analysis_parties_title_margin_start"
+                        android:layout_weight="1"
+                        android:textColor="@color/legal_lens_primary"
+                        android:textSize="@dimen/analysis_parties_party_title_text_size"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/analysis_parties_employer_role"
+                        android:layout_width="wrap_content"
+                        android:layout_height="@dimen/analysis_parties_chip_height"
+                        android:background="@drawable/bg_analysis_party_employer_chip"
+                        android:gravity="center"
+                        android:paddingStart="@dimen/analysis_parties_chip_horizontal_padding"
+                        android:paddingEnd="@dimen/analysis_parties_chip_horizontal_padding"
+                        android:textColor="@color/legal_lens_auth_accent"
+                        android:textSize="@dimen/analysis_parties_chip_text_size" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/dp_1"
+                    android:layout_marginTop="@dimen/analysis_parties_divider_margin_top"
+                    android:background="@color/legal_lens_input_stroke" />
+
+                <TextView
+                    android:id="@+id/analysis_parties_employer_first_label"
+                    style="@style/AnalysisPartiesFieldLabel" />
+
+                <TextView
+                    android:id="@+id/analysis_parties_employer_first_value"
+                    style="@style/AnalysisPartiesFieldValue" />
+
+                <TextView
+                    android:id="@+id/analysis_parties_employer_second_label"
+                    style="@style/AnalysisPartiesFieldLabel" />
+
+                <TextView
+                    android:id="@+id/analysis_parties_employer_second_value"
+                    style="@style/AnalysisPartiesFieldValue" />
+
+                <TextView
+                    android:id="@+id/analysis_parties_employer_third_label"
+                    style="@style/AnalysisPartiesFieldLabel" />
+
+                <TextView
+                    android:id="@+id/analysis_parties_employer_third_value"
+                    style="@style/AnalysisPartiesFieldValue" />
+
+                <TextView
+                    android:id="@+id/analysis_parties_employer_fourth_label"
+                    style="@style/AnalysisPartiesFieldLabel" />
+
+                <TextView
+                    android:id="@+id/analysis_parties_employer_fourth_value"
+                    style="@style/AnalysisPartiesFieldValue" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/analysis_parties_card_spacing"
+                android:background="@drawable/bg_analysis_summary_section"
+                android:orientation="vertical"
+                android:padding="@dimen/analysis_parties_card_padding">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="@dimen/analysis_parties_badge_size"
+                        android:layout_height="@dimen/analysis_parties_badge_size"
+                        android:background="@drawable/bg_analysis_party_employee_badge"
+                        android:gravity="center"
+                        android:text="@string/analysis_parties_employee_badge"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/analysis_parties_badge_text_size"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/analysis_parties_employee_title"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/analysis_parties_title_margin_start"
+                        android:layout_weight="1"
+                        android:textColor="@color/legal_lens_primary"
+                        android:textSize="@dimen/analysis_parties_party_title_text_size"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/analysis_parties_employee_role"
+                        android:layout_width="wrap_content"
+                        android:layout_height="@dimen/analysis_parties_chip_height"
+                        android:background="@drawable/bg_analysis_party_employee_chip"
+                        android:gravity="center"
+                        android:paddingStart="@dimen/analysis_parties_chip_horizontal_padding"
+                        android:paddingEnd="@dimen/analysis_parties_chip_horizontal_padding"
+                        android:textColor="@color/legal_lens_secondary_text"
+                        android:textSize="@dimen/analysis_parties_chip_text_size" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/dp_1"
+                    android:layout_marginTop="@dimen/analysis_parties_divider_margin_top"
+                    android:background="@color/legal_lens_input_stroke" />
+
+                <TextView
+                    android:id="@+id/analysis_parties_employee_first_label"
+                    style="@style/AnalysisPartiesFieldLabel" />
+
+                <TextView
+                    android:id="@+id/analysis_parties_employee_first_value"
+                    style="@style/AnalysisPartiesFieldValue" />
+
+                <TextView
+                    android:id="@+id/analysis_parties_employee_second_label"
+                    style="@style/AnalysisPartiesFieldLabel" />
+
+                <TextView
+                    android:id="@+id/analysis_parties_employee_second_value"
+                    style="@style/AnalysisPartiesFieldValue" />
+
+                <TextView
+                    android:id="@+id/analysis_parties_employee_third_label"
+                    style="@style/AnalysisPartiesFieldLabel" />
+
+                <TextView
+                    android:id="@+id/analysis_parties_employee_third_value"
+                    style="@style/AnalysisPartiesFieldValue" />
+
+                <TextView
+                    android:id="@+id/analysis_parties_employee_fourth_label"
+                    style="@style/AnalysisPartiesFieldLabel" />
+
+                <TextView
+                    android:id="@+id/analysis_parties_employee_fourth_value"
+                    style="@style/AnalysisPartiesFieldValue" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

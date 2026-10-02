@@ -63,3 +63,35 @@ See [requirements.md](docs/project_notes/requirements.md) for acceptance-oriente
 
 - OCR Saved now has a standalone Figma-aligned presentation screen under `presentation/feature/ocr/saved`. It accepts document metadata through its intent and keeps Contract Detail and AI Analysis navigation unconnected until their approved destinations are integrated.
 - The local OCR flow now routes OCR Review confirmation to OCR Saved. OCR Processing accepts an internal `shouldSimulateFailure` test flag: false keeps the success preview; true opens OCR Failure, whose retry returns to the success preview. Replace this flag with a typed backend outcome before production.
+
+## 2026-09-18 status
+
+- AI Analysis is available under `presentation/feature/analysis`: OCR Saved opens Start with the selected document name, Start opens Processing, and the local Processing presentation advances to the Figma-aligned Result screen.
+- Result presents local sample score, key facts, risks, references, and six section entry cards. Replace local sample data and the timed transition with typed backend analysis outcomes before production; section-detail destinations remain pending their approved Figma designs.
+
+## 2026-09-19 status
+
+- The result Summary entry opens a Figma-aligned contract summary detail screen under `presentation/feature/analysis/summary`; its existing-style primary action opens `presentation/feature/analysis/keyfacts` with the same document metadata. The Important Information result entry remains available directly. The salary Key Fact opens a Figma-aligned clause-source bottom sheet, while the remaining source links stay visual-only until their source excerpts are supplied. All display values remain local until the backend provides typed, contract-scoped responses.
+- The Analysis Result Parties entry opens the Figma-aligned `presentation/feature/analysis/parties` screen with the same document metadata. Its employer and employee values are anonymized local samples until typed, contract-scoped backend responses are available.
+
+## 2026-09-19 OCR retry status
+
+- OCR Processing and Analysis Processing now share the same state-driven timeline component. A simulated OCR failure still stops after Image Analysis; Retry restarts from Image Analysis, advances through Text Recognition and Ready for Review, and only then opens OCR Result. Timed local behavior remains a presentation placeholder until the backend returns typed OCR progress and outcomes.
+
+## 2026-09-20 status
+
+- The Analysis Result Rights and Obligations entry now opens the Figma-aligned `presentation/feature/analysis/obligations` screen with the same document metadata. It displays local, anonymized obligation examples for employer and employee; tab and clause-source actions remain display-only because the supplied design does not define destinations or typed analysis data.
+- The Analysis Result Risk entry now opens `presentation/feature/analysis/risk`, which presents the Figma-aligned local score, severity summary, and legal disclaimer. The high-risk penalty finding opens `presentation/feature/analysis/risk/detail` with its reason, clause excerpt, legal explanation, legal-reference card, and suggested negotiation action; the legal-reference card remains visual-only and the other local findings retain the unavailable detail state until typed backend analysis data and their approved designs are available.
+
+## 2026-09-22 status
+
+- Analysis Processing now has a Figma-aligned failure presentation route under `presentation/feature/analysis/failure`. Its local `shouldSimulateFailure` flag preserves the existing success path by default, opens the failure screen with the current document metadata when enabled, retries through Processing, and returns to `MainActivity` from the home action. Replace the local flag with a typed backend analysis outcome when an API contract is available.
+- The Analysis Result legal-basis entry now opens the Figma-aligned legal-reference list under `presentation/feature/analysis/legalreferences`. The list preserves the current document context and supports local filtering across three design-provided sample references. The approved `legal-02-detail` screen is available for the Commercial Law 2005 reference and links its related-risk card to the existing risk-detail screen; the other two reference details remain unavailable. All displayed legal text remains presentation-only sample data until typed backend citations are available.
+
+## 2026-09-23 status
+
+- The legal-reference card on the high-risk penalty detail now opens the Figma-aligned citation-source screen under `presentation/feature/analysis/risk/citation`. It explains why the citation supports the original finding, highlights the statutory 8% limit, and returns to the originating risk detail from either navigation action. The finding and citation remain local presentation samples until the backend supplies typed, contract-scoped evidence.
+
+## 2026-10-02 status
+
+- Contract-bound AI Chatbot is available under `presentation/feature/chatbot`. Contract Detail now opens the Figma-aligned chat screen with the selected contract name and type. The initial conversation and send behavior are local presentation data only; attachment and backend/RAG-based answers remain pending a typed API contract.

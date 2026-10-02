@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/analysis_result_item_height"
+    android:layout_marginBottom="@dimen/analysis_result_item_spacing"
+    android:background="@drawable/bg_analysis_result_card"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="@dimen/analysis_result_item_padding"
+    android:paddingEnd="@dimen/analysis_result_item_padding">
+
+    <FrameLayout
+        android:id="@+id/analysis_result_item_icon_container"
+        android:layout_width="@dimen/analysis_result_item_icon_container_size"
+        android:layout_height="@dimen/analysis_result_item_icon_container_size"
+        android:background="@drawable/bg_analysis_result_icon">
+
+        <ImageView
+            android:id="@+id/analysis_result_item_icon"
+            android:layout_width="@dimen/analysis_result_item_icon_size"
+            android:layout_height="@dimen/analysis_result_item_icon_size"
+            android:layout_gravity="center"
+            android:contentDescription="@null" />
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/analysis_result_item_text_margin_start"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/analysis_result_item_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/ocr_saved_navy"
+                android:textSize="@dimen/analysis_result_item_title_text_size"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/analysis_result_item_risk_badge"
+                android:layout_width="@dimen/analysis_result_risk_badge_size"
+                android:layout_height="@dimen/analysis_result_risk_badge_size"
+                android:layout_marginStart="@dimen/analysis_result_risk_badge_margin_start"
+                android:background="@drawable/bg_analysis_result_risk_badge"
+                android:gravity="center"
+                android:text="@string/analysis_result_risk_badge"
+                android:textColor="@color/analysis_result_risk"
+                android:textSize="@dimen/analysis_result_risk_badge_text_size"
+                android:textStyle="bold"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/analysis_result_item_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/analysis_result_item_description_margin_top"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/ocr_saved_body"
+            android:textSize="@dimen/analysis_result_item_description_text_size" />
+    </LinearLayout>
+
+    <ImageView
+        android:layout_width="@dimen/analysis_result_item_chevron_size"
+        android:layout_height="@dimen/analysis_result_item_chevron_size"
+        android:contentDescription="@null"
+        android:src="@drawable/ic_contract_search_chevron_right" />
+</LinearLayout>
