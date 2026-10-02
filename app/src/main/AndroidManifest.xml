@@ -16,13 +16,8 @@
         android:theme="@style/Theme.LagalLens">
         <activity
             android:name=".presentation.feature.splash.ui.SplashActivity"
-            android:exported="true"
+            android:exported="false"
             android:windowSoftInputMode="adjustResize">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".presentation.feature.onboarding.ui.OnboardingActivity"
@@ -56,8 +51,14 @@
             android:exported="false" />
         <activity
             android:name=".presentation.feature.upload.ui.UploadSourceActivity"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".presentation.feature.camera.permission.ui.CameraPermissionActivity"
             android:exported="false"
