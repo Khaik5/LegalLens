@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/analysis_obligations_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/legal_lens_background">
+
+    <TextView
+        android:id="@+id/analysis_obligations_title"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/analysis_header_height"
+        android:gravity="center_vertical"
+        android:paddingStart="@dimen/analysis_content_side_padding"
+        android:paddingEnd="@dimen/analysis_content_side_padding"
+        android:text="@string/analysis_obligations_title"
+        android:textColor="@color/legal_lens_primary"
+        android:textSize="@dimen/analysis_header_title_text_size"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/analysis_obligations_document"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/analysis_document_card_height"
+        android:layout_marginStart="@dimen/analysis_content_side_padding"
+        android:layout_marginTop="@dimen/dp_12"
+        android:layout_marginEnd="@dimen/analysis_content_side_padding"
+        android:background="@drawable/bg_analysis_summary_section"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="@dimen/analysis_document_card_padding"
+        android:paddingEnd="@dimen/analysis_document_card_padding"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/analysis_obligations_title">
+
+        <FrameLayout
+            android:layout_width="@dimen/analysis_document_icon_size"
+            android:layout_height="@dimen/analysis_document_icon_size"
+            android:background="@drawable/bg_analysis_summary_document_icon">
+
+            <ImageView
+                android:layout_width="@dimen/analysis_document_icon_art_size"
+                android:layout_height="@dimen/analysis_document_icon_art_size"
+                android:layout_gravity="center"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_ocr_saved_document" />
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/analysis_document_text_margin_start"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/analysis_obligations_document_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@color/legal_lens_primary"
+                android:textSize="@dimen/analysis_document_name_text_size"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/analysis_obligations_document_metadata"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/analysis_document_metadata_margin_top"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@color/legal_lens_secondary_text"
+                android:textSize="@dimen/analysis_document_metadata_text_size" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/analysis_obligations_tabs"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/dp_40"
+        android:layout_marginStart="@dimen/analysis_content_side_padding"
+        android:layout_marginTop="@dimen/dp_12"
+        android:layout_marginEnd="@dimen/analysis_content_side_padding"
+        android:background="@drawable/bg_analysis_obligations_tabs"
+        android:orientation="horizontal"
+        android:padding="@dimen/dp_4"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/analysis_obligations_document">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/bg_analysis_obligations_selected_tab"
+            android:gravity="center"
+            android:text="@string/analysis_obligations_rights_tab"
+            android:textColor="@color/legal_lens_primary"
+            android:textSize="@dimen/sp_13"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/analysis_obligations_duties_tab"
+            android:textColor="@color/legal_lens_secondary_text"
+            android:textSize="@dimen/sp_13"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/analysis_obligations_items"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="@dimen/analysis_content_side_padding"
+        android:layout_marginTop="@dimen/dp_12"
+        android:layout_marginEnd="@dimen/analysis_content_side_padding"
+        android:clipToPadding="false"
+        android:overScrollMode="never"
+        android:paddingBottom="@dimen/dp_16"
+        android:scrollbars="none"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/analysis_obligations_tabs" />
+</androidx.constraintlayout.widget.ConstraintLayout>

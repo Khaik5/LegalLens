@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="@dimen/analysis_processing_timeline_item_min_height">
+
+    <View
+        android:id="@+id/processing_timeline_step_connector"
+        android:layout_width="@dimen/analysis_processing_timeline_connector_width"
+        android:layout_height="0dp"
+        android:layout_marginStart="@dimen/analysis_processing_timeline_connector_start_margin"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/processing_timeline_step_indicator_anchor" />
+
+    <View
+        android:id="@+id/processing_timeline_step_indicator_anchor"
+        android:layout_width="@dimen/analysis_processing_timeline_indicator_size"
+        android:layout_height="@dimen/analysis_processing_timeline_indicator_size"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/processing_timeline_step_completed_indicator"
+        android:layout_width="@dimen/analysis_processing_timeline_indicator_size"
+        android:layout_height="@dimen/analysis_processing_timeline_indicator_size"
+        android:background="@drawable/bg_ocr_processing_completed_indicator"
+        app:layout_constraintBottom_toBottomOf="@id/processing_timeline_step_indicator_anchor"
+        app:layout_constraintEnd_toEndOf="@id/processing_timeline_step_indicator_anchor"
+        app:layout_constraintStart_toStartOf="@id/processing_timeline_step_indicator_anchor"
+        app:layout_constraintTop_toTopOf="@id/processing_timeline_step_indicator_anchor" />
+
+    <ImageView
+        android:id="@+id/processing_timeline_step_completed_icon"
+        android:layout_width="@dimen/ocr_processing_check_icon_size"
+        android:layout_height="@dimen/ocr_processing_check_icon_size"
+        android:contentDescription="@null"
+        android:src="@drawable/ic_ocr_processing_check"
+        app:layout_constraintBottom_toBottomOf="@id/processing_timeline_step_indicator_anchor"
+        app:layout_constraintEnd_toEndOf="@id/processing_timeline_step_indicator_anchor"
+        app:layout_constraintStart_toStartOf="@id/processing_timeline_step_indicator_anchor"
+        app:layout_constraintTop_toTopOf="@id/processing_timeline_step_indicator_anchor" />
+
+    <View
+        android:id="@+id/processing_timeline_step_active_indicator"
+        android:layout_width="@dimen/analysis_processing_timeline_indicator_size"
+        android:layout_height="@dimen/analysis_processing_timeline_indicator_size"
+        android:background="@drawable/bg_ocr_processing_active_indicator"
+        app:layout_constraintBottom_toBottomOf="@id/processing_timeline_step_indicator_anchor"
+        app:layout_constraintEnd_toEndOf="@id/processing_timeline_step_indicator_anchor"
+        app:layout_constraintStart_toStartOf="@id/processing_timeline_step_indicator_anchor"
+        app:layout_constraintTop_toTopOf="@id/processing_timeline_step_indicator_anchor" />
+
+    <View
+        android:id="@+id/processing_timeline_step_active_dot"
+        android:layout_width="@dimen/ocr_processing_active_dot_size"
+        android:layout_height="@dimen/ocr_processing_active_dot_size"
+        android:background="@drawable/bg_ocr_processing_active_dot"
+        app:layout_constraintBottom_toBottomOf="@id/processing_timeline_step_indicator_anchor"
+        app:layout_constraintEnd_toEndOf="@id/processing_timeline_step_indicator_anchor"
+        app:layout_constraintStart_toStartOf="@id/processing_timeline_step_indicator_anchor"
+        app:layout_constraintTop_toTopOf="@id/processing_timeline_step_indicator_anchor" />
+
+    <TextView
+        android:id="@+id/processing_timeline_step_pending_indicator"
+        android:layout_width="@dimen/analysis_processing_timeline_indicator_size"
+        android:layout_height="@dimen/analysis_processing_timeline_indicator_size"
+        android:background="@drawable/bg_ocr_processing_pending_indicator"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:textColor="@color/ocr_saved_body"
+        android:textSize="@dimen/analysis_processing_step_number_text_size"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@id/processing_timeline_step_indicator_anchor"
+        app:layout_constraintEnd_toEndOf="@id/processing_timeline_step_indicator_anchor"
+        app:layout_constraintStart_toStartOf="@id/processing_timeline_step_indicator_anchor"
+        app:layout_constraintTop_toTopOf="@id/processing_timeline_step_indicator_anchor" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/analysis_processing_timeline_content_margin_start"
+        android:layout_marginTop="@dimen/analysis_processing_timeline_content_top_margin"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/processing_timeline_step_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/analysis_processing_timeline_title_text_size"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/processing_timeline_step_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/analysis_processing_timeline_description_margin_top"
+            android:lineSpacingExtra="@dimen/analysis_processing_timeline_description_line_spacing"
+            android:textSize="@dimen/analysis_processing_timeline_description_text_size" />
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -102,4 +102,16 @@
     <color name="ocr_saved_border">#FFE1E8F0</color>
     <color name="ocr_saved_surface">#FFFFFFFF</color>
     <color name="ocr_saved_white">#FFFFFFFF</color>
+    <color name="analysis_disclaimer_border">#FFFDE68A</color>
+    <color name="analysis_disclaimer_text">#FF78350F</color>
+    <color name="analysis_result_risk">#FFEF4444</color>
+    <color name="analysis_result_risk_surface">#FFFEE2E2</color>
+    <color name="analysis_result_medium_surface">#FFFEF3C7</color>
+    <color name="analysis_result_score_track">#FFF1F5F9</color>
+    <color name="analysis_risk_overview_disclaimer_surface">#FFF8FAFC</color>
+    <color name="analysis_risk_detail_quote_surface">#FFFFFBEB</color>
+    <color name="analysis_risk_detail_quote_border">#FFFDE68A</color>
+    <color name="analysis_risk_detail_recommendation_border">#FFCCECEE</color>
+    <color name="chatbot_user_message">#FFE7F3F2</color>
+    <color name="chatbot_input_stroke">#FFDCE5EC</color>
 </resources>

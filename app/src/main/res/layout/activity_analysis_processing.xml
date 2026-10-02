@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/analysis_processing_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/ocr_saved_background">
+
+    <TextView
+        android:id="@+id/analysis_processing_title"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/analysis_processing_header_height"
+        android:gravity="center_vertical"
+        android:paddingStart="@dimen/analysis_content_side_padding"
+        android:paddingEnd="@dimen/analysis_content_side_padding"
+        android:text="@string/analysis_processing_title"
+        android:textColor="@color/ocr_saved_navy"
+        android:textSize="@dimen/analysis_processing_title_text_size"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/analysis_processing_document_card"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/analysis_document_card_height"
+        android:layout_marginStart="@dimen/analysis_content_side_padding"
+        android:layout_marginTop="@dimen/analysis_processing_document_margin_top"
+        android:layout_marginEnd="@dimen/analysis_content_side_padding"
+        android:background="@drawable/bg_analysis_document_card"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="@dimen/analysis_document_card_padding"
+        android:paddingEnd="@dimen/analysis_document_card_padding"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/analysis_processing_title">
+
+        <FrameLayout
+            android:layout_width="@dimen/analysis_document_icon_size"
+            android:layout_height="@dimen/analysis_document_icon_size"
+            android:background="@drawable/bg_ocr_saved_document_icon">
+
+            <ImageView
+                android:layout_width="@dimen/analysis_document_icon_art_size"
+                android:layout_height="@dimen/analysis_document_icon_art_size"
+                android:layout_gravity="center"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_ocr_saved_document" />
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/analysis_document_text_margin_start"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/analysis_processing_document_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@color/ocr_saved_navy"
+                android:textSize="@dimen/analysis_document_name_text_size"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/analysis_processing_document_metadata"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/analysis_document_metadata_margin_top"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@color/ocr_saved_body"
+                android:textSize="@dimen/analysis_document_metadata_text_size" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/analysis_processing_timeline"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="@dimen/analysis_processing_timeline_side_padding"
+        android:layout_marginTop="@dimen/analysis_processing_timeline_margin_top"
+        android:layout_marginEnd="@dimen/analysis_processing_timeline_side_padding"
+        android:clipToPadding="false"
+        android:overScrollMode="never"
+        app:layout_constraintBottom_toTopOf="@id/analysis_processing_footer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/analysis_processing_document_card" />
+
+    <LinearLayout
+        android:id="@+id/analysis_processing_footer"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/ocr_processing_footer_height"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:paddingTop="@dimen/ocr_processing_footer_top_padding"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <LinearLayout
+            android:layout_width="@dimen/ocr_processing_footer_dots_width"
+            android:layout_height="@dimen/ocr_processing_footer_dot_size"
+            android:orientation="horizontal">
+
+            <View
+                android:layout_width="@dimen/ocr_processing_footer_dot_size"
+                android:layout_height="@dimen/ocr_processing_footer_dot_size"
+                android:background="@drawable/bg_ocr_processing_footer_dot_active" />
+
+            <View
+                android:layout_width="@dimen/ocr_processing_footer_dot_spacing"
+                android:layout_height="@dimen/ocr_processing_footer_dot_size" />
+
+            <View
+                android:layout_width="@dimen/ocr_processing_footer_dot_size"
+                android:layout_height="@dimen/ocr_processing_footer_dot_size"
+                android:background="@drawable/bg_ocr_processing_footer_dot_middle" />
+
+            <View
+                android:layout_width="@dimen/ocr_processing_footer_dot_spacing"
+                android:layout_height="@dimen/ocr_processing_footer_dot_size" />
+
+            <View
+                android:layout_width="@dimen/ocr_processing_footer_dot_size"
+                android:layout_height="@dimen/ocr_processing_footer_dot_size"
+                android:background="@drawable/bg_ocr_processing_footer_dot_pending" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/ocr_processing_footer_notice_margin_top"
+            android:letterSpacing="0.092"
+            android:text="@string/analysis_processing_notice"
+            android:textColor="@color/ocr_saved_body"
+            android:textSize="@dimen/analysis_processing_notice_text_size" />
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

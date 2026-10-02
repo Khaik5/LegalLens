@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="@dimen/analysis_result_score_size"
+    android:height="@dimen/analysis_result_score_size"
+    android:viewportWidth="72"
+    android:viewportHeight="72">
+    <path
+        android:fillColor="@android:color/transparent"
+        android:pathData="M36,6A30,30 0,1 1,35.99,6"
+        android:strokeColor="@color/analysis_result_score_track"
+        android:strokeWidth="9" />
+    <path
+        android:fillColor="@android:color/transparent"
+        android:pathData="M36,6A30,30 0,1 1,11.73,50.27"
+        android:strokeColor="@color/contract_pending"
+        android:strokeWidth="9" />
+</vector>

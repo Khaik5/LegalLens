@@ -21,6 +21,7 @@ import com.example.lagallens.presentation.feature.contracts.detail.contract.Cont
 import com.example.lagallens.presentation.feature.contracts.detail.contract.ContractDetailUiState
 import com.example.lagallens.presentation.feature.contracts.detail.viewmodel.ContractDetailViewModel
 import com.example.lagallens.presentation.feature.contracts.detail.dialog.ContractDeleteDialog
+import com.example.lagallens.presentation.feature.chatbot.ui.ChatbotActivity
 import kotlinx.coroutines.launch
 
 class ContractDetailFragment : Fragment() {
@@ -72,6 +73,13 @@ class ContractDetailFragment : Fragment() {
                 viewModel.uiEffect.collect { effect ->
                     when (effect) {
                         ContractDetailUiEffect.NavigateBack -> findNavController().navigateUp()
+                        is ContractDetailUiEffect.NavigateToChatbot -> startActivity(
+                            ChatbotActivity.createIntent(
+                                requireContext(),
+                                getString(effect.contractNameRes),
+                                getString(effect.contractTypeRes)
+                            )
+                        )
                         ContractDetailUiEffect.ShowDeleteConfirmation -> showDeleteConfirmation()
                         is ContractDetailUiEffect.ShowMessage -> Toast.makeText(requireContext(), effect.messageRes, Toast.LENGTH_SHORT).show()
                     }

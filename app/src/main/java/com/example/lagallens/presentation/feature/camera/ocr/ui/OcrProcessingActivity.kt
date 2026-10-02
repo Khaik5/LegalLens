@@ -13,9 +13,11 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.lagallens.R
 import com.example.lagallens.databinding.ActivityOcrProcessingBinding
 import com.example.lagallens.domain.model.camera.ScanPage
+import com.example.lagallens.presentation.common.adapter.ProcessingTimelineStepAdapter
 import com.example.lagallens.presentation.feature.camera.ocr.contract.OcrProcessingUiEffect
 import com.example.lagallens.presentation.feature.camera.ocr.contract.OcrProcessingUiEvent
 import com.example.lagallens.presentation.feature.camera.ocr.contract.OcrProcessingUiState
@@ -27,6 +29,7 @@ import kotlinx.coroutines.launch
 class OcrProcessingActivity : AppCompatActivity() {
     private val binding by lazy { ActivityOcrProcessingBinding.inflate(layoutInflater) }
     private val viewModel by viewModels<OcrProcessingViewModel>()
+    private val stepAdapter = ProcessingTimelineStepAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,6 +44,7 @@ class OcrProcessingActivity : AppCompatActivity() {
         applyWindowInsets()
         initializeDocumentMetadata()
         bindView()
+        bindTimeline()
         collectState()
         viewModel.onEvent(
             OcrProcessingUiEvent.ScreenOpened(
@@ -72,6 +76,11 @@ class OcrProcessingActivity : AppCompatActivity() {
         binding.ocrProcessingBack.setOnClickListener { finish() }
     }
 
+    private fun bindTimeline() = with(binding.ocrProcessingTimeline) {
+        layoutManager = LinearLayoutManager(this@OcrProcessingActivity)
+        adapter = stepAdapter
+    }
+
     private fun collectState() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -84,6 +93,7 @@ class OcrProcessingActivity : AppCompatActivity() {
     private fun render(state: OcrProcessingUiState) {
         binding.ocrProcessingDocumentName.text = state.documentName
         binding.ocrProcessingDocumentDetails.text = state.documentDetails
+        stepAdapter.submitList(state.steps)
     }
 
     private fun handleEffect(effect: OcrProcessingUiEffect) {

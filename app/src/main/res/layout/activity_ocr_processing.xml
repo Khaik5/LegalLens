@@ -91,258 +91,19 @@
         </LinearLayout>
     </LinearLayout>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/ocr_processing_timeline"
         android:layout_width="0dp"
-        android:layout_height="@dimen/ocr_processing_timeline_height"
-        android:layout_marginStart="@dimen/ocr_processing_timeline_side_padding"
-        android:layout_marginTop="@dimen/ocr_processing_timeline_top_margin"
-        android:layout_marginEnd="@dimen/ocr_processing_timeline_side_padding"
+        android:layout_height="0dp"
+        android:layout_marginStart="@dimen/analysis_processing_timeline_side_padding"
+        android:layout_marginTop="@dimen/analysis_processing_timeline_margin_top"
+        android:layout_marginEnd="@dimen/analysis_processing_timeline_side_padding"
+        android:clipToPadding="false"
+        android:overScrollMode="never"
+        app:layout_constraintBottom_toTopOf="@id/ocr_processing_footer"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ocr_processing_document_card">
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/ocr_processing_upload_step"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/ocr_processing_timeline_step_height"
-            android:layout_marginTop="@dimen/ocr_processing_timeline_top_padding"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <View
-                android:id="@+id/ocr_processing_upload_connector"
-                android:layout_width="@dimen/ocr_processing_timeline_connector_width"
-                android:layout_height="0dp"
-                android:layout_marginStart="@dimen/ocr_processing_timeline_connector_start_margin"
-                android:background="@color/camera_scan_ready"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/ocr_processing_upload_indicator" />
-
-            <View
-                android:id="@+id/ocr_processing_upload_indicator"
-                android:layout_width="@dimen/ocr_processing_timeline_indicator_size"
-                android:layout_height="@dimen/ocr_processing_timeline_indicator_size"
-                android:background="@drawable/bg_ocr_processing_completed_indicator"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <ImageView
-                android:layout_width="@dimen/ocr_processing_check_icon_size"
-                android:layout_height="@dimen/ocr_processing_check_icon_size"
-                android:src="@drawable/ic_ocr_processing_check"
-                app:layout_constraintBottom_toBottomOf="@id/ocr_processing_upload_indicator"
-                app:layout_constraintEnd_toEndOf="@id/ocr_processing_upload_indicator"
-                app:layout_constraintStart_toStartOf="@id/ocr_processing_upload_indicator"
-                app:layout_constraintTop_toTopOf="@id/ocr_processing_upload_indicator" />
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/ocr_processing_timeline_content_margin_start"
-                android:layout_marginTop="@dimen/ocr_processing_timeline_title_top_margin"
-                android:orientation="vertical"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif"
-                    android:text="@string/ocr_processing_upload_title"
-                    android:textColor="@color/upload_navy"
-                    android:textSize="@dimen/ocr_processing_timeline_title_text_size"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/ocr_processing_timeline_body_margin_top"
-                    android:text="@string/ocr_processing_upload_body"
-                    android:textColor="@color/upload_body"
-                    android:textSize="@dimen/ocr_processing_body_text_size" />
-            </LinearLayout>
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/ocr_processing_analysis_step"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/ocr_processing_timeline_step_height"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/ocr_processing_upload_step">
-
-            <View
-                android:id="@+id/ocr_processing_analysis_connector"
-                android:layout_width="@dimen/ocr_processing_timeline_connector_width"
-                android:layout_height="0dp"
-                android:layout_marginStart="@dimen/ocr_processing_timeline_connector_start_margin"
-                android:background="@color/upload_border"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/ocr_processing_analysis_indicator" />
-
-            <View
-                android:id="@+id/ocr_processing_analysis_indicator"
-                android:layout_width="@dimen/ocr_processing_timeline_indicator_size"
-                android:layout_height="@dimen/ocr_processing_timeline_indicator_size"
-                android:background="@drawable/bg_ocr_processing_active_indicator"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <View
-                android:layout_width="@dimen/ocr_processing_active_dot_size"
-                android:layout_height="@dimen/ocr_processing_active_dot_size"
-                android:background="@drawable/bg_ocr_processing_active_dot"
-                app:layout_constraintBottom_toBottomOf="@id/ocr_processing_analysis_indicator"
-                app:layout_constraintEnd_toEndOf="@id/ocr_processing_analysis_indicator"
-                app:layout_constraintStart_toStartOf="@id/ocr_processing_analysis_indicator"
-                app:layout_constraintTop_toTopOf="@id/ocr_processing_analysis_indicator" />
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/ocr_processing_timeline_content_margin_start"
-                android:layout_marginTop="@dimen/ocr_processing_timeline_title_top_margin"
-                android:orientation="vertical"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif"
-                    android:text="@string/ocr_processing_analyzing_title"
-                    android:textColor="@color/upload_teal"
-                    android:textSize="@dimen/ocr_processing_timeline_title_text_size"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/ocr_processing_timeline_body_margin_top"
-                    android:fontFamily="sans-serif-medium"
-                    android:text="@string/ocr_processing_analyzing_body"
-                    android:textColor="@color/upload_teal"
-                    android:textSize="@dimen/ocr_processing_body_text_size" />
-            </LinearLayout>
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/ocr_processing_text_step"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/ocr_processing_timeline_step_height"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/ocr_processing_analysis_step">
-
-            <View
-                android:id="@+id/ocr_processing_text_connector"
-                android:layout_width="@dimen/ocr_processing_timeline_connector_width"
-                android:layout_height="0dp"
-                android:layout_marginStart="@dimen/ocr_processing_timeline_connector_start_margin"
-                android:background="@color/upload_border"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/ocr_processing_text_indicator" />
-
-            <TextView
-                android:id="@+id/ocr_processing_text_indicator"
-                android:layout_width="@dimen/ocr_processing_timeline_indicator_size"
-                android:layout_height="@dimen/ocr_processing_timeline_indicator_size"
-                android:background="@drawable/bg_ocr_processing_pending_indicator"
-                android:fontFamily="sans-serif"
-                android:gravity="center"
-                android:includeFontPadding="false"
-                android:text="@string/ocr_processing_text_step_number"
-                android:textColor="@color/upload_body"
-                android:textSize="@dimen/ocr_processing_step_number_text_size"
-                android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/ocr_processing_timeline_content_margin_start"
-                android:layout_marginTop="@dimen/ocr_processing_timeline_title_top_margin"
-                android:orientation="vertical"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-medium"
-                    android:text="@string/ocr_processing_pending_title"
-                    android:textColor="@color/upload_body"
-                    android:textSize="@dimen/ocr_processing_timeline_title_text_size" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/ocr_processing_timeline_body_margin_top"
-                    android:text="@string/ocr_processing_pending_body"
-                    android:textColor="@color/upload_body"
-                    android:textSize="@dimen/ocr_processing_body_text_size" />
-            </LinearLayout>
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="0dp"
-            android:layout_height="@dimen/ocr_processing_timeline_final_step_height"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/ocr_processing_text_step">
-
-            <TextView
-                android:id="@+id/ocr_processing_review_indicator"
-                android:layout_width="@dimen/ocr_processing_timeline_indicator_size"
-                android:layout_height="@dimen/ocr_processing_timeline_indicator_size"
-                android:background="@drawable/bg_ocr_processing_pending_indicator"
-                android:fontFamily="sans-serif"
-                android:gravity="center"
-                android:includeFontPadding="false"
-                android:text="@string/ocr_processing_review_step_number"
-                android:textColor="@color/upload_body"
-                android:textSize="@dimen/ocr_processing_step_number_text_size"
-                android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/ocr_processing_timeline_content_margin_start"
-                android:layout_marginTop="@dimen/ocr_processing_timeline_title_top_margin"
-                android:orientation="vertical"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-medium"
-                    android:text="@string/ocr_processing_review_title"
-                    android:textColor="@color/upload_body"
-                    android:textSize="@dimen/ocr_processing_timeline_title_text_size" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/ocr_processing_timeline_body_margin_top"
-                    android:text="@string/ocr_processing_pending_body"
-                    android:textColor="@color/upload_body"
-                    android:textSize="@dimen/ocr_processing_body_text_size" />
-            </LinearLayout>
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        app:layout_constraintTop_toBottomOf="@id/ocr_processing_document_card" />
 
     <LinearLayout
         android:id="@+id/ocr_processing_footer"
@@ -351,9 +112,9 @@
         android:gravity="center_horizontal"
         android:orientation="vertical"
         android:paddingTop="@dimen/ocr_processing_footer_top_padding"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ocr_processing_timeline">
+        app:layout_constraintStart_toStartOf="parent">
 
         <LinearLayout
             android:layout_width="@dimen/ocr_processing_footer_dots_width"

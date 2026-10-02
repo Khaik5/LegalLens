@@ -13,7 +13,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class OcrProcessingViewModel : ViewModel() {
+class OcrProcessingViewModel(
+    private val processingStageDurationMillis: Long = PROCESSING_STAGE_DURATION_MILLIS
+) : ViewModel() {
     private val _uiState = MutableStateFlow(OcrProcessingUiState())
     val uiState = _uiState.asStateFlow()
 
@@ -41,25 +43,31 @@ class OcrProcessingViewModel : ViewModel() {
         if (hasStartedLocalPreview) return
         hasStartedLocalPreview = true
         viewModelScope.launch {
-            delay(LOCAL_PREVIEW_DURATION_MILLIS)
+            delay(processingStageDurationMillis)
             val state = _uiState.value
-            _uiEffect.emit(
-                if (shouldSimulateFailure) {
+            if (shouldSimulateFailure) {
+                _uiEffect.emit(
                     OcrProcessingUiEffect.NavigateToOcrFailure(
                         documentName = state.documentName,
                         documentDetails = state.documentDetails
                     )
-                } else {
-                    OcrProcessingUiEffect.NavigateToOcrResult(
-                        documentName = state.documentName,
-                        documentDetails = state.documentDetails
-                    )
-                }
+                )
+                return@launch
+            }
+            (3..4).forEach { activeStepId ->
+                _uiState.update { state -> state.withActiveStep(activeStepId) }
+                delay(processingStageDurationMillis)
+            }
+            _uiEffect.emit(
+                OcrProcessingUiEffect.NavigateToOcrResult(
+                    documentName = state.documentName,
+                    documentDetails = state.documentDetails
+                )
             )
         }
     }
 
     private companion object {
-        const val LOCAL_PREVIEW_DURATION_MILLIS = 2_000L
+        const val PROCESSING_STAGE_DURATION_MILLIS = 900L
     }
 }

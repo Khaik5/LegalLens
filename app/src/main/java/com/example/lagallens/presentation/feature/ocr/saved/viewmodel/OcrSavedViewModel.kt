@@ -30,7 +30,9 @@ class OcrSavedViewModel : ViewModel() {
             }
 
             OcrSavedUiEvent.ReturnToContractClicked -> emitEffect(OcrSavedUiEffect.NavigateBack)
-            OcrSavedUiEvent.AnalyzeClicked -> emitEffect(OcrSavedUiEffect.ShowAnalysisUnavailable)
+            OcrSavedUiEvent.AnalyzeClicked -> {
+                emitEffect(OcrSavedUiEffect.NavigateToAnalysis(_uiState.value.documentName))
+            }
         }
     }
 
