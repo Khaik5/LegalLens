@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="@dimen/chatbot_error_retry_icon_size"
+    android:height="@dimen/chatbot_error_retry_icon_size"
+    android:viewportWidth="14"
+    android:viewportHeight="14">
+    <path
+        android:fillColor="@android:color/transparent"
+        android:pathData="M11.67,4.67L11.67,1.75M11.67,1.75L8.75,1.75M11.5,7C11.5,9.49 9.49,11.5 7,11.5C4.51,11.5 2.5,9.49 2.5,7C2.5,4.51 4.51,2.5 7,2.5C8.24,2.5 9.36,3 10.18,3.82L11.67,4.67"
+        android:strokeColor="@color/analysis_result_risk"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="1.8" />
+</vector>

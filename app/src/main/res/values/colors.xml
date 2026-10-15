@@ -114,4 +114,8 @@
     <color name="analysis_risk_detail_recommendation_border">#FFCCECEE</color>
     <color name="chatbot_user_message">#FFE7F3F2</color>
     <color name="chatbot_input_stroke">#FFDCE5EC</color>
+    <color name="chatbot_drawer_surface">#FFF0F2F0</color>
+    <color name="chatbot_drawer_active">#FFE2EEEC</color>
+    <color name="chatbot_drawer_section_text">#FF7D8A8B</color>
+    <color name="chatbot_drawer_scrim">#281A2D42</color>
 </resources>

@@ -6,19 +6,44 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.lagallens.databinding.ItemChatbotAssistantMessageBinding
+import com.example.lagallens.databinding.ItemChatbotAssistantCitationMessageBinding
+import com.example.lagallens.databinding.ItemChatbotAssistantErrorMessageBinding
+import com.example.lagallens.databinding.ItemChatbotAssistantGroundedMessageBinding
+import com.example.lagallens.databinding.ItemChatbotAssistantNoEvidenceMessageBinding
 import com.example.lagallens.databinding.ItemChatbotUserMessageBinding
 import com.example.lagallens.presentation.feature.chatbot.contract.ChatbotMessage
 import com.example.lagallens.presentation.feature.chatbot.contract.ChatbotMessageAuthor
 
-class ChatbotMessageAdapter : ListAdapter<ChatbotMessage, RecyclerView.ViewHolder>(DiffCallback) {
-    override fun getItemViewType(position: Int): Int = when (getItem(position).author) {
-        ChatbotMessageAuthor.ASSISTANT -> VIEW_TYPE_ASSISTANT
-        ChatbotMessageAuthor.USER -> VIEW_TYPE_USER
+class ChatbotMessageAdapter(
+    private val onCitationClicked: () -> Unit,
+    private val onRetryClicked: (Long) -> Unit
+) : ListAdapter<ChatbotMessage, RecyclerView.ViewHolder>(DiffCallback) {
+    override fun getItemViewType(position: Int): Int = when {
+        getItem(position).error != null -> VIEW_TYPE_ASSISTANT_ERROR
+        getItem(position).noEvidence != null -> VIEW_TYPE_ASSISTANT_NO_EVIDENCE
+        getItem(position).references.isNotEmpty() -> VIEW_TYPE_ASSISTANT_GROUNDED
+        getItem(position).author == ChatbotMessageAuthor.ASSISTANT && getItem(position).citation != null -> VIEW_TYPE_ASSISTANT_CITATION
+        getItem(position).author == ChatbotMessageAuthor.ASSISTANT -> VIEW_TYPE_ASSISTANT
+        else -> VIEW_TYPE_USER
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder = when (viewType) {
         VIEW_TYPE_ASSISTANT -> AssistantMessageViewHolder(
             ItemChatbotAssistantMessageBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        )
+        VIEW_TYPE_ASSISTANT_CITATION -> AssistantCitationMessageViewHolder(
+            ItemChatbotAssistantCitationMessageBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+            onCitationClicked
+        )
+        VIEW_TYPE_ASSISTANT_GROUNDED -> AssistantGroundedMessageViewHolder(
+            ItemChatbotAssistantGroundedMessageBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        )
+        VIEW_TYPE_ASSISTANT_NO_EVIDENCE -> AssistantNoEvidenceMessageViewHolder(
+            ItemChatbotAssistantNoEvidenceMessageBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        )
+        VIEW_TYPE_ASSISTANT_ERROR -> AssistantErrorMessageViewHolder(
+            ItemChatbotAssistantErrorMessageBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+            onRetryClicked
         )
         else -> UserMessageViewHolder(
             ItemChatbotUserMessageBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -28,6 +53,10 @@ class ChatbotMessageAdapter : ListAdapter<ChatbotMessage, RecyclerView.ViewHolde
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
             is AssistantMessageViewHolder -> holder.bind(getItem(position))
+            is AssistantCitationMessageViewHolder -> holder.bind(getItem(position))
+            is AssistantGroundedMessageViewHolder -> holder.bind(getItem(position))
+            is AssistantNoEvidenceMessageViewHolder -> holder.bind(getItem(position))
+            is AssistantErrorMessageViewHolder -> holder.bind(getItem(position))
             is UserMessageViewHolder -> holder.bind(getItem(position))
         }
     }
@@ -48,6 +77,63 @@ class ChatbotMessageAdapter : ListAdapter<ChatbotMessage, RecyclerView.ViewHolde
         }
     }
 
+    private class AssistantCitationMessageViewHolder(
+        private val binding: ItemChatbotAssistantCitationMessageBinding,
+        onCitationClicked: () -> Unit
+    ) : RecyclerView.ViewHolder(binding.root) {
+        init {
+            binding.chatbotCitationCard.setOnClickListener { onCitationClicked() }
+        }
+
+        fun bind(item: ChatbotMessage) = with(binding) {
+            val citation = requireNotNull(item.citation)
+            chatbotAssistantCitationMessage.text = item.content
+            chatbotCitationTitle.text = citation.title
+            chatbotCitationDescription.text = citation.description
+            chatbotCitationAction.text = citation.actionLabel
+        }
+    }
+
+    private class AssistantGroundedMessageViewHolder(
+        private val binding: ItemChatbotAssistantGroundedMessageBinding
+    ) : RecyclerView.ViewHolder(binding.root) {
+        fun bind(item: ChatbotMessage) {
+            val firstReference = item.references.firstOrNull() ?: return
+            val secondReference = item.references.getOrNull(1)
+            with(binding) {
+                chatbotAssistantGroundedMessage.text = item.content
+                chatbotReferenceSectionTitle.text = item.referenceSectionTitle
+                chatbotReferenceFirstTitle.text = firstReference.title
+                chatbotReferenceFirstExcerpt.text = firstReference.excerpt
+                chatbotReferenceSecondCard.visibility = if (secondReference == null) android.view.View.GONE else android.view.View.VISIBLE
+                chatbotReferenceSecondTitle.text = secondReference?.title.orEmpty()
+                chatbotReferenceSecondExcerpt.text = secondReference?.excerpt.orEmpty()
+            }
+        }
+    }
+
+    private class AssistantNoEvidenceMessageViewHolder(
+        private val binding: ItemChatbotAssistantNoEvidenceMessageBinding
+    ) : RecyclerView.ViewHolder(binding.root) {
+        fun bind(item: ChatbotMessage) = with(binding) {
+            val noEvidence = requireNotNull(item.noEvidence)
+            chatbotNoEvidenceTitle.text = noEvidence.title
+            chatbotNoEvidenceMessage.text = noEvidence.message
+        }
+    }
+
+    private class AssistantErrorMessageViewHolder(
+        private val binding: ItemChatbotAssistantErrorMessageBinding,
+        private val onRetryClicked: (Long) -> Unit
+    ) : RecyclerView.ViewHolder(binding.root) {
+        fun bind(item: ChatbotMessage) = with(binding) {
+            val error = requireNotNull(item.error)
+            chatbotErrorTitle.text = error.title
+            chatbotErrorRetryLabel.text = error.retryLabel
+            chatbotErrorRetry.setOnClickListener { onRetryClicked(item.id) }
+        }
+    }
+
     private object DiffCallback : DiffUtil.ItemCallback<ChatbotMessage>() {
         override fun areItemsTheSame(oldItem: ChatbotMessage, newItem: ChatbotMessage): Boolean = oldItem.id == newItem.id
 
@@ -57,5 +143,9 @@ class ChatbotMessageAdapter : ListAdapter<ChatbotMessage, RecyclerView.ViewHolde
     private companion object {
         const val VIEW_TYPE_ASSISTANT = 1
         const val VIEW_TYPE_USER = 2
+        const val VIEW_TYPE_ASSISTANT_CITATION = 3
+        const val VIEW_TYPE_ASSISTANT_GROUNDED = 4
+        const val VIEW_TYPE_ASSISTANT_NO_EVIDENCE = 5
+        const val VIEW_TYPE_ASSISTANT_ERROR = 6
     }
 }

@@ -1,0 +1,12 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="@dimen/chatbot_drawer_item_icon_size"
+    android:height="@dimen/chatbot_drawer_item_icon_size"
+    android:viewportWidth="20"
+    android:viewportHeight="20">
+    <path
+        android:fillColor="@android:color/transparent"
+        android:pathData="M7.3,7.2C7.45,5.75 8.55,5 10,5C11.45,5 12.5,5.9 12.5,7.25C12.5,8.2 12.05,8.78 11.1,9.4C10.15,10.02 9.7,10.65 9.7,11.75M9.7,14.8L9.72,14.8"
+        android:strokeColor="@color/legal_lens_secondary_text"
+        android:strokeLineCap="round"
+        android:strokeWidth="1.6" />
+</vector>

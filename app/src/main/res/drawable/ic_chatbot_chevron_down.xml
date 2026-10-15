@@ -1,0 +1,13 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="@dimen/chatbot_reference_chevron_size"
+    android:height="@dimen/chatbot_reference_chevron_size"
+    android:viewportWidth="14"
+    android:viewportHeight="14">
+    <path
+        android:fillColor="@android:color/transparent"
+        android:pathData="M3.5,5.25L7,8.75L10.5,5.25"
+        android:strokeColor="@color/legal_lens_secondary_text"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="1.5" />
+</vector>

@@ -18,13 +18,21 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.LagalLens">
         <activity
+            android:name=".presentation.feature.chatbot.history.ui.ChatbotHistoryActivity"
+            android:exported="false" />
+        <activity
             android:name=".presentation.feature.chatbot.ui.ChatbotActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".presentation.feature.splash.ui.SplashActivity"
-            android:exported="false"
+            android:exported="true"
             android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         <activity
             android:name=".presentation.feature.ocr.editor.ui.OcrEditorActivity"
@@ -129,14 +137,8 @@
             android:exported="false" />
         <activity
             android:name=".presentation.feature.upload.ui.UploadSourceActivity"
-            android:exported="true"
-            android:windowSoftInputMode="adjustResize">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".presentation.feature.camera.permission.ui.CameraPermissionActivity"
             android:exported="false"

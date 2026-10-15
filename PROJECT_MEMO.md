@@ -48,6 +48,7 @@ See [requirements.md](docs/project_notes/requirements.md) for acceptance-oriente
 - Add Contract source selection and the OCR text-review screen are implemented in the same flow. OCR review supports editing, basic text formatting, restoring the generated text, and local save feedback; the backend OCR/upload integration remains pending.
 - The Add Contract flow now routes a locally selected document to the Figma-aligned upload-progress UI. It presents local file metadata and a cancellable placeholder processing state; it does not upload or perform OCR until the backend contract is available.
 - The Figma-aligned upload failure state is available with a retry path back to file selection and a return-to-caller path. The backend must provide a typed upload/OCR failure before this state can be reached from live processing.
+
 ## 2026-09-12 status
 
 - Add Contract has a local UI-test flow while the backend contract is unavailable: PDF, DOCX, and Gallery selections show metadata on Upload Progress, advance from 68% to 100%, then open OCR Processing with the same metadata. This transition must be replaced with typed backend upload/OCR outcomes before production.
@@ -93,4 +94,4 @@ See [requirements.md](docs/project_notes/requirements.md) for acceptance-oriente
 
 ## 2026-10-02 status
 
-- Contract-bound AI Chatbot is available under `presentation/feature/chatbot`. Contract Detail now opens the Figma-aligned chat screen with the selected contract name and type. The initial conversation and send behavior are local presentation data only; attachment and backend/RAG-based answers remain pending a typed API contract.
+- Contract-bound AI Chatbot is available under `presentation/feature/chatbot`. Contract Detail now opens the Figma-aligned chat screen with the selected contract name and type. Its initial state shows an assistant greeting with four Figma-provided questions; selecting one starts the local sample conversation. The supplied termination-question state renders two contract-source reference cards, the parking-support question renders the approved no-evidence warning, and the local penalty-question response retains its citation card that opens the existing commercial-law detail screen. The Figma navigation drawer opens from the chat menu, starts the Figma-aligned empty new-conversation state with three suggested questions, and opens the local Figma-aligned conversation-history screen. The local “Tóm tắt nghĩa vụ của bên thuê” request renders the approved retryable connection-error card; retry swaps it for the local fallback response. History entries and search remain presentation-only until conversation sync is connected; help, attachment, and backend/RAG-based answers remain pending a typed API contract.

@@ -1,0 +1,12 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="@dimen/chatbot_no_evidence_icon_size"
+    android:height="@dimen/chatbot_no_evidence_icon_size"
+    android:viewportWidth="20"
+    android:viewportHeight="20">
+    <path
+        android:fillColor="@android:color/transparent"
+        android:pathData="M9.99642,7.49967L9.99642,10.833M9.99642,14.1663L10.0048,14.1663M18.1051,14.9999L11.4384,3.33319C11.2931,3.0767 11.0823,2.86335 10.8275,2.71492C10.5728,2.56649 10.2833,2.48828 9.98843,2.48828C9.69361,2.48828 9.40406,2.56649 9.14933,2.71492C8.8946,2.86335 8.6838,3.0767 8.53843,3.33319L1.87177,14.9999C1.72484,15.2543 1.64779,15.5431 1.64844,15.837C1.64909,16.1308 1.72742,16.4192 1.87547,16.673C2.02353,16.9269 2.23606,17.137 2.49151,17.2822C2.74697,17.4274 3.03627,17.5025 3.3301,17.4999L16.6634,17.4999C16.9558,17.4996 17.243,17.4223 17.4962,17.2759C17.7493,17.1295 17.9594,16.9191 18.1055,16.6658C18.2516,16.4125 18.3285,16.1252 18.3284,15.8328C18.3283,15.5404 18.2513,15.2531 18.1051,14.9999Z"
+        android:strokeColor="@color/upload_amber"
+        android:strokeLineCap="round"
+        android:strokeWidth="2" />
+</vector>

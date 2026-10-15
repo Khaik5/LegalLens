@@ -1,0 +1,12 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="@dimen/chatbot_drawer_item_icon_size"
+    android:height="@dimen/chatbot_drawer_item_icon_size"
+    android:viewportWidth="20"
+    android:viewportHeight="20">
+    <path
+        android:fillColor="@android:color/transparent"
+        android:pathData="M10,3L10,17M3,10L17,10"
+        android:strokeColor="@color/legal_lens_primary"
+        android:strokeLineCap="round"
+        android:strokeWidth="1.75" />
+</vector>
