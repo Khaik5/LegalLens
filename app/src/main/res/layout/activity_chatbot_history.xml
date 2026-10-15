@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/chatbotHistoryRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/legal_lens_background">
+
+    <FrameLayout
+        android:id="@+id/chatbotHistoryHeader"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/chatbot_history_header_height"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageButton
+            android:id="@+id/chatbotHistoryBack"
+            android:layout_width="@dimen/chatbot_header_action_size"
+            android:layout_height="@dimen/chatbot_header_action_size"
+            android:layout_gravity="center_vertical|start"
+            android:layout_marginStart="@dimen/dp_8"
+            android:background="@android:color/transparent"
+            android:contentDescription="@string/chatbot_history_back_content_description"
+            android:padding="@dimen/upload_back_icon_inset"
+            android:src="@drawable/ic_contract_search_back" />
+
+        <TextView
+            android:id="@+id/chatbotHistoryTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="@dimen/dp_52"
+            android:ellipsize="end"
+            android:includeFontPadding="false"
+            android:maxLines="1"
+            android:text="@string/chatbot_history_title"
+            android:textColor="@color/legal_lens_primary"
+            android:textSize="@dimen/sp_18"
+            android:textStyle="bold" />
+
+        <ImageButton
+            android:id="@+id/chatbotHistorySearch"
+            android:layout_width="@dimen/chatbot_header_action_size"
+            android:layout_height="@dimen/chatbot_header_action_size"
+            android:layout_gravity="center_vertical|end"
+            android:layout_marginEnd="@dimen/dp_8"
+            android:background="@android:color/transparent"
+            android:contentDescription="@string/chatbot_history_search_content_description"
+            android:padding="@dimen/chatbot_header_action_padding"
+            android:src="@drawable/ic_contract_search"
+            android:tint="@color/legal_lens_primary" />
+    </FrameLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/chatbotHistoryList"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:paddingStart="@dimen/chatbot_side_padding"
+        android:paddingTop="@dimen/chatbot_history_content_top_padding"
+        android:paddingEnd="@dimen/chatbot_side_padding"
+        android:paddingBottom="@dimen/chatbot_history_content_bottom_padding"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/chatbotHistoryHeader" />
+</androidx.constraintlayout.widget.ConstraintLayout>

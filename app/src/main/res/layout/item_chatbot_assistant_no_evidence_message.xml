@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/chatbot_message_row_spacing">
+
+    <TextView
+        android:id="@+id/chatbotNoEvidenceAvatar"
+        android:layout_width="@dimen/chatbot_avatar_size"
+        android:layout_height="@dimen/chatbot_avatar_size"
+        android:background="@drawable/bg_chatbot_avatar"
+        android:fontFamily="sans-serif"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:text="@string/chatbot_avatar_initials"
+        android:textColor="@color/white"
+        android:textSize="@dimen/chatbot_avatar_text_size"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/chatbotNoEvidenceBubble"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/chatbot_avatar_gap"
+        android:layout_marginEnd="@dimen/chatbot_grounded_assistant_end_margin"
+        android:background="@drawable/bg_chatbot_no_evidence_message"
+        android:padding="@dimen/chatbot_no_evidence_padding"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/chatbotNoEvidenceAvatar"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/chatbotNoEvidenceIcon"
+            android:layout_width="@dimen/chatbot_no_evidence_icon_size"
+            android:layout_height="@dimen/chatbot_no_evidence_icon_size"
+            android:contentDescription="@null"
+            android:src="@drawable/ic_chatbot_no_evidence"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/chatbotNoEvidenceTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/chatbot_no_evidence_title_margin_start"
+            android:fontFamily="sans-serif"
+            android:includeFontPadding="false"
+            android:textColor="@color/upload_amber"
+            android:textSize="@dimen/chatbot_no_evidence_title_text_size"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/chatbotNoEvidenceIcon"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/chatbotNoEvidenceIcon"
+            app:layout_constraintTop_toTopOf="@id/chatbotNoEvidenceIcon" />
+
+        <TextView
+            android:id="@+id/chatbotNoEvidenceMessage"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/chatbot_no_evidence_message_margin_top"
+            android:fontFamily="sans-serif"
+            android:includeFontPadding="false"
+            android:lineSpacingExtra="@dimen/chatbot_no_evidence_message_line_spacing"
+            android:textColor="@color/legal_lens_status_text"
+            android:textSize="@dimen/chatbot_no_evidence_message_text_size"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/chatbotNoEvidenceIcon" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

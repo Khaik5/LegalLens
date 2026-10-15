@@ -19,17 +19,26 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.lagallens.R
 import com.example.lagallens.databinding.ActivityChatbotBinding
+import com.example.lagallens.presentation.feature.analysis.legalreferences.detail.ui.AnalysisLegalReferenceDetailActivity
 import com.example.lagallens.presentation.feature.chatbot.adapter.ChatbotMessageAdapter
+import com.example.lagallens.presentation.feature.chatbot.contract.ChatbotCitation
+import com.example.lagallens.presentation.feature.chatbot.contract.ChatbotError
+import com.example.lagallens.presentation.feature.chatbot.contract.ChatbotNoEvidence
+import com.example.lagallens.presentation.feature.chatbot.contract.ChatbotReference
 import com.example.lagallens.presentation.feature.chatbot.contract.ChatbotUiEffect
 import com.example.lagallens.presentation.feature.chatbot.contract.ChatbotUiEvent
 import com.example.lagallens.presentation.feature.chatbot.contract.ChatbotUiState
+import com.example.lagallens.presentation.feature.chatbot.history.ui.ChatbotHistoryActivity
 import com.example.lagallens.presentation.feature.chatbot.viewmodel.ChatbotViewModel
 import kotlinx.coroutines.launch
 
 class ChatbotActivity : AppCompatActivity() {
     private lateinit var binding: ActivityChatbotBinding
     private val viewModel by viewModels<ChatbotViewModel>()
-    private val messageAdapter = ChatbotMessageAdapter()
+    private val messageAdapter = ChatbotMessageAdapter(
+        onCitationClicked = { viewModel.onEvent(ChatbotUiEvent.CitationClicked) },
+        onRetryClicked = { messageId -> viewModel.onEvent(ChatbotUiEvent.ErrorRetryClicked(messageId)) }
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,14 +69,53 @@ class ChatbotActivity : AppCompatActivity() {
             ChatbotUiEvent.ScreenOpened(
                 contractName = intent.getStringExtra(EXTRA_CONTRACT_NAME)
                     .orEmpty()
-                    .ifBlank { getString(R.string.contract_office_lease) },
+                    .ifBlank { getString(R.string.chatbot_default_contract_name) },
                 contractType = intent.getStringExtra(EXTRA_CONTRACT_TYPE)
                     .orEmpty()
-                    .ifBlank { getString(R.string.contract_office_lease_subtitle) },
+                    .ifBlank { getString(R.string.chatbot_default_contract_type) },
                 initialGreeting = getString(R.string.chatbot_initial_greeting),
-                initialQuestion = getString(R.string.chatbot_initial_question),
-                initialAnswer = getString(R.string.chatbot_initial_answer),
-                localResponse = getString(R.string.chatbot_local_response)
+                initialSuggestions = listOf(
+                    getString(R.string.chatbot_suggestion_contract_term),
+                    getString(R.string.chatbot_suggestion_salary),
+                    getString(R.string.chatbot_suggestion_notable_terms),
+                    getString(R.string.chatbot_suggestion_rights_and_obligations)
+                ),
+                newChatSuggestions = listOf(
+                    getString(R.string.chatbot_new_suggestion_risk),
+                    getString(R.string.chatbot_new_suggestion_payment),
+                    getString(R.string.chatbot_new_suggestion_penalty)
+                ),
+                localResponse = getString(R.string.chatbot_local_response),
+                citationQuestion = getString(R.string.chatbot_citation_question),
+                citationResponse = getString(R.string.chatbot_citation_response),
+                citation = ChatbotCitation(
+                    title = getString(R.string.chatbot_citation_title),
+                    description = getString(R.string.chatbot_citation_description),
+                    actionLabel = getString(R.string.chatbot_citation_action)
+                ),
+                groundedQuestion = getString(R.string.chatbot_grounded_question),
+                groundedResponse = getString(R.string.chatbot_grounded_response),
+                groundedReferenceSectionTitle = getString(R.string.chatbot_grounded_reference_section_title),
+                groundedReferences = listOf(
+                    ChatbotReference(
+                        title = getString(R.string.chatbot_grounded_reference_first_title),
+                        excerpt = getString(R.string.chatbot_grounded_reference_first_excerpt)
+                    ),
+                    ChatbotReference(
+                        title = getString(R.string.chatbot_grounded_reference_second_title),
+                        excerpt = getString(R.string.chatbot_grounded_reference_second_excerpt)
+                    )
+                ),
+                noEvidenceQuestion = getString(R.string.chatbot_no_evidence_question),
+                noEvidence = ChatbotNoEvidence(
+                    title = getString(R.string.chatbot_no_evidence_title),
+                    message = getString(R.string.chatbot_no_evidence_message)
+                ),
+                errorQuestion = getString(R.string.chatbot_error_question),
+                error = ChatbotError(
+                    title = getString(R.string.chatbot_error_title),
+                    retryLabel = getString(R.string.chatbot_error_retry)
+                )
             )
         )
     }
@@ -77,10 +125,44 @@ class ChatbotActivity : AppCompatActivity() {
             layoutManager = LinearLayoutManager(this@ChatbotActivity)
             adapter = messageAdapter
         }
-        chatbotBack.setOnClickListener { viewModel.onEvent(ChatbotUiEvent.BackClicked) }
-        chatbotMore.setOnClickListener { viewModel.onEvent(ChatbotUiEvent.AttachmentClicked) }
+        chatbotBack.setOnClickListener { viewModel.onEvent(ChatbotUiEvent.DrawerOpened) }
+        chatbotMore.setOnClickListener {
+            viewModel.onEvent(
+                if (viewModel.uiState.value.isNewConversation) {
+                    ChatbotUiEvent.NewChatClicked
+                } else {
+                    ChatbotUiEvent.AttachmentClicked
+                }
+            )
+        }
+        chatbotDrawerScrim.setOnClickListener { viewModel.onEvent(ChatbotUiEvent.DrawerDismissed) }
+        chatbotDrawerActiveChat.setOnClickListener { viewModel.onEvent(ChatbotUiEvent.DrawerDismissed) }
+        chatbotDrawerNewChat.setOnClickListener { viewModel.onEvent(ChatbotUiEvent.NewChatClicked) }
+        chatbotDrawerHistory.setOnClickListener { viewModel.onEvent(ChatbotUiEvent.HistoryClicked) }
+        chatbotDrawerHelp.setOnClickListener { viewModel.onEvent(ChatbotUiEvent.HelpClicked) }
         chatbotAttach.setOnClickListener { viewModel.onEvent(ChatbotUiEvent.AttachmentClicked) }
         chatbotSend.setOnClickListener { viewModel.onEvent(ChatbotUiEvent.SendClicked) }
+        chatbotSuggestionContractTerm.setOnClickListener {
+            viewModel.onEvent(ChatbotUiEvent.SuggestionClicked(chatbotSuggestionContractTerm.text.toString()))
+        }
+        chatbotSuggestionSalary.setOnClickListener {
+            viewModel.onEvent(ChatbotUiEvent.SuggestionClicked(chatbotSuggestionSalary.text.toString()))
+        }
+        chatbotSuggestionNotableTerms.setOnClickListener {
+            viewModel.onEvent(ChatbotUiEvent.SuggestionClicked(chatbotSuggestionNotableTerms.text.toString()))
+        }
+        chatbotSuggestionRightsAndObligations.setOnClickListener {
+            viewModel.onEvent(ChatbotUiEvent.SuggestionClicked(chatbotSuggestionRightsAndObligations.text.toString()))
+        }
+        chatbotNewSuggestionRisk.setOnClickListener {
+            viewModel.onEvent(ChatbotUiEvent.SuggestionClicked(chatbotNewSuggestionRisk.text.toString()))
+        }
+        chatbotNewSuggestionPayment.setOnClickListener {
+            viewModel.onEvent(ChatbotUiEvent.SuggestionClicked(chatbotNewSuggestionPayment.text.toString()))
+        }
+        chatbotNewSuggestionPenalty.setOnClickListener {
+            viewModel.onEvent(ChatbotUiEvent.SuggestionClicked(chatbotNewSuggestionPenalty.text.toString()))
+        }
         chatbotInput.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEND) {
                 viewModel.onEvent(ChatbotUiEvent.SendClicked)
@@ -112,10 +194,32 @@ class ChatbotActivity : AppCompatActivity() {
     private fun render(state: ChatbotUiState) = with(binding) {
         chatbotContractName.text = state.contractName
         chatbotContractType.text = state.contractType
+        chatbotDrawerActiveChat.text = state.contractName
+        chatbotDrawerOverlay.visibility = if (state.isDrawerVisible) android.view.View.VISIBLE else android.view.View.GONE
+        chatbotEmptyState.visibility = if (state.isNewConversation) android.view.View.VISIBLE else android.view.View.GONE
+        chatbotMessages.visibility = if (state.isNewConversation) android.view.View.GONE else android.view.View.VISIBLE
         if (chatbotInput.text.toString() != state.messageDraft) {
             chatbotInput.setText(state.messageDraft)
             chatbotInput.setSelection(state.messageDraft.length)
         }
+        chatbotSuggestions.visibility = if (!state.isNewConversation && state.suggestions.isNotEmpty()) android.view.View.VISIBLE else android.view.View.GONE
+        chatbotSuggestionContractTerm.text = state.suggestions.getOrNull(0).orEmpty()
+        chatbotSuggestionSalary.text = state.suggestions.getOrNull(1).orEmpty()
+        chatbotSuggestionNotableTerms.text = state.suggestions.getOrNull(2).orEmpty()
+        chatbotSuggestionRightsAndObligations.text = state.suggestions.getOrNull(3).orEmpty()
+        chatbotNewSuggestionRisk.text = state.suggestions.getOrNull(0).orEmpty()
+        chatbotNewSuggestionPayment.text = state.suggestions.getOrNull(1).orEmpty()
+        chatbotNewSuggestionPenalty.text = state.suggestions.getOrNull(2).orEmpty()
+        chatbotMore.setImageResource(
+            if (state.isNewConversation) R.drawable.ic_chatbot_new_chat_add else R.drawable.ic_analysis_risk_overview_more
+        )
+        chatbotMore.contentDescription = getString(
+            if (state.isNewConversation) {
+                R.string.chatbot_new_state_add_content_description
+            } else {
+                R.string.chatbot_more_content_description
+            }
+        )
         messageAdapter.submitList(state.messages) {
             if (state.messages.isNotEmpty()) chatbotMessages.scrollToPosition(state.messages.lastIndex)
         }
@@ -124,6 +228,15 @@ class ChatbotActivity : AppCompatActivity() {
     private fun handleEffect(effect: ChatbotUiEffect) {
         when (effect) {
             ChatbotUiEffect.NavigateBack -> finish()
+            ChatbotUiEffect.NavigateToHistory -> startActivity(ChatbotHistoryActivity.createIntent(this))
+            ChatbotUiEffect.NavigateToLegalReference -> startActivity(
+                AnalysisLegalReferenceDetailActivity.createIntent(
+                    context = this,
+                    referenceId = CHATBOT_COMMERCIAL_LAW_REFERENCE_ID,
+                    documentName = binding.chatbotContractName.text.toString(),
+                    documentMetadata = binding.chatbotContractType.text.toString()
+                )
+            )
             is ChatbotUiEffect.ShowMessage -> android.widget.Toast.makeText(this, effect.messageRes, android.widget.Toast.LENGTH_SHORT).show()
         }
     }
@@ -133,9 +246,19 @@ class ChatbotActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
+    @Deprecated("Deprecated in Java")
+    override fun onBackPressed() {
+        if (viewModel.uiState.value.isDrawerVisible) {
+            viewModel.onEvent(ChatbotUiEvent.DrawerDismissed)
+        } else {
+            super.onBackPressed()
+        }
+    }
+
     companion object {
         private const val EXTRA_CONTRACT_NAME = "chatbot_contract_name"
         private const val EXTRA_CONTRACT_TYPE = "chatbot_contract_type"
+        private const val CHATBOT_COMMERCIAL_LAW_REFERENCE_ID = "commercial_law_2005_article_301"
 
         fun createIntent(context: Context, contractName: String, contractType: String): Intent =
             Intent(context, ChatbotActivity::class.java)

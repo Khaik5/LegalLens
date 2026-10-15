@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <corners
+        android:topLeftRadius="@dimen/dp_4"
+        android:topRightRadius="@dimen/dp_16"
+        android:bottomRightRadius="@dimen/dp_16"
+        android:bottomLeftRadius="@dimen/dp_16" />
+    <solid android:color="@color/analysis_risk_detail_quote_surface" />
+    <stroke
+        android:width="@dimen/dp_1"
+        android:color="@color/analysis_risk_detail_quote_border" />
+</shape>

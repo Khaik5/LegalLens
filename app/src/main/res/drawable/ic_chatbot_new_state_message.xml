@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="@dimen/chatbot_new_state_mascot_icon_size"
+    android:height="@dimen/chatbot_new_state_mascot_icon_size"
+    android:viewportWidth="40"
+    android:viewportHeight="40">
+    <path
+        android:fillColor="@android:color/transparent"
+        android:pathData="M33.33,19.17C33.33,26.53 27.14,32.5 19.5,32.5C16.85,32.5 14.37,31.78 12.25,30.53L7.17,32.17L8.75,27.45C7.3,25.14 6.5,22.38 6.5,19.17C6.5,11.8 12.7,5.83 20.33,5.83C27.97,5.83 33.33,11.8 33.33,19.17Z"
+        android:strokeColor="@color/legal_lens_auth_accent"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="2.7" />
+</vector>
