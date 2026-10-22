@@ -61,8 +61,8 @@ class ProfileFragment : Fragment() {
         bindAction(
             binding.actionNotificationSettings,
             R.drawable.ic_profile_notification,
-            R.string.profile_notification_settings,
-            ProfileUiEvent.NotificationSettingsClicked
+            R.string.profile_settings_title,
+            ProfileUiEvent.SettingsClicked
         )
         bindAction(binding.actionPrivacy, R.drawable.ic_profile_shield, R.string.profile_privacy)
         bindAction(binding.actionAppearance, R.drawable.ic_profile_language, R.string.profile_appearance)
@@ -114,7 +114,7 @@ class ProfileFragment : Fragment() {
                         ProfileUiEffect.NavigateToEditProfile -> findNavController().navigate(
                             R.id.action_profileFragment_to_profileEditFragment
                         )
-                        ProfileUiEffect.NavigateToNotificationSettings -> findNavController().navigate(
+                        ProfileUiEffect.NavigateToSettings -> findNavController().navigate(
                             R.id.action_profileFragment_to_profileSettingsFragment
                         )
                         ProfileUiEffect.NavigateToChangePassword -> findNavController().navigate(

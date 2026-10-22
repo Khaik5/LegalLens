@@ -36,6 +36,6 @@
     <color name="contract_risk_high_background">#41252B</color>
     <color name="profile_blue">#82B5F5</color>
     <color name="profile_edit_disabled">#273442</color>
-    <color name="profile_toggle_off">#5D6D7E</color>
+    <color name="profile_toggle_off">#CBD5E1</color>
     <color name="contract_delete_overlay">#99121A24</color>
 </resources>

@@ -25,8 +25,8 @@ class ProfileViewModel : ViewModel() {
                 ProfileUiEffect.ShowActionUnavailable(event.actionTitleRes)
             )
             ProfileUiEvent.EditProfileClicked -> emitEffect(ProfileUiEffect.NavigateToEditProfile)
-            ProfileUiEvent.NotificationSettingsClicked -> emitEffect(
-                ProfileUiEffect.NavigateToNotificationSettings
+            ProfileUiEvent.SettingsClicked -> emitEffect(
+                ProfileUiEffect.NavigateToSettings
             )
             ProfileUiEvent.ChangePasswordClicked -> emitEffect(ProfileUiEffect.NavigateToChangePassword)
             is ProfileUiEvent.ProfileUpdated -> _uiState.update {

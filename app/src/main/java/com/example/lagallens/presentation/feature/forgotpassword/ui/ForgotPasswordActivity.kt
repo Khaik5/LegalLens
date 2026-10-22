@@ -60,7 +60,7 @@ class ForgotPasswordActivity : AppCompatActivity() {
                         binding.emailInput.setText(state.email)
                         binding.emailInput.setSelection(state.email.length)
                     }
-                    binding.emailInput.error = state.emailError
+                    binding.emailInput.error = state.emailErrorResId?.let(::getString)
                     binding.submitButton.isEnabled = !state.isLoading
                 }
             }

@@ -65,10 +65,10 @@ class ProfileLanguageBottomSheet : BottomSheetDialogFragment() {
         return when (language) {
             ProfileLanguage.VIETNAMESE -> R.id.rbVietnamese
             ProfileLanguage.ENGLISH -> R.id.rbEnglish
-            ProfileLanguage.JAPANESE -> R.id.rbJapanese
-            ProfileLanguage.FRENCH -> R.id.rbFrench
-            ProfileLanguage.CHINESE -> R.id.rbChinese
-            ProfileLanguage.KOREAN -> R.id.rbKorean
+            ProfileLanguage.JAPANESE,
+            ProfileLanguage.FRENCH,
+            ProfileLanguage.CHINESE,
+            ProfileLanguage.KOREAN -> R.id.rbVietnamese
         }
     }
 
@@ -76,10 +76,6 @@ class ProfileLanguageBottomSheet : BottomSheetDialogFragment() {
         return when (id) {
             R.id.rbVietnamese -> ProfileLanguage.VIETNAMESE
             R.id.rbEnglish -> ProfileLanguage.ENGLISH
-            R.id.rbJapanese -> ProfileLanguage.JAPANESE
-            R.id.rbFrench -> ProfileLanguage.FRENCH
-            R.id.rbChinese -> ProfileLanguage.CHINESE
-            R.id.rbKorean -> ProfileLanguage.KOREAN
             else -> null
         }
     }

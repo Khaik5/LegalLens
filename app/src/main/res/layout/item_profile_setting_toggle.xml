@@ -32,12 +32,17 @@
     </LinearLayout>
 
     <androidx.appcompat.widget.SwitchCompat
+        android:layout_marginStart="10sp"
         android:id="@+id/swSetting"
-        android:layout_width="@dimen/dp_48"
+        android:layout_width="@dimen/dp_56"
         android:layout_height="@dimen/dp_28"
         android:contentDescription="@null"
+        android:padding="@dimen/dp_0"
         app:showText="false"
+        app:splitTrack="false"
         app:switchMinWidth="@dimen/dp_48"
         android:thumb="@drawable/bg_profile_settings_toggle_thumb"
-        app:track="@drawable/selector_profile_settings_toggle_track" />
+        app:thumbTint="@null"
+        app:track="@drawable/selector_profile_settings_toggle_track"
+        app:trackTint="@null" />
 </LinearLayout>

@@ -5,9 +5,9 @@ data class RegisterUiState(
     val email: String = "",
     val password: String = "",
     val confirmPassword: String = "",
-    val fullNameError: String? = null,
-    val emailError: String? = null,
-    val passwordError: String? = null,
-    val confirmPasswordError: String? = null,
+    val fullNameErrorResId: Int? = null,
+    val emailErrorResId: Int? = null,
+    val passwordErrorResId: Int? = null,
+    val confirmPasswordErrorResId: Int? = null,
     val isLoading: Boolean = false
 )

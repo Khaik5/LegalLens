@@ -55,11 +55,7 @@ class ProfileSettingsViewModel(
             is ProfileSettingsUiEvent.BiometricToggled -> _uiState.update {
                 it.copy(isBiometricEnabled = event.isEnabled)
             }
-            is ProfileSettingsUiEvent.AppearanceSelected -> viewModelScope.launch {
-                updateProfileAppearanceUseCase(
-                    com.example.lagallens.domain.model.ProfileAppearance.valueOf(event.appearance.name)
-                )
-            }
+            is ProfileSettingsUiEvent.AppearanceSelected -> updateAppearance(event.appearance)
             ProfileSettingsUiEvent.LanguageClicked -> emitEffect(
                 ProfileSettingsUiEffect.ShowLanguagePicker(_uiState.value.language)
             )
@@ -75,6 +71,15 @@ class ProfileSettingsViewModel(
     private fun emitEffect(effect: ProfileSettingsUiEffect) {
         viewModelScope.launch {
             _uiEffect.emit(effect)
+        }
+    }
+
+    private fun updateAppearance(appearance: ProfileAppearance) {
+        _uiState.update { it.copy(appearance = appearance) }
+        viewModelScope.launch {
+            updateProfileAppearanceUseCase(
+                com.example.lagallens.domain.model.ProfileAppearance.valueOf(appearance.name)
+            )
         }
     }
 

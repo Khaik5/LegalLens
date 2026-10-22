@@ -5,6 +5,10 @@
     <string name="home_tagline">Số hóa, phân tích và hiểu rõ hợp đồng của bạn bằng trí tuệ nhân tạo.</string>
     <string name="login">Đăng nhập</string>
     <string name="username">Tên đăng nhập</string>
+    <string name="login_username_required">Vui lòng nhập tên đăng nhập</string>
+    <string name="login_password_required">Vui lòng nhập mật khẩu</string>
+    <string name="login_password_minimum_length">Mật khẩu cần ít nhất 6 ký tự</string>
+    <string name="login_invalid_credentials">Tên đăng nhập hoặc mật khẩu không đúng</string>
     <string name="login_username_hint">Admin</string>
     <string name="login_welcome_back">Chào mừng trở lại</string>
     <string name="login_subtitle">Vui lòng đăng nhập để tiếp tục truy cập dữ liệu bảo mật.</string>
@@ -19,6 +23,12 @@
     <string name="register_legal_lens">Đăng ký LegalLens</string>
     <string name="register_subtitle">Trải nghiệm công cụ phân tích hợp đồng AI tối tân.</string>
     <string name="full_name">Họ và tên</string>
+    <string name="register_full_name_required">Vui lòng nhập họ và tên</string>
+    <string name="register_email_invalid">Vui lòng nhập email hợp lệ</string>
+    <string name="register_password_required">Vui lòng nhập mật khẩu</string>
+    <string name="register_password_minimum_length">Mật khẩu cần ít nhất 6 ký tự</string>
+    <string name="register_confirm_password_required">Vui lòng xác nhận mật khẩu</string>
+    <string name="register_password_mismatch">Mật khẩu xác nhận không khớp</string>
     <string name="full_name_hint">Nguyễn Văn A</string>
     <string name="email_address">Địa chỉ Email</string>
     <string name="email_hint">nguyenvana@gmail.com</string>
@@ -80,7 +90,7 @@
     <string name="dashboard_employment_contract">HĐ Lao động · 23/10/2026</string>
     <string name="dashboard_reviewing">Cần xem lại</string>
     <string name="dashboard_high_risk">Rủi ro cao (3 cảnh báo)</string>
-    <string name="dashboard_analyze_action">Phân tích ›</string>
+    <string name="dashboard_analyze_action">Chi tiết›</string>
     <string name="dashboard_upcoming_dates">Ngày quan trọng sắp tới</string>
     <string name="dashboard_probation_end">Kết thúc thử việc</string>
     <string name="dashboard_probation_date">HĐ Cộng tác viên · Còn 12 ngày</string>

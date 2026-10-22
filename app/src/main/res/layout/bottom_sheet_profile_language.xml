@@ -49,40 +49,5 @@
             android:textColor="@color/legal_lens_primary"
             android:textSize="@dimen/sp_15" />
 
-        <androidx.appcompat.widget.AppCompatRadioButton
-            android:id="@+id/rbJapanese"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/dp_44"
-            android:buttonTint="@color/legal_lens_auth_accent"
-            android:text="@string/profile_settings_language_japanese"
-            android:textColor="@color/legal_lens_primary"
-            android:textSize="@dimen/sp_15" />
-
-        <androidx.appcompat.widget.AppCompatRadioButton
-            android:id="@+id/rbFrench"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/dp_44"
-            android:buttonTint="@color/legal_lens_auth_accent"
-            android:text="@string/profile_settings_language_french"
-            android:textColor="@color/legal_lens_primary"
-            android:textSize="@dimen/sp_15" />
-
-        <androidx.appcompat.widget.AppCompatRadioButton
-            android:id="@+id/rbChinese"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/dp_44"
-            android:buttonTint="@color/legal_lens_auth_accent"
-            android:text="@string/profile_settings_language_chinese"
-            android:textColor="@color/legal_lens_primary"
-            android:textSize="@dimen/sp_15" />
-
-        <androidx.appcompat.widget.AppCompatRadioButton
-            android:id="@+id/rbKorean"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/dp_44"
-            android:buttonTint="@color/legal_lens_auth_accent"
-            android:text="@string/profile_settings_language_korean"
-            android:textColor="@color/legal_lens_primary"
-            android:textSize="@dimen/sp_15" />
     </RadioGroup>
 </LinearLayout>
