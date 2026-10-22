@@ -1,7 +1,9 @@
 package com.example.lagallens.presentation.feature.analysis.result.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.lagallens.domain.usecase.GetAnalysisOverviewUseCase
 import com.example.lagallens.presentation.feature.analysis.result.contract.AnalysisResultDestination
 import com.example.lagallens.presentation.feature.analysis.result.contract.AnalysisResultUiEffect
 import com.example.lagallens.presentation.feature.analysis.result.contract.AnalysisResultUiEvent
@@ -13,7 +15,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class AnalysisResultViewModel : ViewModel() {
+class AnalysisResultViewModel(
+    private val getAnalysisOverview: GetAnalysisOverviewUseCase
+) : ViewModel() {
     private val _uiState = MutableStateFlow(AnalysisResultUiState())
     val uiState = _uiState.asStateFlow()
 
@@ -22,62 +26,83 @@ class AnalysisResultViewModel : ViewModel() {
 
     fun onEvent(event: AnalysisResultUiEvent) {
         when (event) {
-            is AnalysisResultUiEvent.ScreenOpened -> _uiState.update {
-                it.copy(
-                    documentName = event.documentName,
-                    documentMetadata = event.documentMetadata
-                )
-            }
-
+            is AnalysisResultUiEvent.ScreenOpened -> loadOverview(event.documentName, event.documentMetadata)
             AnalysisResultUiEvent.BackClicked -> emitEffect(AnalysisResultUiEffect.NavigateBack)
+            is AnalysisResultUiEvent.ItemClicked -> navigateToDestination(event.destination)
+        }
+    }
 
-            is AnalysisResultUiEvent.ItemClicked -> when (event.destination) {
-                AnalysisResultDestination.SUMMARY -> emitEffect(
-                    AnalysisResultUiEffect.NavigateToSummary(
-                        documentName = _uiState.value.documentName,
-                        documentMetadata = _uiState.value.documentMetadata
-                    )
-                )
-
-                AnalysisResultDestination.KEY_FACTS -> emitEffect(
-                    AnalysisResultUiEffect.NavigateToKeyFacts(
-                        documentName = _uiState.value.documentName,
-                        documentMetadata = _uiState.value.documentMetadata
-                    )
-                )
-
-                AnalysisResultDestination.PARTIES -> emitEffect(
-                    AnalysisResultUiEffect.NavigateToParties(
-                        documentName = _uiState.value.documentName,
-                        documentMetadata = _uiState.value.documentMetadata
-                    )
-                )
-
-                AnalysisResultDestination.OBLIGATIONS -> emitEffect(
-                    AnalysisResultUiEffect.NavigateToObligations(
-                        documentName = _uiState.value.documentName,
-                        documentMetadata = _uiState.value.documentMetadata
-                    )
-                )
-
-                AnalysisResultDestination.RISK_OVERVIEW -> emitEffect(
-                    AnalysisResultUiEffect.NavigateToRiskOverview(
-                        documentName = _uiState.value.documentName,
-                        documentMetadata = _uiState.value.documentMetadata
-                    )
-                )
-
-                AnalysisResultDestination.LEGAL_REFERENCES -> emitEffect(
-                    AnalysisResultUiEffect.NavigateToLegalReferences(
-                        documentName = _uiState.value.documentName,
-                        documentMetadata = _uiState.value.documentMetadata
-                    )
+    private fun loadOverview(documentName: String, documentMetadata: String) {
+        viewModelScope.launch {
+            val overview = getAnalysisOverview(documentName, documentMetadata)
+            _uiState.update {
+                it.copy(
+                    documentName = documentName,
+                    documentMetadata = documentMetadata,
+                    score = overview.score,
+                    keyFactsCount = overview.keyFactsCount,
+                    riskCount = overview.riskCount,
+                    referenceCount = overview.referenceCount
                 )
             }
         }
     }
 
+    private fun navigateToDestination(destination: AnalysisResultDestination) = when (destination) {
+        AnalysisResultDestination.SUMMARY -> emitEffect(
+            AnalysisResultUiEffect.NavigateToSummary(
+                documentName = _uiState.value.documentName,
+                documentMetadata = _uiState.value.documentMetadata
+            )
+        )
+
+        AnalysisResultDestination.KEY_FACTS -> emitEffect(
+            AnalysisResultUiEffect.NavigateToKeyFacts(
+                documentName = _uiState.value.documentName,
+                documentMetadata = _uiState.value.documentMetadata
+            )
+        )
+
+        AnalysisResultDestination.PARTIES -> emitEffect(
+            AnalysisResultUiEffect.NavigateToParties(
+                documentName = _uiState.value.documentName,
+                documentMetadata = _uiState.value.documentMetadata
+            )
+        )
+
+        AnalysisResultDestination.OBLIGATIONS -> emitEffect(
+            AnalysisResultUiEffect.NavigateToObligations(
+                documentName = _uiState.value.documentName,
+                documentMetadata = _uiState.value.documentMetadata
+            )
+        )
+
+        AnalysisResultDestination.RISK_OVERVIEW -> emitEffect(
+            AnalysisResultUiEffect.NavigateToRiskOverview(
+                documentName = _uiState.value.documentName,
+                documentMetadata = _uiState.value.documentMetadata
+            )
+        )
+
+        AnalysisResultDestination.LEGAL_REFERENCES -> emitEffect(
+            AnalysisResultUiEffect.NavigateToLegalReferences(
+                documentName = _uiState.value.documentName,
+                documentMetadata = _uiState.value.documentMetadata
+            )
+        )
+    }
+
     private fun emitEffect(effect: AnalysisResultUiEffect) {
         viewModelScope.launch { _uiEffect.emit(effect) }
+    }
+
+    class Factory(
+        private val getAnalysisOverview: GetAnalysisOverviewUseCase
+    ) : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            require(modelClass.isAssignableFrom(AnalysisResultViewModel::class.java))
+            return AnalysisResultViewModel(getAnalysisOverview) as T
+        }
     }
 }

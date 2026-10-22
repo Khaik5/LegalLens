@@ -3,22 +3,7 @@ package com.example.lagallens.presentation.feature.chatbot.contract
 sealed interface ChatbotUiEvent {
     data class ScreenOpened(
         val contractName: String,
-        val contractType: String,
-        val initialGreeting: String,
-        val initialSuggestions: List<String>,
-        val newChatSuggestions: List<String>,
-        val localResponse: String,
-        val citationQuestion: String,
-        val citationResponse: String,
-        val citation: ChatbotCitation,
-        val groundedQuestion: String,
-        val groundedResponse: String,
-        val groundedReferenceSectionTitle: String,
-        val groundedReferences: List<ChatbotReference>,
-        val noEvidenceQuestion: String,
-        val noEvidence: ChatbotNoEvidence,
-        val errorQuestion: String,
-        val error: ChatbotError
+        val contractType: String
     ) : ChatbotUiEvent
 
     data class MessageChanged(val message: String) : ChatbotUiEvent

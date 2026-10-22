@@ -14,6 +14,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.lagallens.LegalLensApplication
 import com.example.lagallens.R
 import com.example.lagallens.databinding.ActivityAnalysisResultBinding
 import com.example.lagallens.presentation.feature.analysis.legalreferences.ui.AnalysisLegalReferencesActivity
@@ -31,7 +32,11 @@ import kotlinx.coroutines.launch
 
 class AnalysisResultActivity : AppCompatActivity() {
     private lateinit var binding: ActivityAnalysisResultBinding
-    private val viewModel by viewModels<AnalysisResultViewModel>()
+    private val viewModel by viewModels<AnalysisResultViewModel> {
+        AnalysisResultViewModel.Factory(
+            (application as LegalLensApplication).getAnalysisOverviewUseCase
+        )
+    }
     private val resultAdapter = AnalysisResultAdapter { destination ->
         viewModel.onEvent(AnalysisResultUiEvent.ItemClicked(destination))
     }

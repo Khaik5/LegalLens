@@ -17,14 +17,11 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.lagallens.LegalLensApplication
 import com.example.lagallens.R
 import com.example.lagallens.databinding.ActivityChatbotBinding
 import com.example.lagallens.presentation.feature.analysis.legalreferences.detail.ui.AnalysisLegalReferenceDetailActivity
 import com.example.lagallens.presentation.feature.chatbot.adapter.ChatbotMessageAdapter
-import com.example.lagallens.presentation.feature.chatbot.contract.ChatbotCitation
-import com.example.lagallens.presentation.feature.chatbot.contract.ChatbotError
-import com.example.lagallens.presentation.feature.chatbot.contract.ChatbotNoEvidence
-import com.example.lagallens.presentation.feature.chatbot.contract.ChatbotReference
 import com.example.lagallens.presentation.feature.chatbot.contract.ChatbotUiEffect
 import com.example.lagallens.presentation.feature.chatbot.contract.ChatbotUiEvent
 import com.example.lagallens.presentation.feature.chatbot.contract.ChatbotUiState
@@ -34,7 +31,14 @@ import kotlinx.coroutines.launch
 
 class ChatbotActivity : AppCompatActivity() {
     private lateinit var binding: ActivityChatbotBinding
-    private val viewModel by viewModels<ChatbotViewModel>()
+    private val viewModel by viewModels<ChatbotViewModel> {
+        val app = application as LegalLensApplication
+        ChatbotViewModel.Factory(
+            openConversation = app.openChatbotConversationUseCase,
+            sendMessage = app.sendChatbotMessageUseCase,
+            retryMessage = app.retryChatbotMessageUseCase
+        )
+    }
     private val messageAdapter = ChatbotMessageAdapter(
         onCitationClicked = { viewModel.onEvent(ChatbotUiEvent.CitationClicked) },
         onRetryClicked = { messageId -> viewModel.onEvent(ChatbotUiEvent.ErrorRetryClicked(messageId)) }
@@ -72,50 +76,7 @@ class ChatbotActivity : AppCompatActivity() {
                     .ifBlank { getString(R.string.chatbot_default_contract_name) },
                 contractType = intent.getStringExtra(EXTRA_CONTRACT_TYPE)
                     .orEmpty()
-                    .ifBlank { getString(R.string.chatbot_default_contract_type) },
-                initialGreeting = getString(R.string.chatbot_initial_greeting),
-                initialSuggestions = listOf(
-                    getString(R.string.chatbot_suggestion_contract_term),
-                    getString(R.string.chatbot_suggestion_salary),
-                    getString(R.string.chatbot_suggestion_notable_terms),
-                    getString(R.string.chatbot_suggestion_rights_and_obligations)
-                ),
-                newChatSuggestions = listOf(
-                    getString(R.string.chatbot_new_suggestion_risk),
-                    getString(R.string.chatbot_new_suggestion_payment),
-                    getString(R.string.chatbot_new_suggestion_penalty)
-                ),
-                localResponse = getString(R.string.chatbot_local_response),
-                citationQuestion = getString(R.string.chatbot_citation_question),
-                citationResponse = getString(R.string.chatbot_citation_response),
-                citation = ChatbotCitation(
-                    title = getString(R.string.chatbot_citation_title),
-                    description = getString(R.string.chatbot_citation_description),
-                    actionLabel = getString(R.string.chatbot_citation_action)
-                ),
-                groundedQuestion = getString(R.string.chatbot_grounded_question),
-                groundedResponse = getString(R.string.chatbot_grounded_response),
-                groundedReferenceSectionTitle = getString(R.string.chatbot_grounded_reference_section_title),
-                groundedReferences = listOf(
-                    ChatbotReference(
-                        title = getString(R.string.chatbot_grounded_reference_first_title),
-                        excerpt = getString(R.string.chatbot_grounded_reference_first_excerpt)
-                    ),
-                    ChatbotReference(
-                        title = getString(R.string.chatbot_grounded_reference_second_title),
-                        excerpt = getString(R.string.chatbot_grounded_reference_second_excerpt)
-                    )
-                ),
-                noEvidenceQuestion = getString(R.string.chatbot_no_evidence_question),
-                noEvidence = ChatbotNoEvidence(
-                    title = getString(R.string.chatbot_no_evidence_title),
-                    message = getString(R.string.chatbot_no_evidence_message)
-                ),
-                errorQuestion = getString(R.string.chatbot_error_question),
-                error = ChatbotError(
-                    title = getString(R.string.chatbot_error_title),
-                    retryLabel = getString(R.string.chatbot_error_retry)
-                )
+                    .ifBlank { getString(R.string.chatbot_default_contract_type) }
             )
         )
     }
@@ -195,6 +156,8 @@ class ChatbotActivity : AppCompatActivity() {
         chatbotContractName.text = state.contractName
         chatbotContractType.text = state.contractType
         chatbotDrawerActiveChat.text = state.contractName
+        chatbotInput.isEnabled = state.isConversationReady && !state.isReplyPending
+        chatbotSend.isEnabled = state.isConversationReady && !state.isReplyPending
         chatbotDrawerOverlay.visibility = if (state.isDrawerVisible) android.view.View.VISIBLE else android.view.View.GONE
         chatbotEmptyState.visibility = if (state.isNewConversation) android.view.View.VISIBLE else android.view.View.GONE
         chatbotMessages.visibility = if (state.isNewConversation) android.view.View.GONE else android.view.View.VISIBLE

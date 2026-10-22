@@ -1,8 +1,13 @@
 package com.example.lagallens.presentation.feature.chatbot.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.lagallens.R
+import com.example.lagallens.domain.model.chatbot.ChatbotReply
+import com.example.lagallens.domain.usecase.OpenChatbotConversationUseCase
+import com.example.lagallens.domain.usecase.RetryChatbotMessageUseCase
+import com.example.lagallens.domain.usecase.SendChatbotMessageUseCase
 import com.example.lagallens.presentation.feature.chatbot.contract.ChatbotCitation
 import com.example.lagallens.presentation.feature.chatbot.contract.ChatbotError
 import com.example.lagallens.presentation.feature.chatbot.contract.ChatbotMessage
@@ -19,28 +24,22 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class ChatbotViewModel : ViewModel() {
+class ChatbotViewModel(
+    private val openConversation: OpenChatbotConversationUseCase,
+    private val sendMessage: SendChatbotMessageUseCase,
+    private val retryMessage: RetryChatbotMessageUseCase
+) : ViewModel() {
     private val _uiState = MutableStateFlow(ChatbotUiState())
     val uiState = _uiState.asStateFlow()
 
     private val _uiEffect = MutableSharedFlow<ChatbotUiEffect>()
     val uiEffect = _uiEffect.asSharedFlow()
 
+    private var conversationId: String? = null
     private var nextMessageId = INITIAL_MESSAGE_ID
-    private var localResponse = ""
-    private var citationQuestion = ""
-    private var citationResponse = ""
-    private var citation: ChatbotCitation? = null
-    private var groundedQuestion = ""
-    private var groundedResponse = ""
-    private var groundedReferenceSectionTitle = ""
-    private var groundedReferences: List<ChatbotReference> = emptyList()
-    private var noEvidenceQuestion = ""
-    private var noEvidence: ChatbotNoEvidence? = null
-    private var errorQuestion = ""
-    private var error: ChatbotError? = null
-    private var newChatSuggestions: List<String> = emptyList()
     private var hasOpened = false
+    private val failedQuestions = mutableMapOf<Long, String>()
+    private var newChatSuggestions: List<String> = emptyList()
 
     fun onEvent(event: ChatbotUiEvent) {
         when (event) {
@@ -62,51 +61,66 @@ class ChatbotViewModel : ViewModel() {
     private fun openScreen(event: ChatbotUiEvent.ScreenOpened) {
         if (hasOpened) return
         hasOpened = true
-        localResponse = event.localResponse
-        citationQuestion = event.citationQuestion
-        citationResponse = event.citationResponse
-        citation = event.citation
-        groundedQuestion = event.groundedQuestion
-        groundedResponse = event.groundedResponse
-        groundedReferenceSectionTitle = event.groundedReferenceSectionTitle
-        groundedReferences = event.groundedReferences
-        noEvidenceQuestion = event.noEvidenceQuestion
-        noEvidence = event.noEvidence
-        errorQuestion = event.errorQuestion
-        error = event.error
-        newChatSuggestions = event.newChatSuggestions
-        _uiState.update {
-            it.copy(
-                contractName = event.contractName,
-                contractType = event.contractType,
-                messages = initialMessages(event.initialGreeting),
-                suggestions = event.initialSuggestions
-            )
+        viewModelScope.launch {
+            val conversation = openConversation(event.contractName, event.contractType)
+            conversationId = conversation.id
+            newChatSuggestions = conversation.newConversationSuggestions
+            _uiState.update {
+                it.copy(
+                    contractName = event.contractName,
+                    contractType = event.contractType,
+                    messages = initialMessages(conversation.greeting),
+                    suggestions = conversation.initialSuggestions,
+                    isConversationReady = true
+                )
+            }
         }
     }
 
     private fun sendMessage(message: String = _uiState.value.messageDraft.trim()) {
         if (message.isBlank()) return
+        val activeConversationId = conversationId ?: return
+        if (_uiState.value.isReplyPending) return
+        val userMessage = ChatbotMessage(
+            id = nextMessageId++,
+            author = ChatbotMessageAuthor.USER,
+            content = message
+        )
         _uiState.update { state ->
             state.copy(
                 messageDraft = "",
                 suggestions = emptyList(),
+                isReplyPending = true,
                 isNewConversation = false,
-                messages = state.messages + ChatbotMessage(
-                    id = nextMessageId++,
-                    author = ChatbotMessageAuthor.USER,
-                    content = message
-                ) + assistantResponseFor(message)
+                messages = state.messages + userMessage
+            )
+        }
+        viewModelScope.launch {
+            appendReply(message, sendMessage(activeConversationId, message))
+        }
+    }
+
+    private fun appendReply(question: String, reply: ChatbotReply) {
+        val assistantMessage = reply.toMessage(nextMessageId++)
+        if (reply is ChatbotReply.RetryableError) {
+            failedQuestions[assistantMessage.id] = question
+        }
+        _uiState.update { state ->
+            state.copy(
+                messages = state.messages + assistantMessage,
+                isReplyPending = false
             )
         }
     }
 
     private fun resetConversation() {
+        failedQuestions.clear()
         _uiState.update {
             it.copy(
                 messageDraft = "",
                 messages = emptyList(),
                 suggestions = newChatSuggestions,
+                isReplyPending = false,
                 isNewConversation = true,
                 isDrawerVisible = false
             )
@@ -124,48 +138,58 @@ class ChatbotViewModel : ViewModel() {
     }
 
     private fun retryMessage(messageId: Long) {
-        _uiState.update { state ->
-            val errorIndex = state.messages.indexOfFirst { message -> message.id == messageId && message.error != null }
-            if (errorIndex == -1) return@update state
-            val retriedMessage = ChatbotMessage(
-                id = messageId,
-                author = ChatbotMessageAuthor.ASSISTANT,
-                content = localResponse
-            )
-            state.copy(messages = state.messages.toMutableList().also { it[errorIndex] = retriedMessage })
+        val activeConversationId = conversationId ?: return
+        val question = failedQuestions[messageId] ?: return
+        if (_uiState.value.isReplyPending) return
+        _uiState.update { it.copy(isReplyPending = true) }
+        viewModelScope.launch {
+            val retriedMessage = retryMessage(activeConversationId, question).toMessage(messageId)
+            failedQuestions.remove(messageId)
+            _uiState.update { state ->
+                val errorIndex = state.messages.indexOfFirst { message -> message.id == messageId && message.error != null }
+                if (errorIndex == -1) return@update state
+                state.copy(
+                    messages = state.messages.toMutableList().also { it[errorIndex] = retriedMessage },
+                    isReplyPending = false
+                )
+            }
         }
     }
 
-    private fun assistantResponseFor(message: String): ChatbotMessage = when (message) {
-        errorQuestion -> ChatbotMessage(
-            id = nextMessageId++,
+    private fun ChatbotReply.toMessage(id: Long): ChatbotMessage = when (this) {
+        is ChatbotReply.Answer -> ChatbotMessage(
+            id = id,
             author = ChatbotMessageAuthor.ASSISTANT,
-            content = error?.title.orEmpty(),
-            error = error
+            content = content
         )
-        noEvidenceQuestion -> ChatbotMessage(
-            id = nextMessageId++,
+
+        is ChatbotReply.CitationAnswer -> ChatbotMessage(
+            id = id,
             author = ChatbotMessageAuthor.ASSISTANT,
-            content = noEvidence?.message.orEmpty(),
-            noEvidence = noEvidence
+            content = content,
+            citation = ChatbotCitation(citation.title, citation.description, citation.actionLabel)
         )
-        groundedQuestion -> ChatbotMessage(
-            id = nextMessageId++,
+
+        is ChatbotReply.GroundedAnswer -> ChatbotMessage(
+            id = id,
             author = ChatbotMessageAuthor.ASSISTANT,
-            content = groundedResponse,
-            referenceSectionTitle = groundedReferenceSectionTitle,
-            references = groundedReferences
+            content = content,
+            referenceSectionTitle = referenceSectionTitle,
+            references = references.map { ChatbotReference(it.title, it.excerpt) }
         )
-        citationQuestion -> ChatbotMessage(
-            id = nextMessageId++,
+
+        is ChatbotReply.NoEvidenceAnswer -> ChatbotMessage(
+            id = id,
             author = ChatbotMessageAuthor.ASSISTANT,
-            content = citationResponse,
-            citation = citation
+            content = content,
+            noEvidence = ChatbotNoEvidence(title, content)
         )
-        else -> ChatbotMessage(
-            id = nextMessageId++,
+
+        is ChatbotReply.RetryableError -> ChatbotMessage(
+            id = id,
             author = ChatbotMessageAuthor.ASSISTANT,
-            content = localResponse
+            content = title,
+            error = ChatbotError(title, retryLabel)
         )
     }
 
@@ -177,6 +201,18 @@ class ChatbotViewModel : ViewModel() {
 
     private fun emitEffect(effect: ChatbotUiEffect) {
         viewModelScope.launch { _uiEffect.emit(effect) }
+    }
+
+    class Factory(
+        private val openConversation: OpenChatbotConversationUseCase,
+        private val sendMessage: SendChatbotMessageUseCase,
+        private val retryMessage: RetryChatbotMessageUseCase
+    ) : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            require(modelClass.isAssignableFrom(ChatbotViewModel::class.java))
+            return ChatbotViewModel(openConversation, sendMessage, retryMessage) as T
+        }
     }
 
     private companion object {

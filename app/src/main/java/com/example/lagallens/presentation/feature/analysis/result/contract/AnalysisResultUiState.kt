@@ -5,10 +5,10 @@ import com.example.lagallens.R
 data class AnalysisResultUiState(
     val documentName: String = "",
     val documentMetadata: String = "",
-    val score: Int = 65,
-    val keyFactsCount: Int = 8,
-    val riskCount: Int = 3,
-    val referenceCount: Int = 12,
+    val score: Int = 0,
+    val keyFactsCount: Int = 0,
+    val riskCount: Int = 0,
+    val referenceCount: Int = 0,
     val items: List<AnalysisResultItem> = listOf(
         AnalysisResultItem(
             iconRes = R.drawable.ic_ocr_saved_document,
