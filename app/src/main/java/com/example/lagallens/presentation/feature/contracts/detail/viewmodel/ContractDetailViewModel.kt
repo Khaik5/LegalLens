@@ -23,7 +23,10 @@ class ContractDetailViewModel : ViewModel() {
 
     fun loadContract(contractId: String?) {
         val contract = ContractListItem.allSamples.find { it.id == contractId }
-            ?: ContractListItem.samples.first()
+        if (contract == null) {
+            emitEffect(ContractDetailUiEffect.NavigateBack)
+            return
+        }
         _uiState.update { ContractDetailUiState.from(contract) }
     }
 
@@ -31,11 +34,33 @@ class ContractDetailViewModel : ViewModel() {
         when (event) {
             ContractDetailUiEvent.BackClicked -> emitEffect(ContractDetailUiEffect.NavigateBack)
             is ContractDetailUiEvent.AssistantActionClicked -> {
-                if (event.action == com.example.lagallens.presentation.feature.contracts.detail.contract.ContractAssistantAction.CHAT) {
-                    val state = _uiState.value
-                    emitEffect(ContractDetailUiEffect.NavigateToChatbot(state.titleRes, state.contractTypeRes))
-                } else {
-                    emitEffect(ContractDetailUiEffect.ShowMessage(R.string.contract_detail_feature_unavailable))
+                val state = _uiState.value
+                when (event.action) {
+                    com.example.lagallens.presentation.feature.contracts.detail.contract.ContractAssistantAction.OCR_TEXT -> {
+                        emitEffect(
+                            ContractDetailUiEffect.NavigateToOcrText(
+                                documentNameRes = state.titleRes,
+                                documentDetailsRes = state.fileFormatRes
+                            )
+                        )
+                    }
+
+                    com.example.lagallens.presentation.feature.contracts.detail.contract.ContractAssistantAction.ANALYZE -> {
+                        emitEffect(
+                            ContractDetailUiEffect.NavigateToAnalysis(
+                                documentNameRes = state.titleRes,
+                                documentMetadataRes = state.contractTypeRes
+                            )
+                        )
+                    }
+
+                    com.example.lagallens.presentation.feature.contracts.detail.contract.ContractAssistantAction.CHAT -> {
+                        emitEffect(ContractDetailUiEffect.NavigateToChatbot(state.titleRes, state.contractTypeRes))
+                    }
+
+                    else -> emitEffect(
+                        ContractDetailUiEffect.ShowMessage(R.string.contract_detail_feature_unavailable)
+                    )
                 }
             }
             ContractDetailUiEvent.RenameClicked -> {

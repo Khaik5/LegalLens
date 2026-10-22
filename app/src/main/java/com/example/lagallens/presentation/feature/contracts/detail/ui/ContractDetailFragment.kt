@@ -22,6 +22,8 @@ import com.example.lagallens.presentation.feature.contracts.detail.contract.Cont
 import com.example.lagallens.presentation.feature.contracts.detail.viewmodel.ContractDetailViewModel
 import com.example.lagallens.presentation.feature.contracts.detail.dialog.ContractDeleteDialog
 import com.example.lagallens.presentation.feature.chatbot.ui.ChatbotActivity
+import com.example.lagallens.presentation.feature.ocr.result.ui.OcrResultActivity
+import com.example.lagallens.presentation.feature.analysis.start.ui.AnalysisStartActivity
 import kotlinx.coroutines.launch
 
 class ContractDetailFragment : Fragment() {
@@ -39,7 +41,6 @@ class ContractDetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.loadContract(arguments?.getString(ARG_CONTRACT_ID))
         binding.rvAssistantActions.apply {
             layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
             adapter = assistantAdapter
@@ -57,6 +58,7 @@ class ContractDetailFragment : Fragment() {
         }
         collectUiState()
         collectUiEffect()
+        viewModel.loadContract(arguments?.getString(ARG_CONTRACT_ID))
     }
 
     private fun collectUiState() {
@@ -73,6 +75,20 @@ class ContractDetailFragment : Fragment() {
                 viewModel.uiEffect.collect { effect ->
                     when (effect) {
                         ContractDetailUiEffect.NavigateBack -> findNavController().navigateUp()
+                        is ContractDetailUiEffect.NavigateToOcrText -> startActivity(
+                            OcrResultActivity.createIntent(
+                                context = requireContext(),
+                                documentName = getString(effect.documentNameRes),
+                                documentDetails = getString(effect.documentDetailsRes)
+                            )
+                        )
+                        is ContractDetailUiEffect.NavigateToAnalysis -> startActivity(
+                            AnalysisStartActivity.createIntent(
+                                context = requireContext(),
+                                documentName = getString(effect.documentNameRes),
+                                documentMetadata = getString(effect.documentMetadataRes)
+                            )
+                        )
                         is ContractDetailUiEffect.NavigateToChatbot -> startActivity(
                             ChatbotActivity.createIntent(
                                 requireContext(),

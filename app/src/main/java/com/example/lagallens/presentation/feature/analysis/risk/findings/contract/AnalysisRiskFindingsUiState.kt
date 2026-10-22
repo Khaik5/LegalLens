@@ -6,6 +6,8 @@ import com.example.lagallens.presentation.feature.analysis.risk.findings.model.A
 import com.example.lagallens.presentation.feature.analysis.risk.findings.model.AnalysisRiskSeverity
 
 data class AnalysisRiskFindingsUiState(
+    val documentName: String = "",
+    val documentMetadata: String = "",
     val selectedFilter: AnalysisRiskFilter = AnalysisRiskFilter.ALL,
     val findings: List<AnalysisRiskFinding> = allFindings
 ) {

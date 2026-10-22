@@ -1,5 +1,6 @@
 package com.example.lagallens.presentation.feature.dashboard.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,11 +11,15 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import com.example.lagallens.R
 import com.example.lagallens.databinding.FragmentHomeDashboardBinding
+import com.example.lagallens.presentation.feature.camera.permission.ui.CameraPermissionActivity
+import com.example.lagallens.presentation.feature.contracts.detail.ui.ContractDetailFragment
 import com.example.lagallens.presentation.feature.dashboard.contract.HomeDashboardUiEffect
 import com.example.lagallens.presentation.feature.dashboard.contract.HomeDashboardUiEvent
 import com.example.lagallens.presentation.feature.dashboard.viewmodel.HomeDashboardViewModel
+import com.example.lagallens.presentation.feature.upload.ui.UploadSourceActivity
 import kotlinx.coroutines.launch
 
 class HomeDashboardFragment : Fragment() {
@@ -39,25 +44,25 @@ class HomeDashboardFragment : Fragment() {
 
     private fun bindView() {
         binding.shortcutUpload.root.setOnClickListener {
-            viewModel.onEvent(HomeDashboardUiEvent.ShortcutClicked(R.string.dashboard_upload))
+            viewModel.onEvent(HomeDashboardUiEvent.UploadClicked)
         }
         binding.shortcutCamera.root.setOnClickListener {
-            viewModel.onEvent(HomeDashboardUiEvent.ShortcutClicked(R.string.dashboard_capture))
+            viewModel.onEvent(HomeDashboardUiEvent.CameraClicked)
         }
         binding.shortcutAnalyze.root.setOnClickListener {
-            viewModel.onEvent(HomeDashboardUiEvent.ShortcutClicked(R.string.dashboard_analyze))
+            viewModel.onEvent(HomeDashboardUiEvent.AnalyzeClicked)
         }
         binding.shortcutCompare.root.setOnClickListener {
-            viewModel.onEvent(HomeDashboardUiEvent.ShortcutClicked(R.string.dashboard_compare))
+            viewModel.onEvent(HomeDashboardUiEvent.CompareClicked)
         }
         binding.tvViewAllContracts.setOnClickListener {
             viewModel.onEvent(HomeDashboardUiEvent.ViewAllContractsClicked)
         }
         binding.recentApprovedContract.root.setOnClickListener {
-            viewModel.onEvent(HomeDashboardUiEvent.ContractClicked)
+            viewModel.onEvent(HomeDashboardUiEvent.ContractClicked(CONTRACT_OFFICE_LEASE))
         }
         binding.recentReviewContract.root.setOnClickListener {
-            viewModel.onEvent(HomeDashboardUiEvent.ContractClicked)
+            viewModel.onEvent(HomeDashboardUiEvent.ContractClicked(CONTRACT_COLLABORATOR))
         }
     }
 
@@ -66,6 +71,19 @@ class HomeDashboardFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiEffect.collect { effect ->
                     when (effect) {
+                        HomeDashboardUiEffect.NavigateToUploadSource -> startActivity(
+                            Intent(requireContext(), UploadSourceActivity::class.java)
+                        )
+
+                        HomeDashboardUiEffect.NavigateToCamera -> startActivity(
+                            CameraPermissionActivity.createIntent(requireContext())
+                        )
+
+                        HomeDashboardUiEffect.NavigateToContracts -> navigateToContracts()
+                        is HomeDashboardUiEffect.NavigateToContractDetail -> navigateToContractDetail(
+                            effect.contractId
+                        )
+
                         is HomeDashboardUiEffect.ShowMessage -> {
                             Toast.makeText(
                                 requireContext(),
@@ -79,8 +97,32 @@ class HomeDashboardFragment : Fragment() {
         }
     }
 
+    private fun navigateToContracts() {
+        val navController = findNavController()
+        if (navController.currentDestination?.id == R.id.homeDashboardFragment) {
+            navController.navigate(R.id.contractListFragment)
+        }
+    }
+
+    private fun navigateToContractDetail(contractId: String) {
+        val navController = findNavController()
+        if (navController.currentDestination?.id == R.id.homeDashboardFragment) {
+            navController.navigate(
+                R.id.contractDetailFragment,
+                Bundle().apply {
+                    putString(ContractDetailFragment.ARG_CONTRACT_ID, contractId)
+                }
+            )
+        }
+    }
+
     override fun onDestroyView() {
         _binding = null
         super.onDestroyView()
+    }
+
+    private companion object {
+        const val CONTRACT_OFFICE_LEASE = "office-lease"
+        const val CONTRACT_COLLABORATOR = "collaborator"
     }
 }

@@ -1,9 +1,10 @@
 package com.example.lagallens.presentation.feature.dashboard.contract
 
-import androidx.annotation.StringRes
-
 sealed interface HomeDashboardUiEvent {
-    data class ShortcutClicked(@StringRes val titleRes: Int) : HomeDashboardUiEvent
+    data object UploadClicked : HomeDashboardUiEvent
+    data object CameraClicked : HomeDashboardUiEvent
+    data object AnalyzeClicked : HomeDashboardUiEvent
+    data object CompareClicked : HomeDashboardUiEvent
     data object ViewAllContractsClicked : HomeDashboardUiEvent
-    data object ContractClicked : HomeDashboardUiEvent
+    data class ContractClicked(val contractId: String) : HomeDashboardUiEvent
 }
