@@ -24,6 +24,7 @@
     <dimen name="dp_53">53dp</dimen>
     <dimen name="dp_54">54dp</dimen>
     <dimen name="dp_56">56dp</dimen>
+    <dimen name="floating_premium_sticker_margin">12dp</dimen>
     <dimen name="dp_58">58dp</dimen>
     <dimen name="dp_72">72dp</dimen>
     <dimen name="dp_96">96dp</dimen>
@@ -623,4 +624,12 @@
     <dimen name="chatbot_error_retry_icon_margin_end">6dp</dimen>
     <dimen name="chatbot_error_retry_padding_horizontal">16dp</dimen>
     <dimen name="chatbot_error_retry_text_size">12sp</dimen>
+    <dimen name="credit_store_intro_heading_height">84dp</dimen>
+    <dimen name="credit_store_balance_height">77dp</dimen>
+    <dimen name="credit_store_package_height">67dp</dimen>
+    <dimen name="credit_hub_balance_height">147dp</dimen>
+    <dimen name="credit_hub_balance_summary_height">61dp</dimen>
+    <dimen name="credit_hub_balance_text_size">26sp</dimen>
+    <dimen name="credit_hub_action_height">88dp</dimen>
+    <dimen name="credit_hub_info_height">104dp</dimen>
 </resources>
