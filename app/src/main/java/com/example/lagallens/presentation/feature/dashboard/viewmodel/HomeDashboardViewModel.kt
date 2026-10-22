@@ -21,15 +21,23 @@ class HomeDashboardViewModel : ViewModel() {
 
     fun onEvent(event: HomeDashboardUiEvent) {
         when (event) {
-            is HomeDashboardUiEvent.ShortcutClicked -> showMessage(event.titleRes)
-            HomeDashboardUiEvent.ContractClicked,
-            HomeDashboardUiEvent.ViewAllContractsClicked -> showMessage(R.string.menu_contracts)
+            HomeDashboardUiEvent.UploadClicked,
+            HomeDashboardUiEvent.AnalyzeClicked -> emitEffect(HomeDashboardUiEffect.NavigateToUploadSource)
+
+            HomeDashboardUiEvent.CameraClicked -> emitEffect(HomeDashboardUiEffect.NavigateToCamera)
+            HomeDashboardUiEvent.CompareClicked -> showMessage(R.string.dashboard_compare)
+            HomeDashboardUiEvent.ViewAllContractsClicked -> emitEffect(HomeDashboardUiEffect.NavigateToContracts)
+            is HomeDashboardUiEvent.ContractClicked -> emitEffect(
+                HomeDashboardUiEffect.NavigateToContractDetail(event.contractId)
+            )
         }
     }
 
     private fun showMessage(titleRes: Int) {
-        viewModelScope.launch {
-            _uiEffect.emit(HomeDashboardUiEffect.ShowMessage(titleRes))
-        }
+        emitEffect(HomeDashboardUiEffect.ShowMessage(titleRes))
+    }
+
+    private fun emitEffect(effect: HomeDashboardUiEffect) {
+        viewModelScope.launch { _uiEffect.emit(effect) }
     }
 }

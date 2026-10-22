@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/creditStorePackageRoot"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/credit_store_package_height"
+    android:background="@drawable/bg_contract_detail_assistant"
+    android:clickable="true"
+    android:focusable="true"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="@dimen/dp_16"
+    android:paddingEnd="@dimen/dp_16">
+
+    <FrameLayout
+        android:id="@+id/creditStorePackageSelection"
+        android:layout_width="@dimen/dp_20"
+        android:layout_height="@dimen/dp_20"
+        android:background="@drawable/bg_credit_store_package_selection">
+
+        <ImageView
+            android:id="@+id/creditStorePackageCheck"
+            android:layout_width="@dimen/dp_14"
+            android:layout_height="@dimen/dp_14"
+            android:layout_gravity="center"
+            android:contentDescription="@null"
+            android:src="@drawable/ic_credit_store_check" />
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dp_12"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/creditStorePackageTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif"
+            android:includeFontPadding="false"
+            android:textColor="@color/legal_lens_primary"
+            android:textSize="@dimen/sp_15"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/creditStorePackageDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_2"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif"
+            android:includeFontPadding="false"
+            android:maxLines="1"
+            android:textColor="@color/legal_lens_secondary_text"
+            android:textSize="@dimen/sp_12" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/creditStorePackageCredits"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dp_8"
+        android:fontFamily="sans-serif"
+        android:includeFontPadding="false"
+        android:textColor="@color/legal_lens_primary"
+        android:textSize="@dimen/sp_15"
+        android:textStyle="bold" />
+</LinearLayout>

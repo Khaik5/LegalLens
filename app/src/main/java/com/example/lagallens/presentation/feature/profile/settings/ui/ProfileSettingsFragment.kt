@@ -86,9 +86,6 @@ class ProfileSettingsFragment : Fragment() {
         binding.btnLightAppearance.setOnClickListener {
             viewModel.onEvent(ProfileSettingsUiEvent.AppearanceSelected(ProfileAppearance.LIGHT))
         }
-        binding.btnDarkAppearance.setOnClickListener {
-            viewModel.onEvent(ProfileSettingsUiEvent.AppearanceSelected(ProfileAppearance.DARK))
-        }
         binding.rowLanguage.setOnClickListener {
             viewModel.onEvent(ProfileSettingsUiEvent.LanguageClicked)
         }
@@ -146,9 +143,8 @@ class ProfileSettingsFragment : Fragment() {
         updateToggle(binding.toggleEmail.swSetting, state.isEmailEnabled)
         updateToggle(binding.toggleInApp.swSetting, state.isInAppEnabled)
         updateToggle(binding.toggleBiometric.swSetting, state.isBiometricEnabled)
-        renderAppearanceOption(binding.btnSystemAppearance, state.appearance == ProfileAppearance.SYSTEM)
+        renderAppearanceOption(binding.btnSystemAppearance, state.appearance != ProfileAppearance.LIGHT)
         renderAppearanceOption(binding.btnLightAppearance, state.appearance == ProfileAppearance.LIGHT)
-        renderAppearanceOption(binding.btnDarkAppearance, state.appearance == ProfileAppearance.DARK)
         binding.tvLanguageValue.setText(state.language.toDisplayName())
     }
 
@@ -159,6 +155,8 @@ class ProfileSettingsFragment : Fragment() {
     }
 
     private fun renderAppearanceOption(view: android.widget.TextView, isSelected: Boolean) {
+        view.isSelected = isSelected
+        view.isActivated = isSelected
         view.setBackgroundResource(
             if (isSelected) R.drawable.bg_profile_settings_theme_selected
             else R.drawable.bg_profile_settings_theme_unselected
@@ -174,10 +172,10 @@ class ProfileSettingsFragment : Fragment() {
         return when (this) {
             ProfileLanguage.VIETNAMESE -> R.string.profile_settings_language_vietnamese
             ProfileLanguage.ENGLISH -> R.string.profile_settings_language_english
-            ProfileLanguage.JAPANESE -> R.string.profile_settings_language_japanese
-            ProfileLanguage.FRENCH -> R.string.profile_settings_language_french
-            ProfileLanguage.CHINESE -> R.string.profile_settings_language_chinese
-            ProfileLanguage.KOREAN -> R.string.profile_settings_language_korean
+            ProfileLanguage.JAPANESE,
+            ProfileLanguage.FRENCH,
+            ProfileLanguage.CHINESE,
+            ProfileLanguage.KOREAN -> R.string.profile_settings_language_vietnamese
         }
     }
 

@@ -25,7 +25,7 @@
             android:contentDescription="@string/profile_settings_back_description"
             android:padding="@dimen/dp_10"
             android:src="@drawable/ic_contract_search_back"
-            android:tint="@color/legal_lens_primary" />
+            app:tint="@color/legal_lens_primary" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -183,22 +183,6 @@
                         android:textSize="@dimen/sp_12"
                         android:textStyle="bold" />
 
-                    <TextView
-                        android:id="@+id/btnDarkAppearance"
-                        android:layout_width="wrap_content"
-                        android:layout_height="@dimen/dp_28"
-                        android:layout_marginStart="@dimen/dp_4"
-                        android:background="@drawable/bg_profile_settings_theme_unselected"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:gravity="center"
-                        android:includeFontPadding="false"
-                        android:paddingStart="@dimen/dp_10"
-                        android:paddingEnd="@dimen/dp_10"
-                        android:text="@string/profile_settings_dark"
-                        android:textColor="@color/legal_lens_secondary_text"
-                        android:textSize="@dimen/sp_12"
-                        android:textStyle="bold" />
                 </LinearLayout>
 
                 <View

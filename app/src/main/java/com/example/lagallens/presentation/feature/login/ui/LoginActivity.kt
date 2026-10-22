@@ -86,8 +86,8 @@ class LoginActivity : AppCompatActivity() {
                 viewModel.uiState.collect { state ->
                     updateTextInputs(state)
                     updatePasswordVisibility(state)
-                    binding.emailInput.error = state.usernameError
-                    binding.passwordInput.error = state.passwordError
+                    binding.emailInput.error = state.usernameErrorResId?.let(::getString)
+                    binding.passwordInput.error = state.passwordErrorResId?.let(::getString)
                     binding.submitButton.isEnabled = !state.isLoading
                 }
             }

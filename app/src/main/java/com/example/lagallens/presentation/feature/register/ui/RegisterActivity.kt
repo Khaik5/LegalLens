@@ -91,10 +91,10 @@ class RegisterActivity : AppCompatActivity() {
                     }
                     updateText(binding.passwordInput, state.password)
                     updateText(binding.confirmPasswordInput, state.confirmPassword)
-                    binding.fullNameInput.error = state.fullNameError
-                    binding.emailInput.error = state.emailError
-                    binding.passwordInput.error = state.passwordError
-                    binding.confirmPasswordInput.error = state.confirmPasswordError
+                    binding.fullNameInput.error = state.fullNameErrorResId?.let(::getString)
+                    binding.emailInput.error = state.emailErrorResId?.let(::getString)
+                    binding.passwordInput.error = state.passwordErrorResId?.let(::getString)
+                    binding.confirmPasswordInput.error = state.confirmPasswordErrorResId?.let(::getString)
                 }
             }
         }

@@ -6,6 +6,8 @@ data class ChatbotUiState(
     val messageDraft: String = "",
     val messages: List<ChatbotMessage> = emptyList(),
     val suggestions: List<String> = emptyList(),
+    val isConversationReady: Boolean = false,
+    val isReplyPending: Boolean = false,
     val isNewConversation: Boolean = false,
     val isDrawerVisible: Boolean = false
 )

@@ -12,6 +12,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.example.lagallens.LegalLensApplication
 import com.example.lagallens.R
 import com.example.lagallens.databinding.ActivityOcrResultBinding
 import com.example.lagallens.presentation.feature.ocr.result.contract.OcrResultUiEffect
@@ -25,7 +26,11 @@ import kotlinx.coroutines.launch
 
 class OcrResultActivity : AppCompatActivity() {
     private lateinit var binding: ActivityOcrResultBinding
-    private val viewModel by viewModels<OcrResultViewModel>()
+    private val viewModel by viewModels<OcrResultViewModel> {
+        OcrResultViewModel.Factory(
+            (application as LegalLensApplication).getOcrResultUseCase
+        )
+    }
     private val ocrReviewLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -87,7 +92,7 @@ class OcrResultActivity : AppCompatActivity() {
     }
 
     private fun render(state: OcrResultUiState) = with(binding) {
-        ocrResultConfidenceLabel.text = getString(R.string.ocr_result_confidence_label)
+        ocrResultConfidenceLabel.text = state.confidenceLabel
         ocrResultConfidencePercentage.text = state.confidencePercentage
         ocrResultDocument.text = state.documentText
     }

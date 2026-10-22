@@ -2,6 +2,7 @@ package com.example.lagallens.presentation.feature.login.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.lagallens.R
 import com.example.lagallens.domain.usecase.AuthenticateUserUseCase
 import com.example.lagallens.presentation.feature.login.contract.LoginUiEffect
 import com.example.lagallens.presentation.feature.login.contract.LoginUiEvent
@@ -28,10 +29,10 @@ class LoginViewModel(
         when (event) {
             LoginUiEvent.BackClicked -> sendEffect(LoginUiEffect.CloseScreen)
             is LoginUiEvent.EmailChanged -> _uiState.update {
-                it.copy(email = event.value, usernameError = null)
+                it.copy(email = event.value, usernameErrorResId = null)
             }
             is LoginUiEvent.PasswordChanged -> _uiState.update {
-                it.copy(password = event.value, passwordError = null)
+                it.copy(password = event.value, passwordErrorResId = null)
             }
             LoginUiEvent.PasswordVisibilityClicked -> _uiState.update {
                 it.copy(isPasswordVisible = !it.isPasswordVisible)
@@ -48,24 +49,26 @@ class LoginViewModel(
         val state = _uiState.value
         val username = state.email.trim()
         val password = state.password
-        val usernameError = if (username.isEmpty()) "Vui lòng nhập tên đăng nhập" else null
-        val passwordError = when {
-            password.isEmpty() -> "Vui lòng nhập mật khẩu"
-            password.length < MINIMUM_PASSWORD_LENGTH -> "Mật khẩu cần ít nhất 6 ký tự"
+        val usernameErrorResId = if (username.isEmpty()) R.string.login_username_required else null
+        val passwordErrorResId = when {
+            password.isEmpty() -> R.string.login_password_required
+            password.length < MINIMUM_PASSWORD_LENGTH -> R.string.login_password_minimum_length
             else -> null
         }
 
-        if (usernameError != null || passwordError != null) {
-            _uiState.update { it.copy(usernameError = usernameError, passwordError = passwordError) }
+        if (usernameErrorResId != null || passwordErrorResId != null) {
+            _uiState.update {
+                it.copy(usernameErrorResId = usernameErrorResId, passwordErrorResId = passwordErrorResId)
+            }
             return
         }
 
         if (authenticateUser(username, password)) {
-            _uiState.update { it.copy(usernameError = null, passwordError = null) }
+            _uiState.update { it.copy(usernameErrorResId = null, passwordErrorResId = null) }
             sendEffect(LoginUiEffect.NavigateToMain)
         } else {
             _uiState.update {
-                it.copy(usernameError = null, passwordError = "Tên đăng nhập hoặc mật khẩu không đúng")
+                it.copy(usernameErrorResId = null, passwordErrorResId = R.string.login_invalid_credentials)
             }
         }
     }

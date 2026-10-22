@@ -2,6 +2,7 @@ package com.example.lagallens.presentation.feature.forgotpassword.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.lagallens.R
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -24,7 +25,7 @@ class ForgotPasswordViewModel : ViewModel() {
     fun onEvent(event: ForgotPasswordUiEvent) {
         when (event) {
             ForgotPasswordUiEvent.BackClicked -> sendEffect(ForgotPasswordUiEffect.CloseScreen)
-            is ForgotPasswordUiEvent.EmailChanged -> _uiState.update { it.copy(email = event.value, emailError = null) }
+            is ForgotPasswordUiEvent.EmailChanged -> _uiState.update { it.copy(email = event.value, emailErrorResId = null) }
             ForgotPasswordUiEvent.SubmitClicked -> sendOtp()
             ForgotPasswordUiEvent.LoginClicked -> sendEffect(ForgotPasswordUiEffect.NavigateToLogin)
         }
@@ -36,13 +37,13 @@ class ForgotPasswordViewModel : ViewModel() {
             _uiState.update {
                 it.copy(
                     email = email,
-                    emailError = "Vui lòng nhập email hợp lệ",
+                    emailErrorResId = R.string.register_email_invalid,
                     isLoading = false
                 )
             }
             return
         }
-        _uiState.update { it.copy(email = email, emailError = null, isLoading = true) }
+        _uiState.update { it.copy(email = email, emailErrorResId = null, isLoading = true) }
         _uiState.update { it.copy(isLoading = false) }
         sendEffect(ForgotPasswordUiEffect.NavigateToOtp(email))
     }

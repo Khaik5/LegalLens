@@ -58,6 +58,12 @@ class AnalysisRiskFindingsActivity : AppCompatActivity() {
         }
         bindFilters()
         observeViewModel()
+        viewModel.onEvent(
+            AnalysisRiskFindingsUiEvent.ScreenOpened(
+                documentName = intent.getStringExtra(EXTRA_DOCUMENT_NAME).orEmpty(),
+                documentMetadata = intent.getStringExtra(EXTRA_DOCUMENT_METADATA).orEmpty()
+            )
+        )
     }
 
     private fun bindFilters() = with(binding) {

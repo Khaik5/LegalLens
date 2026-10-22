@@ -1,6 +1,8 @@
 package com.example.lagallens.presentation.feature.ocr.result.viewmodel
 
 import com.example.lagallens.MainDispatcherRule
+import com.example.lagallens.data.repository.FakeOcrRepository
+import com.example.lagallens.domain.usecase.GetOcrResultUseCase
 import com.example.lagallens.presentation.feature.ocr.result.contract.OcrResultUiEvent
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -12,7 +14,7 @@ class OcrResultViewModelTest {
 
     @Test
     fun documentUpdateReplacesTheDisplayedOcrText() {
-        val viewModel = OcrResultViewModel()
+        val viewModel = viewModel()
         val editedText = "Nội dung OCR đã được người dùng chỉnh sửa"
 
         viewModel.onEvent(OcrResultUiEvent.DocumentUpdated(editedText))
@@ -22,10 +24,13 @@ class OcrResultViewModelTest {
 
     @Test
     fun reviewConfirmationIsKeptForTheCurrentSession() {
-        val viewModel = OcrResultViewModel()
+        val viewModel = viewModel()
 
         viewModel.onEvent(OcrResultUiEvent.ReviewConfirmed)
 
         assertEquals(true, viewModel.uiState.value.isReviewConfirmed)
     }
+
+    private fun viewModel(): OcrResultViewModel =
+        OcrResultViewModel(GetOcrResultUseCase(FakeOcrRepository()))
 }

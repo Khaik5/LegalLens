@@ -22,6 +22,13 @@ class AnalysisRiskFindingsViewModel : ViewModel() {
 
     fun onEvent(event: AnalysisRiskFindingsUiEvent) {
         when (event) {
+            is AnalysisRiskFindingsUiEvent.ScreenOpened -> _uiState.update {
+                it.copy(
+                    documentName = event.documentName,
+                    documentMetadata = event.documentMetadata
+                )
+            }
+
             AnalysisRiskFindingsUiEvent.BackClicked -> emitEffect(AnalysisRiskFindingsUiEffect.NavigateBack)
             is AnalysisRiskFindingsUiEvent.FilterClicked -> _uiState.update {
                 it.copy(
