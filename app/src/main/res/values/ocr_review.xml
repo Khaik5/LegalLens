@@ -79,16 +79,16 @@
     <dimen name="ocr_review_warning_source_text_size">13sp</dimen>
 
     <string name="ocr_review_title">Cần xem lại kết quả OCR</string>
-    <string name="ocr_review_alert">Cần xem lại — Độ tin cậy OCR thấp (72.4%)</string>
+    <string name="ocr_review_alert" translatable="false">Cần xem lại — Độ tin cậy OCR thấp (72.4%)</string>
     <string name="ocr_review_section_title">CÁC ĐOẠN VĂN BẢN ĐƯỢC CẢNH BÁO</string>
-    <string name="ocr_review_warning_one_section">Mục: Bên thuê (Bên B)</string>
-    <string name="ocr_review_warning_one_confidence">Độ chính xác: 65%</string>
-    <string name="ocr_review_warning_one_recognized_value">Bà [Họ và tên]</string>
-    <string name="ocr_review_warning_one_source">Gốc trong ảnh: &quot;Bà [Họ và tên]&quot; (Ảnh hơi mờ)</string>
-    <string name="ocr_review_warning_two_section">Mục: Địa chỉ &amp; Vị trí</string>
-    <string name="ocr_review_warning_two_confidence">Độ chính xác: 58%</string>
-    <string name="ocr_review_warning_two_recognized_value">thuê văn phòng tại Tầng 24</string>
-    <string name="ocr_review_warning_two_source">Gốc trong ảnh: &quot;Tầng 24&quot; (Bị bóng đè khuất một phần nét)</string>
+    <string name="ocr_review_warning_one_section" translatable="false">Mục: Bên thuê (Bên B)</string>
+    <string name="ocr_review_warning_one_confidence" translatable="false">Độ chính xác: 65%</string>
+    <string name="ocr_review_warning_one_recognized_value" translatable="false">Bà [Họ và tên]</string>
+    <string name="ocr_review_warning_one_source" translatable="false">Gốc trong ảnh: &quot;Bà [Họ và tên]&quot; (Ảnh hơi mờ)</string>
+    <string name="ocr_review_warning_two_section" translatable="false">Mục: Địa chỉ &amp; Vị trí</string>
+    <string name="ocr_review_warning_two_confidence" translatable="false">Độ chính xác: 58%</string>
+    <string name="ocr_review_warning_two_recognized_value" translatable="false">thuê văn phòng tại Tầng 24</string>
+    <string name="ocr_review_warning_two_source" translatable="false">Gốc trong ảnh: &quot;Tầng 24&quot; (Bị bóng đè khuất một phần nét)</string>
     <string name="ocr_review_recognized_text">Văn bản nhận diện: %1$s</string>
     <string name="ocr_review_confirm">Xác nhận &amp; Hoàn tất</string>
     <string name="ocr_review_back_content_description">Quay lại</string>

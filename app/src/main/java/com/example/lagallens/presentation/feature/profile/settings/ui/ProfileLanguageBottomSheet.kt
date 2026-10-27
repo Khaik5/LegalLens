@@ -65,10 +65,6 @@ class ProfileLanguageBottomSheet : BottomSheetDialogFragment() {
         return when (language) {
             ProfileLanguage.VIETNAMESE -> R.id.rbVietnamese
             ProfileLanguage.ENGLISH -> R.id.rbEnglish
-            ProfileLanguage.JAPANESE,
-            ProfileLanguage.FRENCH,
-            ProfileLanguage.CHINESE,
-            ProfileLanguage.KOREAN -> R.id.rbVietnamese
         }
     }
 

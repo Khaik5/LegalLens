@@ -42,11 +42,15 @@ class ProfileSettingsLocalDataSource(
     }
 
     private fun String?.toLanguage(): ProfileLanguage {
-        return ProfileLanguage.entries.find { it.name == this } ?: ProfileLanguage.VIETNAMESE
+        return profileLanguageOrDefault(this)
     }
 
     private companion object {
         val APPEARANCE_KEY: Preferences.Key<String> = stringPreferencesKey("appearance")
         val LANGUAGE_KEY: Preferences.Key<String> = stringPreferencesKey("language")
     }
+}
+
+internal fun profileLanguageOrDefault(value: String?): ProfileLanguage {
+    return ProfileLanguage.entries.find { it.name == value } ?: ProfileLanguage.VIETNAMESE
 }

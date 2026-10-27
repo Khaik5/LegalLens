@@ -172,10 +172,6 @@ class ProfileSettingsFragment : Fragment() {
         return when (this) {
             ProfileLanguage.VIETNAMESE -> R.string.profile_settings_language_vietnamese
             ProfileLanguage.ENGLISH -> R.string.profile_settings_language_english
-            ProfileLanguage.JAPANESE,
-            ProfileLanguage.FRENCH,
-            ProfileLanguage.CHINESE,
-            ProfileLanguage.KOREAN -> R.string.profile_settings_language_vietnamese
         }
     }
 

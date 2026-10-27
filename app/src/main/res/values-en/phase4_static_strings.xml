@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="login_username_hint">Enter your username</string>
+    <string name="full_name_hint">Enter your full name</string>
+    <string name="email_hint">Enter your email address</string>
+    <string name="password_hint">Enter your password</string>
+    <string name="dashboard_total_contracts">Total contracts</string>
+    <string name="dashboard_analyzed_contracts">Analysed contracts</string>
+    <string name="dashboard_review_contracts">Contracts to review</string>
+    <string name="dashboard_analyze_action">Analyse now</string>
+    <string name="profile_avatar_description">Profile picture</string>
+    <string name="unavailable_feature_title">%1$s unavailable</string>
+    <string name="contract_detail_type">Contract type</string>
+    <string name="contract_detail_active_status">Active</string>
+    <string name="contract_detail_low_risk">Low risk</string>
+    <string name="analysis_result_medium">Medium</string>
+    <string name="analysis_risk_overview_high_risk">High risk</string>
+    <string name="analysis_risk_overview_low_risk">Low risk</string>
+    <string name="analysis_risk_findings_filter_all">All</string>
+    <string name="analysis_risk_findings_filter_high">High</string>
+    <string name="analysis_risk_findings_filter_medium">Medium</string>
+    <string name="analysis_risk_findings_filter_low">Low</string>
+    <string name="analysis_risk_findings_high">High</string>
+    <string name="analysis_risk_findings_medium">Medium</string>
+    <string name="analysis_risk_findings_low">Low</string>
+    <string name="analysis_risk_detail_severity_high">High risk</string>
+</resources>
