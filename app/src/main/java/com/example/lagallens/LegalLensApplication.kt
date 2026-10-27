@@ -97,10 +97,6 @@ class LegalLensApplication : Application() {
 
     private fun ProfileLanguage.toLocaleList(): LocaleListCompat = when (this) {
         ProfileLanguage.ENGLISH -> LocaleListCompat.forLanguageTags("en")
-        ProfileLanguage.VIETNAMESE,
-        ProfileLanguage.JAPANESE,
-        ProfileLanguage.FRENCH,
-        ProfileLanguage.CHINESE,
-        ProfileLanguage.KOREAN -> LocaleListCompat.forLanguageTags("vi")
+        ProfileLanguage.VIETNAMESE -> LocaleListCompat.forLanguageTags("vi")
     }
 }

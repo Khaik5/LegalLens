@@ -13,9 +13,5 @@ enum class ProfileAppearance {
 
 enum class ProfileLanguage {
     VIETNAMESE,
-    ENGLISH,
-    JAPANESE,
-    FRENCH,
-    CHINESE,
-    KOREAN
+    ENGLISH
 }
