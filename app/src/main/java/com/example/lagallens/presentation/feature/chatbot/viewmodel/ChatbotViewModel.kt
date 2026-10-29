@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.lagallens.R
 import com.example.lagallens.domain.model.chatbot.ChatbotReply
+import com.example.lagallens.domain.model.chatbot.ChatbotTranscriptMessage
 import com.example.lagallens.domain.usecase.OpenChatbotConversationUseCase
 import com.example.lagallens.domain.usecase.RetryChatbotMessageUseCase
 import com.example.lagallens.domain.usecase.SendChatbotMessageUseCase
@@ -17,12 +18,16 @@ import com.example.lagallens.presentation.feature.chatbot.contract.ChatbotRefere
 import com.example.lagallens.presentation.feature.chatbot.contract.ChatbotUiEffect
 import com.example.lagallens.presentation.feature.chatbot.contract.ChatbotUiEvent
 import com.example.lagallens.presentation.feature.chatbot.contract.ChatbotUiState
+import com.example.lagallens.presentation.feature.chatbot.contract.DraftGenerationStatus
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.CancellationException
 
 class ChatbotViewModel(
     private val openConversation: OpenChatbotConversationUseCase,
@@ -36,43 +41,89 @@ class ChatbotViewModel(
     val uiEffect = _uiEffect.asSharedFlow()
 
     private var conversationId: String? = null
+    private var activeContractId: String? = null
     private var nextMessageId = INITIAL_MESSAGE_ID
     private var hasOpened = false
     private val failedQuestions = mutableMapOf<Long, String>()
     private var newChatSuggestions: List<String> = emptyList()
+    private var draftTransition: Job? = null
+    private var draftGeneration: Job? = null
+    private var previewDraftError = false
 
     fun onEvent(event: ChatbotUiEvent) {
         when (event) {
             is ChatbotUiEvent.ScreenOpened -> openScreen(event)
             is ChatbotUiEvent.MessageChanged -> _uiState.update { it.copy(messageDraft = event.message) }
             ChatbotUiEvent.SendClicked -> sendMessage()
+            is ChatbotUiEvent.NewDraftClicked -> startDraftConversation(event.request, event.clarification)
+            is ChatbotUiEvent.DraftDetailsSubmitted -> sendDraftClarification(event.message, event.acknowledgement)
+            ChatbotUiEvent.ReviewDraftClicked -> _uiState.update { it.copy(isDraftReviewVisible = true) }
+            ChatbotUiEvent.CreateDraftClicked -> if (_uiState.value.isDraftReviewVisible) createDraft()
+            ChatbotUiEvent.RetryDraftCreationClicked -> if (_uiState.value.draftGenerationStatus == DraftGenerationStatus.ERROR) createDraft()
+            ChatbotUiEvent.ViewDraftClicked -> if (_uiState.value.draftGenerationStatus == DraftGenerationStatus.SUCCESS) emitEffect(ChatbotUiEffect.ShowDraftPreview)
+            ChatbotUiEvent.EditDraftClicked -> _uiState.update {
+                it.copy(isDraftReviewVisible = false, isDraftReviewReady = false, draftGenerationStatus = DraftGenerationStatus.NONE)
+            }
             is ChatbotUiEvent.SuggestionClicked -> sendMessage(event.suggestion)
             ChatbotUiEvent.CitationClicked -> emitEffect(ChatbotUiEffect.NavigateToLegalReference)
             is ChatbotUiEvent.ErrorRetryClicked -> retryMessage(event.messageId)
-            ChatbotUiEvent.AttachmentClicked -> emitEffect(ChatbotUiEffect.ShowMessage(R.string.chatbot_attachment_unavailable))
+            ChatbotUiEvent.AttachmentClicked -> emitEffect(ChatbotUiEffect.OpenAttachmentSheet)
+            ChatbotUiEvent.AttachmentCameraClicked -> emitEffect(ChatbotUiEffect.OpenCamera)
+            ChatbotUiEvent.AttachmentSavedClicked -> emitEffect(ChatbotUiEffect.ShowMessage(R.string.chatbot_attachment_saved_unavailable))
+            is ChatbotUiEvent.AttachmentSelected -> _uiState.update { it.copy(attachmentUri = event.uri, attachmentName = event.name) }
+            ChatbotUiEvent.AttachmentRemoved -> _uiState.update { it.copy(attachmentUri = null, attachmentName = null) }
             ChatbotUiEvent.DrawerOpened -> _uiState.update { it.copy(isDrawerVisible = true) }
             ChatbotUiEvent.DrawerDismissed -> _uiState.update { it.copy(isDrawerVisible = false) }
             ChatbotUiEvent.NewChatClicked -> resetConversation()
             ChatbotUiEvent.HistoryClicked -> openHistory()
-            ChatbotUiEvent.HelpClicked -> showUnavailable(R.string.chatbot_help_unavailable)
+            ChatbotUiEvent.HelpClicked -> {
+                _uiState.update { it.copy(isDrawerVisible = false) }
+                emitEffect(ChatbotUiEffect.NavigateToHelp)
+            }
         }
     }
 
     private fun openScreen(event: ChatbotUiEvent.ScreenOpened) {
         if (hasOpened) return
         hasOpened = true
+        previewDraftError = event.previewDraftError
         viewModelScope.launch {
-            val conversation = openConversation(event.contractName, event.contractType)
+            val conversation = try {
+                openConversation(event.contractName, event.contractType, event.contractId, event.conversationId)
+            } catch (cancellationException: CancellationException) {
+                throw cancellationException
+            } catch (_: Exception) {
+                _uiState.update {
+                    it.copy(contractName = event.contractName, contractType = event.contractType, isConversationReady = false, isReplyPending = false, isNewConversation = true)
+                }
+                emitEffect(ChatbotUiEffect.ShowMessage(R.string.auth_backend_not_configured))
+                return@launch
+            }
             conversationId = conversation.id
+            activeContractId = event.contractId
             newChatSuggestions = conversation.newConversationSuggestions
+            val storedMessages = if (event.conversationId != null) openConversation.messages(conversation.id) else emptyList()
+            val restoredMessages = storedMessages.mapNotNull { stored ->
+                stored.messageId.toLongOrNull()?.let { id ->
+                    ChatbotMessage(id, if (stored.isUser) ChatbotMessageAuthor.USER else ChatbotMessageAuthor.ASSISTANT, stored.content)
+                }
+            }
+            nextMessageId = (restoredMessages.maxOfOrNull(ChatbotMessage::id) ?: 0L) + 1L
             _uiState.update {
                 it.copy(
                     contractName = event.contractName,
                     contractType = event.contractType,
-                    messages = initialMessages(conversation.greeting),
-                    suggestions = conversation.initialSuggestions,
-                    isConversationReady = true
+                    messages = restoredMessages.ifEmpty { initialMessages(conversation.greeting) },
+                    isConversationReady = true,
+                    isNewConversation = event.startNewConversation,
+                    isDraftConversation = false,
+                    isDraftReviewReady = false,
+                    isDraftReviewVisible = false,
+                    suggestions = if (event.startNewConversation) newChatSuggestions else conversation.initialSuggestions
                 )
+            }
+            if (!event.draftRequest.isNullOrBlank() && !event.draftClarification.isNullOrBlank()) {
+                startDraftConversation(event.draftRequest, event.draftClarification)
             }
         }
     }
@@ -95,8 +146,15 @@ class ChatbotViewModel(
                 messages = state.messages + userMessage
             )
         }
+        persistTranscript()
         viewModelScope.launch {
-            appendReply(message, sendMessage(activeConversationId, message))
+            try {
+                appendReply(message, sendMessage(activeConversationId, message))
+            } catch (cancellationException: CancellationException) {
+                throw cancellationException
+            } catch (_: Exception) {
+                appendReply(message, ChatbotReply.RetryableError("Không thể gửi tin nhắn. Vui lòng thử lại.", "Thử lại"))
+            }
         }
     }
 
@@ -111,10 +169,18 @@ class ChatbotViewModel(
                 isReplyPending = false
             )
         }
+        persistTranscript()
     }
 
     private fun resetConversation() {
+        draftTransition?.cancel()
+        draftGeneration?.cancel()
         failedQuestions.clear()
+        val previous = _uiState.value
+        val contractName = previous.contractName
+        val contractType = previous.contractType
+        val contractId = activeContractId
+        conversationId = null
         _uiState.update {
             it.copy(
                 messageDraft = "",
@@ -122,14 +188,119 @@ class ChatbotViewModel(
                 suggestions = newChatSuggestions,
                 isReplyPending = false,
                 isNewConversation = true,
-                isDrawerVisible = false
+                isDraftConversation = false,
+                isDraftPreparing = false,
+                isDraftReviewReady = false,
+                isDraftReviewVisible = false,
+                draftGenerationStatus = DraftGenerationStatus.NONE,
+                isDrawerVisible = false,
+                isConversationReady = false
             )
+        }
+        viewModelScope.launch {
+            runCatching { openConversation(contractName, contractType, contractId) }
+                .onSuccess { conversation ->
+                    conversationId = conversation.id
+                    newChatSuggestions = conversation.newConversationSuggestions
+                    _uiState.update { it.copy(isConversationReady = true, suggestions = conversation.newConversationSuggestions) }
+                }
+                .onFailure { emitEffect(ChatbotUiEffect.ShowMessage(R.string.auth_backend_not_configured)) }
         }
     }
 
-    private fun showUnavailable(messageRes: Int) {
-        _uiState.update { it.copy(isDrawerVisible = false) }
-        emitEffect(ChatbotUiEffect.ShowMessage(messageRes))
+    private fun startDraftConversation(requestText: String, clarificationText: String) {
+        val previous = _uiState.value
+        if (!previous.isConversationReady || previous.isReplyPending) return
+        val request = ChatbotMessage(
+            id = nextMessageId++,
+            author = ChatbotMessageAuthor.USER,
+            content = requestText
+        )
+        val clarification = ChatbotMessage(
+            id = nextMessageId++,
+            author = ChatbotMessageAuthor.ASSISTANT,
+            content = clarificationText
+        )
+        if (!previous.isNewConversation && previous.messages.size > 1 && !previous.isDraftConversation) {
+            val action = ChatbotMessage(nextMessageId++, ChatbotMessageAuthor.ASSISTANT, "", isDraftAction = true)
+            val loading = ChatbotMessage(nextMessageId++, ChatbotMessageAuthor.ASSISTANT, "", isDraftLoading = true)
+            _uiState.update {
+                it.copy(
+                    messageDraft = "",
+                    messages = it.messages + action + request + loading,
+                    suggestions = emptyList(),
+                    isNewConversation = false,
+                    isDraftConversation = true,
+                    isDraftPreparing = true,
+                    isDraftReviewReady = false,
+                    isDraftReviewVisible = false,
+                    isReplyPending = true,
+                    isDrawerVisible = false
+                )
+            }
+            draftTransition = viewModelScope.launch {
+                delay(DRAFT_TRANSITION_DELAY_MS)
+                showDraftClarification(request, clarification)
+            }
+            return
+        }
+        showDraftClarification(request, clarification)
+    }
+
+    private fun showDraftClarification(request: ChatbotMessage, clarification: ChatbotMessage) {
+        _uiState.update {
+            it.copy(
+                messageDraft = "",
+                messages = listOf(request, clarification),
+                suggestions = emptyList(),
+                isNewConversation = false,
+                isDraftConversation = true,
+                isDraftPreparing = false,
+                isDraftReviewReady = false,
+                isDraftReviewVisible = false,
+                isReplyPending = false,
+                isDrawerVisible = false
+            )
+        }
+        persistTranscript()
+    }
+
+    private fun sendDraftClarification(message: String, acknowledgement: String) {
+        if (message.isBlank() || _uiState.value.isReplyPending || _uiState.value.draftGenerationStatus != DraftGenerationStatus.NONE) return
+        val userMessage = ChatbotMessage(
+            id = nextMessageId++,
+            author = ChatbotMessageAuthor.USER,
+            content = message
+        )
+        val assistantMessage = ChatbotMessage(
+            id = nextMessageId++,
+            author = ChatbotMessageAuthor.ASSISTANT,
+            content = acknowledgement,
+            showDraftNotice = true
+        )
+        _uiState.update { state ->
+            state.copy(
+                messageDraft = "",
+                messages = state.messages + userMessage + assistantMessage,
+                suggestions = emptyList(),
+                isDraftReviewReady = true,
+                isDraftReviewVisible = false,
+                isReplyPending = false
+            )
+        }
+        persistTranscript()
+    }
+
+    private fun createDraft() {
+        if (_uiState.value.draftGenerationStatus == DraftGenerationStatus.LOADING) return
+        draftGeneration?.cancel()
+        _uiState.update { it.copy(isDraftReviewVisible = false, draftGenerationStatus = DraftGenerationStatus.LOADING, isReplyPending = true) }
+        draftGeneration = viewModelScope.launch {
+            delay(DRAFT_GENERATION_DELAY_MS)
+            val result = if (previewDraftError) DraftGenerationStatus.ERROR else DraftGenerationStatus.SUCCESS
+            previewDraftError = false
+            _uiState.update { it.copy(draftGenerationStatus = result, isReplyPending = false) }
+        }
     }
 
     private fun openHistory() {
@@ -143,7 +314,15 @@ class ChatbotViewModel(
         if (_uiState.value.isReplyPending) return
         _uiState.update { it.copy(isReplyPending = true) }
         viewModelScope.launch {
-            val retriedMessage = retryMessage(activeConversationId, question).toMessage(messageId)
+            val retriedMessage = try {
+                retryMessage(activeConversationId, question).toMessage(messageId)
+            } catch (cancellationException: CancellationException) {
+                throw cancellationException
+            } catch (_: Exception) {
+                _uiState.update { it.copy(isReplyPending = false) }
+                emitEffect(ChatbotUiEffect.ShowMessage(R.string.auth_backend_not_configured))
+                return@launch
+            }
             failedQuestions.remove(messageId)
             _uiState.update { state ->
                 val errorIndex = state.messages.indexOfFirst { message -> message.id == messageId && message.error != null }
@@ -153,6 +332,17 @@ class ChatbotViewModel(
                     isReplyPending = false
                 )
             }
+            persistTranscript()
+        }
+    }
+
+    private fun persistTranscript() {
+        val id = conversationId ?: return
+        val state = _uiState.value
+        val stored = state.messages.filter { it.content.isNotBlank() && !it.isDraftLoading && !it.isDraftAction }
+            .map { message -> ChatbotTranscriptMessage(message.id.toString(), message.author == ChatbotMessageAuthor.USER, message.content, System.currentTimeMillis()) }
+        viewModelScope.launch {
+            runCatching { openConversation.save(id, activeContractId, state.contractName, state.contractType, stored) }
         }
     }
 
@@ -217,5 +407,7 @@ class ChatbotViewModel(
 
     private companion object {
         const val INITIAL_MESSAGE_ID = 1L
+        const val DRAFT_TRANSITION_DELAY_MS = 1500L
+        const val DRAFT_GENERATION_DELAY_MS = 1800L
     }
 }

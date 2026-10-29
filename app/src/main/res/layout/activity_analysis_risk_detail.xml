@@ -119,6 +119,7 @@
                 android:textSize="@dimen/sp_14" />
 
             <TextView
+                android:id="@+id/analysisRiskDetailClauseHeading"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/analysis_risk_detail_section_margin_top"
@@ -138,6 +139,7 @@
                 android:padding="@dimen/dp_14">
 
                 <TextView
+                    android:id="@+id/analysisRiskDetailClauseReference"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:includeFontPadding="false"
@@ -158,6 +160,7 @@
             </LinearLayout>
 
             <TextView
+                android:id="@+id/analysisRiskDetailLegalHeading"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/analysis_risk_detail_section_margin_top"
@@ -238,6 +241,7 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/analysisRiskDetailRecommendationCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/analysis_risk_detail_section_margin_top"

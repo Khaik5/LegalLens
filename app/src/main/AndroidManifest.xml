@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />
@@ -16,6 +17,32 @@
         android:roundIcon="@drawable/legallens_logo"
         android:supportsRtl="true"
         android:theme="@style/Theme.LagalLens">
+        <activity android:name=".presentation.feature.profile.information.ui.ProfileInformationActivity" android:exported="false" />
+        <activity android:name=".presentation.feature.chatbot.help.ui.ChatbotHelpActivity" android:exported="false" />
+        <activity android:name=".presentation.feature.chatbot.draft.ui.ChatbotDraftPreviewActivity" android:exported="false" />
+        <activity android:name=".presentation.feature.chatbot.draft.ui.ChatbotDraftRegenerationActivity" android:exported="false" />
+        <activity android:name=".presentation.feature.chatbot.draft.ui.ChatbotDraftManualEditActivity" android:exported="false" />
+        <activity android:name=".presentation.feature.chatbot.draft.ui.ChatbotDraftManualSavedActivity" android:exported="false" />
+        <activity android:name=".presentation.feature.chatbot.draft.ui.ChatbotDraftAiEditingActivity" android:exported="false" />
+        <activity android:name=".presentation.feature.chatbot.draft.ui.ChatbotDraftAiReviewActivity" android:exported="false" />
+        <activity android:name=".presentation.feature.chatbot.draft.ui.ChatbotDraftAiApplyActivity" android:exported="false" />
+        <activity android:name=".presentation.feature.chatbot.draft.ui.ChatbotDraftVersionsActivity" android:exported="false" />
+        <activity android:name=".presentation.feature.chatbot.draft.ui.AppliedDraftPreviewActivity" android:exported="false" />
+        <activity android:name=".presentation.feature.chatbot.draft.ui.CompareDraftVersionsActivity" android:exported="false" />
+        <activity android:name=".presentation.feature.chatbot.draft.ui.CopyDraftVersionActivity" android:exported="false" />
+        <activity android:name=".presentation.feature.chatbot.draft.save.detail.SavedDraftCopyDetailActivity" android:exported="false" />
+        <activity android:name=".presentation.feature.documentviewer.ui.DocumentViewerActivity" android:exported="false" />
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.draftpdf"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/draft_pdf_file_paths" />
+        </provider>
+        <activity android:name=".presentation.feature.compare.select.ui.CompareSelectActivity" android:exported="false" android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".presentation.feature.compare.result.ui.CompareResultActivity" android:exported="false" />
         <activity android:name=".presentation.feature.creditstore.hub.ui.CreditHubActivity" android:exported="false" />
         <activity android:name=".presentation.feature.creditstore.flow.ui.PurchaseSuccessActivity" android:exported="false" />
         <activity android:name=".presentation.feature.creditstore.flow.ui.PaymentPendingActivity" android:exported="false" />

@@ -63,7 +63,15 @@ class LoginViewModel(
             return
         }
 
-        if (authenticateUser(username, password)) {
+        val authenticated = try {
+            authenticateUser(username, password)
+        } catch (_: Exception) {
+            _uiState.update {
+                it.copy(usernameErrorResId = null, passwordErrorResId = R.string.auth_backend_not_configured)
+            }
+            return
+        }
+        if (authenticated) {
             _uiState.update { it.copy(usernameErrorResId = null, passwordErrorResId = null) }
             sendEffect(LoginUiEffect.NavigateToMain)
         } else {

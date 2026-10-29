@@ -2,6 +2,8 @@ package com.example.lagallens.presentation.feature.profile.ui
 
 import android.content.Intent
 import android.os.Bundle
+import android.net.Uri
+import androidx.core.view.isVisible
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,6 +16,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.example.lagallens.R
 import com.example.lagallens.databinding.FragmentProfileBinding
+import com.example.lagallens.presentation.common.utils.bindPressFeedback
 import com.example.lagallens.databinding.ItemProfileActionBinding
 import com.example.lagallens.presentation.feature.home.ui.HomeActivity
 import com.example.lagallens.presentation.feature.profile.contract.ProfileUiEffect
@@ -21,12 +24,14 @@ import com.example.lagallens.presentation.feature.profile.contract.ProfileUiEven
 import com.example.lagallens.presentation.feature.profile.contract.ProfileUiState
 import com.example.lagallens.presentation.feature.profile.dialog.ProfileLogoutDialog
 import com.example.lagallens.presentation.feature.profile.viewmodel.ProfileViewModel
+import com.example.lagallens.presentation.feature.profile.information.ui.ProfileInformationActivity
 import kotlinx.coroutines.launch
 
 class ProfileFragment : Fragment() {
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
     private val viewModel by activityViewModels<ProfileViewModel>()
+    private var hasShownBackendUnavailable = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -46,6 +51,7 @@ class ProfileFragment : Fragment() {
     }
 
     private fun bindView() {
+        listOf(binding.btnAvatarEdit, binding.btnSignOut).forEach { it.bindPressFeedback() }
         bindAction(
             binding.actionEditProfile,
             R.drawable.ic_profile_edit,
@@ -64,9 +70,9 @@ class ProfileFragment : Fragment() {
             R.string.profile_settings_title,
             ProfileUiEvent.SettingsClicked
         )
-        bindAction(binding.actionPrivacy, R.drawable.ic_profile_shield, R.string.profile_privacy)
-        bindAction(binding.actionAppearance, R.drawable.ic_profile_language, R.string.profile_appearance)
-        bindAction(binding.actionAbout, R.drawable.ic_profile_info, R.string.profile_about)
+        bindAction(binding.actionPrivacy, R.drawable.ic_profile_shield, R.string.profile_privacy, ProfileUiEvent.PrivacyClicked)
+        bindAction(binding.actionAppearance, R.drawable.ic_profile_language, R.string.profile_appearance, ProfileUiEvent.SettingsClicked)
+        bindAction(binding.actionAbout, R.drawable.ic_profile_info, R.string.profile_about, ProfileUiEvent.AboutClicked)
         binding.btnAvatarEdit.setOnClickListener {
             viewModel.onEvent(ProfileUiEvent.EditProfileClicked)
         }
@@ -82,6 +88,7 @@ class ProfileFragment : Fragment() {
         event: ProfileUiEvent = ProfileUiEvent.ActionClicked(titleRes)
     ) {
         actionBinding.ivProfileActionIcon.setImageResource(iconRes)
+        actionBinding.root.bindPressFeedback()
         actionBinding.tvProfileActionTitle.setText(titleRes)
         actionBinding.root.setOnClickListener {
             viewModel.onEvent(event)
@@ -117,6 +124,8 @@ class ProfileFragment : Fragment() {
                         ProfileUiEffect.NavigateToSettings -> findNavController().navigate(
                             R.id.action_profileFragment_to_profileSettingsFragment
                         )
+                        ProfileUiEffect.NavigateToPrivacy -> startActivity(ProfileInformationActivity.createIntent(requireContext(), true))
+                        ProfileUiEffect.NavigateToAbout -> startActivity(ProfileInformationActivity.createIntent(requireContext(), false))
                         ProfileUiEffect.NavigateToChangePassword -> findNavController().navigate(
                             R.id.action_profileFragment_to_profilePasswordFragment
                         )
@@ -129,9 +138,15 @@ class ProfileFragment : Fragment() {
     }
 
     private fun render(state: ProfileUiState) {
+        if (state.isBackendUnavailable && !hasShownBackendUnavailable) {
+            hasShownBackendUnavailable = true
+            Toast.makeText(requireContext(), R.string.profile_backend_not_configured, Toast.LENGTH_SHORT).show()
+        }
         binding.tvProfileName.text = state.name
         binding.tvProfileEmail.text = state.email
         binding.tvProfileAvatar.text = state.name.initials()
+        binding.ivProfileAvatar.isVisible = state.photoUri != null
+        binding.ivProfileAvatar.setImageURI(state.photoUri?.let(Uri::parse))
         binding.tvProfileStatus.setText(state.statusRes)
         binding.tvProfileContractCount.setText(state.contractCountRes)
         binding.tvProfileAnalysisCount.setText(state.analysisCountRes)
@@ -156,6 +171,7 @@ class ProfileFragment : Fragment() {
     }
 
     private fun navigateToAuthentication() {
+        (requireActivity().application as com.example.lagallens.LegalLensApplication).logoutDemoSession()
         startActivity(
             Intent(requireContext(), HomeActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK

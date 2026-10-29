@@ -14,6 +14,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.lagallens.databinding.ActivityAnalysisFailureBinding
+import com.example.lagallens.presentation.common.utils.bindPressFeedback
 import com.example.lagallens.presentation.feature.analysis.failure.contract.AnalysisFailureUiEffect
 import com.example.lagallens.presentation.feature.analysis.failure.contract.AnalysisFailureUiEvent
 import com.example.lagallens.presentation.feature.analysis.failure.viewmodel.AnalysisFailureViewModel
@@ -52,6 +53,7 @@ class AnalysisFailureActivity : AppCompatActivity() {
     }
 
     private fun bindEvents() = with(binding) {
+        listOf(analysisFailureBack, analysisFailureRetry, analysisFailureReturnHome).forEach { it.bindPressFeedback() }
         analysisFailureBack.setOnClickListener {
             viewModel.onEvent(AnalysisFailureUiEvent.BackClicked)
         }
@@ -89,7 +91,7 @@ class AnalysisFailureActivity : AppCompatActivity() {
                         context = this,
                         documentName = effect.documentName,
                         documentMetadata = effect.documentMetadata
-                    )
+                    ).putExtra("analysis_return_home", intent.getBooleanExtra("analysis_return_home", false))
                 )
                 finish()
             }

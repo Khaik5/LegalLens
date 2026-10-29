@@ -11,7 +11,7 @@
         android:layout_gravity="end"
         android:layout_marginStart="@dimen/chatbot_user_start_margin"
         android:background="@drawable/bg_chatbot_user_message"
-        android:fontFamily="sans-serif"
+        android:fontFamily="@font/manrope"
         android:includeFontPadding="false"
         android:lineSpacingExtra="@dimen/chatbot_message_line_spacing"
         android:maxWidth="@dimen/chatbot_message_max_width"

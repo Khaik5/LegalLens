@@ -3,6 +3,7 @@ package com.example.lagallens.presentation.feature.analysis.result.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.lagallens.R
 import com.example.lagallens.domain.usecase.GetAnalysisOverviewUseCase
 import com.example.lagallens.presentation.feature.analysis.result.contract.AnalysisResultDestination
 import com.example.lagallens.presentation.feature.analysis.result.contract.AnalysisResultUiEffect
@@ -14,6 +15,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.CancellationException
 
 class AnalysisResultViewModel(
     private val getAnalysisOverview: GetAnalysisOverviewUseCase
@@ -34,16 +36,23 @@ class AnalysisResultViewModel(
 
     private fun loadOverview(documentName: String, documentMetadata: String) {
         viewModelScope.launch {
-            val overview = getAnalysisOverview(documentName, documentMetadata)
-            _uiState.update {
-                it.copy(
-                    documentName = documentName,
-                    documentMetadata = documentMetadata,
-                    score = overview.score,
-                    keyFactsCount = overview.keyFactsCount,
-                    riskCount = overview.riskCount,
-                    referenceCount = overview.referenceCount
-                )
+            try {
+                val overview = getAnalysisOverview(documentName, documentMetadata)
+                _uiState.update {
+                    it.copy(
+                        documentName = documentName,
+                        documentMetadata = documentMetadata,
+                        score = overview.score,
+                        keyFactsCount = overview.keyFactsCount,
+                        riskCount = overview.riskCount,
+                        referenceCount = overview.referenceCount,
+                        errorMessageRes = null
+                    )
+                }
+            } catch (cancellationException: CancellationException) {
+                throw cancellationException
+            } catch (_: Exception) {
+                _uiState.update { it.copy(documentName = documentName, documentMetadata = documentMetadata, score = 0, keyFactsCount = 0, riskCount = 0, referenceCount = 0, items = emptyList(), errorMessageRes = R.string.auth_backend_not_configured) }
             }
         }
     }

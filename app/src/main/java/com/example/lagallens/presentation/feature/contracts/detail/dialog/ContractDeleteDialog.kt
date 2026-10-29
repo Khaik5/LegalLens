@@ -12,6 +12,7 @@ import android.view.WindowManager
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import com.example.lagallens.databinding.DialogContractDeleteBinding
+import com.example.lagallens.presentation.common.utils.bindPressFeedback
 
 class ContractDeleteDialog : DialogFragment() {
     private var _binding: DialogContractDeleteBinding? = null
@@ -34,6 +35,7 @@ class ContractDeleteDialog : DialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        listOf(binding.btnCancel, binding.btnDeleteForever).forEach { it.bindPressFeedback() }
         binding.root.setOnClickListener { dismiss() }
         binding.deleteCard.setOnClickListener { }
         binding.btnCancel.setOnClickListener { dismiss() }

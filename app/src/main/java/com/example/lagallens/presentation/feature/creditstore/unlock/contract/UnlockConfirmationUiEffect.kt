@@ -1,6 +1,7 @@
 package com.example.lagallens.presentation.feature.creditstore.unlock.contract
 
 sealed interface UnlockConfirmationUiEffect {
+    data object ShowBackendUnavailable : UnlockConfirmationUiEffect
     data object NavigateBack : UnlockConfirmationUiEffect
     data object NavigateToInsufficientCredits : UnlockConfirmationUiEffect
     data class UnlockRequested(

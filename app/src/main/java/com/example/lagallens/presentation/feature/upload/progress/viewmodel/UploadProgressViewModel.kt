@@ -26,7 +26,7 @@ class UploadProgressViewModel : ViewModel() {
         when (event) {
             is UploadProgressEvent.ScreenOpened -> {
                 _uiState.update {
-                    it.copy(fileName = event.fileName, fileDetails = event.fileDetails)
+                    it.copy(fileName = event.fileName, fileDetails = event.fileDetails, documentUri = event.documentUri, documentId = event.documentId)
                 }
                 startLocalOcrPreview(event.fileName, event.fileDetails)
             }
@@ -44,7 +44,7 @@ class UploadProgressViewModel : ViewModel() {
             delay(700)
             _uiState.update { it.copy(progress = 100) }
             delay(300)
-            _effects.emit(UploadProgressEffect.NavigateToOcrProcessing(fileName, fileDetails))
+            _effects.emit(UploadProgressEffect.NavigateToOcrProcessing(fileName, fileDetails, _uiState.value.documentUri, _uiState.value.documentId))
         }
     }
 

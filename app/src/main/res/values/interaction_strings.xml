@@ -1,0 +1,8 @@
+<resources>
+    <string name="chatbot_history_search_hint">Tìm kiếm hội thoại</string>
+    <string name="chatbot_history_empty">Không tìm thấy hội thoại phù hợp.</string>
+    <string name="chatbot_attachment_selected">Tệp đã chọn (chưa gửi): %1$s  ×</string>
+    <string name="chatbot_attachment_remove">Bỏ tệp đính kèm %1$s</string>
+    <string name="analysis_reference_summary_heading">Tóm tắt tham khảo</string>
+    <string name="analysis_risk_finding_summary">Nội dung phát hiện</string>
+</resources>

@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/creditStorePackageRoot"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/credit_store_package_height"
+    android:layout_height="wrap_content" android:minHeight="@dimen/credit_store_package_height" android:paddingTop="@dimen/dp_8" android:paddingBottom="@dimen/dp_8"
     android:background="@drawable/bg_contract_detail_assistant"
     android:clickable="true"
     android:focusable="true"
@@ -48,10 +48,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/dp_2"
-            android:ellipsize="end"
             android:fontFamily="sans-serif"
             android:includeFontPadding="false"
-            android:maxLines="1"
             android:textColor="@color/legal_lens_secondary_text"
             android:textSize="@dimen/sp_12" />
     </LinearLayout>

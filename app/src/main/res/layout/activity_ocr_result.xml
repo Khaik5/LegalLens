@@ -58,7 +58,7 @@
             android:layout_width="@dimen/ocr_result_confidence_icon_size"
             android:layout_height="@dimen/ocr_result_confidence_icon_size"
             android:src="@drawable/ic_shield_check"
-            android:tint="@color/ocr_review_green" />
+            app:tint="@color/ocr_review_green" />
 
         <TextView
             android:id="@+id/ocr_result_confidence_label"

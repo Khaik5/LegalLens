@@ -2,6 +2,8 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="chatbot_draft_notice_background">#FFFBEB</color>
+    <color name="chatbot_draft_notice_icon">#D97706</color>
     <color name="legal_lens_background">#FAF9F6</color>
     <color name="legal_lens_primary">#1A2D42</color>
     <color name="legal_lens_status_text">#1C2434</color>

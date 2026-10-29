@@ -9,7 +9,7 @@ data class ContractListUiState(
     val query: String = "",
     val selectedFilter: ContractFilter = ContractFilter.ALL,
     val filterSelection: ContractFilterSelection = ContractFilterSelection(),
-    val contracts: List<ContractListItem> = ContractListItem.samples
+    val contracts: List<ContractListItem> = ContractListItem.allSamples
 )
 
 data class ContractFilterSelection(
@@ -71,22 +71,26 @@ data class ContractListItem(
     @DrawableRes val contractIconBackgroundRes: Int,
     @ColorRes val contractIconTintRes: Int,
     @DrawableRes val riskIconRes: Int,
-    @ColorRes val riskTextColorRes: Int
+    @ColorRes val riskTextColorRes: Int,
+    val titleOverride: String? = null,
+    val subtitleOverride: String? = null,
+    val documentId: String = "",
+    val content: String = ""
 ) {
     companion object {
         val allSamples = listOf(
             ContractListItem(
                 id = "office-lease",
-                titleRes = R.string.contract_office_lease,
-                subtitleRes = R.string.contract_office_lease_subtitle,
+                titleRes = R.string.contract_demo_labor_indefinite,
+                subtitleRes = R.string.contract_demo_labor_subtitle,
                 statusRes = R.string.contract_complete_status,
                 riskRes = R.string.contract_low_risk,
-                detailTypeRes = R.string.contract_detail_type_service,
+                detailTypeRes = R.string.contract_detail_type_employment,
                 createdAtRes = R.string.contract_detail_office_created_at,
                 updatedAtRes = R.string.contract_detail_office_updated_at,
                 pageCountRes = R.string.contract_detail_office_page_count,
                 fileFormatRes = R.string.contract_detail_office_file_format,
-                contractType = ContractType.SERVICE,
+                contractType = ContractType.EMPLOYMENT,
                 processingStatus = ContractProcessingStatus.COMPLETE,
                 riskLevel = ContractRiskLevel.LOW,
                 statusBackgroundRes = R.drawable.bg_contract_status_complete,
@@ -98,8 +102,8 @@ data class ContractListItem(
             ),
             ContractListItem(
                 id = "collaborator",
-                titleRes = R.string.contract_collaborator,
-                subtitleRes = R.string.contract_collaborator_subtitle,
+                titleRes = R.string.contract_demo_labor_fixed_term,
+                subtitleRes = R.string.contract_demo_labor_subtitle,
                 statusRes = R.string.contract_processing_status,
                 riskRes = R.string.contract_high_risk,
                 detailTypeRes = R.string.contract_detail_type_employment,
@@ -119,8 +123,8 @@ data class ContractListItem(
             ),
             ContractListItem(
                 id = "equipment-purchase",
-                titleRes = R.string.contract_equipment_purchase,
-                subtitleRes = R.string.contract_equipment_purchase_subtitle,
+                titleRes = R.string.contract_demo_labor_probation,
+                subtitleRes = R.string.contract_demo_labor_subtitle,
                 statusRes = R.string.contract_draft_status,
                 riskRes = R.string.contract_not_analyzed_risk,
                 detailTypeRes = R.string.contract_detail_type_commercial,
@@ -128,7 +132,7 @@ data class ContractListItem(
                 updatedAtRes = R.string.contract_detail_equipment_updated_at,
                 pageCountRes = R.string.contract_detail_equipment_page_count,
                 fileFormatRes = R.string.contract_detail_equipment_file_format,
-                contractType = ContractType.COMMERCIAL,
+                contractType = ContractType.EMPLOYMENT,
                 processingStatus = ContractProcessingStatus.DRAFT,
                 riskLevel = ContractRiskLevel.NOT_ANALYZED,
                 statusBackgroundRes = R.drawable.bg_contract_status_draft,
@@ -140,16 +144,16 @@ data class ContractListItem(
             ),
             ContractListItem(
                 id = "vehicle-lease",
-                titleRes = R.string.contract_vehicle_lease,
-                subtitleRes = R.string.contract_vehicle_lease_search_subtitle,
+                titleRes = R.string.contract_demo_labor_part_time,
+                subtitleRes = R.string.contract_demo_labor_subtitle,
                 statusRes = R.string.contract_complete_status,
                 riskRes = R.string.contract_low_risk,
-                detailTypeRes = R.string.contract_detail_type_service,
+                detailTypeRes = R.string.contract_detail_type_employment,
                 createdAtRes = R.string.contract_detail_vehicle_created_at,
                 updatedAtRes = R.string.contract_detail_vehicle_updated_at,
                 pageCountRes = R.string.contract_detail_vehicle_page_count,
                 fileFormatRes = R.string.contract_detail_vehicle_file_format,
-                contractType = ContractType.SERVICE,
+                contractType = ContractType.EMPLOYMENT,
                 processingStatus = ContractProcessingStatus.COMPLETE,
                 riskLevel = ContractRiskLevel.LOW,
                 statusBackgroundRes = R.drawable.bg_contract_status_complete,

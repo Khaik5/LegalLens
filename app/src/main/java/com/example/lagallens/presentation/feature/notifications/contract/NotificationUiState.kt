@@ -7,7 +7,8 @@ import com.example.lagallens.R
 
 data class NotificationUiState(
     val selectedFilter: NotificationFilter = NotificationFilter.ALL,
-    val notifications: List<NotificationItem> = emptyList()
+    val notifications: List<NotificationItem> = emptyList(),
+    val errorMessageRes: Int? = null
 )
 
 enum class NotificationFilter(@StringRes val titleRes: Int) {

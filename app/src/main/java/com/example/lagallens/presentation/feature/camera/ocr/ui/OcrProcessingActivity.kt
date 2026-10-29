@@ -103,7 +103,9 @@ class OcrProcessingActivity : AppCompatActivity() {
                     OcrResultActivity.createIntent(
                         context = this,
                         documentName = effect.documentName,
-                        documentDetails = effect.documentDetails
+                        documentDetails = effect.documentDetails,
+                        documentUri = intent.getStringExtra(EXTRA_DOCUMENT_URI),
+                        documentId = intent.getStringExtra(EXTRA_DOCUMENT_ID).orEmpty().ifBlank { java.util.UUID.randomUUID().toString() }
                     )
                 )
                 finish()
@@ -125,6 +127,8 @@ class OcrProcessingActivity : AppCompatActivity() {
         private const val EXTRA_PAGE_PATHS = "ocr_page_paths"
         private const val EXTRA_DOCUMENT_NAME = "ocr_document_name"
         private const val EXTRA_DOCUMENT_DETAILS = "ocr_document_details"
+        private const val EXTRA_DOCUMENT_URI = "ocr_document_uri"
+        private const val EXTRA_DOCUMENT_ID = "ocr_document_id"
         private const val EXTRA_SHOULD_SIMULATE_FAILURE = "ocr_should_simulate_failure"
 
         fun createIntent(
@@ -135,18 +139,23 @@ class OcrProcessingActivity : AppCompatActivity() {
             context,
             OcrProcessingActivity::class.java
         ).putStringArrayListExtra(EXTRA_PAGE_PATHS, ArrayList(pages.map(ScanPage::path)))
+            .putExtra(EXTRA_DOCUMENT_ID, java.util.UUID.randomUUID().toString())
             .putExtra(EXTRA_SHOULD_SIMULATE_FAILURE, shouldSimulateFailure)
 
         fun createIntent(
             context: Context,
             documentName: String,
             documentDetails: String,
-            shouldSimulateFailure: Boolean = false
+            shouldSimulateFailure: Boolean = false,
+            documentUri: String? = null,
+            documentId: String = java.util.UUID.randomUUID().toString()
         ): Intent = Intent(
             context,
             OcrProcessingActivity::class.java
         ).putExtra(EXTRA_DOCUMENT_NAME, documentName)
             .putExtra(EXTRA_DOCUMENT_DETAILS, documentDetails)
+            .putExtra(EXTRA_DOCUMENT_URI, documentUri)
+            .putExtra(EXTRA_DOCUMENT_ID, documentId)
             .putExtra(EXTRA_SHOULD_SIMULATE_FAILURE, shouldSimulateFailure)
     }
 }

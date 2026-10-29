@@ -18,6 +18,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.lagallens.R
 import com.example.lagallens.databinding.ActivityCameraPermissionBinding
+import com.example.lagallens.presentation.common.utils.bindPressFeedback
 import com.example.lagallens.presentation.feature.camera.capture.ui.CameraCaptureActivity
 import com.example.lagallens.presentation.feature.camera.permission.contract.CameraPermissionUiEffect
 import com.example.lagallens.presentation.feature.camera.permission.contract.CameraPermissionUiEvent
@@ -58,6 +59,7 @@ class CameraPermissionActivity : AppCompatActivity() {
     }
 
     private fun bindView() {
+        listOf(binding.cameraPermissionBack, binding.cameraPermissionAllow, binding.cameraPermissionLater).forEach { it.bindPressFeedback() }
         binding.cameraPermissionBack.setOnClickListener {
             viewModel.onEvent(CameraPermissionUiEvent.LaterClicked)
         }

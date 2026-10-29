@@ -8,6 +8,10 @@ import com.example.lagallens.presentation.feature.contracts.contract.ContractLis
 import com.example.lagallens.presentation.feature.contracts.contract.ContractRiskLevel
 
 data class ContractDetailUiState(
+    val contractId: String = "",
+    val documentId: String = "",
+    val documentText: String = "",
+    val renamedTitle: String? = null,
     @StringRes val titleRes: Int = R.string.contract_office_lease,
     @StringRes val contractTypeRes: Int = R.string.contract_detail_type_service,
     @StringRes val statusRes: Int = R.string.contract_complete_status,
@@ -24,6 +28,10 @@ data class ContractDetailUiState(
 ) {
     companion object {
         fun from(contract: ContractListItem): ContractDetailUiState = ContractDetailUiState(
+            contractId = contract.id,
+            documentId = contract.documentId,
+            documentText = contract.content,
+            renamedTitle = contract.titleOverride,
             titleRes = contract.titleRes,
             contractTypeRes = contract.detailTypeRes,
             statusRes = contract.statusRes,

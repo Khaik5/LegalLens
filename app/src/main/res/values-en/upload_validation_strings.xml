@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="upload_source_unsupported_file">Only PDF, DOCX, or image files are supported.</string>
+    <string name="upload_source_file_too_large">The file exceeds the 20 MB demo limit.</string>
+    <string name="upload_source_file_empty">The file is empty.</string>
+</resources>

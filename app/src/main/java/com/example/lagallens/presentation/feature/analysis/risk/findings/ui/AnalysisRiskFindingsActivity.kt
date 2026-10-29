@@ -109,8 +109,8 @@ class AnalysisRiskFindingsActivity : AppCompatActivity() {
     private fun handleEffect(effect: AnalysisRiskFindingsUiEffect) {
         when (effect) {
             AnalysisRiskFindingsUiEffect.NavigateBack -> finish()
-            AnalysisRiskFindingsUiEffect.NavigateToRiskDetail -> startActivity(
-                AnalysisRiskDetailActivity.createIntent(this)
+            is AnalysisRiskFindingsUiEffect.NavigateToRiskDetail -> startActivity(
+                AnalysisRiskDetailActivity.createIntent(this, effect.findingId)
             )
             is AnalysisRiskFindingsUiEffect.ShowMessage -> {
                 Toast.makeText(this, effect.messageRes, Toast.LENGTH_SHORT).show()

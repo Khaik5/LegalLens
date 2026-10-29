@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipToPadding="false"
+    android:fillViewport="true"
+    android:paddingStart="@dimen/chatbot_side_padding"
+    android:paddingTop="@dimen/chatbot_messages_padding_vertical"
+    android:paddingEnd="@dimen/chatbot_side_padding"
+    android:paddingBottom="@dimen/chatbot_messages_padding_vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView android:fontFamily="@font/manrope"
+                android:layout_width="@dimen/chatbot_avatar_size"
+                android:layout_height="@dimen/chatbot_avatar_size"
+                android:background="@drawable/bg_chatbot_avatar"
+                android:gravity="center"
+                android:text="@string/chatbot_avatar_initials"
+                android:textColor="@color/white"
+                android:textSize="@dimen/chatbot_avatar_text_size"
+                android:textStyle="bold" />
+
+            <TextView android:fontFamily="@font/manrope"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/chatbot_avatar_gap"
+                android:layout_weight="1"
+                android:text="@string/chatbot_draft_review_prompt"
+                android:textColor="@color/legal_lens_status_text"
+                android:textSize="@dimen/chatbot_message_text_size" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/chatbot_message_row_spacing"
+            android:background="@drawable/bg_chatbot_draft_review"
+            android:orientation="vertical"
+            android:padding="@dimen/chatbot_draft_review_padding">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/manrope"
+                android:includeFontPadding="false"
+                android:text="@string/chatbot_draft_review_title"
+                android:textColor="@color/legal_lens_primary"
+                android:textSize="@dimen/chatbot_draft_review_title_text_size"
+                android:textStyle="bold" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp_1"
+                android:layout_marginTop="@dimen/dp_12"
+                android:background="@color/legal_lens_input_stroke" />
+
+            <TextView android:fontFamily="@font/manrope"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/chatbot_draft_review_section_gap"
+                android:text="@string/chatbot_draft_contract_type_label"
+                android:textColor="@color/legal_lens_secondary_text"
+                android:textSize="@dimen/chatbot_draft_review_section_label_text_size" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_8"
+                android:fontFamily="@font/manrope"
+                android:text="@string/chatbot_draft_contract_type_value"
+                android:textColor="@color/legal_lens_status_text"
+                android:textSize="@dimen/chatbot_draft_review_value_text_size"
+                android:textStyle="bold" />
+
+            <TextView android:fontFamily="@font/manrope"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/chatbot_draft_review_section_gap"
+                android:text="@string/chatbot_draft_source_label"
+                android:textColor="@color/legal_lens_secondary_text"
+                android:textSize="@dimen/chatbot_draft_review_section_label_text_size" />
+
+            <TextView android:fontFamily="@font/manrope"
+                android:id="@+id/chatbotDraftSourceName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_8"
+                android:textColor="@color/legal_lens_status_text"
+                android:textSize="@dimen/chatbot_draft_review_value_text_size"
+                android:textStyle="bold" />
+
+            <TextView android:fontFamily="@font/manrope"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_8"
+                android:background="@drawable/bg_chatbot_source_badge"
+                android:paddingStart="@dimen/chatbot_document_badge_padding_horizontal"
+                android:paddingTop="@dimen/chatbot_document_badge_padding_vertical"
+                android:paddingEnd="@dimen/chatbot_document_badge_padding_horizontal"
+                android:paddingBottom="@dimen/chatbot_document_badge_padding_vertical"
+                android:text="@string/chatbot_draft_source_status"
+                android:textColor="@color/legal_lens_auth_accent"
+                android:textSize="@dimen/chatbot_document_badge_text_size" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp_1"
+                android:layout_marginTop="@dimen/chatbot_draft_review_section_gap"
+                android:background="@color/legal_lens_input_stroke" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/chatbot_draft_review_section_gap"
+                android:fontFamily="@font/manrope"
+                android:text="@string/chatbot_draft_changes_title"
+                android:textColor="@color/legal_lens_primary"
+                android:textSize="@dimen/chatbot_draft_review_value_text_size"
+                android:textStyle="bold" />
+
+            <TextView android:fontFamily="@font/manrope"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_12"
+                android:lineSpacingExtra="@dimen/dp_4"
+                android:text="@string/chatbot_draft_change_term"
+                android:textColor="@color/legal_lens_status_text"
+                android:textSize="@dimen/chatbot_message_text_size" />
+
+            <TextView android:fontFamily="@font/manrope"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_4"
+                android:lineSpacingExtra="@dimen/dp_4"
+                android:text="@string/chatbot_draft_change_missing"
+                android:textColor="@color/legal_lens_status_text"
+                android:textSize="@dimen/chatbot_message_text_size" />
+
+            <TextView android:fontFamily="@font/manrope"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_12"
+                android:background="@drawable/bg_chatbot_draft_warning"
+                android:drawableStart="@drawable/ic_alert_triangle"
+                android:drawablePadding="@dimen/dp_8"
+                android:drawableTint="@color/chatbot_draft_notice_icon"
+                android:gravity="center_vertical"
+                android:lineSpacingExtra="@dimen/dp_2"
+                android:padding="@dimen/dp_12"
+                android:text="@string/chatbot_draft_warning"
+                android:textColor="@color/legal_lens_secondary_text"
+                android:textSize="@dimen/chatbot_draft_review_section_label_text_size" />
+
+            <TextView android:fontFamily="@font/manrope"
+                android:id="@+id/chatbotDraftCreate"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/chatbot_draft_review_button_height"
+                android:layout_marginTop="@dimen/dp_12"
+                android:background="@drawable/bg_chatbot_primary_action"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:textAllCaps="false"
+                android:text="@string/chatbot_draft_create_action"
+                android:textColor="@color/white"
+                android:textSize="@dimen/sp_15"
+                android:textStyle="bold" />
+
+            <TextView android:fontFamily="@font/manrope"
+                android:id="@+id/chatbotDraftEdit"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/chatbot_draft_review_button_height"
+                android:layout_marginTop="@dimen/chatbot_draft_review_button_gap"
+                android:background="@drawable/bg_chatbot_new_state_suggestion"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:textAllCaps="false"
+                android:text="@string/chatbot_draft_edit_action"
+                android:textColor="@color/legal_lens_primary"
+                android:textSize="@dimen/sp_15"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

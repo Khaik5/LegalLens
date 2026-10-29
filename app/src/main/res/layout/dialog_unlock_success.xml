@@ -62,12 +62,11 @@
         <Button
             android:id="@+id/unlockSuccessViewResult"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/dp_54"
+            android:layout_height="wrap_content" android:minHeight="@dimen/dp_54"
             android:layout_marginTop="@dimen/dp_20"
             android:background="@drawable/bg_unlock_confirmation_primary_action"
             android:backgroundTint="@null"
             android:includeFontPadding="false"
-            android:minHeight="@dimen/dp_0"
             android:minWidth="@dimen/dp_0"
             android:text="@string/unlock_success_view_result"
             android:textAllCaps="false"

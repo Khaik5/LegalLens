@@ -17,6 +17,7 @@
         android:paddingBottom="@dimen/dp_24">
 
         <LinearLayout
+            android:id="@+id/dashboardGreeting"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
@@ -89,6 +90,7 @@
             android:textStyle="bold" />
 
         <LinearLayout
+            android:id="@+id/dashboardQuickActions"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/dp_14"

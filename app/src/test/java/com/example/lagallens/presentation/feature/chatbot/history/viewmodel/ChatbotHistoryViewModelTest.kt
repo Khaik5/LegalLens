@@ -11,7 +11,7 @@ class ChatbotHistoryViewModelTest {
         val viewModel = ChatbotHistoryViewModel()
         val conversations = listOf(
             ChatbotHistoryConversation(
-                id = 1L,
+                id = "conversation-1",
                 contractName = "HĐ Thuê VP Bitexco",
                 timestamp = "Hôm nay · 09:41",
                 messageCount = "8 tin nhắn",

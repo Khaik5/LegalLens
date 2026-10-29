@@ -7,6 +7,7 @@ data class AnalysisLegalReferenceDetailUiState(
     val referenceId: String = "",
     val documentName: String = "",
     val documentMetadata: String = "",
+    val isDetailedExample: Boolean = true,
     @StringRes val titleRes: Int = R.string.analysis_legal_references_commercial_law_title,
     @StringRes val articleRes: Int = R.string.analysis_legal_reference_detail_article,
     @StringRes val effectiveDateRes: Int = R.string.analysis_legal_reference_detail_effective_date,

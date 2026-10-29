@@ -13,7 +13,10 @@ data class ChatbotMessage(
     val referenceSectionTitle: String? = null,
     val references: List<ChatbotReference> = emptyList(),
     val noEvidence: ChatbotNoEvidence? = null,
-    val error: ChatbotError? = null
+    val error: ChatbotError? = null,
+    val showDraftNotice: Boolean = false,
+    val isDraftAction: Boolean = false,
+    val isDraftLoading: Boolean = false
 )
 
 data class ChatbotCitation(

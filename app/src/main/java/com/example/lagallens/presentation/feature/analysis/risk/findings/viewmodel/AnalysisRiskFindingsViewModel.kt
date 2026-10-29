@@ -2,7 +2,6 @@ package com.example.lagallens.presentation.feature.analysis.risk.findings.viewmo
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.lagallens.R
 import com.example.lagallens.presentation.feature.analysis.risk.findings.contract.AnalysisRiskFindingsUiEffect
 import com.example.lagallens.presentation.feature.analysis.risk.findings.contract.AnalysisRiskFindingsUiEvent
 import com.example.lagallens.presentation.feature.analysis.risk.findings.contract.AnalysisRiskFindingsUiState
@@ -39,14 +38,9 @@ class AnalysisRiskFindingsViewModel : ViewModel() {
                 )
             }
             is AnalysisRiskFindingsUiEvent.FindingClicked -> {
-                val effect = if (event.findingId == PENALTY_CAP_FINDING_ID) {
-                    AnalysisRiskFindingsUiEffect.NavigateToRiskDetail
-                } else {
-                    AnalysisRiskFindingsUiEffect.ShowMessage(
-                        R.string.analysis_risk_findings_solution_unavailable
-                    )
+                if (AnalysisRiskFindingsUiState.allFindings.any { it.id == event.findingId }) {
+                    emitEffect(AnalysisRiskFindingsUiEffect.NavigateToRiskDetail(event.findingId))
                 }
-                emitEffect(effect)
             }
         }
     }
@@ -55,7 +49,4 @@ class AnalysisRiskFindingsViewModel : ViewModel() {
         viewModelScope.launch { _uiEffect.emit(effect) }
     }
 
-    private companion object {
-        const val PENALTY_CAP_FINDING_ID = "penalty-cap"
-    }
 }

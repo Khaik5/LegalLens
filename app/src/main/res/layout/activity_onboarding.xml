@@ -26,6 +26,7 @@
 
     <TextView
         android:id="@+id/onboarding_skip"
+        android:elevation="4dp"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/onboarding_skip_height"
         android:layout_marginTop="@dimen/onboarding_skip_top"
@@ -107,11 +108,6 @@
             android:textSize="@dimen/onboarding_cta_text_size"
             android:textStyle="bold" />
 
-        <View
-            android:layout_width="@dimen/onboarding_nav_handle_width"
-            android:layout_height="@dimen/onboarding_nav_handle_height"
-            android:layout_gravity="center"
-            android:layout_marginTop="@dimen/onboarding_nav_handle_top"
-            android:background="@drawable/onboarding_nav_handle" />
+
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -23,6 +23,7 @@ class OnboardingViewModel(
 
     private val _uiEffect = MutableSharedFlow<OnboardingUiEffect>()
     val uiEffect = _uiEffect.asSharedFlow()
+    private var isCompleting = false
 
     fun onEvent(event: OnboardingUiEvent) {
         when (event) {
@@ -47,6 +48,8 @@ class OnboardingViewModel(
     }
 
     private fun completeOnboarding() {
+        if (isCompleting) return
+        isCompleting = true
         viewModelScope.launch {
             completeOnboardingUseCase()
             _uiEffect.emit(OnboardingUiEffect.NavigateToHome)

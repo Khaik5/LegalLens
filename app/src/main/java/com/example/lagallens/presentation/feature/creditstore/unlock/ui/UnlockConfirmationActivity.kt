@@ -2,6 +2,7 @@ package com.example.lagallens.presentation.feature.creditstore.unlock.ui
 
 import android.content.Context
 import android.content.Intent
+import android.widget.Toast
 import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
@@ -14,6 +15,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.lagallens.R
 import com.example.lagallens.databinding.ActivityUnlockConfirmationBinding
+import com.example.lagallens.presentation.common.utils.bindPressFeedback
 import com.example.lagallens.presentation.feature.creditstore.unlock.contract.UnlockConfirmationUiEffect
 import com.example.lagallens.presentation.feature.creditstore.unlock.contract.UnlockConfirmationUiEvent
 import com.example.lagallens.presentation.feature.creditstore.unlock.contract.UnlockConfirmationUiState
@@ -23,10 +25,13 @@ import com.example.lagallens.presentation.feature.creditstore.unlock.viewmodel.U
 import com.example.lagallens.presentation.feature.creditstore.flow.ui.UnlockedAnalysisResultActivity
 import com.example.lagallens.presentation.feature.creditstore.flow.ui.InsufficientCreditsActivity
 import kotlinx.coroutines.launch
+import com.example.lagallens.LegalLensApplication
 
 class UnlockConfirmationActivity : AppCompatActivity() {
     private val binding by lazy { ActivityUnlockConfirmationBinding.inflate(layoutInflater) }
-    private val viewModel by viewModels<UnlockConfirmationViewModel>()
+    private val viewModel by viewModels<UnlockConfirmationViewModel> {
+        UnlockConfirmationViewModel.Factory((application as LegalLensApplication).creditRepository)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,6 +62,7 @@ class UnlockConfirmationActivity : AppCompatActivity() {
     }
 
     private fun bindView() = with(binding) {
+        listOf(unlockConfirmationBack, unlockConfirmationCancel, unlockConfirmationConfirm).forEach { it.bindPressFeedback() }
         unlockConfirmationBack.setOnClickListener {
             viewModel.onEvent(UnlockConfirmationUiEvent.BackClicked)
         }
@@ -108,10 +114,15 @@ class UnlockConfirmationActivity : AppCompatActivity() {
         )
         unlockConfirmationConfirm.isEnabled =
             !state.isConfirmationRequested && !state.isInsufficientCreditsRequested
+        if (state.isBackendUnavailable) {
+            unlockConfirmationBalanceBefore.setText(R.string.credit_backend_not_configured)
+            unlockConfirmationBalanceAfter.setText(R.string.credit_backend_not_configured)
+        }
     }
 
     private fun handleEffect(effect: UnlockConfirmationUiEffect) {
         when (effect) {
+            UnlockConfirmationUiEffect.ShowBackendUnavailable -> Toast.makeText(this, R.string.credit_backend_not_configured, Toast.LENGTH_SHORT).show()
             UnlockConfirmationUiEffect.NavigateBack -> finish()
             UnlockConfirmationUiEffect.NavigateToInsufficientCredits -> {
                 startActivity(InsufficientCreditsActivity.createIntent(this))

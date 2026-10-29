@@ -14,7 +14,10 @@
 
         <TextView
             android:layout_width="match_parent"
-            android:layout_height="@dimen/dp_56"
+            android:layout_height="wrap_content"
+            android:minHeight="@dimen/dp_56"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
             android:gravity="center_vertical"
             android:includeFontPadding="false"
             android:paddingStart="@dimen/dp_16"
@@ -49,6 +52,17 @@
                     android:textSize="@dimen/sp_28"
                     android:textStyle="bold" />
 
+                <ImageView
+                    android:id="@+id/ivProfileAvatar"
+                    android:layout_width="@dimen/dp_80"
+                    android:layout_height="@dimen/dp_80"
+                    android:layout_gravity="center"
+                    android:background="@drawable/bg_dashboard_fab"
+                    android:clipToOutline="true"
+                    android:contentDescription="@string/profile_avatar_description"
+                    android:scaleType="centerCrop"
+                    android:visibility="gone" />
+
                 <ImageButton
                     android:id="@+id/btnAvatarEdit"
                     android:layout_width="@dimen/dp_28"
@@ -62,7 +76,10 @@
 
             <TextView
                 android:id="@+id/tvProfileName"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
+                android:gravity="center"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/dp_16"
                 android:includeFontPadding="false"
@@ -72,7 +89,10 @@
 
             <TextView
                 android:id="@+id/tvProfileEmail"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
+                android:gravity="center"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/dp_4"
                 android:includeFontPadding="false"
@@ -97,14 +117,18 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="@dimen/dp_66"
+            android:layout_height="wrap_content"
+            android:minHeight="@dimen/dp_66"
             android:orientation="horizontal"
             android:paddingStart="@dimen/dp_20"
             android:paddingEnd="@dimen/dp_20">
 
             <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/dp_66"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
                 android:layout_weight="1"
                 android:background="@drawable/bg_profile_stat"
                 android:gravity="center"
@@ -136,7 +160,10 @@
 
             <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/dp_66"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
                 android:layout_weight="1"
                 android:background="@drawable/bg_profile_stat"
                 android:gravity="center"
@@ -168,7 +195,10 @@
 
             <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/dp_66"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
                 android:layout_weight="1"
                 android:background="@drawable/bg_profile_stat"
                 android:gravity="center"

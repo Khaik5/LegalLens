@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.lagallens.R
 import com.example.lagallens.databinding.ItemCreditStorePackageBinding
+import com.example.lagallens.presentation.common.utils.bindPressFeedback
 import com.example.lagallens.presentation.feature.creditstore.contract.CreditPackage
 
 class CreditPackageAdapter(
@@ -27,6 +28,7 @@ class CreditPackageAdapter(
         private val binding: ItemCreditStorePackageBinding,
         private val onPackageClicked: (CreditPackage) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
+        init { binding.root.bindPressFeedback() }
         fun bind(item: CreditPackage, isLastItem: Boolean) = with(binding) {
             root.setBackgroundResource(
                 if (item.isSelected) {

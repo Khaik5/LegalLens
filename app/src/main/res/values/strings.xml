@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="credit_backend_not_configured">Ví Credit chưa thể tải hoặc thay đổi vì Backend chưa được cấu hình.</string>
+    <string name="credit_history_backend_not_configured">Lịch sử Credit chưa thể tải vì Backend chưa được cấu hình.</string>
+    <string name="profile_backend_not_configured">Hồ sơ chưa thể tải hoặc lưu vì Backend chưa được cấu hình.</string>
+    <string name="profile_demo_default_name">Người dùng DEMO</string>
     <string name="app_name">LegalLens</string>
     <string name="legal_lens_logo_description">LegalLens</string>
     <string name="home_tagline">Số hóa, phân tích và hiểu rõ hợp đồng của bạn bằng trí tuệ nhân tạo.</string>
@@ -69,9 +73,9 @@
     <string name="dashboard_greeting">Xin chào,</string>
     <string name="dashboard_user_name" translatable="false">Nguyễn Văn A</string>
     <string name="dashboard_avatar_description" translatable="false">Ảnh đại diện Nguyễn Văn A</string>
-    <string name="dashboard_total_contracts">3</string>
-    <string name="dashboard_analyzed_contracts">2</string>
-    <string name="dashboard_review_contracts">1</string>
+    <string name="dashboard_total_contracts" translatable="false">3</string>
+    <string name="dashboard_analyzed_contracts" translatable="false">2</string>
+    <string name="dashboard_review_contracts" translatable="false">1</string>
     <string name="dashboard_contracts_label">Hợp đồng</string>
     <string name="dashboard_analyzed_label">Đã phân tích</string>
     <string name="dashboard_review_label">Cần xem lại</string>
@@ -83,17 +87,17 @@
     <string name="dashboard_recent_contracts">Hợp đồng gần đây</string>
     <string name="dashboard_view_all">Xem tất cả</string>
     <string name="dashboard_office_lease" translatable="false">HĐ Thuê văn phòng tòa nhà</string>
-    <string name="dashboard_service_contract" translatable="false">HĐ Dịch vụ · 24/10/2026</string>
-    <string name="dashboard_approved" translatable="false">Đã duyệt</string>
-    <string name="dashboard_low_risk" translatable="false">Rủi ro thấp</string>
+    <string name="dashboard_service_contract">HĐ Dịch vụ · 24/10/2026</string>
+    <string name="dashboard_approved">Đã duyệt</string>
+    <string name="dashboard_low_risk">Rủi ro thấp</string>
     <string name="dashboard_collaborator_contract" translatable="false">HĐ Cộng tác viên công nghệ</string>
-    <string name="dashboard_employment_contract" translatable="false">HĐ Lao động · 23/10/2026</string>
-    <string name="dashboard_reviewing" translatable="false">Cần xem lại</string>
-    <string name="dashboard_high_risk" translatable="false">Rủi ro cao (3 cảnh báo)</string>
+    <string name="dashboard_employment_contract">HĐ Lao động · 23/10/2026</string>
+    <string name="dashboard_reviewing">Cần xem lại</string>
+    <string name="dashboard_high_risk">Rủi ro cao (3 cảnh báo)</string>
     <string name="dashboard_analyze_action">Chi tiết ›</string>
     <string name="dashboard_upcoming_dates">Ngày quan trọng sắp tới</string>
-    <string name="dashboard_probation_end" translatable="false">Kết thúc thử việc</string>
-    <string name="dashboard_probation_date" translatable="false">HĐ Cộng tác viên · Còn 12 ngày</string>
+    <string name="dashboard_probation_end">Kết thúc thử việc</string>
+    <string name="dashboard_probation_date">HĐ Cộng tác viên · Còn 12 ngày</string>
     <string name="menu_home">Trang chủ</string>
     <string name="menu_contracts">Hợp đồng</string>
     <string name="menu_calendar">Lịch</string>
@@ -104,12 +108,12 @@
     <string name="notification_filter_analysis">Phân tích</string>
     <string name="notification_filter_ocr">OCR</string>
     <string name="notification_filter_reminder">Lịch hẹn</string>
-    <string name="notification_analysis_complete_title" translatable="false">Phân tích hoàn tất: HĐ Thuê Bitexco</string>
-    <string name="notification_analysis_complete_description" translatable="false">Hợp đồng thuê văn phòng tòa nhà Bitexco đã được phân tích thành công với mức rủi ro Thấp.</string>
-    <string name="notification_ocr_review_title" translatable="false">OCR cần kiểm tra: HĐ Lao động CTV</string>
-    <string name="notification_ocr_review_description" translatable="false">Một số chữ ký bị mờ trong bản scan của HĐ Cộng tác viên công nghệ cần bạn xác nhận thủ công.</string>
-    <string name="notification_expiring_title" translatable="false">Sắp hết hạn: HĐ Bitexco</string>
-    <string name="notification_expiring_description" translatable="false">Hợp đồng thuê văn phòng tòa nhà Bitexco sẽ chính thức hết hạn sau 3 ngày tới. Cân nhắc gia hạn.</string>
+    <string name="notification_analysis_complete_title">Phân tích hoàn tất: HĐ lao động mẫu</string>
+    <string name="notification_analysis_complete_description">Bản phân tích DEMO của hợp đồng lao động đã sẵn sàng để xem.</string>
+    <string name="notification_ocr_review_title">OCR cần kiểm tra: HĐ lao động xác định thời hạn</string>
+    <string name="notification_ocr_review_description">Bản trích xuất DEMO của hợp đồng lao động đang chờ bạn kiểm tra.</string>
+    <string name="notification_expiring_title">Thông báo về hợp đồng lao động</string>
+    <string name="notification_expiring_description">Đây là thông báo DEMO. App chưa theo dõi ngày hết hạn hợp đồng.</string>
     <string name="notification_document_ready_title" translatable="false">Tài liệu đã sẵn sàng</string>
     <string name="notification_document_ready_description" translatable="false">Báo cáo phân tích rủi ro định dạng PDF đã được xuất thành công và sẵn sàng để tải xuống.</string>
     <string name="notification_maintenance_title" translatable="false">Bảo trì hệ thống</string>
@@ -198,6 +202,9 @@
     <string name="profile_password_confirmation_mismatch">Mật khẩu xác nhận không khớp.</string>
     <string name="profile_password_backend_unavailable">Cập nhật mật khẩu sẽ được kết nối khi backend sẵn sàng.</string>
     <string name="profile_password_requirements_not_met">Mật khẩu mới chưa đáp ứng yêu cầu bảo mật.</string>
+    <string name="profile_password_current_incorrect">Mật khẩu hiện tại không đúng.</string>
+    <string name="profile_password_updated">Đã cập nhật mật khẩu DEMO.</string>
+    <string name="profile_password_same_as_current">Mật khẩu mới phải khác mật khẩu hiện tại.</string>
     <string name="add_contract">Thêm hợp đồng</string>
     <string name="unavailable_feature_title">%1$s</string>
     <string name="unavailable_feature_message">Màn hình này sẽ được kết nối khi feature tương ứng hoàn tất.</string>
@@ -233,6 +240,7 @@
     <string name="contract_processing_status">Đang xử lý</string>
     <string name="contract_draft_status">Nháp</string>
     <string name="contract_low_risk">Rủi ro: Thấp</string>
+    <string name="contract_medium_risk">Rủi ro: Trung bình</string>
     <string name="contract_high_risk">Rủi ro: Cao</string>
     <string name="contract_not_analyzed_risk">Rủi ro: Chưa phân tích</string>
     <string name="contract_view_detail">Chi tiết ›</string>
@@ -346,10 +354,17 @@
     <string name="contract_search_recent_labor" translatable="false">Hợp đồng lao động mẫu</string>
     <string name="contract_search_recent_equipment" translatable="false">Thiết bị văn phòng</string>
     <string name="contract_search_results">KẾT QUẢ TÌM KIẾM (%1$d)</string>
-    <string name="contract_search_default_query" translatable="false">Hợp đồng thuê</string>
+    <string name="contract_search_default_query" translatable="false">Hợp đồng lao động</string>
     <string name="contract_vehicle_lease" translatable="false">HĐ Thuê xe đưa đón nhân viên</string>
     <string name="contract_office_lease_search_subtitle" translatable="false">Dịch vụ · 24/10/2026</string>
     <string name="contract_vehicle_lease_search_subtitle" translatable="false">Dịch vụ · 10/10/2026</string>
+    <string name="contract_demo_labor_indefinite">Hợp đồng lao động không xác định thời hạn · DEMO</string>
+    <string name="contract_demo_labor_fixed_term">Hợp đồng lao động xác định thời hạn · DEMO</string>
+    <string name="contract_demo_labor_probation">Thỏa thuận thử việc · DEMO</string>
+    <string name="contract_demo_labor_part_time">Hợp đồng lao động bán thời gian · DEMO</string>
+    <string name="contract_demo_labor_subtitle">Hợp đồng lao động · Dữ liệu minh họa</string>
+    <string name="ocr_review_document_text_title">Nội dung văn bản đã nhận dạng · có thể chỉnh sửa</string>
+    <string name="ocr_review_empty_document">Văn bản đang trống. Thêm nội dung trước khi lưu hợp đồng.</string>
     <string name="contract_detail_title">Chi tiết hợp đồng</string>
     <string name="contract_detail_back_description">Quay lại danh sách hợp đồng</string>
     <string name="contract_detail_type">Hợp đồng dịch vụ thuê tài sản</string>
@@ -380,12 +395,12 @@
     <string name="contract_detail_delete_dialog_title">Xóa hợp đồng?</string>
     <string name="contract_detail_delete_dialog_message">Hành động này sẽ xóa vĩnh viễn tệp hợp đồng và toàn bộ dữ liệu phân tích AI liên quan. Bạn không thể hoàn tác hành động này.</string>
     <string name="contract_detail_delete_forever">Xóa vĩnh viễn</string>
-    <string name="contract_detail_type_service" translatable="false">Hợp đồng dịch vụ thuê tài sản</string>
-    <string name="contract_detail_type_employment" translatable="false">Hợp đồng lao động</string>
-    <string name="contract_detail_type_commercial" translatable="false">Hợp đồng thương mại</string>
+    <string name="contract_detail_type_service">Hợp đồng dịch vụ thuê tài sản</string>
+    <string name="contract_detail_type_employment">Hợp đồng lao động</string>
+    <string name="contract_detail_type_commercial">Hợp đồng thương mại</string>
     <string name="contract_detail_office_created_at" translatable="false">20/10/2026</string>
     <string name="contract_detail_office_updated_at" translatable="false">24/10/2026</string>
-    <string name="contract_detail_office_page_count" translatable="false">12 trang</string>
+    <string name="contract_detail_office_page_count">12 trang</string>
     <string name="contract_detail_office_file_format" translatable="false">PDF (Scan)</string>
     <string name="contract_detail_collaborator_created_at" translatable="false">18/10/2026</string>
     <string name="contract_detail_collaborator_updated_at" translatable="false">23/10/2026</string>
@@ -442,7 +457,7 @@
     <string name="analysis_result_score_label">/100</string>
     <string name="analysis_result_risk_heading">Đánh giá rủi ro:</string>
     <string name="analysis_result_medium">Trung bình</string>
-    <string name="analysis_result_risk_assessment_description" translatable="false">Hợp đồng có một vài điều khoản cần thương thảo lại để đảm bảo quyền lợi tốt nhất.</string>
+    <string name="analysis_result_risk_assessment_description">Hợp đồng có một vài điều khoản cần thương thảo lại để đảm bảo quyền lợi tốt nhất.</string>
     <string name="analysis_result_key_facts">Key Facts</string>
     <string name="analysis_result_risks">Rủi ro</string>
     <string name="analysis_result_references">Tham chiếu</string>
@@ -462,8 +477,8 @@
     <string name="analysis_risk_overview_title">Đánh giá rủi ro</string>
     <string name="analysis_risk_overview_back_content_description">Quay lại</string>
     <string name="analysis_risk_overview_more_content_description">Thêm tùy chọn</string>
-    <string name="analysis_risk_overview_description" translatable="false">Hợp đồng này chứa một số điều khoản bất lợi về phạt vi phạm và bồi thường thiệt hại. Cần đàm phán lại.</string>
-    <string name="analysis_risk_overview_summary_title" translatable="false">Tổng hợp phát hiện (3 rủi ro)</string>
+    <string name="analysis_risk_overview_description">Hợp đồng này chứa một số điều khoản bất lợi về phạt vi phạm và bồi thường thiệt hại. Cần đàm phán lại.</string>
+    <string name="analysis_risk_overview_summary_title">Tổng hợp phát hiện (3 rủi ro)</string>
     <string name="analysis_risk_overview_high_risk">Rủi ro cao</string>
     <string name="analysis_risk_overview_low_risk">Rủi ro thấp</string>
     <string name="analysis_risk_overview_disclaimer"><b>Khước từ trách nhiệm:</b> Kết quả phân tích được thực hiện bởi AI và chỉ mang tính chất tham khảo pháp lý, không thay thế cho tư vấn từ luật sư chuyên nghiệp.</string>
@@ -661,8 +676,9 @@
     <string name="analysis_risk_citation_return">Quay lại phân tích rủi ro</string>
     <string name="chatbot_back_content_description">Mở điều hướng hội thoại</string>
     <string name="chatbot_more_content_description">Tùy chọn hội thoại</string>
-    <string name="chatbot_default_contract_name" translatable="false">HĐ Thuê VP Bitexco</string>
-    <string name="chatbot_default_contract_type" translatable="false">Hợp đồng Thuê văn phòng</string>
+    <string name="chatbot_default_contract_name" translatable="false">HĐ Lao động mẫu</string>
+    <string name="chatbot_default_source_name" translatable="false">HĐ Thuê văn phòng tòa nhà Bitexco</string>
+    <string name="chatbot_default_contract_type" translatable="false">Hợp đồng lao động</string>
     <string name="chatbot_attach_content_description">Đính kèm tệp</string>
     <string name="chatbot_send_content_description">Gửi tin nhắn</string>
     <string name="chatbot_input_hint">Hỏi về điều khoản hợp đồng...</string>
@@ -679,6 +695,71 @@
     <string name="chatbot_history_back_content_description">Quay lại trò chuyện</string>
     <string name="chatbot_history_search_content_description">Tìm kiếm lịch sử trò chuyện</string>
     <string name="chatbot_history_search_unavailable">Tìm kiếm sẽ khả dụng khi đồng bộ hội thoại được kết nối.</string>
+    <string name="chatbot_document_uploaded_read_only">PDF đã tải lên · Chỉ đọc</string>
+    <string name="chatbot_document_original">Hợp đồng gốc</string>
+    <string name="chatbot_new_chat_title">Bắt đầu cuộc trò chuyện mới</string>
+    <string name="chatbot_new_chat_description">Hỏi về hợp đồng gốc hoặc tạo một bản nháp độc lập.</string>
+    <string name="chatbot_new_draft_from_document">Tạo hợp đồng mới từ tài liệu này</string>
+    <string name="chatbot_new_chat_term_question">Thời hạn hợp đồng là bao lâu?</string>
+    <string name="chatbot_new_chat_rights_question">Quyền và nghĩa vụ của tôi là gì?</string>
+    <string name="chatbot_grounded_answer_notice">Câu trả lời sẽ dẫn chiếu tài liệu khi có căn cứ. Nếu thông tin chưa có, AI sẽ yêu cầu bổ sung.</string>
+    <string name="chatbot_draft_request">Tạo hợp đồng thuê văn phòng mới từ tài liệu này, thời hạn 24 tháng thay vì 36 tháng.</string>
+    <string name="chatbot_draft_header_subtitle">Tạo hợp đồng mới</string>
+    <string name="chatbot_draft_reference_badge">Tham chiếu: Hợp đồng gốc</string>
+    <string name="chatbot_draft_preparing">Đang chuẩn bị yêu cầu</string>
+    <string name="chatbot_draft_check_notice">Bản nháp cần được bạn kiểm tra; chưa đủ thông tin để ký.</string>
+    <string name="chatbot_draft_clarification">Bạn muốn tính 24 tháng từ ngày nào? Thông tin bên thuê, giá thuê, tiền đặt cọc và mặt bằng cho hợp đồng mới có thay đổi không?</string>
+    <string name="chatbot_draft_sample_details">Tính từ ngày bàn giao. Tôi chưa có thông tin các bên, địa chỉ cụ thể, giá thuê và tiền cọc; hãy để trong [ngoặc vuông] để bổ sung sau.</string>
+    <string name="chatbot_draft_acknowledgement">Tôi sẽ tạo bản nháp mới 24 tháng từ ngày bàn giao, ghi rõ các mục còn thiếu. Hợp đồng gốc 36 tháng được giữ nguyên.</string>
+    <string name="chatbot_draft_review_prompt">Vui lòng kiểm tra yêu cầu trước khi tạo bản nháp.</string>
+    <string name="chatbot_draft_review_action">Xem lại yêu cầu</string>
+    <string name="chatbot_draft_review_title">Yêu cầu tạo hợp đồng</string>
+    <string name="chatbot_draft_contract_type_label">LOẠI HỢP ĐỒNG</string>
+    <string name="chatbot_draft_contract_type_value">Thuê văn phòng</string>
+    <string name="chatbot_draft_source_label">TÀI LIỆU THAM CHIẾU</string>
+    <string name="chatbot_draft_source_status">Hợp đồng gốc · Chỉ đọc</string>
+    <string name="chatbot_draft_changes_title">Thay đổi chính</string>
+    <string name="chatbot_draft_change_term">• Thời hạn đề xuất: 24 tháng từ bàn giao, thay cho 36 tháng của bản gốc.</string>
+    <string name="chatbot_draft_change_missing">• Các bên, mặt bằng, giá thuê và tiền cọc để [chưa cung cấp].</string>
+    <string name="chatbot_draft_warning">Không sao chép thông tin chưa được xác nhận. Chưa sẵn sàng để ký.</string>
+    <string name="chatbot_draft_create_action">Tạo bản nháp</string>
+    <string name="chatbot_draft_edit_action">Chỉnh sửa yêu cầu</string>
+    <string name="chatbot_draft_local_only">Đây là bản xem trước mẫu. Chưa có bản nháp nào được lưu.</string>
+    <string name="chatbot_generation_request">Tạo bản nháp thuê 24 tháng từ ngày bàn giao. Để thông tin chưa có trong [ngoặc vuông].</string>
+    <string name="chatbot_generation_confirmed">YÊU CẦU MẪU ĐÃ XÁC NHẬN</string>
+    <string name="chatbot_generation_source">Tham chiếu: %1$s · Hợp đồng gốc 36 tháng.</string>
+    <string name="chatbot_generation_original_badge">Bản mới · Không ghi đè bản gốc</string>
+    <string name="chatbot_generation_loading_title">Đang chuẩn bị bản nháp mẫu</string>
+    <string name="chatbot_generation_loading_body">Đang soạn các điều khoản theo yêu cầu 24 tháng và đánh dấu thông tin cần bổ sung.</string>
+    <string name="chatbot_generation_loading_step">Đang kiểm tra tính nhất quán giữa thời hạn và điều khoản chấm dứt.</string>
+    <string name="chatbot_generation_loading_note">Bạn không cần gửi lại yêu cầu. Hợp đồng gốc được giữ nguyên.</string>
+    <string name="chatbot_generation_error">Chưa tạo được bản nháp do kết nối bị gián đoạn. Yêu cầu và câu trả lời của bạn vẫn được giữ lại.</string>
+    <string name="chatbot_generation_retry">Thử lại</string>
+    <string name="chatbot_generation_error_note">Thử lại với cùng yêu cầu 24 tháng; chưa có bản nháp nào được tạo hoặc lưu.</string>
+    <string name="chatbot_generation_success">Bản nháp mẫu D1 đã sẵn sàng. Hợp đồng gốc không thay đổi.</string>
+    <string name="chatbot_generation_result_name">HĐ Thuê văn phòng Bitexco · D1</string>
+    <string name="chatbot_generation_result_metadata">Mẫu minh họa · Thời hạn 24 tháng</string>
+    <string name="chatbot_generation_result_badge">Bản nháp mẫu · Chưa lưu</string>
+    <string name="chatbot_generation_result_warning">Còn thông tin cần bổ sung. Rà soát nội dung trước khi lưu hoặc xuất.</string>
+    <string name="chatbot_generation_view_draft">Xem bản nháp</string>
+    <string name="chatbot_generation_preview_title">Bản nháp D1 · Minh họa</string>
+    <string name="chatbot_generation_preview_body">Dữ liệu minh họa cố định, chưa phân tích nội dung bạn nhập. Bản mẫu chưa được lưu và chưa phải hợp đồng hoàn chỉnh.\n\nLoại hợp đồng: Thuê văn phòng\nThời hạn dự kiến: 24 tháng từ ngày bàn giao\nCác bên, địa chỉ, giá thuê và tiền cọc: [chưa cung cấp]\n\nHợp đồng gốc được giữ nguyên.</string>
+    <string name="chatbot_generation_preview_close">Đóng</string>
+    <string name="chatbot_attachment_sheet_title">Đính kèm tài liệu</string>
+    <string name="chatbot_attachment_sheet_notice">Tài liệu bổ sung chỉ dùng làm tham chiếu cho yêu cầu mới; không thay thế hợp đồng gốc.</string>
+    <string name="chatbot_attachment_pdf_action">Chọn tệp PDF</string>
+    <string name="chatbot_attachment_camera_action">Chụp tài liệu</string>
+    <string name="chatbot_attachment_saved_action">Chọn từ hợp đồng đã lưu</string>
+    <string name="chatbot_attachment_cancel_action">Hủy</string>
+    <string name="chatbot_attachment_saved_unavailable">Chọn hợp đồng đã lưu sẽ khả dụng khi kho hợp đồng được kết nối.</string>
+    <string name="chatbot_history_today">Hôm nay</string>
+    <string name="chatbot_history_draft_badge">Yêu cầu tạo bản nháp</string>
+    <string name="chatbot_history_draft_preview">Thuê 24 tháng từ ngày bàn giao. Thông tin còn thiếu để trong [ngoặc vuông].</string>
+    <string name="chatbot_history_previous_timestamp">Trước đó · Hỏi đáp tài liệu gốc</string>
+    <string name="chatbot_history_previous_preview">Theo Điều 3.1, thời hạn thuê là 36 tháng...</string>
+    <string name="chatbot_history_preservation_note">Cuộc trò chuyện mới không xóa lịch sử hay hợp đồng gốc.</string>
+    <string name="chatbot_history_new_conversation">Cuộc trò chuyện mới</string>
+    <string name="chatbot_history_continue">Tiếp tục cuộc trò chuyện</string>
     <string name="chatbot_history_first_title" translatable="false">HĐ Thuê VP Bitexco</string>
     <string name="chatbot_history_first_timestamp" translatable="false">Hôm nay · 09:41</string>
     <string name="chatbot_history_first_count" translatable="false">8 tin nhắn</string>
@@ -741,20 +822,20 @@
     <string name="credit_store_top_up_action">Nạp Credit</string>
     <string name="credit_store_select_package">Chọn gói nạp</string>
     <string name="credit_store_package_5_title" translatable="false">5 Credits</string>
-    <string name="credit_store_package_5_description" translatable="false">Minh họa: 29.000đ</string>
+    <string name="credit_store_package_5_description">Minh họa: 29.000đ</string>
     <string name="credit_store_package_15_title" translatable="false">15 Credits</string>
-    <string name="credit_store_package_15_description" translatable="false">Minh họa: 79.000đ · Phổ biến nhất</string>
+    <string name="credit_store_package_15_description">Minh họa: 79.000đ · Phổ biến nhất</string>
     <string name="credit_store_package_30_title" translatable="false">30 Credits</string>
-    <string name="credit_store_package_30_description" translatable="false">Minh họa: 149.000đ</string>
+    <string name="credit_store_package_30_description">Minh họa: 149.000đ</string>
     <string name="credit_store_package_100_title" translatable="false">100 Credits</string>
-    <string name="credit_store_package_100_description" translatable="false">Minh họa: 449.000đ</string>
+    <string name="credit_store_package_100_description">Minh họa: 449.000đ</string>
     <string name="credit_store_history_title">Lịch sử giao dịch</string>
     <string name="credit_store_view_all">Xem tất cả</string>
     <string name="credit_store_history_purchase_title">Mua Credit</string>
-    <string name="credit_store_history_purchase_description" translatable="false">15 Credits · Minh họa: 79.000đ</string>
+    <string name="credit_store_history_purchase_description">15 Credits · Minh họa: 79.000đ</string>
     <string name="credit_store_history_purchase_amount" translatable="false">+15</string>
     <string name="credit_store_history_unlock_title">Mở khóa kết quả</string>
-    <string name="credit_store_history_unlock_description" translatable="false">Phân tích hợp đồng · 2 Credits</string>
+    <string name="credit_store_history_unlock_description">Phân tích hợp đồng · 2 Credits</string>
     <string name="credit_store_history_unlock_amount" translatable="false">−2</string>
     <string name="unlock_confirmation_title">Xác nhận mở khóa</string>
     <string name="unlock_confirmation_back_description">Quay lại</string>
@@ -785,7 +866,7 @@
     <string name="unlock_success_view_result">Xem kết quả</string>
     <string name="credit_flow_back">Quay lại</string>
     <string name="credit_flow_unlocked_title">Phân tích rủi ro</string>
-    <string name="credit_flow_unlocked_status" translatable="false">KQ-1042 · ĐÃ MỞ KHÓA</string>
+    <string name="credit_flow_unlocked_status">KQ-1042 · ĐÃ MỞ KHÓA</string>
     <string name="credit_flow_unlocked_summary" translatable="false" formatted="false">Đã mở toàn bộ kết quả · −2 Credits\nSố dư: 3 Credits · Xem lại miễn phí vĩnh viễn</string>
     <string name="credit_flow_legal_warning" translatable="false">Cảnh báo pháp lý quan trọng: điều khoản chấm dứt hợp đồng thiếu thời gian báo trước rõ ràng; khoản phạt và nghĩa vụ hoàn trả cần làm rõ trước khi ký.</string>
     <string name="credit_flow_risk_summary">Tóm tắt rủi ro</string>
@@ -805,7 +886,7 @@
     <string name="credit_flow_recommendation_two" translatable="false">Làm rõ cơ sở tính khoản phạt, nghĩa vụ hoàn trả và điều kiện áp dụng trước khi ký.</string>
     <string name="credit_flow_recommendation_three" translatable="false">Rà soát lại điều khoản thanh toán, gia hạn và chấm dứt để đảm bảo quyền lợi của bên thuê.</string>
     <string name="credit_flow_recommendation_items" translatable="false" formatted="false">•  Bổ sung thời gian báo trước cụ thể cho điều khoản chấm dứt để tránh tranh chấp.\n\n•  Làm rõ cơ sở tính khoản phạt, nghĩa vụ hoàn trả và điều kiện áp dụng trước khi ký.\n\n•  Rà soát lại điều khoản thanh toán, gia hạn và chấm dứt để đảm bảo quyền lợi của bên thuê.</string>
-    <string name="credit_flow_unlocked_note" translatable="false">Kết quả này đã mở khóa hoàn chỉnh. Bạn có thể xem lại miễn phí, không cần Credit lần nữa.</string>
+    <string name="credit_flow_unlocked_note">Kết quả này đã mở khóa hoàn chỉnh. Bạn có thể xem lại miễn phí, không cần Credit lần nữa.</string>
     <string name="credit_flow_view_analysis_history">Về lịch sử phân tích</string>
     <string name="credit_flow_insufficient_title">Mở kết quả AI</string>
     <string name="credit_flow_insufficient_heading">Không đủ Credit để mở khóa</string>
@@ -820,7 +901,7 @@
     <string name="credit_flow_insufficient_note">Chưa trừ Credit nào. Credit chỉ trừ sau khi bạn xác nhận mở kết quả.</string>
     <string name="credit_flow_risk_warning_title">Cảnh báo rủi ro quan trọng</string>
     <string name="credit_flow_risk_warning_body" translatable="false">Điều khoản chấm dứt hợp đồng có thể thiếu báo trước, ảnh hưởng đến quyền lợi của bên thuê.</string>
-    <string name="credit_flow_preview_note" translatable="false" formatted="false">Bạn vẫn dùng tất cả chức năng và xem trước 40% kết quả mới khi hết Credit.</string>
+    <string name="credit_flow_preview_note" formatted="false">Bạn vẫn dùng tất cả chức năng và xem trước 40% kết quả mới khi hết Credit.</string>
     <string name="credit_flow_go_to_store">Đến Cửa hàng Credit</string>
     <string name="credit_flow_continue_free">Tiếp tục xem miễn phí</string>
     <string name="credit_flow_purchase_title">Xác nhận mua Credit</string>
@@ -828,14 +909,14 @@
     <string name="credit_flow_purchase_description">Nạp Credit để mở toàn bộ nội dung kết quả khi cần. Tất cả chức năng luôn được sử dụng không giới hạn.</string>
     <string name="credit_flow_current_balance">Số dư hiện tại</string>
     <string name="credit_flow_selected_package">Gói Credit đã chọn</string>
-    <string name="credit_flow_package_description" translatable="false">Phổ biến nhất · Không hết hạn</string>
+    <string name="credit_flow_package_description">Phổ biến nhất · Không hết hạn</string>
     <string name="credit_flow_transaction_summary">Tóm tắt giao dịch</string>
     <string name="credit_flow_selected_purchase">Gói mua đã chọn</string>
     <string name="credit_flow_transaction_amount">Số tiền giao dịch</string>
     <string name="credit_flow_balance_after_transaction">Số dư sau giao dịch</string>
     <string name="credit_flow_expected_balance_note">Số dư dự kiến sau khi thanh toán thành công. Mua Credit không tự mở khóa kết quả.</string>
-    <string name="credit_flow_payment_method" translatable="false" formatted="false">Phương thức thanh toán\nChuyển khoản ngân hàng · Thay đổi</string>
-    <string name="credit_flow_purchase_note" translatable="false">Bạn chỉ trả Credit khi chủ động xác nhận mở khóa. Kết quả đã mở được xem lại miễn phí vĩnh viễn.\n\nGiao dịch chưa được xác nhận. Giá minh họa; có thể cấu hình.</string>
+    <string name="credit_flow_payment_method" formatted="false">Phương thức thanh toán\nChuyển khoản ngân hàng · Thay đổi</string>
+    <string name="credit_flow_purchase_note">Bạn chỉ trả Credit khi chủ động xác nhận mở khóa. Kết quả đã mở được xem lại miễn phí vĩnh viễn.\n\nGiao dịch chưa được xác nhận. Giá minh họa; có thể cấu hình.</string>
     <string name="credit_flow_pay" translatable="false">Thanh toán 79.000đ</string>
     <string name="credit_flow_history_title">Lịch sử Credit</string>
     <string name="credit_flow_credit_never_expires">Credit không hết hạn</string>
@@ -843,9 +924,13 @@
     <string name="credit_flow_tab_all">Tất cả</string>
     <string name="credit_flow_tab_purchase">Mua</string>
     <string name="credit_flow_tab_usage">Sử dụng</string>
-    <string name="credit_flow_history_count" translatable="false">6 giao dịch minh họa</string>
+    <string name="credit_flow_history_count">%1$d giao dịch</string>
+    <string name="credit_history_empty">Chưa có giao dịch nào.</string>
+    <string name="credit_history_row">%1$s%2$d Credits · %3$s\n%4$s</string>
+    <string name="credit_history_purchase_detail">Mã gói %1$s · %2$d₫</string>
+    <string name="credit_history_usage_detail">Mã giao dịch %1$s</string>
     <string name="credit_flow_history_dates" translatable="false">13–15/10/2026</string>
-    <string name="credit_flow_history_unlock_one" translatable="false">Mở kết quả · KQ-1041</string>
+    <string name="credit_flow_history_unlock_one">Mở kết quả · KQ-1041</string>
     <string name="credit_flow_history_unlock_two" translatable="false">Mở kết quả · KQ-1040</string>
     <string name="credit_flow_history_unlock_three" translatable="false">Mở kết quả · KQ-1039</string>
     <string name="credit_flow_history_unlock_four" translatable="false">Mở kết quả · KQ-1038</string>
@@ -861,22 +946,22 @@
     <string name="credit_flow_pending_status">Chờ xác nhận</string>
     <string name="credit_flow_credit_pending">Credit chờ cộng</string>
     <string name="credit_flow_pending_note">Không thanh toán lại khi giao dịch đang xử lý để tránh tạo thêm giao dịch. Vui lòng chờ xác nhận.</string>
-    <string name="credit_flow_pending_footer" translatable="false" formatted="false">KQ-1042 vẫn ở trạng thái xem trước 40%. Mua Credit không tự mở khóa kết quả.</string>
+    <string name="credit_flow_pending_footer" formatted="false">KQ-1042 vẫn ở trạng thái xem trước 40%. Mua Credit không tự mở khóa kết quả.</string>
     <string name="credit_flow_pending_button">Đang chờ xác nhận…</string>
     <string name="credit_flow_pending_hint">Bạn không cần thanh toán lại.</string>
     <string name="credit_flow_success_title">Mua Credit thành công</string>
-    <string name="credit_flow_success_heading" translatable="false">Đã cộng 15 Credits</string>
-    <string name="credit_flow_success_description">Thanh toán thành công. Credit đã được cộng vào tài khoản và không hết hạn.</string>
+    <string name="credit_flow_success_heading">Đã cộng %1$d Credits</string>
+    <string name="credit_flow_success_description">Thanh toán DEMO đã mô phỏng. Không phát sinh thanh toán thật; số dư credit mẫu được lưu trên thiết bị.</string>
     <string name="credit_flow_receipt">Biên nhận giao dịch</string>
     <string name="credit_flow_credits_purchased">Credit đã mua</string>
     <string name="credit_flow_balance_before_purchase">Số dư trước khi mua</string>
     <string name="credit_flow_confirmation_time">Thời gian xác nhận</string>
     <string name="credit_flow_transaction_id">Mã giao dịch</string>
-    <string name="credit_flow_pending_result" translatable="false">Kết quả đang chờ mở · KQ-1042</string>
+    <string name="credit_flow_pending_result">Kết quả đang chờ mở · KQ-1042</string>
     <string name="credit_flow_result_status">Trạng thái</string>
-    <string name="credit_flow_preview_status" translatable="false" formatted="false">Xem trước 40%</string>
+    <string name="credit_flow_preview_status" formatted="false">Xem trước 40%</string>
     <string name="credit_flow_unlock_cost">Chi phí mở kết quả này</string>
-    <string name="credit_flow_success_note" translatable="false">Mua Credit không tự mở khóa kết quả. Quay về KQ-1042 và chủ động xác nhận riêng để mở toàn bộ; khi đó mới trừ 2 Credits.</string>
+    <string name="credit_flow_success_note">Mua Credit không tự mở khóa kết quả. Quay về KQ-1042 và chủ động xác nhận riêng để mở toàn bộ; khi đó mới trừ 2 Credits.</string>
     <string name="credit_flow_return_to_unlock">Về kết quả để xác nhận mở</string>
     <string name="credit_flow_view_credit_history">Xem lịch sử Credit</string>
 
@@ -891,4 +976,15 @@
     <string name="credit_hub_unlock_title">Mở khóa kết quả</string>
     <string name="credit_hub_unlock_description">Xem các kết quả phân tích chưa mở khóa</string>
     <string name="credit_hub_info">Bạn được xem miễn phí 40% kết quả phân tích AI. Sử dụng Credit để mở khóa 100% nội dung. Kết quả đã mở khóa có thể xem lại mà không cần trả thêm Credit.</string>
+    <string name="credit_flow_return_to_hub">Về Credit của tôi</string>
+    <string name="credit_purchase_pay_amount">Thanh toán %1$s</string>
+    <string name="credit_purchase_added">+%1$d Credits</string>
+    <string name="credit_purchase_pending_note">Chỉ cộng %1$d Credits sau khi thanh toán được xác nhận thành công.</string>
+    <string name="credit_purchase_no_expiry">Không hết hạn</string>
+    <string name="credit_receipt_purchased">Credit đã mua</string>
+    <string name="credit_receipt_amount">Số tiền đã thanh toán</string>
+    <string name="credit_receipt_before">Số dư trước khi mua</string>
+    <string name="credit_receipt_after">Số dư hiện tại</string>
+    <string name="credit_sample_price">Giá minh họa</string>
+    <string name="credit_time_submitted">Thời gian gửi</string>
 </resources>

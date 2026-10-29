@@ -4,7 +4,10 @@ import androidx.annotation.StringRes
 import com.example.lagallens.R
 
 data class OcrReviewUiState(
-    val warnings: List<OcrReviewWarning> = OcrReviewSample.warnings
+    val warnings: List<OcrReviewWarning> = OcrReviewSample.warnings,
+    val documentId: String = "",
+    val contractId: String? = null,
+    val documentText: String = ""
 )
 
 data class OcrReviewWarning(

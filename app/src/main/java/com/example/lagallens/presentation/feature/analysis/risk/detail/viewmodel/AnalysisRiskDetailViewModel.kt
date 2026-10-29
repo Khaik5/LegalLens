@@ -9,6 +9,8 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import com.example.lagallens.presentation.feature.analysis.risk.findings.contract.AnalysisRiskFindingsUiState
 import kotlinx.coroutines.launch
 
 class AnalysisRiskDetailViewModel : ViewModel() {
@@ -17,6 +19,21 @@ class AnalysisRiskDetailViewModel : ViewModel() {
 
     private val _uiEffect = MutableSharedFlow<AnalysisRiskDetailUiEffect>()
     val uiEffect = _uiEffect.asSharedFlow()
+
+    fun loadFinding(id: String) {
+        val finding = AnalysisRiskFindingsUiState.allFindings.find { it.id == id } ?: return
+        if (id == "penalty-cap") return
+        _uiState.update { it.copy(
+            isDetailedExample = false,
+            severityRes = finding.severity.labelRes,
+            severityBackgroundRes = finding.severity.badgeBackgroundRes,
+            severityColorRes = finding.severity.labelColorRes,
+            titleRes = finding.titleRes,
+            attentionReasonRes = finding.consequenceRes,
+            clauseReferenceRes = finding.clauseRes,
+            clauseExcerptRes = finding.descriptionRes
+        ) }
+    }
 
     fun onEvent(event: AnalysisRiskDetailUiEvent) {
         when (event) {

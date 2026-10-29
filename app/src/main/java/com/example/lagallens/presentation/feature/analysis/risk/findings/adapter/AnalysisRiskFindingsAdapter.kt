@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.lagallens.databinding.ItemAnalysisRiskFindingBinding
+import com.example.lagallens.presentation.common.utils.bindPressFeedback
 import com.example.lagallens.presentation.feature.analysis.risk.findings.model.AnalysisRiskFinding
 
 class AnalysisRiskFindingsAdapter(
@@ -29,6 +30,7 @@ class AnalysisRiskFindingsAdapter(
         private val binding: ItemAnalysisRiskFindingBinding,
         private val onFindingClicked: (String) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
+        init { binding.root.bindPressFeedback() }
         fun bind(item: AnalysisRiskFinding) = with(binding) {
             analysisRiskFindingSeverity.setText(item.severity.labelRes)
             analysisRiskFindingSeverity.setBackgroundResource(item.severity.badgeBackgroundRes)

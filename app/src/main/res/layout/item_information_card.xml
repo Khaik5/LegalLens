@@ -1,0 +1,4 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/dp_16" android:background="@drawable/bg_contract_search_result" android:orientation="vertical" android:padding="@dimen/dp_16">
+    <TextView android:id="@+id/informationCardTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/legal_lens_primary" android:textSize="@dimen/sp_15" android:textStyle="bold" />
+    <TextView android:id="@+id/informationCardBody" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/dp_8" android:lineSpacingExtra="@dimen/dp_2" android:textColor="@color/legal_lens_secondary_text" android:textSize="@dimen/sp_13" />
+</LinearLayout>

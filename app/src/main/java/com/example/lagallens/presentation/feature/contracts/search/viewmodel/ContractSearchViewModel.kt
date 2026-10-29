@@ -4,6 +4,8 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.lagallens.R
+import com.example.lagallens.LegalLensApplication
+import com.example.lagallens.domain.model.EmploymentContract
 import com.example.lagallens.presentation.feature.contracts.search.contract.ContractSearchResult
 import com.example.lagallens.presentation.feature.contracts.search.contract.ContractSearchUiEffect
 import com.example.lagallens.presentation.feature.contracts.search.contract.ContractSearchUiEvent
@@ -14,19 +16,37 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.CancellationException
 
 class ContractSearchViewModel(application: Application) : AndroidViewModel(application) {
     private val initialQuery = application.getString(R.string.contract_search_default_query)
     private val _uiState = MutableStateFlow(
         ContractSearchUiState(
-            query = initialQuery,
-            results = ContractSearchResult.samples.filter { it.matches(initialQuery) }
+            query = initialQuery
         )
     )
     val uiState = _uiState.asStateFlow()
 
     private val _uiEffect = MutableSharedFlow<ContractSearchUiEffect>()
     val uiEffect = _uiEffect.asSharedFlow()
+
+    private var contracts: List<EmploymentContract> = emptyList()
+
+    init {
+        viewModelScope.launch {
+            try {
+                (application as LegalLensApplication).contractRepository.observeContracts().collect { observed ->
+                    contracts = observed
+                    updateQuery(_uiState.value.query)
+                }
+            } catch (cancellationException: CancellationException) {
+                throw cancellationException
+            } catch (_: Exception) {
+                contracts = emptyList()
+                updateQuery(_uiState.value.query)
+            }
+        }
+    }
 
     fun onEvent(event: ContractSearchUiEvent) {
         when (event) {
@@ -42,15 +62,29 @@ class ContractSearchViewModel(application: Application) : AndroidViewModel(appli
         _uiState.update {
             it.copy(
                 query = query,
-                results = ContractSearchResult.samples.filter { item -> item.matches(query) }
+                results = activeResults().filter { item -> item.matches(query) }
             )
         }
     }
 
     private fun ContractSearchResult.matches(query: String): Boolean {
         val normalizedQuery = query.trim().lowercase()
-        return normalizedQuery.isBlank() || searchKeywords.any { keyword ->
+        return normalizedQuery.isBlank() || titleOverride?.lowercase()?.contains(normalizedQuery) == true || searchKeywords.any { keyword ->
             keyword.contains(normalizedQuery) || normalizedQuery.contains(keyword)
+        }
+    }
+
+    private fun activeResults(): List<ContractSearchResult> {
+        val context = getApplication<Application>()
+        return contracts.map { contract ->
+            val template = ContractSearchResult.samples.firstOrNull { it.contractId == contract.id }
+                ?: ContractSearchResult.samples.first()
+            template.copy(
+                contractId = contract.id,
+                titleOverride = contract.title,
+                subtitleOverride = context.getString(R.string.contract_demo_labor_subtitle),
+                searchKeywords = listOf(contract.title, contract.content, "hợp đồng lao động", "người lao động")
+            )
         }
     }
 

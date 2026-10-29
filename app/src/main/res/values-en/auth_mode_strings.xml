@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="auth_demo_session_hint">DEMO mode: enter any email and password to continue.</string>
+    <string name="auth_backend_not_configured">The Backend is not configured for REAL mode.</string>
+</resources>

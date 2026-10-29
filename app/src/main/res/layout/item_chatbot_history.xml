@@ -2,7 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/chatbot_history_item_height"
+    android:layout_height="wrap_content"
+    android:minHeight="@dimen/chatbot_history_item_height"
     android:layout_marginBottom="@dimen/chatbot_history_item_spacing"
     android:background="@drawable/bg_chatbot_history_card"
     android:orientation="vertical"
@@ -10,53 +11,56 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/chatbot_history_row_height">
+        android:layout_height="wrap_content"
+        android:minHeight="@dimen/chatbot_history_row_height">
 
         <ImageView
             android:id="@+id/chatbotHistoryIcon"
-            android:layout_width="@dimen/chatbot_history_icon_size"
-            android:layout_height="@dimen/chatbot_history_icon_size"
-            android:background="@drawable/bg_chatbot_history_icon"
+            android:layout_width="@dimen/dp_20"
+            android:layout_height="@dimen/dp_20"
             android:contentDescription="@null"
-            android:padding="@dimen/chatbot_history_icon_padding"
             android:src="@drawable/ic_chatbot_history_message"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
+        <TextView android:fontFamily="@font/manrope"
             android:id="@+id/chatbotHistoryContractName"
             android:layout_width="0dp"
-            android:layout_height="@dimen/dp_18"
-            android:layout_marginStart="@dimen/chatbot_history_item_text_margin_start"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_8"
             android:ellipsize="end"
             android:includeFontPadding="false"
             android:maxLines="1"
             android:textColor="@color/legal_lens_primary"
             android:textSize="@dimen/sp_15"
             android:textStyle="bold"
-            app:layout_constraintEnd_toStartOf="@id/chatbotHistoryMessageCount"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/chatbotHistoryIcon"
+            app:layout_goneMarginStart="@dimen/dp_0"
             app:layout_constraintTop_toTopOf="@id/chatbotHistoryIcon" />
 
-        <TextView
+        <TextView android:fontFamily="@font/manrope"
             android:id="@+id/chatbotHistoryTimestamp"
             android:layout_width="0dp"
-            android:layout_height="@dimen/dp_18"
-            android:layout_marginTop="@dimen/chatbot_history_metadata_margin_top"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_12"
             android:ellipsize="end"
             android:includeFontPadding="false"
             android:maxLines="1"
             android:textColor="@color/legal_lens_secondary_text"
             android:textSize="@dimen/sp_13"
-            app:layout_constraintEnd_toStartOf="@id/chatbotHistoryMessageCount"
-            app:layout_constraintStart_toStartOf="@id/chatbotHistoryContractName"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/chatbotHistoryContractName" />
 
-        <TextView
+        <TextView android:fontFamily="@font/manrope"
             android:id="@+id/chatbotHistoryMessageCount"
             android:layout_width="wrap_content"
-            android:layout_height="@dimen/dp_23"
-            android:layout_marginStart="@dimen/chatbot_history_badge_margin_start"
+            android:layout_height="wrap_content"
+            android:minHeight="@dimen/dp_23"
+            android:paddingTop="2dp"
+            android:paddingBottom="2dp"
+            android:layout_marginTop="@dimen/dp_8"
             android:background="@drawable/bg_chatbot_history_badge"
             android:gravity="center"
             android:includeFontPadding="false"
@@ -65,18 +69,33 @@
             android:textColor="@color/legal_lens_auth_accent"
             android:textSize="@dimen/sp_11"
             android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/chatbotHistoryTimestamp" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <TextView
+    <TextView android:fontFamily="@font/manrope"
         android:id="@+id/chatbotHistoryPreview"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/dp_18"
-        android:layout_marginTop="@dimen/chatbot_history_preview_margin_top"
+        android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/chatbot_history_preview_margin_top"
         android:ellipsize="end"
         android:includeFontPadding="false"
-        android:maxLines="1"
-        android:textColor="@color/legal_lens_secondary_text"
-        android:textSize="@dimen/sp_13" />
+        android:maxLines="2"
+        android:textColor="@color/legal_lens_status_text"
+        android:textSize="@dimen/sp_14" />
+
+    <TextView android:fontFamily="@font/manrope"
+        android:id="@+id/chatbotHistoryContinue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/chatbot_history_continue_margin_top"
+        android:background="?attr/selectableItemBackground"
+        android:gravity="center"
+        android:paddingTop="@dimen/dp_8"
+        android:paddingBottom="@dimen/dp_8"
+        android:text="@string/chatbot_history_continue"
+        android:textColor="@color/legal_lens_auth_accent"
+        android:textSize="@dimen/sp_14"
+        android:textStyle="bold"
+        android:visibility="gone" />
 </LinearLayout>

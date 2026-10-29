@@ -2,6 +2,7 @@ package com.example.lagallens.presentation.feature.creditstore.hub.ui
 
 import android.content.Context
 import android.content.Intent
+import android.widget.Toast
 import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
@@ -13,6 +14,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.lagallens.R
+import com.example.lagallens.presentation.common.utils.bindPressFeedback
 import com.example.lagallens.databinding.ActivityCreditHubBinding
 import com.example.lagallens.presentation.feature.creditstore.flow.ui.CreditHistoryActivity
 import com.example.lagallens.presentation.feature.creditstore.hub.contract.CreditHubUiEffect
@@ -21,11 +23,12 @@ import com.example.lagallens.presentation.feature.creditstore.hub.contract.Credi
 import com.example.lagallens.presentation.feature.creditstore.hub.viewmodel.CreditHubViewModel
 import com.example.lagallens.presentation.feature.creditstore.ui.CreditStoreActivity
 import com.example.lagallens.presentation.feature.creditstore.unlock.ui.UnlockConfirmationActivity
+import com.example.lagallens.LegalLensApplication
 import kotlinx.coroutines.launch
 
 class CreditHubActivity : AppCompatActivity() {
     private val binding by lazy { ActivityCreditHubBinding.inflate(layoutInflater) }
-    private val viewModel by viewModels<CreditHubViewModel>()
+    private val viewModel by viewModels<CreditHubViewModel> { CreditHubViewModel.Factory((application as LegalLensApplication).creditRepository) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +45,7 @@ class CreditHubActivity : AppCompatActivity() {
     }
 
     private fun bindView() = with(binding) {
+        listOf(creditHubBuy, creditHubHistory, creditHubUnlock).forEach { it.bindPressFeedback() }
         creditHubBack.setOnClickListener {
             viewModel.onEvent(CreditHubUiEvent.BackClicked)
         }
@@ -74,11 +78,13 @@ class CreditHubActivity : AppCompatActivity() {
     }
 
     private fun render(state: CreditHubUiState) {
-        binding.creditHubBalance.text = getString(R.string.credit_hub_balance, state.balanceCredits)
+        binding.creditHubBalance.text = if (state.isBackendUnavailable) getString(R.string.credit_backend_not_configured)
+        else getString(R.string.credit_hub_balance, state.balanceCredits)
     }
 
     private fun handleEffect(effect: CreditHubUiEffect) {
         when (effect) {
+            CreditHubUiEffect.ShowBackendUnavailable -> Toast.makeText(this, R.string.credit_backend_not_configured, Toast.LENGTH_SHORT).show()
             CreditHubUiEffect.NavigateBack -> finish()
             CreditHubUiEffect.NavigateToStore -> startActivity(CreditStoreActivity.createIntent(this))
             CreditHubUiEffect.NavigateToHistory -> startActivity(CreditHistoryActivity.createIntent(this))

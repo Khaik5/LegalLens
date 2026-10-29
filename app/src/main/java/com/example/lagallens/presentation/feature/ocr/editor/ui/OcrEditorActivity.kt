@@ -19,6 +19,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.lagallens.R
 import com.example.lagallens.databinding.ActivityOcrEditorBinding
+import com.example.lagallens.presentation.common.utils.bindPressFeedback
 import com.example.lagallens.presentation.feature.ocr.editor.contract.OcrEditorUiEffect
 import com.example.lagallens.presentation.feature.ocr.editor.contract.OcrEditorUiEvent
 import com.example.lagallens.presentation.feature.ocr.editor.contract.OcrEditorUiState
@@ -58,6 +59,7 @@ class OcrEditorActivity : AppCompatActivity() {
     }
 
     private fun bindEvents() = with(binding) {
+        listOf(ocrEditorBack, ocrEditorRestore, ocrEditorSave, ocrEditorBold, ocrEditorItalic, ocrEditorList).forEach { it.bindPressFeedback() }
         ocrEditorBack.setOnClickListener { viewModel.onEvent(OcrEditorUiEvent.BackClicked) }
         ocrEditorRestore.setOnClickListener { viewModel.onEvent(OcrEditorUiEvent.RestoreOriginalClicked) }
         ocrEditorSave.setOnClickListener { viewModel.onEvent(OcrEditorUiEvent.SaveClicked) }
@@ -89,8 +91,12 @@ class OcrEditorActivity : AppCompatActivity() {
             if (state.isOriginalText) R.string.ocr_editor_original_revision else R.string.ocr_editor_edited_revision
         )
         if (ocrEditorText.text.toString() != state.text) {
+            val selectionStart = ocrEditorText.selectionStart.coerceIn(0, state.text.length)
+            val selectionEnd = ocrEditorText.selectionEnd.coerceIn(0, state.text.length)
+            val wasFocused = ocrEditorText.hasFocus()
             ocrEditorText.setText(state.text)
-            ocrEditorText.setSelection(state.text.length)
+            if (wasFocused) ocrEditorText.setSelection(selectionStart, selectionEnd)
+            else ocrEditorText.setSelection(state.text.length)
         }
     }
 

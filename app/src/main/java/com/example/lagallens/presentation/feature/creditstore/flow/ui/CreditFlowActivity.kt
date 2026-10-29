@@ -17,9 +17,12 @@ import com.example.lagallens.presentation.feature.creditstore.flow.contract.Cred
 import com.example.lagallens.presentation.feature.creditstore.flow.viewmodel.CreditFlowViewModel
 import kotlinx.coroutines.launch
 import com.example.lagallens.R
+import com.example.lagallens.LegalLensApplication
 
 abstract class CreditFlowActivity : AppCompatActivity() {
-    protected val viewModel by viewModels<CreditFlowViewModel>()
+    protected val viewModel by viewModels<CreditFlowViewModel> {
+        CreditFlowViewModel.Factory((application as LegalLensApplication).paymentRepository)
+    }
 
     override fun setContentView(view: View?) {
         super.setContentView(view)

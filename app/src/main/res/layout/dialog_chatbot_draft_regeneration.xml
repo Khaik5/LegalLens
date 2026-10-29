@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_chatbot_draft_confirmation"
+    android:orientation="vertical"
+    android:padding="@dimen/dp_24">
+
+    <ImageView
+        android:layout_width="@dimen/dp_64"
+        android:layout_height="@dimen/dp_64"
+        android:background="@drawable/bg_chatbot_generation_progress"
+        android:contentDescription="@null"
+        android:padding="@dimen/dp_20"
+        android:src="@drawable/ic_ocr_saved_check" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dp_24"
+        android:fontFamily="@font/manrope"
+        android:text="@string/chatbot_draft_regeneration_confirm_title"
+        android:textColor="@color/legal_lens_primary"
+        android:textSize="@dimen/sp_20"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dp_16"
+        android:fontFamily="@font/manrope"
+        android:lineSpacingExtra="@dimen/dp_4"
+        android:text="@string/chatbot_draft_regeneration_confirm_body"
+        android:textColor="@color/legal_lens_status_text"
+        android:textSize="@dimen/sp_14" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dp_20"
+        android:background="@color/legal_lens_auth_icon_background"
+        android:drawableStart="@drawable/ic_credit_low_info"
+        android:drawablePadding="@dimen/dp_8"
+        android:gravity="center_vertical"
+        android:lineSpacingExtra="@dimen/dp_4"
+        android:padding="@dimen/dp_12"
+        android:text="@string/chatbot_draft_regeneration_confirm_note"
+        android:textColor="@color/legal_lens_secondary_text"
+        android:textSize="@dimen/sp_12" />
+
+    <TextView
+        android:id="@+id/draftRegenerationConfirm"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_50"
+        android:layout_marginTop="@dimen/dp_20"
+        android:background="@drawable/bg_chatbot_primary_action"
+        android:clickable="true"
+        android:focusable="true"
+        android:fontFamily="@font/manrope"
+        android:gravity="center"
+        android:text="@string/chatbot_draft_regeneration_confirm_action"
+        android:textColor="@color/white"
+        android:textSize="@dimen/sp_15"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/draftRegenerationCancel"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_50"
+        android:layout_marginTop="@dimen/dp_12"
+        android:background="@drawable/bg_chatbot_new_state_suggestion"
+        android:clickable="true"
+        android:focusable="true"
+        android:fontFamily="@font/manrope"
+        android:gravity="center"
+        android:text="@string/chatbot_draft_regeneration_cancel_action"
+        android:textColor="@color/legal_lens_primary"
+        android:textSize="@dimen/sp_15"
+        android:textStyle="bold" />
+</LinearLayout>

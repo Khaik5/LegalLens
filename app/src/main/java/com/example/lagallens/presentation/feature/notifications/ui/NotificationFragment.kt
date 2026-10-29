@@ -18,6 +18,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.lagallens.R
 import com.example.lagallens.databinding.FragmentNotificationBinding
+import com.example.lagallens.presentation.common.utils.bindPressFeedback
 import com.example.lagallens.presentation.feature.notifications.adapter.NotificationAdapter
 import com.example.lagallens.presentation.feature.notifications.contract.NotificationFilter
 import com.example.lagallens.presentation.feature.notifications.contract.NotificationUiEffect
@@ -51,7 +52,14 @@ class NotificationFragment : Fragment() {
         collectUiEffect()
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.onEvent(NotificationUiEvent.ScreenOpened)
+    }
+
     private fun bindView() {
+        listOf(binding.tvMarkAllRead, binding.tvFilterAll, binding.tvFilterAnalysis,
+            binding.tvFilterOcr, binding.tvFilterReminder).forEach { it.bindPressFeedback() }
         binding.rvNotifications.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = notificationAdapter
@@ -105,6 +113,13 @@ class NotificationFragment : Fragment() {
         notificationAdapter.submitList(state.notifications)
         binding.rvNotifications.isVisible = hasNotifications
         binding.emptyNotificationState.isVisible = !hasNotifications
+        state.errorMessageRes?.let { errorRes ->
+            binding.notificationEmptyTitle.setText(R.string.notification_load_error_title)
+            binding.notificationEmptyDescription.setText(errorRes)
+        } ?: run {
+            binding.notificationEmptyTitle.setText(R.string.notification_empty_title)
+            binding.notificationEmptyDescription.setText(R.string.notification_empty_description)
+        }
         binding.filterScrollView.isVisible = hasNotifications
         binding.tvMarkAllRead.isVisible = hasNotifications
         updateFilterStyle(binding.tvFilterAll, state.selectedFilter == NotificationFilter.ALL)

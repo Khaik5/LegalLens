@@ -7,6 +7,8 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
+import androidx.core.view.isVisible
+import com.example.lagallens.R
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -14,6 +16,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.lagallens.databinding.ActivityAnalysisRiskDetailBinding
+import com.example.lagallens.presentation.common.utils.bindPressFeedback
 import com.example.lagallens.presentation.feature.analysis.risk.citation.ui.AnalysisRiskCitationActivity
 import com.example.lagallens.presentation.feature.analysis.risk.detail.contract.AnalysisRiskDetailUiEffect
 import com.example.lagallens.presentation.feature.analysis.risk.detail.contract.AnalysisRiskDetailUiEvent
@@ -41,6 +44,7 @@ class AnalysisRiskDetailActivity : AppCompatActivity() {
             view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+        listOf(binding.analysisRiskDetailBack, binding.analysisRiskDetailLegalReference).forEach { it.bindPressFeedback() }
         binding.analysisRiskDetailBack.setOnClickListener {
             viewModel.onEvent(AnalysisRiskDetailUiEvent.BackClicked)
         }
@@ -48,6 +52,7 @@ class AnalysisRiskDetailActivity : AppCompatActivity() {
             viewModel.onEvent(AnalysisRiskDetailUiEvent.LegalReferenceClicked)
         }
         observeViewModel()
+        viewModel.loadFinding(intent.getStringExtra(EXTRA_FINDING_ID) ?: "penalty-cap")
     }
 
     private fun observeViewModel() {
@@ -61,9 +66,17 @@ class AnalysisRiskDetailActivity : AppCompatActivity() {
 
     private fun render(state: AnalysisRiskDetailUiState) = with(binding) {
         analysisRiskDetailSeverity.setText(state.severityRes)
+        analysisRiskDetailSeverity.setBackgroundResource(state.severityBackgroundRes)
+        analysisRiskDetailSeverity.setTextColor(getColor(state.severityColorRes))
         analysisRiskDetailTitle.setText(state.titleRes)
         analysisRiskDetailAttentionReason.setText(state.attentionReasonRes)
         analysisRiskDetailClauseExcerpt.setText(state.clauseExcerptRes)
+        analysisRiskDetailClauseReference.setText(state.clauseReferenceRes)
+        analysisRiskDetailClauseHeading.setText(if (state.isDetailedExample) R.string.analysis_risk_detail_clause_heading else R.string.analysis_risk_finding_summary)
+        analysisRiskDetailLegalHeading.isVisible = state.isDetailedExample
+        analysisRiskDetailLegalExplanation.isVisible = state.isDetailedExample
+        analysisRiskDetailLegalReference.isVisible = state.isDetailedExample
+        analysisRiskDetailRecommendationCard.isVisible = state.isDetailedExample
         analysisRiskDetailLegalExplanation.setText(state.legalExplanationRes)
         analysisRiskDetailLegalReferenceTitle.setText(state.legalReferenceTitleRes)
         analysisRiskDetailLegalReferenceSubtitle.setText(state.legalReferenceSubtitleRes)
@@ -80,6 +93,8 @@ class AnalysisRiskDetailActivity : AppCompatActivity() {
     }
 
     companion object {
-        fun createIntent(context: Context): Intent = Intent(context, AnalysisRiskDetailActivity::class.java)
+        private const val EXTRA_FINDING_ID = "analysis_risk_detail_finding_id"
+        fun createIntent(context: Context, findingId: String = "penalty-cap"): Intent =
+            Intent(context, AnalysisRiskDetailActivity::class.java).putExtra(EXTRA_FINDING_ID, findingId)
     }
 }

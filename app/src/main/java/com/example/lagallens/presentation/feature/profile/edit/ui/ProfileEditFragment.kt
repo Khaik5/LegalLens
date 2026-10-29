@@ -1,6 +1,8 @@
 package com.example.lagallens.presentation.feature.profile.edit.ui
 
 import android.os.Bundle
+import android.net.Uri
+import androidx.activity.result.contract.ActivityResultContracts
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,6 +18,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.example.lagallens.R
 import com.example.lagallens.databinding.FragmentProfileEditBinding
+import com.example.lagallens.presentation.common.utils.bindPressFeedback
 import com.example.lagallens.presentation.feature.profile.contract.ProfileUiEvent
 import com.example.lagallens.presentation.feature.profile.edit.contract.ProfileEditUiEffect
 import com.example.lagallens.presentation.feature.profile.edit.contract.ProfileEditUiEvent
@@ -25,6 +28,12 @@ import com.example.lagallens.presentation.feature.profile.viewmodel.ProfileViewM
 import kotlinx.coroutines.launch
 
 class ProfileEditFragment : Fragment() {
+    private val photoPicker = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri != null) {
+            runCatching { requireContext().contentResolver.takePersistableUriPermission(uri, android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION) }
+            viewModel.onEvent(ProfileEditUiEvent.PhotoSelected(uri.toString()))
+        }
+    }
     private var _binding: FragmentProfileEditBinding? = null
     private val binding get() = _binding!!
     private val profileViewModel by activityViewModels<ProfileViewModel>()
@@ -48,6 +57,7 @@ class ProfileEditFragment : Fragment() {
     }
 
     private fun bindView() {
+        listOf(binding.btnBack, binding.btnChangePhoto, binding.btnSaveProfile).forEach { it.bindPressFeedback() }
         binding.btnBack.setOnClickListener {
             findNavController().navigateUp()
         }
@@ -70,7 +80,7 @@ class ProfileEditFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 profileViewModel.uiState.collect { profile ->
                     viewModel.onEvent(
-                        ProfileEditUiEvent.Initialize(profile.name, profile.email, profile.phone)
+                        ProfileEditUiEvent.Initialize(profile.name, profile.email, profile.phone, profile.photoUri)
                     )
                 }
             }
@@ -90,7 +100,7 @@ class ProfileEditFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiEffect.collect { effect ->
                     when (effect) {
-                        ProfileEditUiEffect.ShowPhotoPickerUnavailable -> showPhotoPickerUnavailable()
+                        ProfileEditUiEffect.OpenPhotoPicker -> photoPicker.launch(arrayOf("image/*"))
                         is ProfileEditUiEffect.ProfileSaved -> saveProfile(effect)
                     }
                 }
@@ -100,6 +110,8 @@ class ProfileEditFragment : Fragment() {
 
     private fun render(state: ProfileEditUiState) {
         binding.tvProfileEditAvatar.text = state.name.initials()
+        binding.ivProfileEditAvatar.isVisible = state.photoUri != null
+        binding.ivProfileEditAvatar.setImageURI(state.photoUri?.let(Uri::parse))
         updateInput(binding.etProfileName, state.name)
         updateInput(binding.etProfileEmail, state.email)
         updateInput(binding.etProfilePhone, state.phone)
@@ -121,16 +133,12 @@ class ProfileEditFragment : Fragment() {
         }
     }
 
-    private fun showPhotoPickerUnavailable() {
-        Toast.makeText(
-            requireContext(),
-            R.string.profile_edit_photo_unavailable,
-            Toast.LENGTH_SHORT
-        ).show()
-    }
-
     private fun saveProfile(effect: ProfileEditUiEffect.ProfileSaved) {
-        profileViewModel.onEvent(ProfileUiEvent.ProfileUpdated(effect.name, effect.phone))
+        profileViewModel.onEvent(ProfileUiEvent.ProfileUpdated(effect.name, effect.phone, effect.photoUri))
+        if (profileViewModel.uiState.value.isBackendUnavailable) {
+            Toast.makeText(requireContext(), R.string.profile_backend_not_configured, Toast.LENGTH_SHORT).show()
+            return
+        }
         Toast.makeText(requireContext(), R.string.profile_edit_save_success, Toast.LENGTH_SHORT).show()
         findNavController().navigateUp()
     }

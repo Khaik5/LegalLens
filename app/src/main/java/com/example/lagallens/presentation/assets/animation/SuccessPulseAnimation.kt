@@ -11,17 +11,19 @@ object SuccessPulseAnimation {
         val scaleX = ObjectAnimator.ofFloat(target, View.SCALE_X, 1f, 1.08f).apply {
             duration = 800
             repeatMode = ValueAnimator.REVERSE
-            repeatCount = ValueAnimator.INFINITE
+            repeatCount = 1
         }
         val scaleY = ObjectAnimator.ofFloat(target, View.SCALE_Y, 1f, 1.08f).apply {
             duration = 800
             repeatMode = ValueAnimator.REVERSE
-            repeatCount = ValueAnimator.INFINITE
+            repeatCount = 1
         }
         return AnimatorSet().apply {
             playTogether(scaleX, scaleY)
             interpolator = AccelerateDecelerateInterpolator()
-            start()
+            if (ValueAnimator.areAnimatorsEnabled()) {
+                start()
+            }
         }
     }
 }

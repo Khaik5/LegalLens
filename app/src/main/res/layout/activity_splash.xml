@@ -38,19 +38,25 @@
         app:layout_constraintTop_toTopOf="parent"
         android:translationY="@dimen/splash_logo_top" />
 
-    <ProgressBar
+    <FrameLayout
         android:id="@+id/splash_progress"
         android:layout_width="@dimen/splash_progress_width"
         android:layout_height="@dimen/splash_progress_height"
-        android:indeterminate="false"
-        android:max="100"
-        android:progress="60"
-        android:progressDrawable="@drawable/splash_progress_track"
         android:background="@drawable/splash_progress_track"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:translationY="@dimen/splash_progress_top" />
+        android:translationY="@dimen/splash_progress_top">
+
+        <View
+            android:id="@+id/splash_progress_indicator"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/splash_progress_fill"
+            android:importantForAccessibility="no"
+            android:scaleX="0"
+            android:transformPivotX="0dp" />
+    </FrameLayout>
 
     <TextView
         android:id="@+id/splash_status"

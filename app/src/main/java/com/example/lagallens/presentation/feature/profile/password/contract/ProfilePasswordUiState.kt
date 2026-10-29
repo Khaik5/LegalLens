@@ -6,6 +6,7 @@ data class ProfilePasswordUiState(
     val currentPassword: String = "",
     val newPassword: String = "",
     val confirmation: String = "",
+    val isSubmitting: Boolean = false,
     @StringRes val currentPasswordErrorRes: Int? = null,
     @StringRes val newPasswordErrorRes: Int? = null,
     @StringRes val confirmationErrorRes: Int? = null

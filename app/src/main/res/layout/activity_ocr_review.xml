@@ -214,6 +214,32 @@
                     android:textColor="@color/ocr_review_body"
                     android:textSize="@dimen/ocr_review_warning_source_text_size" />
             </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/ocr_review_side_padding"
+                android:layout_marginTop="@dimen/dp_20"
+                android:layout_marginEnd="@dimen/ocr_review_side_padding"
+                android:text="@string/ocr_review_document_text_title"
+                android:textColor="@color/ocr_review_body"
+                android:textSize="@dimen/ocr_review_section_title_text_size"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/ocr_review_document_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/ocr_review_side_padding"
+                android:layout_marginTop="@dimen/ocr_review_warning_card_top_margin"
+                android:layout_marginEnd="@dimen/ocr_review_side_padding"
+                android:background="@drawable/bg_ocr_review_warning_card"
+                android:gravity="top|start"
+                android:inputType="textCapSentences|textMultiLine"
+                android:minHeight="@dimen/dp_160"
+                android:padding="@dimen/dp_16"
+                android:textColor="@color/ocr_review_text"
+                android:textSize="@dimen/ocr_review_warning_recognized_text_size" />
         </LinearLayout>
     </ScrollView>
 

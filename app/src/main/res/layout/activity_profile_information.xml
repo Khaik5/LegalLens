@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/informationRoot" android:layout_width="match_parent" android:layout_height="match_parent" android:background="@color/legal_lens_background" android:orientation="vertical">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="@dimen/dp_56" android:gravity="center_vertical" android:paddingStart="@dimen/dp_16" android:paddingEnd="@dimen/dp_16">
+        <ImageButton android:id="@+id/informationBack" android:layout_width="@dimen/dp_40" android:layout_height="@dimen/dp_40" android:background="?attr/selectableItemBackgroundBorderless" android:contentDescription="@string/profile_edit_back_description" android:padding="@dimen/dp_10" android:src="@drawable/ic_contract_search_back" />
+        <TextView android:id="@+id/informationTitle" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="@dimen/dp_12" android:textColor="@color/legal_lens_primary" android:textSize="@dimen/sp_18" android:textStyle="bold" />
+    </LinearLayout>
+    <ScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:fillViewport="true" android:clipToPadding="false" android:paddingStart="@dimen/dp_20" android:paddingEnd="@dimen/dp_20">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:paddingTop="@dimen/dp_16" android:paddingBottom="@dimen/dp_24">
+            <LinearLayout android:id="@+id/informationAbout" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:visibility="gone">
+                <ImageView android:layout_width="@dimen/dp_160" android:layout_height="@dimen/dp_160" android:layout_gravity="center_horizontal" android:contentDescription="@string/about_app_name" android:scaleType="fitCenter" android:src="@drawable/legal_lens_logo" />
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:text="@string/about_app_name" android:textColor="@color/legal_lens_primary" android:textSize="@dimen/sp_22" android:textStyle="bold" />
+                <TextView android:id="@+id/informationVersion" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/dp_12" android:gravity="center" android:textColor="@color/legal_lens_auth_accent" android:textSize="@dimen/sp_13" />
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/dp_12" android:gravity="center" android:text="@string/about_description" android:textColor="@color/legal_lens_secondary_text" android:textSize="@dimen/sp_14" />
+                <include android:id="@+id/aboutAssistant" layout="@layout/item_information_card" />
+                <include android:id="@+id/aboutTeam" layout="@layout/item_information_card" />
+                <include android:id="@+id/aboutContact" layout="@layout/item_information_card" />
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/dp_20" android:background="@drawable/bg_compare_notice" android:padding="@dimen/dp_16" android:text="@string/about_disclaimer" android:textColor="@color/legal_lens_secondary_text" android:textSize="@dimen/sp_12" />
+            </LinearLayout>
+            <LinearLayout android:id="@+id/informationPrivacy" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:visibility="gone">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:orientation="horizontal">
+                    <ImageView android:layout_width="@dimen/dp_48" android:layout_height="@dimen/dp_48" android:background="@drawable/bg_compare_notice" android:contentDescription="@null" android:padding="@dimen/dp_12" android:src="@drawable/ic_profile_shield" />
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="@dimen/dp_12" android:layout_weight="1" android:orientation="vertical">
+                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/privacy_intro_title" android:textColor="@color/legal_lens_primary" android:textSize="@dimen/sp_18" android:textStyle="bold" />
+                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/dp_4" android:text="@string/privacy_intro_subtitle" android:textColor="@color/legal_lens_secondary_text" android:textSize="@dimen/sp_12" />
+                    </LinearLayout>
+                </LinearLayout>
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/dp_16" android:background="@drawable/bg_compare_warning" android:padding="@dimen/dp_12" android:text="@string/privacy_notice" android:textColor="@color/legal_lens_secondary_text" android:textSize="@dimen/sp_12" />
+                <include android:id="@+id/privacyOcr" layout="@layout/item_information_card" />
+                <include android:id="@+id/privacyStorage" layout="@layout/item_information_card" />
+                <include android:id="@+id/privacySecurity" layout="@layout/item_information_card" />
+                <include android:id="@+id/privacyRights" layout="@layout/item_information_card" />
+                <include android:id="@+id/privacySafety" layout="@layout/item_information_card" />
+                <include android:id="@+id/privacyPolicy" layout="@layout/item_information_card" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>
