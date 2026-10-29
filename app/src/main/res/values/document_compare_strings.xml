@@ -1,0 +1,89 @@
+<resources>
+    <string name="viewer_title">Xem tài liệu PDF</string>
+    <string name="viewer_preview">Bản xem minh họa</string>
+    <string name="viewer_loading">Đang tải tài liệu…</string>
+    <string name="viewer_loading_message">Đang chuẩn bị bản xem tài liệu. Vui lòng chờ trong giây lát.</string>
+    <string name="viewer_error">Không thể mở tài liệu</string>
+    <string name="viewer_error_message">Chưa có PDF gắn với hợp đồng mẫu này. Chọn một tệp PDF trên thiết bị để xem.</string>
+    <string name="viewer_retry">Chọn tệp PDF</string><string name="viewer_choose_pdf">Chọn tệp PDF</string>
+    <string name="viewer_page_count">%1$d / %2$d</string>
+    <string name="viewer_zoom_level">%1$d%%</string>
+    <string name="viewer_previous_page">Trang trước</string>
+    <string name="viewer_next_page">Trang tiếp theo</string>
+    <string name="viewer_zoom_out">Thu nhỏ</string>
+    <string name="viewer_zoom_in">Phóng to</string>
+    <string name="viewer_share">Chia sẻ tài liệu</string>
+    <string name="viewer_metadata">%1$s · %2$s</string>
+    <string name="compare_title">So sánh hợp đồng</string>
+    <string name="compare_result_title">So sánh</string>
+    <string name="compare_document_a">A    %1$s</string>
+    <string name="compare_document_b">B    %1$s</string>
+    <string name="compare_label_a" translatable="false">[HĐ A]:</string>
+    <string name="compare_label_b" translatable="false">[HĐ B]:</string>
+    <string name="compare_instruction">Chọn đúng 2 hợp đồng để so sánh nội dung và phát hiện khác biệt. Tối đa 2 hợp đồng.</string>
+    <string name="compare_search">Tìm kiếm hợp đồng...</string>
+    <string name="compare_analyzed_date">Phân tích %1$s</string>
+    <string name="compare_preselected">Đã chọn sẵn hợp đồng từ Chi tiết hợp đồng. Bạn vẫn có thể bỏ chọn.</string>
+    <string name="compare_limit">Đã đạt giới hạn 2 hợp đồng. Hãy bỏ chọn một hợp đồng trước.</string>
+    <string name="compare_selected_label">Đã chọn:</string>
+    <string name="compare_selected_count">%1$d / 2 hợp đồng</string>
+    <string name="compare_select_two">Chọn 2 hợp đồng để tiếp tục.</string>
+    <string name="compare_select_one">Chọn thêm 1 hợp đồng để tiếp tục.</string>
+    <string name="compare_can_change">Có thể bỏ chọn để chọn hợp đồng khác.</string>
+    <string name="compare_action">So sánh</string>
+    <string name="compare_current_selected">Hợp đồng hiện tại · Đã chọn</string>
+    <string name="compare_selected">Đã chọn · Nhấn để bỏ chọn</string>
+    <string name="compare_not_selectable">Bỏ chọn một hợp đồng để chọn mục này</string>
+    <string name="compare_no_matches">Không tìm thấy hợp đồng phù hợp.</string>
+    <string name="compare_tab_overview">Tổng quan</string>
+    <string name="compare_tab_risk">Rủi ro</string>
+    <string name="compare_tab_clauses">Điều khoản</string>
+    <string name="compare_loading">Đang đối chiếu nội dung DEMO…</string>
+    <string name="compare_loading_message">Đang đối chiếu nội dung tương ứng và tổng hợp khác biệt giữa hợp đồng A và B.</string>
+    <string name="compare_loading_stage">Đang nhận diện điều khoản tương ứng</string>
+    <string name="compare_loading_next">Tiếp theo: tổng hợp điểm giống, khác và rủi ro tham chiếu.</string>
+    <string name="compare_error">Chưa thể so sánh điều khoản</string>
+    <string name="compare_error_message">Có lỗi khi phân tích cặp hợp đồng này. Hai tài liệu đã chọn được giữ nguyên.</string>
+    <string name="compare_retry">Thử lại phân tích</string>
+    <string name="compare_no_example">Chưa có nội dung so sánh mẫu cho cặp hợp đồng này.</string>
+    <string name="compare_sample_notice">DEMO: kết quả được tính từ nội dung đã lưu, không phải phân tích rủi ro pháp lý.</string>
+    <string name="compare_result_demo_notice">DEMO · Chỉ hiển thị khác biệt văn bản giữa hai hợp đồng đã lưu; chưa có phân tích pháp lý.</string>
+    <string name="compare_result_demo_heading">Khác biệt nội dung (DEMO)</string>
+    <string name="compare_difference_demo_explanation">Đối chiếu trực tiếp nội dung lưu trong từng tài liệu. Hãy kiểm tra bản gốc.</string>
+    <string name="compare_no_text_difference">Không có khác biệt ở mục này</string>
+    <string name="compare_different_types">Hai hợp đồng khác loại, không phải hai phiên bản. Chỉ đối chiếu nội dung tương ứng; cần chuyên gia xác nhận kết luận.</string>
+    <string name="compare_clause_notice">Nội dung tóm lược từ kết quả hiện có, không phải trích dẫn nguyên văn. Kiểm tra tài liệu gốc trước khi đưa ra quyết định.</string>
+    <string name="compare_clauses_heading">Điều khoản &amp; khác biệt</string>
+    <string name="compare_show_risk">Rủi ro tham chiếu: Chấm dứt hợp đồng → tab Rủi ro</string>
+    <string name="compare_demo_contract_nda" translatable="false">HĐ Bảo mật Thông tin NDA</string>
+    <string name="compare_demo_nda_date" translatable="false">Phân tích 15/10/2026</string>
+    <string name="compare_demo_date_office" translatable="false">Phân tích 24/10/2026</string>
+    <string name="compare_demo_date_equipment" translatable="false">Phân tích 18/10/2026</string>
+    <string name="compare_demo_summary" translatable="false">Giống: cùng quy định thời hạn và khoản thanh toán theo tháng. Khác: thời hạn, giá trị, ngày thanh toán; thử việc chỉ áp dụng cho B.</string>
+    <string name="compare_demo_payment_title" translatable="false">Thanh toán · Khác biệt quan trọng</string>
+    <string name="compare_demo_payment_a" translatable="false">HỢP ĐỒNG A · PHÍ THUÊ\n50,000,000 VND / tháng\nTrước ngày 05 hàng tháng</string>
+    <string name="compare_demo_payment_b" translatable="false">HỢP ĐỒNG B · LƯƠNG CTV\n25,000,000 VND / tháng\nVào ngày 30 hàng tháng</string>
+    <string name="compare_demo_payment_explanation" translatable="false">Cùng chu kỳ theo tháng, nhưng khác bản chất khoản chi, giá trị và ngày thanh toán. Không suy ra mức nào có lợi hơn.</string>
+    <string name="compare_demo_term_title" translatable="false">Thời hạn · Khác nhau</string>
+    <string name="compare_demo_term_detail" translatable="false">A: 3 năm  /  B: 12 tháng</string>
+    <string name="compare_demo_trial_title" translatable="false">Thử việc · Không tương ứng</string>
+    <string name="compare_demo_trial_detail" translatable="false" formatted="false">A: Không áp dụng  /  B: 02 tháng, 85% lương</string>
+    <string name="compare_demo_cycle_title" translatable="false">Chu kỳ thanh toán · Giống nhau</string>
+    <string name="compare_demo_cycle_detail" translatable="false">A và B đều có khoản thanh toán theo tháng</string>
+    <string name="compare_demo_overview_type" translatable="false">Loại Hợp Đồng\n\n[HĐ A]:  HĐ Dịch vụ (Thuê văn phòng)\n[HĐ B]:  HĐ Lao động (CTV công nghệ)</string>
+    <string name="compare_demo_overview_term" translatable="false">Thời hạn HĐ\n\n[HĐ A]:  3 năm kể từ ngày ký\n[HĐ B]:  12 tháng (xác định thời hạn)</string>
+    <string name="compare_demo_overview_fee" translatable="false">Khoản lương / Phí\n\n[HĐ A]:  50,000,000 VND / tháng\n[HĐ B]:  25,000,000 VND / tháng</string>
+    <string name="compare_demo_overview_trial" translatable="false" formatted="false">Thử việc\n\n[HĐ A]:  Không áp dụng\n[HĐ B]:  02 tháng (85% lương chính thức)</string>
+    <string name="compare_demo_overview_payment" translatable="false">Thanh toán\n\n[HĐ A]:  Trước ngày 05 hàng tháng\n[HĐ B]:  Vào ngày 30 hàng tháng</string>
+    <string name="compare_demo_overview_damages" translatable="false">Bồi thường\n\n[HĐ A]:  Theo thiệt hại thực tế phát sinh\n[HĐ B]:  Tối đa 03 tháng lương CTV</string>
+    <string name="compare_demo_score_label_a" translatable="false">ĐIỂM AN TOÀN HĐ A</string>
+    <string name="compare_demo_score_label_b" translatable="false">ĐIỂM AN TOÀN HĐ B</string>
+    <string name="compare_demo_score_value_a" translatable="false">65/100</string>
+    <string name="compare_demo_score_value_b" translatable="false">42/100</string>
+    <string name="compare_demo_score_status_a" translatable="false">Rủi ro trung bình</string>
+    <string name="compare_demo_score_status_b" translatable="false">Rủi ro cao</string>
+    <string name="compare_demo_risks_title" translatable="false">So sánh phát hiện rủi ro</string>
+    <string name="compare_demo_risk_termination" translatable="false">Điều khoản Đơn Phương Chấm Dứt · Cao\n\nKhông quy định thời gian báo trước đủ dài cho bên bị chấm dứt.\n\nHĐ A: Mắc rủi ro    HĐ B: An toàn</string>
+    <string name="compare_demo_risk_penalty" translatable="false">Mức Phạt Vi Phạm Vượt Quá Trần · Cao\n\nCần đối chiếu điều khoản phạt với văn bản pháp luật liên quan.\n\nHĐ A: Mắc rủi ro    HĐ B: Mắc rủi ro</string>
+    <string name="compare_demo_risk_force" translatable="false">Định nghĩa Sự Kiện Bất Khả Kháng · Trung bình\n\nCần làm rõ thời gian khắc phục và nghĩa vụ giảm thiểu thiệt hại.\n\nHĐ A: An toàn    HĐ B: Mắc rủi ro</string>
+</resources>

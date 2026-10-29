@@ -30,8 +30,9 @@ class ContractSearchAdapter(
         private val onResultClicked: (ContractSearchResult) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: ContractSearchResult) {
-            binding.tvTitle.setText(item.titleRes)
-            binding.tvSubtitle.setText(item.subtitleRes)
+            binding.tvTitle.text = item.titleOverride ?: binding.root.context.getString(item.titleRes)
+            if (item.subtitleOverride == null) binding.tvSubtitle.setText(item.subtitleRes)
+            else binding.tvSubtitle.text = item.subtitleOverride
             binding.root.setOnClickListener { onResultClicked(item) }
         }
     }

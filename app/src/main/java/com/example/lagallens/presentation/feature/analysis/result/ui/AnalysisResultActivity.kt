@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import androidx.activity.OnBackPressedCallback
+import com.example.lagallens.presentation.feature.main.ui.MainActivity
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -57,6 +59,9 @@ class AnalysisResultActivity : AppCompatActivity() {
             view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() = returnFromResult()
+        })
         binding.analysisResultBack.setOnClickListener {
             viewModel.onEvent(AnalysisResultUiEvent.BackClicked)
         }
@@ -89,17 +94,26 @@ class AnalysisResultActivity : AppCompatActivity() {
 
     private fun render(state: AnalysisResultUiState) = with(binding) {
         analysisResultDocumentName.text = state.documentName
-        analysisResultDocumentMetadata.text = state.documentMetadata
+        analysisResultDocumentMetadata.text = state.errorMessageRes?.let { getString(it) } ?: state.documentMetadata
         analysisResultScore.text = state.score.toString()
         analysisResultKeyFactsValue.text = state.keyFactsCount.toString()
         analysisResultRiskValue.text = state.riskCount.toString()
         analysisResultReferenceValue.text = state.referenceCount.toString()
+        // Each destination row has a fixed resource height and bottom margin. The
+        // surrounding ScrollView must see the height of every row, not only the
+        // RecyclerView's first viewport, otherwise the final row is unreachable.
+        val rowHeight = resources.getDimensionPixelSize(R.dimen.analysis_result_item_height) +
+            resources.getDimensionPixelSize(R.dimen.analysis_result_item_spacing)
+        val listHeight = rowHeight * state.items.size
+        if (analysisResultItems.layoutParams.height != listHeight) {
+            analysisResultItems.layoutParams = analysisResultItems.layoutParams.apply { height = listHeight }
+        }
         resultAdapter.submitList(state.items)
     }
 
     private fun handleEffect(effect: AnalysisResultUiEffect) {
         when (effect) {
-            AnalysisResultUiEffect.NavigateBack -> finish()
+            AnalysisResultUiEffect.NavigateBack -> returnFromResult()
             is AnalysisResultUiEffect.NavigateToSummary -> startActivity(
                 AnalysisSummaryActivity.createIntent(
                     context = this,
@@ -148,6 +162,13 @@ class AnalysisResultActivity : AppCompatActivity() {
                 )
             )
         }
+    }
+
+    private fun returnFromResult() {
+        if (intent.getBooleanExtra("analysis_return_home", false)) {
+            startActivity(Intent(this, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP))
+        }
+        finish()
     }
 
     companion object {

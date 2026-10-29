@@ -12,21 +12,23 @@ data class ContractSearchResult(
     val contractId: String,
     @StringRes val titleRes: Int,
     @StringRes val subtitleRes: Int,
-    val searchKeywords: List<String>
+    val searchKeywords: List<String>,
+    val titleOverride: String? = null,
+    val subtitleOverride: String? = null
 ) {
     companion object {
         val samples = listOf(
             ContractSearchResult(
                 contractId = "office-lease",
-                titleRes = R.string.contract_office_lease,
-                subtitleRes = R.string.contract_office_lease_search_subtitle,
-                searchKeywords = listOf("hợp đồng thuê", "thuê văn phòng", "bitexco")
+                titleRes = R.string.contract_demo_labor_indefinite,
+                subtitleRes = R.string.contract_demo_labor_subtitle,
+                searchKeywords = listOf("hợp đồng lao động", "không xác định thời hạn", "nhân viên")
             ),
             ContractSearchResult(
                 contractId = "vehicle-lease",
-                titleRes = R.string.contract_vehicle_lease,
-                subtitleRes = R.string.contract_vehicle_lease_search_subtitle,
-                searchKeywords = listOf("hợp đồng thuê", "thuê xe", "đưa đón nhân viên")
+                titleRes = R.string.contract_demo_labor_fixed_term,
+                subtitleRes = R.string.contract_demo_labor_subtitle,
+                searchKeywords = listOf("hợp đồng lao động", "xác định thời hạn", "người lao động")
             )
         )
     }

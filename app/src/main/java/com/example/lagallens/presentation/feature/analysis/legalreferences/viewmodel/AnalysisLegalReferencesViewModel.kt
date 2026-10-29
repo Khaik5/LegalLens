@@ -69,16 +69,13 @@ class AnalysisLegalReferencesViewModel : ViewModel() {
             is AnalysisLegalReferencesUiEvent.QueryChanged -> updateQuery(event.query)
             is AnalysisLegalReferencesUiEvent.ReferenceClicked -> {
                 val state = _uiState.value
-                val effect = if (event.referenceId == COMMERCIAL_LAW_REFERENCE_ID) {
-                    AnalysisLegalReferencesUiEffect.NavigateToDetail(
+                if (allReferences.any { it.id == event.referenceId }) {
+                    emitEffect(AnalysisLegalReferencesUiEffect.NavigateToDetail(
                         referenceId = event.referenceId,
                         documentName = state.documentName,
                         documentMetadata = state.documentMetadata
-                    )
-                } else {
-                    AnalysisLegalReferencesUiEffect.ShowDetailUnavailable
+                    ))
                 }
-                emitEffect(effect)
             }
 
             AnalysisLegalReferencesUiEvent.BackClicked -> emitEffect(
@@ -88,7 +85,7 @@ class AnalysisLegalReferencesViewModel : ViewModel() {
     }
 
     private fun updateQuery(query: String) {
-        val normalizedQuery = query.trim().lowercase(Locale.ROOT)
+        val normalizedQuery = normalizeSearch(query)
         _uiState.update {
             it.copy(
                 query = query,
@@ -96,18 +93,20 @@ class AnalysisLegalReferencesViewModel : ViewModel() {
                     allReferences
                 } else {
                     allReferences.filter { reference ->
-                        reference.searchTerms.contains(normalizedQuery)
+                        normalizeSearch(reference.searchTerms).contains(normalizedQuery)
                     }
                 }
             )
         }
     }
 
+    private fun normalizeSearch(value: String): String = value
+        .lowercase(Locale.ROOT)
+        .replace(Regex("[^\\p{L}\\p{M}\\p{N}]+"), " ")
+        .trim()
+
     private fun emitEffect(effect: AnalysisLegalReferencesUiEffect) {
         viewModelScope.launch { _uiEffect.emit(effect) }
     }
 
-    companion object {
-        private const val COMMERCIAL_LAW_REFERENCE_ID = "commercial-law-2005-article-301"
-    }
 }

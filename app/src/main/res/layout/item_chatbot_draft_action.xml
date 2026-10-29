@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/chatbot_new_state_suggestion_height"
+    android:layout_marginBottom="@dimen/chatbot_message_row_spacing"
+    android:background="@drawable/bg_chatbot_new_state_suggestion"
+    android:fontFamily="@font/manrope"
+    android:gravity="center"
+    android:text="@string/chatbot_new_draft_from_document"
+    android:textColor="@color/legal_lens_primary"
+    android:textSize="@dimen/sp_14"
+    android:textStyle="bold" />

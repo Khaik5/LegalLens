@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.lagallens.R
 import com.example.lagallens.databinding.ItemNotificationBinding
+import com.example.lagallens.presentation.common.utils.bindPressFeedback
 import com.example.lagallens.presentation.feature.notifications.contract.NotificationItem
 
 class NotificationAdapter(
@@ -29,6 +30,7 @@ class NotificationAdapter(
         private val binding: ItemNotificationBinding,
         private val onNotificationClicked: (NotificationItem) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
+        init { binding.root.bindPressFeedback() }
         fun bind(item: NotificationItem) {
             val context = binding.root.context
             binding.root.setBackgroundResource(

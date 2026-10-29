@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import com.example.lagallens.databinding.ActivityInsufficientCreditsBinding
+import com.example.lagallens.presentation.common.utils.bindPressFeedback
 import com.example.lagallens.presentation.feature.creditstore.flow.contract.CreditFlowUiEffect
 import com.example.lagallens.presentation.feature.creditstore.flow.contract.CreditFlowUiEvent
 import com.example.lagallens.presentation.feature.creditstore.ui.CreditStoreActivity
@@ -16,6 +17,7 @@ class InsufficientCreditsActivity : CreditFlowActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(binding.root)
+        listOf(binding.insufficientCreditsBack, binding.insufficientCreditsStore, binding.insufficientCreditsContinue).forEach { it.bindPressFeedback() }
         binding.insufficientCreditsBack.setOnClickListener {
             viewModel.onEvent(CreditFlowUiEvent.BackClicked)
         }

@@ -10,6 +10,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.lagallens.R
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.hamcrest.Description
+import org.hamcrest.TypeSafeMatcher
 
 @RunWith(AndroidJUnit4::class)
 class UploadProgressActivityTest {
@@ -23,7 +25,10 @@ class UploadProgressActivityTest {
             )
         ).use {
             onView(withText(R.string.upload_progress_title)).check(matches(isDisplayed()))
-            onView(withId(R.id.upload_progress_percentage)).check(matches(withText("68%")))
+            onView(withId(R.id.upload_progress_percentage)).check(matches(withText(object : TypeSafeMatcher<String>() {
+                override fun matchesSafely(value: String): Boolean = value.endsWith("%") && value.dropLast(1).toIntOrNull()?.let { it in 0..100 } == true
+                override fun describeTo(description: Description) { description.appendText("a percentage from 0 to 100") }
+            })))
             onView(withId(R.id.upload_progress_file_name))
                 .check(matches(withText("hop_dong_thue_nha_2026.pdf")))
             onView(withId(R.id.upload_progress_cancel)).check(matches(isDisplayed()))

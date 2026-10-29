@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/viewerRoot" android:layout_width="match_parent" android:layout_height="match_parent" android:background="@color/legal_lens_background" android:orientation="vertical">
+    <LinearLayout android:id="@+id/viewerToolbar" android:layout_width="match_parent" android:layout_height="@dimen/dp_56" android:gravity="center_vertical" android:paddingStart="@dimen/dp_16" android:paddingEnd="@dimen/dp_16">
+        <ImageButton android:id="@+id/viewerBack" android:layout_width="@dimen/dp_40" android:layout_height="@dimen/dp_40" android:background="?attr/selectableItemBackgroundBorderless" android:contentDescription="@string/analysis_risk_findings_back_content_description" android:padding="@dimen/dp_10" android:src="@drawable/ic_contract_search_back" />
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="@dimen/dp_12" android:text="@string/viewer_title" android:textColor="@color/legal_lens_primary" android:textSize="@dimen/sp_18" android:textStyle="bold" />
+        <ImageButton android:id="@+id/viewerShare" android:layout_width="@dimen/dp_40" android:layout_height="@dimen/dp_40" android:background="?attr/selectableItemBackgroundBorderless" android:contentDescription="@string/viewer_share" android:padding="@dimen/dp_10" android:src="@drawable/ic_viewer_share" android:enabled="false" />
+    </LinearLayout>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:paddingStart="@dimen/dp_20" android:paddingTop="@dimen/dp_12" android:paddingEnd="@dimen/dp_20" android:paddingBottom="@dimen/dp_16">
+        <TextView android:id="@+id/viewerDocumentTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/legal_lens_primary" android:textSize="@dimen/sp_15" android:textStyle="bold" />
+        <TextView android:id="@+id/viewerDocumentMetadata" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/dp_4" android:textColor="@color/legal_lens_secondary_text" android:textSize="@dimen/sp_12" />
+    </LinearLayout>
+    <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:background="@color/notification_system_surface">
+        <LinearLayout android:id="@+id/viewerContent" android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center_horizontal" android:orientation="vertical" android:paddingTop="@dimen/dp_20" android:paddingBottom="@dimen/dp_20">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/viewer_preview" android:textColor="@color/legal_lens_secondary_text" android:textSize="@dimen/sp_11" />
+            <HorizontalScrollView android:id="@+id/viewerPageViewport" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:layout_marginTop="@dimen/dp_12" android:fillViewport="true" android:scrollbars="none">
+                <ScrollView android:layout_width="wrap_content" android:layout_height="match_parent" android:fillViewport="true" android:paddingStart="@dimen/dp_20" android:paddingEnd="@dimen/dp_20">
+                    <FrameLayout android:id="@+id/viewerPageContainer" android:layout_width="@dimen/viewer_page_width" android:layout_height="@dimen/viewer_page_height" android:layout_gravity="center_horizontal">
+                    <ImageView android:id="@+id/viewerPage" android:layout_width="@dimen/viewer_page_width" android:layout_height="@dimen/viewer_page_height" android:background="@color/white" android:contentDescription="@string/viewer_title" android:scaleType="fitCenter" />
+                    <TextView android:id="@+id/viewerPageNumber" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="bottom|center_horizontal" android:layout_marginBottom="@dimen/dp_8" android:background="@color/white" android:paddingStart="@dimen/dp_8" android:paddingEnd="@dimen/dp_8" android:textColor="@color/legal_lens_secondary_text" android:textSize="@dimen/sp_10" />
+                    </FrameLayout>
+                </ScrollView>
+            </HorizontalScrollView>
+        </LinearLayout>
+        <LinearLayout android:id="@+id/viewerLoading" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_gravity="center" android:gravity="center" android:orientation="vertical" android:padding="@dimen/dp_20" android:visibility="gone">
+            <ProgressBar android:layout_width="@dimen/dp_48" android:layout_height="@dimen/dp_48" android:indeterminateTint="@color/legal_lens_auth_accent" />
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/dp_20" android:gravity="center" android:text="@string/viewer_loading" android:textColor="@color/legal_lens_primary" android:textSize="@dimen/sp_20" android:textStyle="bold" />
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/dp_8" android:gravity="center" android:text="@string/viewer_loading_message" android:textColor="@color/legal_lens_secondary_text" android:textSize="@dimen/sp_14" />
+        </LinearLayout>
+        <LinearLayout android:id="@+id/viewerError" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_gravity="center" android:gravity="center" android:orientation="vertical" android:padding="@dimen/dp_20" android:visibility="gone">
+            <ImageView android:layout_width="@dimen/dp_48" android:layout_height="@dimen/dp_48" android:contentDescription="@null" android:src="@drawable/ic_alert_triangle" />
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/dp_20" android:gravity="center" android:text="@string/viewer_error" android:textColor="@color/legal_lens_primary" android:textSize="@dimen/sp_20" android:textStyle="bold" />
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/dp_8" android:gravity="center" android:text="@string/viewer_error_message" android:textColor="@color/legal_lens_secondary_text" android:textSize="@dimen/sp_14" />
+            <TextView android:id="@+id/viewerRetry" android:layout_width="match_parent" android:layout_height="@dimen/dp_50" android:layout_marginTop="@dimen/dp_32" android:background="@drawable/bg_compare_button" android:clickable="true" android:focusable="true" android:gravity="center" android:text="@string/viewer_retry" android:textColor="@color/white" android:textStyle="bold" />
+        </LinearLayout>
+    </FrameLayout>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="@dimen/dp_60" android:background="@color/white" android:gravity="center_vertical" android:orientation="horizontal" android:paddingStart="@dimen/dp_20" android:paddingEnd="@dimen/dp_20">
+        <ImageButton android:id="@+id/viewerPrevious" android:layout_width="@dimen/dp_40" android:layout_height="@dimen/dp_40" android:background="?attr/selectableItemBackgroundBorderless" android:contentDescription="@string/viewer_previous_page" android:padding="@dimen/dp_10" android:src="@drawable/ic_chevron_left" />
+        <TextView android:id="@+id/viewerPageCount" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="@color/legal_lens_primary" android:textStyle="bold" />
+        <ImageButton android:id="@+id/viewerNext" android:layout_width="@dimen/dp_40" android:layout_height="@dimen/dp_40" android:background="?attr/selectableItemBackgroundBorderless" android:contentDescription="@string/viewer_next_page" android:padding="@dimen/dp_10" android:src="@drawable/ic_contract_search_chevron_right" />
+        <Space android:layout_width="0dp" android:layout_height="@dimen/dp_1" android:layout_weight="1" />
+        <ImageButton android:id="@+id/viewerZoomOut" android:layout_width="@dimen/dp_40" android:layout_height="@dimen/dp_40" android:background="?attr/selectableItemBackgroundBorderless" android:padding="@dimen/dp_10" android:contentDescription="@string/viewer_zoom_out" android:src="@drawable/ic_viewer_zoom_out" />
+        <TextView android:id="@+id/viewerZoom" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="@color/legal_lens_secondary_text" android:textSize="@dimen/sp_13" />
+        <ImageButton android:id="@+id/viewerZoomIn" android:layout_width="@dimen/dp_40" android:layout_height="@dimen/dp_40" android:background="?attr/selectableItemBackgroundBorderless" android:padding="@dimen/dp_10" android:contentDescription="@string/viewer_zoom_in" android:src="@drawable/ic_viewer_zoom_in" />
+    </LinearLayout>
+</LinearLayout>

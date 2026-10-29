@@ -4,5 +4,6 @@ import androidx.annotation.StringRes
 
 sealed interface ChatbotHistoryUiEffect {
     data object NavigateBack : ChatbotHistoryUiEffect
+    data class OpenConversation(val conversation: ChatbotHistoryConversation) : ChatbotHistoryUiEffect
     data class ShowMessage(@StringRes val messageRes: Int) : ChatbotHistoryUiEffect
 }

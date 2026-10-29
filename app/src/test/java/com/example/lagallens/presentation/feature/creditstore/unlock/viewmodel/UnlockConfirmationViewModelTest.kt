@@ -1,6 +1,7 @@
 package com.example.lagallens.presentation.feature.creditstore.unlock.viewmodel
 
 import com.example.lagallens.MainDispatcherRule
+import com.example.lagallens.data.datasource.local.datastore.CreditDemoLedger
 import com.example.lagallens.presentation.feature.creditstore.unlock.contract.UnlockConfirmationUiEffect
 import com.example.lagallens.presentation.feature.creditstore.unlock.contract.UnlockConfirmationUiEvent
 import kotlinx.coroutines.CoroutineStart
@@ -18,7 +19,7 @@ class UnlockConfirmationViewModelTest {
 
     @Test
     fun confirmationRequestKeepsTheCreditCalculationAndEmitsOneEffect() = runTest {
-        val viewModel = UnlockConfirmationViewModel()
+        val viewModel = UnlockConfirmationViewModel(CreditDemoLedger(initialBalance = 5))
         val effect = async(start = CoroutineStart.UNDISPATCHED) { viewModel.uiEffect.first() }
 
         viewModel.onEvent(
@@ -33,9 +34,9 @@ class UnlockConfirmationViewModelTest {
 
         val state = viewModel.uiState.value
         assertTrue(state.isConfirmationRequested)
-        assertEquals(5, state.availableCredits)
+        assertEquals(3, state.availableCredits)
         assertEquals(2, state.unlockCost)
-        assertEquals(3, state.remainingCredits)
+        assertEquals(1, state.remainingCredits)
         assertEquals(
             UnlockConfirmationUiEffect.UnlockRequested(
                 analysisResultId = state.analysisResultId,
@@ -47,7 +48,7 @@ class UnlockConfirmationViewModelTest {
 
     @Test
     fun confirmationRequestWithInsufficientCreditsEmitsOneRedirectEffect() = runTest {
-        val viewModel = UnlockConfirmationViewModel()
+        val viewModel = UnlockConfirmationViewModel(CreditDemoLedger(initialBalance = 1))
         val effect = async(start = CoroutineStart.UNDISPATCHED) { viewModel.uiEffect.first() }
 
         viewModel.onEvent(

@@ -1,7 +1,11 @@
 package com.example.lagallens.presentation.common.view
 
 import android.content.Context
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.graphics.BitmapFactory
+import android.graphics.Canvas
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
@@ -9,6 +13,7 @@ import android.view.ViewConfiguration
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.view.doOnLayout
 import com.example.lagallens.R
+import com.example.lagallens.presentation.common.utils.MotionTokens
 import kotlin.math.abs
 import kotlin.math.hypot
 
@@ -27,6 +32,11 @@ class FloatingPremiumSticker @JvmOverloads constructor(
     private var downViewY = 0f
     private var isDragging = false
     private var onStickerClick: (() -> Unit)? = null
+    private var motionActive = false
+    private var hasPlayedEntrance = false
+    private var floatingOffset = 0f
+    private var floatingAnimator: ValueAnimator? = null
+    private var entranceAnimator: AnimatorSet? = null
 
     init {
         setImageBitmap(BitmapFactory.decodeResource(resources, R.drawable.img_floating_premium_sticker))
@@ -39,6 +49,67 @@ class FloatingPremiumSticker @JvmOverloads constructor(
 
     fun setOnStickerClick(listener: () -> Unit) {
         onStickerClick = listener
+    }
+
+    fun setMotionActive(active: Boolean) {
+        if (motionActive == active) return
+        motionActive = active
+        if (!active) {
+            stopFloating()
+            entranceAnimator?.cancel()
+            entranceAnimator = null
+            alpha = 1f
+            scaleX = DEFAULT_SCALE
+            scaleY = DEFAULT_SCALE
+        } else if (MotionTokens.areAnimationsEnabled()) {
+            if (!hasPlayedEntrance) {
+                hasPlayedEntrance = true
+                entranceAnimator = AnimatorSet().apply {
+                    playTogether(
+                        ObjectAnimator.ofFloat(this@FloatingPremiumSticker, View.ALPHA, 0f, 1f),
+                        ObjectAnimator.ofFloat(this@FloatingPremiumSticker, View.SCALE_X, 0.95f, 1f),
+                        ObjectAnimator.ofFloat(this@FloatingPremiumSticker, View.SCALE_Y, 0.95f, 1f)
+                    )
+                    duration = MotionTokens.EMPHASIS_DURATION_MILLIS
+                    interpolator = MotionTokens.linearOutSlowIn
+                    start()
+                }
+            }
+            startFloating()
+        }
+    }
+
+    override fun onDraw(canvas: Canvas) {
+        val checkpoint = canvas.save()
+        canvas.translate(0f, floatingOffset)
+        super.onDraw(canvas)
+        canvas.restoreToCount(checkpoint)
+    }
+
+    private fun startFloating() {
+        if (!motionActive || floatingAnimator != null || !MotionTokens.areAnimationsEnabled()) return
+        floatingAnimator = ValueAnimator.ofFloat(0f, -3f * resources.displayMetrics.density).apply {
+            duration = 1250L
+            repeatMode = ValueAnimator.REVERSE
+            repeatCount = 1
+            addUpdateListener {
+                floatingOffset = it.animatedValue as Float
+                invalidate()
+            }
+            start()
+        }
+    }
+
+    private fun stopFloating() {
+        floatingAnimator?.cancel()
+        floatingAnimator = null
+        floatingOffset = 0f
+        invalidate()
+    }
+
+    override fun onDetachedFromWindow() {
+        setMotionActive(false)
+        super.onDetachedFromWindow()
     }
 
     fun setSafeTopInset(inset: Int) {
@@ -63,6 +134,10 @@ class FloatingPremiumSticker @JvmOverloads constructor(
     }
 
     private fun beginTouch(event: MotionEvent) {
+        entranceAnimator?.cancel()
+        entranceAnimator = null
+        alpha = 1f
+        stopFloating()
         downRawX = event.rawX
         downRawY = event.rawY
         downViewX = x
@@ -91,6 +166,7 @@ class FloatingPremiumSticker @JvmOverloads constructor(
         } else {
             performClick()
         }
+        startFloating()
     }
 
     private fun cancelTouch() {
@@ -98,6 +174,7 @@ class FloatingPremiumSticker @JvmOverloads constructor(
         if (isDragging) {
             snapToNearestEdge()
         }
+        startFloating()
     }
 
     private fun snapToNearestEdge() {
@@ -150,7 +227,7 @@ class FloatingPremiumSticker @JvmOverloads constructor(
 
     private companion object {
         const val DEFAULT_SCALE = 1f
-        const val PRESSED_SCALE = 0.94f
+        const val PRESSED_SCALE = 0.97f
         const val SCALE_DURATION_MILLIS = 100L
         const val SNAP_DURATION_MILLIS = 180L
     }

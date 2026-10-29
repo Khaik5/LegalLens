@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notification_load_error_title">Notifications are unavailable</string>
+    <string name="notification_analysis_complete_title">Analysis ready: Sample employment contract</string>
+    <string name="notification_analysis_complete_description">The DEMO analysis for the employment contract is ready to view.</string>
+    <string name="notification_ocr_review_title">Review OCR: Fixed-term employment contract</string>
+    <string name="notification_ocr_review_description">The DEMO extraction for this employment contract is waiting for your review.</string>
+    <string name="notification_expiring_title">Employment contract notice</string>
+    <string name="notification_expiring_description">This is a DEMO notification. The app does not track contract expiry dates.</string>
+    <string name="notification_document_ready_title">Document is ready</string>
+    <string name="notification_document_ready_description">The DEMO analysis document is ready to view.</string>
+    <string name="notification_maintenance_title">System maintenance</string>
+    <string name="notification_maintenance_description">This is a sample system notification.</string>
+    <string name="notification_ten_minutes_ago">10 minutes ago</string>
+    <string name="notification_one_hour_ago">1 hour ago</string>
+    <string name="notification_three_hours_ago">3 hours ago</string>
+    <string name="notification_yesterday">Yesterday</string>
+    <string name="notification_two_days_ago">2 days ago</string>
+</resources>

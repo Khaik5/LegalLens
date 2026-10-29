@@ -1,31 +1,27 @@
 package com.example.lagallens.presentation.feature.creditstore.viewmodel
 
+import com.example.lagallens.data.datasource.local.datastore.CreditDemoLedger
+import com.example.lagallens.MainDispatcherRule
+import com.example.lagallens.presentation.feature.creditstore.contract.CreditStoreUiEffect
 import com.example.lagallens.presentation.feature.creditstore.contract.CreditStoreUiEvent
+import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
+import org.junit.Rule
 import org.junit.Test
 
 class CreditStoreViewModelTest {
-    @Test
-    fun selectingPackageUpdatesTheSelectedPackageOnly() {
-        val viewModel = CreditStoreViewModel()
+    @get:Rule val mainDispatcherRule = MainDispatcherRule()
 
-        viewModel.onEvent(CreditStoreUiEvent.PackageClicked("credits_30"))
-
-        val packages = viewModel.uiState.value.packages
-        assertTrue(packages.single { it.id == "credits_30" }.isSelected)
-        assertFalse(packages.single { it.id == "credits_15" }.isSelected)
-        assertEquals(1, packages.count { it.isSelected })
-    }
-
-    @Test
-    fun selectingUnknownPackageKeepsCurrentSelection() {
-        val viewModel = CreditStoreViewModel()
-
-        viewModel.onEvent(CreditStoreUiEvent.PackageClicked("unknown"))
-
-        assertTrue(viewModel.uiState.value.packages.single { it.id == "credits_15" }.isSelected)
-        assertEquals(1, viewModel.uiState.value.packages.count { it.isSelected })
+    @Test fun topUpUsesSelectedPackageForEveryOption() = runTest {
+        val model = CreditStoreViewModel(CreditDemoLedger(initialBalance = 5))
+        listOf("credits_5", "credits_15", "credits_30", "credits_100").forEach { id ->
+            model.onEvent(CreditStoreUiEvent.PackageClicked(id))
+            val effect = async { model.uiEffect.first() }
+            kotlinx.coroutines.yield()
+            model.onEvent(CreditStoreUiEvent.TopUpClicked)
+            assertEquals(CreditStoreUiEffect.NavigateToPurchaseConfirmation(id, 5), effect.await())
+        }
     }
 }

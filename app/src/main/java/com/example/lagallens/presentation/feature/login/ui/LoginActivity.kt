@@ -16,12 +16,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.doOnPreDraw
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.lagallens.R
 import com.example.lagallens.LegalLensApplication
+import com.example.lagallens.di.AppDataMode
 import com.example.lagallens.databinding.ActivityLoginBinding
 import com.example.lagallens.presentation.feature.forgotpassword.ui.ForgotPasswordActivity
 import com.example.lagallens.presentation.feature.register.ui.RegisterActivity
@@ -31,6 +33,9 @@ import com.example.lagallens.presentation.feature.login.contract.LoginUiEvent
 import com.example.lagallens.presentation.feature.login.contract.LoginUiState
 import com.example.lagallens.presentation.feature.login.viewmodel.LoginViewModel
 import com.example.lagallens.presentation.feature.login.viewmodel.LoginViewModelFactory
+import com.example.lagallens.presentation.common.utils.animateContentEntrance
+import com.example.lagallens.presentation.common.utils.animateLoadingFeedback
+import com.example.lagallens.presentation.common.utils.bindPressFeedback
 import kotlinx.coroutines.launch
 
 class LoginActivity : AppCompatActivity() {
@@ -40,11 +45,16 @@ class LoginActivity : AppCompatActivity() {
             (application as LegalLensApplication).authenticateUserUseCase
         )
     }
+    private var wasLoading = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(binding.root)
+        if ((application as LegalLensApplication).dataMode == AppDataMode.DEMO) {
+            binding.loginSubtitleText.text = getString(R.string.login_subtitle) + "\n" + getString(R.string.auth_demo_session_hint)
+        }
+        playEntranceMotion()
         bindView()
         bindText()
         collectState()
@@ -57,6 +67,8 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun bindView() {
+        binding.backButton.bindPressFeedback()
+        binding.submitButton.bindPressFeedback()
         binding.backButton.setOnClickListener {
             viewModel.onEvent(LoginUiEvent.BackClicked)
         }
@@ -80,6 +92,12 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
+    private fun playEntranceMotion() {
+        binding.loginScroll.doOnPreDraw {
+            binding.loginScroll.animateContentEntrance(resources.getDimension(R.dimen.dp_16))
+        }
+    }
+
     private fun collectState() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -89,6 +107,10 @@ class LoginActivity : AppCompatActivity() {
                     binding.emailInput.error = state.usernameErrorResId?.let(::getString)
                     binding.passwordInput.error = state.passwordErrorResId?.let(::getString)
                     binding.submitButton.isEnabled = !state.isLoading
+                    if (wasLoading != state.isLoading) {
+                        binding.submitButton.animateLoadingFeedback(state.isLoading)
+                        wasLoading = state.isLoading
+                    }
                 }
             }
         }

@@ -6,5 +6,9 @@ data class OcrResultUiState(
     val documentText: String = "",
     val documentName: String = "",
     val documentDetails: String = "",
-    val isReviewConfirmed: Boolean = false
+    val documentId: String = "",
+    val contractId: String? = null,
+    val documentUri: String? = null,
+    val isReviewConfirmed: Boolean = false,
+    val errorMessageRes: Int? = null
 )

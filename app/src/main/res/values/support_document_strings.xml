@@ -1,0 +1,70 @@
+<resources>
+    <string name="about_screen_title">Về LegalLens</string>
+    <string name="about_app_name" translatable="false">Legal Lens</string>
+    <string name="about_version">Phiên bản %1$s</string>
+    <string name="about_description">Số hóa, phân tích và hiểu rõ hợp đồng của bạn bằng trí tuệ nhân tạo.</string>
+    <string name="about_assistant_title">Trợ lý cho hợp đồng của bạn</string>
+    <string name="about_assistant_description">Nhận diện văn bản từ tài liệu quét bằng OCR, tóm tắt và phân tích nội dung hợp đồng, nhận diện điểm cần xem lại và hỏi đáp cùng trợ lý AI.</string>
+    <string name="about_team_title">Nhóm phát triển</string>
+    <string name="about_team_placeholder">[Tên nhóm phát triển]</string>
+    <string name="about_contact_title">Thông tin liên hệ</string>
+    <string name="about_contact_placeholder">[Email liên hệ]</string>
+    <string name="about_disclaimer">Legal Lens hỗ trợ đọc hiểu hợp đồng. Kết quả AI cần được kiểm tra với tài liệu gốc và không thay thế tư vấn pháp lý chuyên nghiệp.</string>
+    <string name="privacy_screen_title">Quyền riêng tư</string>
+    <string name="privacy_intro_title">Hiểu cách dữ liệu được xử lý</string>
+    <string name="privacy_intro_subtitle">Thông tin đang cập nhật</string>
+    <string name="privacy_notice">Một số thông tin chưa được xác nhận. Các mục bên dưới không phải cam kết bảo mật của sản phẩm.</string>
+    <string name="privacy_ocr_title">Dữ liệu cho OCR &amp; phân tích AI</string>
+    <string name="privacy_ocr_body">Tệp hợp đồng, hình ảnh quét và văn bản nhận diện được dùng cho chức năng OCR, tóm tắt, phân tích điều khoản và hỗ trợ hỏi đáp về hợp đồng.\n\n[Cần xác nhận phạm vi dữ liệu gửi đi và nơi xử lý cho từng chức năng.]</string>
+    <string name="privacy_storage_title">Xử lý, lưu trữ &amp; bên thứ ba</string>
+    <string name="privacy_storage_body">[Cần xác nhận nơi lưu tài liệu, thời gian lưu, cách xóa, đơn vị cung cấp OCR/AI và dữ liệu được chia sẻ với từng bên.]\n\n[Cần xác nhận việc sử dụng dữ liệu để cải thiện hoặc huấn luyện AI.]</string>
+    <string name="privacy_security_title">Bảo mật tài liệu</string>
+    <string name="privacy_security_body">[Cần xác nhận biện pháp bảo vệ khi truyền và lưu dữ liệu, kiểm soát truy cập và quy trình xử lý sự cố.]\n\nChưa có thông tin xác nhận về mã hóa hoặc chứng nhận tuân thủ.</string>
+    <string name="privacy_rights_title">Quyền của bạn &amp; cách yêu cầu</string>
+    <string name="privacy_rights_body">Bạn có thể cần yêu cầu truy cập, chỉnh sửa hoặc xóa dữ liệu. [Cần xác nhận quyền được hỗ trợ, điều kiện, đầu mối tiếp nhận và thời gian phản hồi.]\n\nKênh yêu cầu: [Email liên hệ quyền riêng tư]\n\nKhông mặc định rằng thao tác xóa hợp đồng đã xóa mọi bản lưu hoặc dữ liệu tại bên thứ ba.</string>
+    <string name="privacy_safety_title">Hướng dẫn an toàn cho bạn</string>
+    <string name="privacy_safety_body">Chỉ tải lên tài liệu bạn có quyền sử dụng. Hạn chế thông tin cá nhân, bí mật kinh doanh không cần thiết; kiểm tra người nhận trước khi chia sẻ.\n\nĐây là khuyến nghị sử dụng, không phải cam kết của Legal Lens.</string>
+    <string name="privacy_policy_title">Chính sách quyền riêng tư</string>
+    <string name="privacy_policy_body">[URL chính sách quyền riêng tư]\n\nNội dung và địa chỉ chính thức đang cập nhật.</string>
+    <string name="chatbot_help_title">Trợ giúp Chatbot</string>
+    <string name="chatbot_help_heading">Hỏi AI rõ hơn, hiểu hợp đồng tốt hơn</string>
+    <string name="chatbot_help_intro">Nêu rõ hợp đồng và điều khoản bạn muốn tìm hiểu. Hỏi từng vấn đề, sau đó yêu cầu AI giải thích hoặc chỉ ra nội dung liên quan.</string>
+    <string name="chatbot_help_attachment_title">Đính kèm tài liệu</string>
+    <string name="chatbot_help_attachment_body">1. Nhấn biểu tượng kẹp giấy cạnh ô nhập trong cuộc trò chuyện.\n\n2. Chọn tài liệu bạn có quyền sử dụng và kiểm tra tên tệp.\n\n3. Nhập câu hỏi rồi nhấn gửi khi chức năng gửi tệp được kết nối.\n\nHiện tại tệp chỉ được chọn để xem trước, chưa gửi tới AI.</string>
+    <string name="chatbot_help_questions">Bạn có thể hỏi</string>
+    <string name="chatbot_help_question_term" translatable="false">Thời hạn hợp đồng thuê là bao lâu?</string>
+    <string name="chatbot_help_question_payment" translatable="false">Tiền thuê và ngày thanh toán được quy định thế nào?</string>
+    <string name="chatbot_help_question_obligations" translatable="false">Nghĩa vụ của bên thuê gồm những gì?</string>
+    <string name="chatbot_help_question_termination" translatable="false">Điều khoản chấm dứt nào cần lưu ý?</string>
+    <string name="chatbot_help_faq">Câu hỏi thường gặp</string>
+    <string name="chatbot_help_faq_evidence">Làm gì khi AI trả lời thiếu căn cứ?</string>
+    <string name="chatbot_help_faq_evidence_answer">Yêu cầu AI nêu điều khoản hoặc phần văn bản liên quan. Mở tài liệu gốc để đối chiếu. Nếu không tìm thấy căn cứ hoặc câu trả lời chưa rõ, không dùng kết quả đó để kết luận; hãy hỏi chuyên gia pháp lý.</string>
+    <string name="chatbot_help_faq_unreadable">Vì sao AI không đọc được tài liệu?</string>
+    <string name="chatbot_help_faq_unreadable_answer">Kiểm tra tệp có mở được, chất lượng bản quét và thông báo lỗi; thử lại với tài liệu rõ hơn nếu cần.</string>
+    <string name="chatbot_help_faq_followup">Có thể hỏi tiếp trong cùng cuộc trò chuyện?</string>
+    <string name="chatbot_help_faq_followup_answer">Bạn có thể đặt thêm câu hỏi trong cuộc trò chuyện hiện tại và nêu rõ điều khoản cần làm rõ.</string>
+    <string name="chatbot_help_faq_verify">Tôi nên kiểm tra câu trả lời như thế nào?</string>
+    <string name="chatbot_help_faq_verify_answer">Đối chiếu câu trả lời với tài liệu gốc và hỏi chuyên gia pháp lý khi cần đưa ra quyết định.</string>
+    <string name="chatbot_help_warning">AI có thể sai hoặc bỏ sót thông tin. Luôn kiểm tra văn bản gốc; nội dung trả lời chỉ để tham khảo và không thay thế chuyên gia pháp lý.</string>
+    <string name="contract_rename_title">Đổi tên hợp đồng</string>
+    <string name="contract_rename_description">Đặt tên để dễ tìm lại hợp đồng của bạn.</string>
+    <string name="contract_rename_label">Tên hợp đồng</string>
+    <string name="contract_rename_hint">Nhập tên hợp đồng</string>
+    <string name="contract_rename_helper">Tên mới được cập nhật trên màn hình này trong phiên hiện tại.</string>
+    <string name="contract_rename_empty">Tên hợp đồng không được để trống. Vui lòng nhập tên trước khi lưu.</string>
+    <string name="contract_rename_saving">Đang lưu tên hợp đồng. Vui lòng chờ; các thao tác tạm thời bị vô hiệu hóa.</string>
+    <string name="contract_rename_save">Lưu</string>
+    <string name="contract_rename_loading">Đang lưu…</string>
+    <string name="contract_export_title">Xuất tài liệu</string>
+    <string name="contract_export_description">Xuất bản PDF của tài liệu gốc, không phải báo cáo phân tích AI.</string>
+    <string name="contract_export_demo_notice">Giao diện minh họa: chưa có tệp PDF gốc để lưu hoặc chia sẻ.</string>
+    <string name="contract_export_save">Lưu PDF về thiết bị</string>
+    <string name="contract_export_share">Chia sẻ tài liệu</string>
+    <string name="contract_export_loading">Đang xuất tài liệu</string>
+    <string name="contract_export_loading_detail">Đang chuẩn bị tài liệu…</string>
+    <string name="contract_export_ready">PDF đã sẵn sàng (minh họa)</string>
+    <string name="contract_export_ready_detail">Trạng thái mẫu; chưa tạo, lưu hoặc chia sẻ tệp thật.</string>
+    <string name="contract_export_error">Xuất tài liệu thất bại</string>
+    <string name="contract_export_error_detail">Chưa có tệp PDF gốc để xuất. Vui lòng thử lại khi tài liệu sẵn sàng.</string>
+    <string name="contract_export_retry">Thử lại xuất PDF</string>
+</resources>

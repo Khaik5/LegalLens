@@ -7,6 +7,8 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
+import androidx.core.view.isVisible
+import com.example.lagallens.R
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -14,6 +16,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.lagallens.databinding.ActivityAnalysisLegalReferenceDetailBinding
+import com.example.lagallens.presentation.common.utils.bindPressFeedback
 import com.example.lagallens.presentation.feature.analysis.legalreferences.detail.contract.AnalysisLegalReferenceDetailUiEffect
 import com.example.lagallens.presentation.feature.analysis.legalreferences.detail.contract.AnalysisLegalReferenceDetailUiEvent
 import com.example.lagallens.presentation.feature.analysis.legalreferences.detail.contract.AnalysisLegalReferenceDetailUiState
@@ -53,6 +56,7 @@ class AnalysisLegalReferenceDetailActivity : AppCompatActivity() {
     }
 
     private fun bindEvents() = with(binding) {
+        listOf(analysisLegalReferenceDetailBack, analysisLegalReferenceDetailRisk).forEach { it.bindPressFeedback() }
         analysisLegalReferenceDetailBack.setOnClickListener {
             viewModel.onEvent(AnalysisLegalReferenceDetailUiEvent.BackClicked)
         }
@@ -75,6 +79,10 @@ class AnalysisLegalReferenceDetailActivity : AppCompatActivity() {
         analysisLegalReferenceDetailArticle.setText(state.articleRes)
         analysisLegalReferenceDetailEffectiveDate.setText(state.effectiveDateRes)
         analysisLegalReferenceDetailFullText.setText(state.fullTextRes)
+        analysisLegalReferenceDetailTextHeading.setText(if (state.isDetailedExample) R.string.analysis_legal_reference_detail_full_text_heading else R.string.analysis_reference_summary_heading)
+        analysisLegalReferenceDetailMetadata.isVisible = state.isDetailedExample
+        analysisLegalReferenceDetailRiskHeading.isVisible = state.isDetailedExample
+        analysisLegalReferenceDetailRisk.isVisible = state.isDetailedExample
         analysisLegalReferenceDetailIssuerValue.setText(state.issuerRes)
         analysisLegalReferenceDetailDocumentTypeValue.setText(state.documentTypeRes)
         analysisLegalReferenceDetailStatus.setText(state.statusRes)

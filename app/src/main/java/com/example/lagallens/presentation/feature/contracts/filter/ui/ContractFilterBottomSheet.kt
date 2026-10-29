@@ -74,6 +74,8 @@ class ContractFilterBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun bindView() {
+        binding.rowService.visibility = android.view.View.GONE
+        binding.rowCommercial.visibility = android.view.View.GONE
         binding.rowService.setOnClickListener {
             viewModel.onEvent(ContractFilterUiEvent.ContractTypeToggled(ContractType.SERVICE))
         }

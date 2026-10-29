@@ -2,6 +2,7 @@ package com.example.lagallens.presentation.feature.analysis.legalreferences.deta
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.lagallens.R
 import com.example.lagallens.presentation.feature.analysis.legalreferences.detail.contract.AnalysisLegalReferenceDetailUiEffect
 import com.example.lagallens.presentation.feature.analysis.legalreferences.detail.contract.AnalysisLegalReferenceDetailUiEvent
 import com.example.lagallens.presentation.feature.analysis.legalreferences.detail.contract.AnalysisLegalReferenceDetailUiState
@@ -22,11 +23,28 @@ class AnalysisLegalReferenceDetailViewModel : ViewModel() {
     fun onEvent(event: AnalysisLegalReferenceDetailUiEvent) {
         when (event) {
             is AnalysisLegalReferenceDetailUiEvent.ScreenOpened -> _uiState.update {
-                it.copy(
+                val base = it.copy(
                     referenceId = event.referenceId,
                     documentName = event.documentName,
                     documentMetadata = event.documentMetadata
                 )
+                when (event.referenceId) {
+                    "civil-code-2015-article-418" -> base.copy(
+                        isDetailedExample = false,
+                        titleRes = R.string.analysis_legal_references_civil_code_title,
+                        articleRes = R.string.analysis_legal_references_civil_code_article,
+                        effectiveDateRes = R.string.analysis_legal_references_civil_code_effective_date,
+                        fullTextRes = R.string.analysis_legal_references_civil_code_description
+                    )
+                    "decree-21-2021-article-15" -> base.copy(
+                        isDetailedExample = false,
+                        titleRes = R.string.analysis_legal_references_decree_title,
+                        articleRes = R.string.analysis_legal_references_decree_article,
+                        effectiveDateRes = R.string.analysis_legal_references_decree_effective_date,
+                        fullTextRes = R.string.analysis_legal_references_decree_description
+                    )
+                    else -> base
+                }
             }
 
             AnalysisLegalReferenceDetailUiEvent.BackClicked -> emitEffect(

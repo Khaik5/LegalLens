@@ -15,6 +15,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.lagallens.R
 import com.example.lagallens.databinding.ActivityAnalysisRiskOverviewBinding
+import com.example.lagallens.presentation.common.utils.bindPressFeedback
 import com.example.lagallens.presentation.feature.analysis.risk.contract.AnalysisRiskOverviewUiEffect
 import com.example.lagallens.presentation.feature.analysis.risk.contract.AnalysisRiskOverviewUiEvent
 import com.example.lagallens.presentation.feature.analysis.risk.contract.AnalysisRiskOverviewUiState
@@ -42,6 +43,7 @@ class AnalysisRiskOverviewActivity : AppCompatActivity() {
             view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+        listOf(binding.analysisRiskOverviewBack, binding.analysisRiskOverviewViewDetails).forEach { it.bindPressFeedback() }
         binding.analysisRiskOverviewBack.setOnClickListener {
             viewModel.onEvent(AnalysisRiskOverviewUiEvent.BackClicked)
         }

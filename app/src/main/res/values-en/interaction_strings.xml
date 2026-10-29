@@ -1,0 +1,8 @@
+<resources>
+    <string name="chatbot_history_search_hint">Search conversations</string>
+    <string name="chatbot_history_empty">No matching conversations found.</string>
+    <string name="chatbot_attachment_selected">Selected file (not sent): %1$s  ×</string>
+    <string name="chatbot_attachment_remove">Remove attachment %1$s</string>
+    <string name="analysis_reference_summary_heading">Reference summary</string>
+    <string name="analysis_risk_finding_summary">Finding summary</string>
+</resources>

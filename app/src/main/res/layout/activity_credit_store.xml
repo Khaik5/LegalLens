@@ -11,7 +11,7 @@
     <LinearLayout
         android:id="@+id/creditStoreHeader"
         android:layout_width="0dp"
-        android:layout_height="@dimen/dp_56"
+        android:layout_height="wrap_content" android:minHeight="@dimen/dp_56"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingStart="@dimen/dp_16"
@@ -119,7 +119,7 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/dp_20"
+                    android:layout_height="wrap_content" android:minHeight="@dimen/dp_20"
                     android:layout_marginTop="@dimen/dp_12"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
@@ -150,7 +150,7 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/dp_20"
+                    android:layout_height="wrap_content" android:minHeight="@dimen/dp_20"
                     android:layout_marginTop="@dimen/dp_10"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
@@ -181,7 +181,7 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/dp_20"
+                    android:layout_height="wrap_content" android:minHeight="@dimen/dp_20"
                     android:layout_marginTop="@dimen/dp_10"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
@@ -213,7 +213,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/credit_store_balance_height"
+                android:layout_height="wrap_content" android:minHeight="@dimen/credit_store_balance_height"
                 android:layout_marginTop="@dimen/dp_16"
                 android:background="@drawable/bg_contract_detail_assistant"
                 android:gravity="center_vertical"
@@ -304,7 +304,7 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/dp_24"
+                    android:layout_height="wrap_content" android:minHeight="@dimen/dp_24"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
@@ -333,7 +333,7 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/dp_39"
+                    android:layout_height="wrap_content" android:minHeight="@dimen/dp_39" android:paddingTop="@dimen/dp_8" android:paddingBottom="@dimen/dp_8"
                     android:layout_marginTop="@dimen/dp_12"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
@@ -353,7 +353,7 @@
 
                     <LinearLayout
                         android:layout_width="0dp"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/dp_12"
                         android:layout_weight="1"
                         android:orientation="vertical">
@@ -398,7 +398,7 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/dp_39"
+                    android:layout_height="wrap_content" android:minHeight="@dimen/dp_39" android:paddingTop="@dimen/dp_8" android:paddingBottom="@dimen/dp_8"
                     android:layout_marginTop="@dimen/dp_12"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
@@ -418,7 +418,7 @@
 
                     <LinearLayout
                         android:layout_width="0dp"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/dp_12"
                         android:layout_weight="1"
                         android:orientation="vertical">
@@ -469,13 +469,12 @@
             <Button
                 android:id="@+id/creditStoreTopUpAction"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/dp_54"
+                android:layout_height="wrap_content" android:minHeight="@dimen/dp_54"
                 android:layout_marginTop="@dimen/dp_20"
                 android:background="@drawable/bg_unlock_confirmation_primary_action"
                 android:backgroundTint="@null"
                 android:fontFamily="sans-serif"
                 android:includeFontPadding="false"
-                android:minHeight="@dimen/dp_0"
                 android:minWidth="@dimen/dp_0"
                 android:text="@string/credit_store_top_up_action"
                 android:textAllCaps="false"

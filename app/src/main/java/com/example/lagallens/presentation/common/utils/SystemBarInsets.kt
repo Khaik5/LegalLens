@@ -18,7 +18,7 @@ fun View.applySystemBarInsets(
     val initialPadding = Insets.of(paddingLeft, paddingTop, paddingRight, paddingBottom)
     val initialHeight = layoutParams.height
     ViewCompat.setOnApplyWindowInsetsListener(this) { view, windowInsets ->
-        val systemBars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+        val systemBars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
         view.updatePadding(
             left = initialPadding.left + systemBars.left,
             top = initialPadding.top + if (top) systemBars.top else 0,

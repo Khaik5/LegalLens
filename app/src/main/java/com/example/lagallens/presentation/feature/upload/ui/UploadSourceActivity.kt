@@ -17,12 +17,14 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.lagallens.R
 import com.example.lagallens.databinding.ActivityUploadSourceBinding
+import com.example.lagallens.presentation.common.utils.bindPressFeedback
 import com.example.lagallens.presentation.feature.camera.permission.ui.CameraPermissionActivity
 import com.example.lagallens.presentation.feature.upload.contract.UploadSourceUiEffect
 import com.example.lagallens.presentation.feature.upload.contract.UploadSourceUiEvent
 import com.example.lagallens.presentation.feature.upload.contract.UploadSourceUiState
 import com.example.lagallens.presentation.feature.upload.progress.ui.UploadProgressActivity
 import com.example.lagallens.presentation.feature.upload.viewmodel.UploadSourceViewModel
+import com.example.lagallens.presentation.feature.upload.UploadFileValidator
 import kotlinx.coroutines.launch
 
 class UploadSourceActivity : AppCompatActivity() {
@@ -31,7 +33,7 @@ class UploadSourceActivity : AppCompatActivity() {
     private val documentPicker = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         uri?.let(::openUploadProgress)
     }
-    private val imagePicker = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+    private val imagePicker = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         uri?.let(::openUploadProgress)
     }
 
@@ -59,6 +61,7 @@ class UploadSourceActivity : AppCompatActivity() {
     }
 
     private fun bindView() {
+        listOf(binding.uploadSourceBack, binding.uploadSourcePdf, binding.uploadSourceDocx, binding.uploadSourceGallery, binding.uploadSourceCamera).forEach { it.bindPressFeedback() }
         binding.uploadSourceBack.setOnClickListener {
             viewModel.onEvent(UploadSourceUiEvent.BackClicked)
         }
@@ -99,7 +102,7 @@ class UploadSourceActivity : AppCompatActivity() {
                 CameraPermissionActivity.createIntent(this)
             )
             is UploadSourceUiEffect.OpenDocumentPicker -> documentPicker.launch(effect.mimeTypes)
-            UploadSourceUiEffect.OpenImagePicker -> imagePicker.launch("image/*")
+            UploadSourceUiEffect.OpenImagePicker -> imagePicker.launch(arrayOf("image/*"))
             UploadSourceUiEffect.ShowFileSelected -> showMessage(R.string.upload_source_selected)
         }
     }
@@ -109,6 +112,9 @@ class UploadSourceActivity : AppCompatActivity() {
     }
 
     private fun openUploadProgress(uri: android.net.Uri) {
+        runCatching {
+            contentResolver.takePersistableUriPermission(uri, android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
         val fileMetadata = contentResolver.query(uri, null, null, null, null)?.use { cursor ->
             val nameColumn = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
             val sizeColumn = cursor.getColumnIndex(OpenableColumns.SIZE)
@@ -121,10 +127,24 @@ class UploadSourceActivity : AppCompatActivity() {
             }
         }
         val fileName = fileMetadata?.first ?: getString(R.string.upload_source_selected_file)
-        val fileSize = fileMetadata?.second?.let { Formatter.formatShortFileSize(this, it) }
-        val fileType = contentResolver.getType(uri)?.let(::formatFileType).orEmpty()
+        val byteCount = fileMetadata?.second
+        val mimeType = contentResolver.getType(uri).orEmpty()
+        if (!UploadFileValidator.isSupported(mimeType)) {
+            showMessage(R.string.upload_source_unsupported_file)
+            return
+        }
+        if (byteCount != null && byteCount > UploadFileValidator.MAX_BYTES) {
+            showMessage(R.string.upload_source_file_too_large)
+            return
+        }
+        if (byteCount == 0L) {
+            showMessage(R.string.upload_source_file_empty)
+            return
+        }
+        val fileSize = byteCount?.let { Formatter.formatShortFileSize(this, it) }
+        val fileType = mimeType.takeIf(String::isNotBlank)?.let(::formatFileType).orEmpty()
         val fileDetails = listOfNotNull(fileType.takeIf { it.isNotBlank() }, fileSize).joinToString(" · ")
-        startActivity(UploadProgressActivity.newIntent(this, fileName, fileDetails))
+        startActivity(UploadProgressActivity.newIntent(this, fileName, fileDetails, uri.toString(), java.util.UUID.randomUUID().toString()))
     }
 
     private fun formatFileType(mimeType: String): String {

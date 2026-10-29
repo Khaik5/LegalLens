@@ -30,8 +30,9 @@ class ProfileEditViewModel : ViewModel() {
                 it.copy(phone = event.value, phoneErrorRes = null)
             }
             ProfileEditUiEvent.ChangePhotoClicked -> emitEffect(
-                ProfileEditUiEffect.ShowPhotoPickerUnavailable
+                ProfileEditUiEffect.OpenPhotoPicker
             )
+            is ProfileEditUiEvent.PhotoSelected -> _uiState.update { it.copy(photoUri = event.uri) }
             ProfileEditUiEvent.SaveClicked -> saveProfile()
         }
     }
@@ -43,6 +44,7 @@ class ProfileEditViewModel : ViewModel() {
                     name = event.name,
                     email = event.email,
                     phone = event.phone,
+                    photoUri = event.photoUri,
                     isInitialized = true
                 )
             }
@@ -67,7 +69,7 @@ class ProfileEditViewModel : ViewModel() {
             return
         }
 
-        emitEffect(ProfileEditUiEffect.ProfileSaved(name, phone))
+        emitEffect(ProfileEditUiEffect.ProfileSaved(name, phone, state.photoUri))
     }
 
     private fun emitEffect(effect: ProfileEditUiEffect) {

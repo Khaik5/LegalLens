@@ -5,10 +5,4 @@
             <solid android:color="@color/splash_progress_track" />
         </shape>
     </item>
-    <item android:width="72dp" android:gravity="start">
-        <shape android:shape="rectangle">
-            <corners android:radius="2dp" />
-            <solid android:color="@color/splash_teal" />
-        </shape>
-    </item>
 </layer-list>

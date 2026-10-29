@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.doOnPreDraw
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -24,6 +25,8 @@ import com.example.lagallens.presentation.feature.otp.ui.OtpVerificationActivity
 import com.example.lagallens.presentation.feature.register.contract.RegisterUiEffect
 import com.example.lagallens.presentation.feature.register.contract.RegisterUiEvent
 import com.example.lagallens.presentation.feature.register.viewmodel.RegisterViewModel
+import com.example.lagallens.presentation.common.utils.animateContentEntrance
+import com.example.lagallens.presentation.common.utils.bindPressFeedback
 import kotlinx.coroutines.launch
 
 class RegisterActivity : AppCompatActivity() {
@@ -34,6 +37,7 @@ class RegisterActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(binding.root)
+        playEntranceMotion()
         bindView()
         bindText()
         collectState()
@@ -46,6 +50,8 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun bindView() {
+        binding.backButton.bindPressFeedback()
+        binding.submitButton.bindPressFeedback()
         binding.backButton.setOnClickListener {
             viewModel.onEvent(RegisterUiEvent.BackClicked)
         }
@@ -66,6 +72,12 @@ class RegisterActivity : AppCompatActivity() {
         }
         binding.loginText.setOnClickListener {
             viewModel.onEvent(RegisterUiEvent.LoginClicked)
+        }
+    }
+
+    private fun playEntranceMotion() {
+        binding.registerScroll.doOnPreDraw {
+            binding.registerScroll.animateContentEntrance(resources.getDimension(R.dimen.dp_16))
         }
     }
 

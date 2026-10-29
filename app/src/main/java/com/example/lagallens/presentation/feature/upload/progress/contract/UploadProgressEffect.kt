@@ -5,6 +5,8 @@ sealed interface UploadProgressEffect {
 
     data class NavigateToOcrProcessing(
         val fileName: String,
-        val fileDetails: String
+        val fileDetails: String,
+        val documentUri: String? = null,
+        val documentId: String = ""
     ) : UploadProgressEffect
 }

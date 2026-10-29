@@ -27,4 +27,17 @@ class OcrReviewViewModelTest {
 
         assertEquals(OcrReviewSample.warnings, viewModel.uiState.value.warnings)
     }
+
+    @Test
+    fun reviewKeepsDocumentIdentityAndEditableContent() {
+        val viewModel = OcrReviewViewModel()
+        val editedContent = "ĐIỀU 1. Nội dung người dùng đã sửa"
+
+        viewModel.onEvent(OcrReviewEvent.ScreenOpened("doc-9", "contract-4", "nội dung gốc"))
+        viewModel.onEvent(OcrReviewEvent.DocumentTextChanged(editedContent))
+
+        assertEquals("doc-9", viewModel.uiState.value.documentId)
+        assertEquals("contract-4", viewModel.uiState.value.contractId)
+        assertEquals(editedContent, viewModel.uiState.value.documentText)
+    }
 }

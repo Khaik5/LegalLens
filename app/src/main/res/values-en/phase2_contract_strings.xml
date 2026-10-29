@@ -1,0 +1,6 @@
+<resources>
+    <string name="compare_result_demo_notice">DEMO · Shows text differences between the two saved contracts; no legal analysis is performed.</string>
+    <string name="compare_result_demo_heading">Content differences (DEMO)</string>
+    <string name="compare_difference_demo_explanation">This compares saved text directly. Check the original document.</string>
+    <string name="compare_no_text_difference">No difference in this section</string>
+</resources>

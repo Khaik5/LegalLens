@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_chatbot_attachment_sheet"
+    android:orientation="vertical"
+    android:paddingStart="@dimen/chatbot_attachment_sheet_horizontal_padding"
+    android:paddingTop="@dimen/chatbot_attachment_sheet_top_padding"
+    android:paddingEnd="@dimen/chatbot_attachment_sheet_horizontal_padding"
+    android:paddingBottom="@dimen/chatbot_attachment_sheet_bottom_space">
+
+    <View
+        android:layout_width="@dimen/chatbot_attachment_sheet_handle_width"
+        android:layout_height="@dimen/chatbot_attachment_sheet_handle_height"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/bg_contract_filter_handle" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/chatbot_attachment_sheet_title_margin_top"
+        android:fontFamily="@font/manrope"
+        android:includeFontPadding="false"
+        android:text="@string/chatbot_attachment_sheet_title"
+        android:textColor="@color/legal_lens_primary"
+        android:textSize="@dimen/sp_20"
+        android:textStyle="bold" />
+
+    <include
+        android:id="@+id/chatbotAttachmentDocument"
+        layout="@layout/view_chatbot_source_document"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/chatbot_document_card_height"
+        android:layout_marginTop="@dimen/dp_16" />
+
+    <TextView android:fontFamily="@font/manrope"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dp_16"
+        android:includeFontPadding="false"
+        android:lineSpacingExtra="@dimen/dp_2"
+        android:text="@string/chatbot_attachment_sheet_notice"
+        android:textColor="@color/legal_lens_secondary_text"
+        android:textSize="@dimen/sp_13" />
+
+    <LinearLayout
+        android:id="@+id/chatbotAttachmentPdf"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/chatbot_attachment_sheet_action_height"
+        android:layout_marginTop="@dimen/dp_16"
+        android:background="@drawable/bg_chatbot_primary_action"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?attr/selectableItemBackground"
+        android:gravity="center"
+        android:orientation="horizontal">
+        <ImageView android:layout_width="@dimen/dp_18" android:layout_height="@dimen/dp_18" android:contentDescription="@null" android:src="@drawable/ic_upload_pdf" app:tint="@color/white" />
+        <TextView android:fontFamily="@font/manrope" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="@dimen/dp_8" android:text="@string/chatbot_attachment_pdf_action" android:textColor="@color/white" android:textSize="@dimen/sp_15" android:textStyle="bold" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/chatbotAttachmentCamera"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/chatbot_attachment_sheet_action_height"
+        android:layout_marginTop="@dimen/chatbot_attachment_sheet_action_gap"
+        android:background="@drawable/bg_chatbot_new_state_suggestion"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?attr/selectableItemBackground"
+        android:gravity="center"
+        android:orientation="horizontal">
+        <ImageView android:layout_width="@dimen/dp_18" android:layout_height="@dimen/dp_18" android:contentDescription="@null" android:src="@drawable/ic_upload_camera" app:tint="@color/legal_lens_primary" />
+        <TextView android:fontFamily="@font/manrope" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="@dimen/dp_8" android:text="@string/chatbot_attachment_camera_action" android:textColor="@color/legal_lens_primary" android:textSize="@dimen/sp_15" android:textStyle="bold" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/chatbotAttachmentSaved"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/chatbot_attachment_sheet_action_height"
+        android:layout_marginTop="@dimen/chatbot_attachment_sheet_action_gap"
+        android:background="@drawable/bg_chatbot_new_state_suggestion"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?attr/selectableItemBackground"
+        android:gravity="center"
+        android:orientation="horizontal">
+        <ImageView android:layout_width="@dimen/dp_18" android:layout_height="@dimen/dp_18" android:contentDescription="@null" android:src="@drawable/ic_contract_search_document" app:tint="@color/legal_lens_primary" />
+        <TextView android:fontFamily="@font/manrope" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="@dimen/dp_8" android:text="@string/chatbot_attachment_saved_action" android:textColor="@color/legal_lens_primary" android:textSize="@dimen/sp_15" android:textStyle="bold" />
+    </LinearLayout>
+
+    <TextView android:fontFamily="@font/manrope"
+        android:id="@+id/chatbotAttachmentCancel"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/chatbot_attachment_sheet_action_height"
+        android:layout_marginTop="@dimen/chatbot_attachment_sheet_action_gap"
+        android:background="@drawable/bg_chatbot_new_state_suggestion"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?attr/selectableItemBackground"
+        android:gravity="center"
+        android:text="@string/chatbot_attachment_cancel_action"
+        android:textAllCaps="false"
+        android:textColor="@color/legal_lens_primary"
+        android:textSize="@dimen/sp_15"
+        android:textStyle="bold" />
+</LinearLayout>

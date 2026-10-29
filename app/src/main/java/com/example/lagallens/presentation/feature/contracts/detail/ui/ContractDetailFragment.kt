@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -15,13 +16,20 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.lagallens.R
 import com.example.lagallens.databinding.FragmentContractDetailBinding
+import com.example.lagallens.presentation.common.utils.animateContentEntrance
+import com.example.lagallens.presentation.common.utils.bindPressFeedback
 import com.example.lagallens.presentation.feature.contracts.detail.adapter.ContractAssistantAdapter
 import com.example.lagallens.presentation.feature.contracts.detail.contract.ContractDetailUiEffect
 import com.example.lagallens.presentation.feature.contracts.detail.contract.ContractDetailUiEvent
 import com.example.lagallens.presentation.feature.contracts.detail.contract.ContractDetailUiState
 import com.example.lagallens.presentation.feature.contracts.detail.viewmodel.ContractDetailViewModel
+import com.example.lagallens.LegalLensApplication
 import com.example.lagallens.presentation.feature.contracts.detail.dialog.ContractDeleteDialog
+import com.example.lagallens.presentation.feature.contracts.detail.rename.ui.ContractRenameDialog
+import com.example.lagallens.presentation.feature.contracts.detail.export.ui.ContractExportBottomSheet
 import com.example.lagallens.presentation.feature.chatbot.ui.ChatbotActivity
+import com.example.lagallens.presentation.feature.documentviewer.ui.DocumentViewerActivity
+import com.example.lagallens.presentation.feature.compare.select.ui.CompareSelectActivity
 import com.example.lagallens.presentation.feature.ocr.result.ui.OcrResultActivity
 import com.example.lagallens.presentation.feature.analysis.start.ui.AnalysisStartActivity
 import kotlinx.coroutines.launch
@@ -29,7 +37,9 @@ import kotlinx.coroutines.launch
 class ContractDetailFragment : Fragment() {
     private var _binding: FragmentContractDetailBinding? = null
     private val binding get() = _binding!!
-    private val viewModel by viewModels<ContractDetailViewModel>()
+    private val viewModel by viewModels<ContractDetailViewModel> {
+        ContractDetailViewModel.Factory((requireActivity().application as LegalLensApplication).contractRepository)
+    }
     private val assistantAdapter = ContractAssistantAdapter { action ->
         viewModel.onEvent(ContractDetailUiEvent.AssistantActionClicked(action))
     }
@@ -41,6 +51,16 @@ class ContractDetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        listOf(binding.btnBack, binding.btnRename, binding.btnDelete).forEach { it.bindPressFeedback() }
+        if (savedInstanceState == null) {
+            view.doOnPreDraw {
+                val current = _binding ?: return@doOnPreDraw
+                val offset = resources.getDimension(R.dimen.dp_8)
+                current.detailAppBar.animateContentEntrance(-offset)
+                current.detailHeader.animateContentEntrance(offset)
+                current.detailInformation.animateContentEntrance(offset, startDelayMillis = 35L)
+            }
+        }
         binding.rvAssistantActions.apply {
             layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
             adapter = assistantAdapter
@@ -55,6 +75,9 @@ class ContractDetailFragment : Fragment() {
             if (result.getBoolean(ContractDeleteDialog.KEY_DELETE_CONFIRMED)) {
                 viewModel.onEvent(ContractDetailUiEvent.DeleteConfirmed)
             }
+        }
+        parentFragmentManager.setFragmentResultListener(ContractRenameDialog.RESULT_KEY, viewLifecycleOwner) { _, result ->
+            result.getString(ContractRenameDialog.KEY_NAME)?.let { viewModel.onEvent(ContractDetailUiEvent.RenameConfirmed(it)) }
         }
         collectUiState()
         collectUiEffect()
@@ -75,11 +98,16 @@ class ContractDetailFragment : Fragment() {
                 viewModel.uiEffect.collect { effect ->
                     when (effect) {
                         ContractDetailUiEffect.NavigateBack -> findNavController().navigateUp()
+                        is ContractDetailUiEffect.NavigateToDocument -> startActivity(DocumentViewerActivity.createIntent(requireContext(), effect.contractId))
+                        is ContractDetailUiEffect.NavigateToCompare -> startActivity(CompareSelectActivity.createIntent(requireContext(), effect.contractId))
                         is ContractDetailUiEffect.NavigateToOcrText -> startActivity(
                             OcrResultActivity.createIntent(
                                 context = requireContext(),
-                                documentName = getString(effect.documentNameRes),
-                                documentDetails = getString(effect.documentDetailsRes)
+                                documentName = effect.documentName,
+                                documentDetails = getString(effect.documentDetailsRes),
+                                documentId = effect.documentId,
+                                contractId = effect.contractId,
+                                initialContent = effect.content
                             )
                         )
                         is ContractDetailUiEffect.NavigateToAnalysis -> startActivity(
@@ -93,10 +121,21 @@ class ContractDetailFragment : Fragment() {
                             ChatbotActivity.createIntent(
                                 requireContext(),
                                 getString(effect.contractNameRes),
-                                getString(effect.contractTypeRes)
+                                getString(effect.contractTypeRes),
+                                effect.contractId
                             )
                         )
                         ContractDetailUiEffect.ShowDeleteConfirmation -> showDeleteConfirmation()
+                        ContractDetailUiEffect.ShowRenameDialog -> {
+                            if (parentFragmentManager.findFragmentByTag(ContractRenameDialog.TAG) == null) {
+                                ContractRenameDialog.newInstance(binding.tvContractTitle.text.toString()).show(parentFragmentManager, ContractRenameDialog.TAG)
+                            }
+                        }
+                        ContractDetailUiEffect.ShowExportSheet -> {
+                            if (parentFragmentManager.findFragmentByTag(ContractExportBottomSheet.TAG) == null) {
+                                ContractExportBottomSheet.newInstance(binding.tvContractTitle.text.toString(), getString(R.string.viewer_metadata, binding.tvFileFormat.text, binding.tvPageCount.text)).show(parentFragmentManager, ContractExportBottomSheet.TAG)
+                            }
+                        }
                         is ContractDetailUiEffect.ShowMessage -> Toast.makeText(requireContext(), effect.messageRes, Toast.LENGTH_SHORT).show()
                     }
                 }
@@ -105,7 +144,7 @@ class ContractDetailFragment : Fragment() {
     }
 
     private fun render(state: ContractDetailUiState) {
-        binding.tvContractTitle.setText(state.titleRes)
+        binding.tvContractTitle.text = state.renamedTitle ?: getString(state.titleRes)
         binding.tvContractType.setText(state.contractTypeRes)
         binding.tvStatus.setText(state.statusRes)
         binding.tvRisk.setText(state.riskRes)

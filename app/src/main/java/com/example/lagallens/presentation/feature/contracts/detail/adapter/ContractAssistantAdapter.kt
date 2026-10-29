@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.lagallens.databinding.ItemContractDetailAssistantBinding
+import com.example.lagallens.presentation.common.utils.bindPressFeedback
 import com.example.lagallens.presentation.feature.contracts.detail.contract.ContractAssistantAction
 
 class ContractAssistantAdapter(
@@ -24,6 +25,8 @@ class ContractAssistantAdapter(
         private val binding: ItemContractDetailAssistantBinding,
         private val onActionClicked: (ContractAssistantAction) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
+        init { binding.root.bindPressFeedback() }
+
         fun bind(item: ContractAssistantAction) {
             binding.ivIcon.setImageResource(item.iconRes)
             binding.tvTitle.setText(item.titleRes)

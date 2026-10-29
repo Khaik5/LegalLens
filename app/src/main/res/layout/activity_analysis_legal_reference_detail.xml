@@ -126,6 +126,7 @@
                 android:padding="@dimen/dp_16">
 
                 <TextView
+                    android:id="@+id/analysisLegalReferenceDetailTextHeading"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:includeFontPadding="false"
@@ -148,6 +149,7 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/analysisLegalReferenceDetailMetadata"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/dp_20"
@@ -244,6 +246,7 @@
             </LinearLayout>
 
             <TextView
+                android:id="@+id/analysisLegalReferenceDetailRiskHeading"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/dp_20"

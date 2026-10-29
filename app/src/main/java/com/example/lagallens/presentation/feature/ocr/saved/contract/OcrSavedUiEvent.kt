@@ -4,7 +4,9 @@ sealed interface OcrSavedUiEvent {
     data class ScreenOpened(
         val documentName: String,
         val documentVersion: String,
-        val documentStatus: String
+        val documentStatus: String,
+        val documentId: String = "",
+        val contractId: String = ""
     ) : OcrSavedUiEvent
 
     data object ReturnToContractClicked : OcrSavedUiEvent

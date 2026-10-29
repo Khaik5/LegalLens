@@ -16,6 +16,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.lagallens.R
 import com.example.lagallens.databinding.ActivityAnalysisStartBinding
+import com.example.lagallens.presentation.common.utils.bindPressFeedback
 import com.example.lagallens.presentation.feature.analysis.start.adapter.AnalysisStartBenefitAdapter
 import com.example.lagallens.presentation.feature.analysis.start.adapter.AnalysisStartBenefitSpacingDecoration
 import com.example.lagallens.presentation.feature.analysis.start.contract.AnalysisStartUiEffect
@@ -62,6 +63,7 @@ class AnalysisStartActivity : AppCompatActivity() {
     }
 
     private fun bindEvents() = with(binding) {
+        listOf(analysisStartBack, analysisStartAction).forEach { it.bindPressFeedback() }
         analysisStartBack.setOnClickListener {
             viewModel.onEvent(AnalysisStartUiEvent.BackClicked)
         }
@@ -104,8 +106,9 @@ class AnalysisStartActivity : AppCompatActivity() {
                         context = this,
                         documentName = effect.documentName,
                         documentMetadata = effect.documentMetadata
-                    )
+                    ).putExtra("analysis_return_home", intent.getBooleanExtra("analysis_return_home", false))
                 )
+                finish()
             }
         }
     }

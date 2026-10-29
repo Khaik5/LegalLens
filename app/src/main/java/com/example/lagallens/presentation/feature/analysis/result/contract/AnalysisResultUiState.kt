@@ -9,6 +9,7 @@ data class AnalysisResultUiState(
     val keyFactsCount: Int = 0,
     val riskCount: Int = 0,
     val referenceCount: Int = 0,
+    val errorMessageRes: Int? = null,
     val items: List<AnalysisResultItem> = listOf(
         AnalysisResultItem(
             iconRes = R.drawable.ic_ocr_saved_document,

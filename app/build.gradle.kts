@@ -2,6 +2,12 @@ plugins {
     alias(libs.plugins.android.application)
 }
 
+val legalLensDataMode = providers.gradleProperty("legalLensDataMode").orElse("DEMO").get().uppercase()
+require(legalLensDataMode in setOf("DEMO", "REAL")) {
+    "legalLensDataMode must be DEMO or REAL"
+}
+val legalLensApiBaseUrl = providers.gradleProperty("legalLensApiBaseUrl").orElse("").get()
+
 android {
     namespace = "com.example.lagallens"
     compileSdk {
@@ -17,16 +23,24 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.example.lagallens.SandboxTestRunner"
+        buildConfigField("String", "DATA_MODE", "\"$legalLensDataMode\"")
+        buildConfigField("String", "API_BASE_URL", "\"$legalLensApiBaseUrl\"")
     }
 
     buildTypes {
+        create("sandbox") {
+            initWith(getByName("debug"))
+            applicationIdSuffix = ".testsandbox"
+            matchingFallbacks += listOf("debug")
+        }
         release {
             optimization {
                 enable = false
             }
         }
     }
+    testBuildType = "sandbox"
     buildFeatures {
         viewBinding = true
         buildConfig = true
@@ -50,6 +64,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.material)
     testImplementation(libs.junit)
+    testImplementation("org.json:json:20240303")
     testImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)

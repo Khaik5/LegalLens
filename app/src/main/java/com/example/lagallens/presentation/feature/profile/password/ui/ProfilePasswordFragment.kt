@@ -17,6 +17,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.example.lagallens.R
 import com.example.lagallens.databinding.FragmentProfilePasswordBinding
+import com.example.lagallens.presentation.common.utils.bindPressFeedback
 import com.example.lagallens.databinding.ItemProfilePasswordRequirementBinding
 import com.example.lagallens.presentation.feature.profile.password.contract.ProfilePasswordUiEffect
 import com.example.lagallens.presentation.feature.profile.password.contract.ProfilePasswordUiEvent
@@ -46,6 +47,7 @@ class ProfilePasswordFragment : Fragment() {
     }
 
     private fun bindViews() = with(binding) {
+        listOf(btnBack, btnUpdatePassword).forEach { it.bindPressFeedback() }
         btnBack.setOnClickListener {
             viewModel.onEvent(ProfilePasswordUiEvent.BackClicked)
         }
@@ -86,6 +88,7 @@ class ProfilePasswordFragment : Fragment() {
         renderRequirement(requirementMinimumLength, state.hasMinimumLength)
         renderRequirement(requirementMixedCase, state.hasMixedCase)
         renderRequirement(requirementNumberOrSpecial, state.hasNumberOrSpecial)
+        btnUpdatePassword.isEnabled = !state.isSubmitting
     }
 
     private fun updateText(editText: EditText, value: String) {
@@ -121,6 +124,8 @@ class ProfilePasswordFragment : Fragment() {
                     Toast.LENGTH_SHORT
                 ).show()
             }
+            ProfilePasswordUiEffect.PasswordUpdated -> Toast.makeText(requireContext(), R.string.profile_password_updated, Toast.LENGTH_SHORT).show()
+            ProfilePasswordUiEffect.CurrentPasswordIncorrect -> Unit
         }
     }
 

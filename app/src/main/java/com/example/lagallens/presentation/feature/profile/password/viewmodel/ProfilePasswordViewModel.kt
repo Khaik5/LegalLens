@@ -1,6 +1,7 @@
 package com.example.lagallens.presentation.feature.profile.password.viewmodel
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.lagallens.R
 import com.example.lagallens.presentation.feature.profile.password.contract.ProfilePasswordUiEffect
@@ -12,8 +13,11 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import com.example.lagallens.LegalLensApplication
 
-class ProfilePasswordViewModel : ViewModel() {
+class ProfilePasswordViewModel(application: Application) : AndroidViewModel(application) {
     private val _uiState = MutableStateFlow(ProfilePasswordUiState())
     val uiState = _uiState.asStateFlow()
 
@@ -46,10 +50,10 @@ class ProfilePasswordViewModel : ViewModel() {
         } else {
             null
         }
-        val newPasswordError = if (!state.meetsSecurityRequirements) {
-            R.string.profile_password_requirements_not_met
-        } else {
-            null
+        val newPasswordError = when {
+            !state.meetsSecurityRequirements -> R.string.profile_password_requirements_not_met
+            state.newPassword == state.currentPassword -> R.string.profile_password_same_as_current
+            else -> null
         }
         val confirmationError = if (state.confirmation != state.newPassword) {
             R.string.profile_password_confirmation_mismatch
@@ -68,8 +72,26 @@ class ProfilePasswordViewModel : ViewModel() {
             return
         }
 
-        _uiState.value = ProfilePasswordUiState()
-        emitEffect(ProfilePasswordUiEffect.ShowBackendUnavailable)
+        if (_uiState.value.isSubmitting) return
+        _uiState.update { it.copy(isSubmitting = true) }
+        viewModelScope.launch {
+            val app = getApplication<Application>() as LegalLensApplication
+            val result = runCatching { withContext(Dispatchers.IO) { app.changeCurrentDemoPassword(state.currentPassword, state.newPassword) } }
+            when {
+                result.isFailure -> {
+                    _uiState.update { it.copy(isSubmitting = false) }
+                    emitEffect(ProfilePasswordUiEffect.ShowBackendUnavailable)
+                }
+                result.getOrDefault(false) -> {
+                    _uiState.value = ProfilePasswordUiState()
+                    emitEffect(ProfilePasswordUiEffect.PasswordUpdated)
+                }
+                else -> {
+                    _uiState.update { it.copy(isSubmitting = false, currentPasswordErrorRes = R.string.profile_password_current_incorrect) }
+                    emitEffect(ProfilePasswordUiEffect.CurrentPasswordIncorrect)
+                }
+            }
+        }
     }
 
     private fun emitEffect(effect: ProfilePasswordUiEffect) {

@@ -16,6 +16,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.lagallens.R
 import com.example.lagallens.databinding.ActivityAnalysisSummaryBinding
+import com.example.lagallens.presentation.common.utils.bindPressFeedback
 import com.example.lagallens.presentation.feature.analysis.keyfacts.ui.AnalysisKeyFactsActivity
 import com.example.lagallens.presentation.feature.analysis.summary.adapter.AnalysisSummaryAdapter
 import com.example.lagallens.presentation.feature.analysis.summary.contract.AnalysisSummaryUiEffect
@@ -45,6 +46,7 @@ class AnalysisSummaryActivity : AppCompatActivity() {
             view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+        listOf(binding.analysisSummaryBack, binding.analysisSummaryImportantInformation).forEach { it.bindPressFeedback() }
         binding.analysisSummaryBack.setOnClickListener {
             viewModel.onEvent(AnalysisSummaryUiEvent.BackClicked)
         }

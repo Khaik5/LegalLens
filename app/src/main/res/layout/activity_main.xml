@@ -21,7 +21,8 @@
     <FrameLayout
         android:id="@+id/bottomNavigationContainer"
         android:layout_width="0dp"
-        android:layout_height="@dimen/dp_52"
+        android:layout_height="wrap_content"
+        android:minHeight="@dimen/dp_52"
         android:background="@color/dashboard_surface"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -29,16 +30,19 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="@dimen/dp_52">
+            android:layout_height="wrap_content"
+        android:minHeight="@dimen/dp_52">
 
             <LinearLayout
                 android:id="@+id/navHome"
-                android:layout_width="@dimen/dp_64"
-                android:layout_height="@dimen/dp_39"
+                android:layout_width="0dp"
+                app:layout_constraintHorizontal_weight="1"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:clickable="true"
                 android:focusable="true"
-                android:gravity="center_horizontal"
+                android:gravity="center"
                 android:orientation="vertical"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/navContracts"
@@ -51,7 +55,7 @@
                     android:contentDescription="@null"
                     android:duplicateParentState="true"
                     android:src="@drawable/ic_dashboard_home"
-                    android:tint="@color/bottom_navigation_item_tint" />
+                    app:tint="@color/bottom_navigation_item_tint" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -66,12 +70,14 @@
 
             <LinearLayout
                 android:id="@+id/navContracts"
-                android:layout_width="@dimen/dp_64"
-                android:layout_height="@dimen/dp_39"
+                android:layout_width="0dp"
+                app:layout_constraintHorizontal_weight="1"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:clickable="true"
                 android:focusable="true"
-                android:gravity="center_horizontal"
+                android:gravity="center"
                 android:orientation="vertical"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/navCenterSpace"
@@ -84,7 +90,7 @@
                     android:contentDescription="@null"
                     android:duplicateParentState="true"
                     android:src="@drawable/ic_dashboard_contract"
-                    android:tint="@color/bottom_navigation_item_tint" />
+                    app:tint="@color/bottom_navigation_item_tint" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -108,12 +114,14 @@
 
             <LinearLayout
                 android:id="@+id/navNotifications"
-                android:layout_width="@dimen/dp_64"
-                android:layout_height="@dimen/dp_39"
+                android:layout_width="0dp"
+                app:layout_constraintHorizontal_weight="1.3"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:clickable="true"
                 android:focusable="true"
-                android:gravity="center_horizontal"
+                android:gravity="center"
                 android:orientation="vertical"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/navProfile"
@@ -126,7 +134,7 @@
                     android:contentDescription="@null"
                     android:duplicateParentState="true"
                     android:src="@drawable/ic_dashboard_notification"
-                    android:tint="@color/bottom_navigation_item_tint" />
+                    app:tint="@color/bottom_navigation_item_tint" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -134,6 +142,8 @@
                     android:layout_marginTop="@dimen/dp_2"
                     android:duplicateParentState="true"
                     android:includeFontPadding="false"
+                    android:maxLines="1"
+                    android:ellipsize="end"
                     android:text="@string/menu_notifications"
                     android:textColor="@color/bottom_navigation_item_tint"
                     android:textSize="@dimen/sp_11" />
@@ -141,12 +151,14 @@
 
             <LinearLayout
                 android:id="@+id/navProfile"
-                android:layout_width="@dimen/dp_64"
-                android:layout_height="@dimen/dp_39"
+                android:layout_width="0dp"
+                app:layout_constraintHorizontal_weight="1"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:clickable="true"
                 android:focusable="true"
-                android:gravity="center_horizontal"
+                android:gravity="center"
                 android:orientation="vertical"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -159,7 +171,7 @@
                     android:contentDescription="@null"
                     android:duplicateParentState="true"
                     android:src="@drawable/ic_dashboard_profile"
-                    android:tint="@color/bottom_navigation_item_tint" />
+                    app:tint="@color/bottom_navigation_item_tint" />
 
                 <TextView
                     android:layout_width="wrap_content"

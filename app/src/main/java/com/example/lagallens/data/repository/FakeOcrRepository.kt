@@ -6,27 +6,25 @@ import com.example.lagallens.domain.repository.OcrRepository
 /** Development-only OCR result source; replace with the backend OCR repository when approved. */
 class FakeOcrRepository : OcrRepository {
     override suspend fun getResult(documentName: String, documentDetails: String): OcrResult = OcrResult(
-        confidenceLabel = "Độ tin cậy OCR rất cao",
-        confidencePercentage = "94.5%",
+        confidenceLabel = "DEMO · Kết quả OCR minh họa, chưa đọc nội dung tệp",
+        confidencePercentage = "—",
         documentText = SAMPLE_DOCUMENT_TEXT
     )
 
     private companion object {
-        val SAMPLE_DOCUMENT_TEXT = """Hôm nay, ngày 24 tháng 10 năm 2026, tại tòa nhà Bitexco Financial Tower, chúng tôi gồm có:
+        val SAMPLE_DOCUMENT_TEXT = """DEMO — BẢN XEM TRƯỚC MẪU HỢP ĐỒNG LAO ĐỘNG
+Ứng dụng chưa trích xuất nội dung từ tệp bạn đã chọn. Không dùng phần minh họa này để ký kết.
 
-BÊN CHO THUÊ (BÊN A):
-- Công ty Cổ phần Đầu tư Phát triển Bitexco
-- Đại diện bởi: Ông Nguyễn Phi Long
-- Chức vụ: Giám đốc Điều hành
+NGƯỜI SỬ DỤNG LAO ĐỘNG: [TÊN, ĐỊA CHỈ, NGƯỜI ĐẠI DIỆN]
+NGƯỜI LAO ĐỘNG: [HỌ TÊN, NGÀY SINH, ĐỊA CHỈ, GIẤY TỜ ĐỊNH DANH]
 
-BÊN THUÊ (BÊN B):
-- Công ty TNHH Công nghệ LegalLens Việt Nam
-- Đại diện bởi: Bà Trần Thị Mai
-- Chức vụ: Giám đốc Kỹ thuật
+ĐIỀU 1. CÔNG VIỆC VÀ ĐỊA ĐIỂM LÀM VIỆC
+[CHỨC DANH, CÔNG VIỆC, ĐỊA ĐIỂM LÀM VIỆC]
 
-ĐIỀU 1: TÀI SẢN CHO THUÊ & GIÁ CẢ
-1. Bên A đồng ý cho Bên B thuê văn phòng tại Tầng 24, tòa nhà Bitexco Financial Tower, Quận 1, TP. Hồ Chí Minh.
-2. Diện tích sử dụng thực tế: 150 m2.
-3. Đơn giá thuê cố định là 45 USD / m2 / tháng (Chưa bao gồm VAT và phí quản lý dịch vụ). Tổng giá trị hợp đồng thanh toán định kỳ mỗi 03 tháng."""
+ĐIỀU 2. THỜI HẠN HỢP ĐỒNG
+[LOẠI HỢP ĐỒNG, NGÀY BẮT ĐẦU, NGÀY KẾT THÚC NẾU CÓ]
+
+ĐIỀU 3. TIỀN LƯƠNG VÀ THỜI GIỜ LÀM VIỆC
+[MỨC LƯƠNG, HÌNH THỨC VÀ KỲ HẠN TRẢ LƯƠNG, PHỤ CẤP, THỜI GIỜ LÀM VIỆC VÀ NGHỈ NGƠI]"""
     }
 }

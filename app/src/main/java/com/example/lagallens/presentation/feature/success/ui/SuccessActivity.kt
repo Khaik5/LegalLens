@@ -8,6 +8,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.doOnPreDraw
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -17,6 +18,9 @@ import com.example.lagallens.presentation.feature.success.contract.SuccessUiEffe
 import com.example.lagallens.presentation.feature.success.contract.SuccessUiEvent
 import com.example.lagallens.presentation.assets.animation.SuccessPulseAnimation
 import com.example.lagallens.presentation.feature.success.viewmodel.SuccessViewModel
+import com.example.lagallens.presentation.common.utils.MotionTokens
+import com.example.lagallens.presentation.common.utils.animateContentEntrance
+import com.example.lagallens.presentation.common.utils.bindPressFeedback
 import kotlinx.coroutines.launch
 
 class SuccessActivity : AppCompatActivity() {
@@ -28,6 +32,8 @@ class SuccessActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(binding.root)
+        playEntranceMotion()
+        binding.startUsingButton.bindPressFeedback()
         binding.startUsingButton.setOnClickListener {
             viewModel.onEvent(SuccessUiEvent.StartUsingClicked)
         }
@@ -36,6 +42,17 @@ class SuccessActivity : AppCompatActivity() {
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
+        }
+    }
+
+    private fun playEntranceMotion() {
+        binding.successRoot.doOnPreDraw {
+            val offset = resources.getDimension(com.example.lagallens.R.dimen.dp_16)
+            binding.successSeal.animateContentEntrance(offset)
+            binding.startUsingButton.animateContentEntrance(
+                translationDistanceY = offset,
+                startDelayMillis = MotionTokens.STANDARD_DURATION_MILLIS
+            )
         }
     }
 

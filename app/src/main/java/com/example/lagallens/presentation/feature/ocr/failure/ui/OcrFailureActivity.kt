@@ -14,6 +14,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.lagallens.databinding.ActivityOcrFailureBinding
+import com.example.lagallens.presentation.common.utils.bindPressFeedback
 import com.example.lagallens.presentation.feature.camera.ocr.ui.OcrProcessingActivity
 import com.example.lagallens.presentation.feature.ocr.failure.contract.OcrFailureUiEffect
 import com.example.lagallens.presentation.feature.ocr.failure.contract.OcrFailureUiEvent
@@ -51,6 +52,7 @@ class OcrFailureActivity : AppCompatActivity() {
     }
 
     private fun bindEvents() = with(binding) {
+        listOf(ocrFailureBack, ocrFailureReturn, ocrFailureRetry).forEach { it.bindPressFeedback() }
         ocrFailureBack.setOnClickListener { viewModel.onEvent(OcrFailureUiEvent.BackClicked) }
         ocrFailureReturn.setOnClickListener { viewModel.onEvent(OcrFailureUiEvent.BackClicked) }
         ocrFailureRetry.setOnClickListener { viewModel.onEvent(OcrFailureUiEvent.RetryClicked) }

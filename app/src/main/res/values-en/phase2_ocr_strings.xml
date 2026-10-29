@@ -1,0 +1,4 @@
+<resources>
+    <string name="ocr_review_document_text_title">Recognized text · editable</string>
+    <string name="ocr_review_empty_document">The text is empty. Add content before saving the contract.</string>
+</resources>

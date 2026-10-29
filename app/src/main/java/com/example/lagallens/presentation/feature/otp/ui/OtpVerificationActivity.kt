@@ -10,6 +10,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.doOnPreDraw
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.Lifecycle
@@ -22,6 +23,9 @@ import com.example.lagallens.presentation.feature.otp.contract.OtpVerificationUi
 import com.example.lagallens.presentation.feature.otp.contract.OtpVerificationUiEvent
 import com.example.lagallens.presentation.feature.otp.contract.OtpVerificationUiState
 import com.example.lagallens.presentation.feature.otp.viewmodel.OtpVerificationViewModel
+import com.example.lagallens.presentation.common.utils.MotionTokens
+import com.example.lagallens.presentation.common.utils.animateContentEntrance
+import com.example.lagallens.presentation.common.utils.bindPressFeedback
 import kotlinx.coroutines.launch
 
 class OtpVerificationActivity : AppCompatActivity() {
@@ -42,6 +46,7 @@ class OtpVerificationActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(binding.root)
+        playEntranceMotion()
         bindView()
         viewModel.onEvent(OtpVerificationUiEvent.Initialized(intent.getStringExtra(EXTRA_EMAIL).orEmpty()))
         collectState()
@@ -54,6 +59,9 @@ class OtpVerificationActivity : AppCompatActivity() {
     }
 
     private fun bindView() {
+        binding.backButton.bindPressFeedback()
+        binding.resendBlock.bindPressFeedback()
+        binding.submitButton.bindPressFeedback()
         binding.backButton.setOnClickListener {
             viewModel.onEvent(OtpVerificationUiEvent.BackClicked)
         }
@@ -63,6 +71,27 @@ class OtpVerificationActivity : AppCompatActivity() {
         }
         binding.submitButton.setOnClickListener {
             viewModel.onEvent(OtpVerificationUiEvent.SubmitClicked)
+        }
+    }
+
+    private fun playEntranceMotion() {
+        binding.otpRoot.doOnPreDraw {
+            val offset = resources.getDimension(R.dimen.dp_16)
+            binding.headerLayout.animateContentEntrance(offset)
+            binding.emailText.animateContentEntrance(
+                translationDistanceY = offset,
+                startDelayMillis = MotionTokens.FAST_DURATION_MILLIS
+            )
+            otpInputs.forEachIndexed { index, input ->
+                input.animateContentEntrance(
+                    translationDistanceY = offset,
+                    startDelayMillis = MotionTokens.FAST_DURATION_MILLIS * (index + 2)
+                )
+            }
+            binding.footerLayout.animateContentEntrance(
+                translationDistanceY = offset,
+                startDelayMillis = MotionTokens.STANDARD_DURATION_MILLIS
+            )
         }
     }
 
@@ -89,7 +118,13 @@ class OtpVerificationActivity : AppCompatActivity() {
                 viewModel.uiState.collect { state ->
                     binding.emailText.text = state.email.ifBlank { getString(R.string.email_hint) }
                     renderOtpInputs(state)
+                    val shouldAnimateError = state.hasError && !binding.errorMessage.isVisible
                     binding.errorMessage.isVisible = state.hasError
+                    if (shouldAnimateError) {
+                        binding.errorMessage.doOnPreDraw {
+                            binding.errorMessage.animateContentEntrance(resources.getDimension(R.dimen.dp_8))
+                        }
+                    }
                     binding.resendText.text = getString(
                         if (state.isResendAvailable) R.string.otp_resend else R.string.otp_resend_after,
                         formatSeconds(state.remainingSeconds)

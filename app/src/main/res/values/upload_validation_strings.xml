@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="upload_source_unsupported_file">Chỉ hỗ trợ PDF, DOCX hoặc hình ảnh.</string>
+    <string name="upload_source_file_too_large">Tệp vượt quá giới hạn demo 20 MB.</string>
+    <string name="upload_source_file_empty">Tệp đang rỗng.</string>
+</resources>

@@ -89,7 +89,7 @@ class AnalysisProcessingActivity : AppCompatActivity() {
                         context = this,
                         documentName = effect.documentName,
                         documentMetadata = effect.documentMetadata
-                    )
+                    ).putExtra("analysis_return_home", intent.getBooleanExtra("analysis_return_home", false))
                 )
                 finish()
             }
@@ -100,7 +100,7 @@ class AnalysisProcessingActivity : AppCompatActivity() {
                         context = this,
                         documentName = effect.documentName,
                         documentMetadata = effect.documentMetadata
-                    )
+                    ).putExtra("analysis_return_home", intent.getBooleanExtra("analysis_return_home", false))
                 )
                 finish()
             }

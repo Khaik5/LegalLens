@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.lagallens.R
 import com.example.lagallens.databinding.ItemAnalysisResultBinding
+import com.example.lagallens.presentation.common.utils.bindPressFeedback
 import com.example.lagallens.presentation.feature.analysis.result.contract.AnalysisResultDestination
 import com.example.lagallens.presentation.feature.analysis.result.contract.AnalysisResultItem
 
@@ -25,6 +26,7 @@ class AnalysisResultAdapter(
     class ViewHolder(
         private val binding: ItemAnalysisResultBinding
     ) : RecyclerView.ViewHolder(binding.root) {
+        init { binding.root.bindPressFeedback() }
         fun bind(
             item: AnalysisResultItem,
             onItemClicked: (AnalysisResultDestination) -> Unit

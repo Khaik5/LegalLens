@@ -25,7 +25,7 @@ class HomeDashboardViewModel : ViewModel() {
             HomeDashboardUiEvent.AnalyzeClicked -> emitEffect(HomeDashboardUiEffect.NavigateToUploadSource)
 
             HomeDashboardUiEvent.CameraClicked -> emitEffect(HomeDashboardUiEffect.NavigateToCamera)
-            HomeDashboardUiEvent.CompareClicked -> showMessage(R.string.dashboard_compare)
+            HomeDashboardUiEvent.CompareClicked -> emitEffect(HomeDashboardUiEffect.NavigateToCompare)
             HomeDashboardUiEvent.ViewAllContractsClicked -> emitEffect(HomeDashboardUiEffect.NavigateToContracts)
             is HomeDashboardUiEvent.ContractClicked -> emitEffect(
                 HomeDashboardUiEffect.NavigateToContractDetail(event.contractId)

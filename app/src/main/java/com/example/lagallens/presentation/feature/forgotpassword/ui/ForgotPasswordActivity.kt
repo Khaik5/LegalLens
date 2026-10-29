@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doAfterTextChanged
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.doOnPreDraw
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -17,16 +18,21 @@ import com.example.lagallens.presentation.feature.otp.ui.OtpVerificationActivity
 import com.example.lagallens.presentation.feature.forgotpassword.contract.ForgotPasswordUiEffect
 import com.example.lagallens.presentation.feature.forgotpassword.contract.ForgotPasswordUiEvent
 import com.example.lagallens.presentation.feature.forgotpassword.viewmodel.ForgotPasswordViewModel
+import com.example.lagallens.presentation.common.utils.animateContentEntrance
+import com.example.lagallens.presentation.common.utils.animateLoadingFeedback
+import com.example.lagallens.presentation.common.utils.bindPressFeedback
 import kotlinx.coroutines.launch
 
 class ForgotPasswordActivity : AppCompatActivity() {
     private val binding by lazy { ActivityForgotPasswordBinding.inflate(layoutInflater) }
     private val viewModel by viewModels<ForgotPasswordViewModel>()
+    private var wasLoading = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(binding.root)
+        playEntranceMotion()
         bindView()
         collectState()
         collectEffect()
@@ -38,6 +44,8 @@ class ForgotPasswordActivity : AppCompatActivity() {
     }
 
     private fun bindView() {
+        binding.backButton.bindPressFeedback()
+        binding.submitButton.bindPressFeedback()
         binding.backButton.setOnClickListener {
             viewModel.onEvent(ForgotPasswordUiEvent.BackClicked)
         }
@@ -52,6 +60,12 @@ class ForgotPasswordActivity : AppCompatActivity() {
         }
     }
 
+    private fun playEntranceMotion() {
+        binding.forgotPasswordScroll.doOnPreDraw {
+            binding.forgotPasswordScroll.animateContentEntrance(resources.getDimension(com.example.lagallens.R.dimen.dp_16))
+        }
+    }
+
     private fun collectState() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -62,6 +76,10 @@ class ForgotPasswordActivity : AppCompatActivity() {
                     }
                     binding.emailInput.error = state.emailErrorResId?.let(::getString)
                     binding.submitButton.isEnabled = !state.isLoading
+                    if (wasLoading != state.isLoading) {
+                        binding.submitButton.animateLoadingFeedback(state.isLoading)
+                        wasLoading = state.isLoading
+                    }
                 }
             }
         }

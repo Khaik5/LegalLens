@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/legal_lens_background"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_64"
+        android:gravity="center_vertical"
+        android:paddingStart="@dimen/dp_12"
+        android:paddingEnd="@dimen/dp_12">
+        <ImageButton
+            android:id="@+id/draftAppliedBack"
+            android:layout_width="@dimen/dp_44"
+            android:layout_height="@dimen/dp_44"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/chatbot_draft_back"
+            android:padding="@dimen/dp_12"
+            android:src="@drawable/ic_contract_search_back" />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_8"
+            android:layout_weight="1"
+            android:fontFamily="@font/manrope"
+            android:id="@+id/draftAppliedTitle"
+            android:text="@string/chatbot_draft_applied_preview_title"
+            android:textColor="@color/legal_lens_primary"
+            android:textSize="@dimen/sp_18"
+            android:textStyle="bold" />
+        <ImageButton
+            android:layout_width="@dimen/dp_44"
+            android:layout_height="@dimen/dp_44"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/chatbot_draft_more"
+            android:padding="@dimen/dp_12"
+            android:src="@drawable/ic_analysis_risk_overview_more" />
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@color/notification_system_surface"
+        android:clipToPadding="false"
+        android:fillViewport="true"
+        android:paddingStart="@dimen/dp_16"
+        android:paddingTop="@dimen/dp_16"
+        android:paddingEnd="@dimen/dp_16"
+        android:paddingBottom="@dimen/dp_16">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_chatbot_source_document"
+                android:orientation="vertical"
+                android:padding="@dimen/dp_16">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/manrope"
+                    android:id="@+id/draftAppliedDocumentName"
+                    android:text="@string/chatbot_draft_ai_apply_document_name"
+                    android:textColor="@color/legal_lens_primary"
+                    android:textSize="@dimen/sp_14"
+                    android:textStyle="bold" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dp_4"
+                    android:fontFamily="@font/manrope"
+                    android:id="@+id/draftAppliedSourceLine"
+                    android:text="@string/chatbot_draft_applied_source_line"
+                    android:textColor="@color/legal_lens_secondary_text"
+                    android:textSize="@dimen/sp_12" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dp_8"
+                    android:background="@drawable/bg_chatbot_source_badge"
+                    android:fontFamily="@font/manrope"
+                    android:paddingStart="@dimen/dp_8"
+                    android:paddingTop="@dimen/dp_4"
+                    android:paddingEnd="@dimen/dp_8"
+                    android:paddingBottom="@dimen/dp_4"
+                    android:id="@+id/draftAppliedVersionBadge"
+                    android:text="@string/chatbot_draft_ai_apply_document_badge"
+                    android:textColor="@color/legal_lens_auth_accent"
+                    android:textSize="@dimen/sp_11"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_16"
+                android:background="@drawable/bg_chatbot_ai_review_after"
+                android:drawableStart="@drawable/ic_credit_low_info"
+                android:drawablePadding="@dimen/dp_8"
+                android:gravity="center_vertical"
+                android:padding="@dimen/dp_12"
+                android:text="@string/chatbot_draft_missing_warning"
+                android:textColor="@color/legal_lens_secondary_text"
+                android:textSize="@dimen/sp_12" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_16"
+                android:background="@drawable/bg_chatbot_ai_review_selected"
+                android:orientation="vertical"
+                android:padding="@dimen/dp_16">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/manrope"
+                    android:text="@string/chatbot_draft_applied_clause_label"
+                    android:textColor="@color/legal_lens_auth_accent"
+                    android:textSize="@dimen/sp_11"
+                    android:textStyle="bold" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dp_8"
+                    android:fontFamily="@font/manrope"
+                    android:lineSpacingExtra="@dimen/dp_4"
+                    android:text="@string/chatbot_draft_section_3_approved_body"
+                    android:textColor="@color/legal_lens_status_text"
+                    android:textSize="@dimen/sp_14" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dp_8"
+                    android:background="@drawable/bg_chatbot_source_badge"
+                    android:fontFamily="@font/manrope"
+                    android:paddingStart="@dimen/dp_8"
+                    android:paddingTop="@dimen/dp_4"
+                    android:paddingEnd="@dimen/dp_8"
+                    android:paddingBottom="@dimen/dp_4"
+                    android:text="@string/chatbot_draft_applied_clause_badge"
+                    android:textColor="@color/legal_lens_auth_accent"
+                    android:textSize="@dimen/sp_11"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/draftAppliedContractSections"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_16"
+                android:background="@drawable/bg_chatbot_draft_paper"
+                android:orientation="vertical"
+                android:padding="@dimen/dp_16">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/manrope"
+                    android:text="@string/chatbot_draft_contract_heading"
+                    android:textColor="@color/legal_lens_primary"
+                    android:textSize="@dimen/sp_14"
+                    android:textStyle="bold" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dp_8"
+                    android:fontFamily="@font/manrope"
+                    android:lineSpacingExtra="@dimen/dp_4"
+                    android:text="@string/chatbot_draft_contract_introduction"
+                    android:textColor="@color/legal_lens_status_text"
+                    android:textSize="@dimen/sp_13" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="@dimen/dp_16"
+        android:paddingTop="@dimen/dp_8"
+        android:paddingEnd="@dimen/dp_16"
+        android:paddingBottom="@dimen/dp_12">
+        <TextView
+            android:id="@+id/draftAppliedSave"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_50"
+            android:background="@drawable/bg_chatbot_primary_action"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="@font/manrope"
+            android:gravity="center"
+            android:text="@string/chatbot_draft_save_action"
+            android:textColor="@color/white"
+            android:textSize="@dimen/sp_15"
+            android:textStyle="bold" />
+        <TextView
+            android:id="@+id/draftAppliedManage"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_50"
+            android:layout_marginTop="@dimen/dp_8"
+            android:background="@drawable/bg_chatbot_new_state_suggestion"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="@font/manrope"
+            android:gravity="center"
+            android:text="@string/chatbot_draft_versions_title"
+            android:textColor="@color/legal_lens_primary"
+            android:textSize="@dimen/sp_15"
+            android:textStyle="bold" />
+    </LinearLayout>
+</LinearLayout>

@@ -25,7 +25,9 @@ class OcrSavedViewModel : ViewModel() {
                 it.copy(
                     documentName = event.documentName,
                     documentVersion = event.documentVersion,
-                    documentStatus = event.documentStatus
+                    documentStatus = event.documentStatus,
+                    documentId = event.documentId,
+                    contractId = event.contractId
                 )
             }
 

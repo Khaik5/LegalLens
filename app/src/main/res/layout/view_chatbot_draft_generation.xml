@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:clipToPadding="false" android:fillViewport="true"
+    android:paddingStart="@dimen/dp_16" android:paddingTop="@dimen/dp_16"
+    android:paddingEnd="@dimen/dp_16" android:paddingBottom="@dimen/dp_16">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
+        <TextView android:id="@+id/chatbotGenerationRequest"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_40" android:background="@drawable/bg_chatbot_user_message"
+            android:fontFamily="@font/manrope" android:padding="@dimen/dp_12"
+            android:text="@string/chatbot_generation_request" android:textColor="@color/legal_lens_status_text" android:textSize="@dimen/sp_14" />
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_16" android:background="@drawable/bg_chatbot_source_document"
+            android:orientation="vertical" android:padding="@dimen/dp_16">
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:fontFamily="@font/manrope" android:text="@string/chatbot_generation_confirmed"
+                android:textColor="@color/legal_lens_secondary_text" android:textSize="@dimen/sp_12" android:textStyle="bold" />
+            <TextView android:id="@+id/chatbotGenerationSource" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_12" android:fontFamily="@font/manrope"
+                android:textColor="@color/legal_lens_status_text" android:textSize="@dimen/sp_13" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_12" android:background="@drawable/bg_chatbot_source_badge"
+                android:fontFamily="@font/manrope" android:paddingStart="@dimen/dp_8" android:paddingTop="@dimen/dp_4"
+                android:paddingEnd="@dimen/dp_8" android:paddingBottom="@dimen/dp_4"
+                android:text="@string/chatbot_generation_original_badge" android:textColor="@color/legal_lens_auth_accent"
+                android:textSize="@dimen/sp_11" android:textStyle="bold" />
+        </LinearLayout>
+        <LinearLayout android:id="@+id/chatbotGenerationLoading" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_16" android:background="@drawable/bg_chatbot_source_document"
+            android:orientation="vertical" android:padding="@dimen/dp_16">
+            <FrameLayout android:layout_width="@dimen/dp_56" android:layout_height="@dimen/dp_56"
+                android:layout_gravity="center_horizontal" android:layout_marginTop="@dimen/dp_12" android:background="@drawable/bg_chatbot_generation_progress">
+                <ProgressBar android:layout_width="@dimen/dp_32" android:layout_height="@dimen/dp_32"
+                    android:layout_gravity="center" android:indeterminate="true" android:indeterminateTint="@color/legal_lens_auth_accent" />
+            </FrameLayout>
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/dp_16"
+                android:fontFamily="@font/manrope" android:gravity="center" android:text="@string/chatbot_generation_loading_title"
+                android:textColor="@color/legal_lens_primary" android:textSize="@dimen/sp_16" android:textStyle="bold" />
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/dp_12"
+                android:fontFamily="@font/manrope" android:gravity="center" android:text="@string/chatbot_generation_loading_body"
+                android:textColor="@color/legal_lens_secondary_text" android:textSize="@dimen/sp_13" />
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/dp_24"
+                android:fontFamily="@font/manrope" android:text="@string/chatbot_generation_loading_step"
+                android:textColor="@color/legal_lens_auth_accent" android:textSize="@dimen/sp_12" />
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/dp_12"
+                android:fontFamily="@font/manrope" android:text="@string/chatbot_generation_loading_note"
+                android:textColor="@color/legal_lens_secondary_text" android:textSize="@dimen/sp_12" />
+        </LinearLayout>
+        <LinearLayout android:id="@+id/chatbotGenerationError" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_16" android:orientation="vertical" android:visibility="gone">
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:background="@drawable/bg_contract_export_error"
+                android:drawableStart="@drawable/ic_chatbot_error" android:drawablePadding="@dimen/dp_8" android:gravity="center_vertical"
+                android:fontFamily="@font/manrope" android:padding="@dimen/dp_12" android:text="@string/chatbot_generation_error"
+                android:textColor="@color/legal_lens_secondary_text" android:textSize="@dimen/sp_12" />
+            <LinearLayout android:id="@+id/chatbotGenerationRetry" android:layout_width="match_parent" android:layout_height="@dimen/dp_50"
+                android:layout_marginTop="@dimen/dp_16" android:background="@drawable/bg_chatbot_primary_action" android:clickable="true" android:focusable="true"
+                android:gravity="center" android:orientation="horizontal">
+                <ImageView android:layout_width="@dimen/dp_20" android:layout_height="@dimen/dp_20" android:contentDescription="@null"
+                    android:src="@drawable/ic_chatbot_retry" app:tint="@color/white" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="@dimen/dp_8"
+                    android:fontFamily="@font/manrope" android:text="@string/chatbot_generation_retry" android:textColor="@color/white"
+                    android:textSize="@dimen/sp_15" android:textStyle="bold" />
+            </LinearLayout>
+            <TextView android:id="@+id/chatbotGenerationEdit" android:layout_width="match_parent" android:layout_height="@dimen/dp_50"
+                android:layout_marginTop="@dimen/dp_16" android:background="@drawable/bg_chatbot_new_state_suggestion" android:clickable="true" android:focusable="true"
+                android:fontFamily="@font/manrope" android:gravity="center" android:text="@string/chatbot_draft_edit_action"
+                android:textColor="@color/legal_lens_primary" android:textSize="@dimen/sp_15" android:textStyle="bold" />
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/dp_16"
+                android:fontFamily="@font/manrope" android:text="@string/chatbot_generation_error_note"
+                android:textColor="@color/legal_lens_secondary_text" android:textSize="@dimen/sp_12" />
+        </LinearLayout>
+        <LinearLayout android:id="@+id/chatbotGenerationSuccess" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_16" android:orientation="vertical" android:visibility="gone">
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:background="@drawable/bg_contract_export_success"
+                android:drawableStart="@drawable/ic_chatbot_draft_success" android:drawablePadding="@dimen/dp_8" android:gravity="center_vertical"
+                android:fontFamily="@font/manrope" android:padding="@dimen/dp_12" android:text="@string/chatbot_generation_success"
+                android:textColor="@color/legal_lens_secondary_text" android:textSize="@dimen/sp_12" />
+            <include android:id="@+id/chatbotGenerationResultDocument" layout="@layout/view_chatbot_source_document"
+                android:layout_width="match_parent" android:layout_height="@dimen/chatbot_document_card_height" android:layout_marginTop="@dimen/dp_16" />
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/dp_16"
+                android:background="@drawable/bg_chatbot_draft_warning" android:drawableStart="@drawable/ic_alert_triangle"
+                android:drawableTint="@color/chatbot_draft_notice_icon" android:drawablePadding="@dimen/dp_8" android:gravity="center_vertical"
+                android:fontFamily="@font/manrope" android:padding="@dimen/dp_12" android:text="@string/chatbot_generation_result_warning"
+                android:textColor="@color/legal_lens_secondary_text" android:textSize="@dimen/sp_12" />
+            <TextView android:id="@+id/chatbotGenerationView" android:layout_width="match_parent" android:layout_height="@dimen/dp_50"
+                android:layout_marginTop="@dimen/dp_16" android:background="@drawable/bg_chatbot_primary_action" android:clickable="true" android:focusable="true"
+                android:fontFamily="@font/manrope" android:gravity="center" android:text="@string/chatbot_generation_view_draft"
+                android:textColor="@color/white" android:textSize="@dimen/sp_15" android:textStyle="bold" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

@@ -1,0 +1,1 @@
+<shape xmlns:android="http://schemas.android.com/apk/res/android"><solid android:color="@color/contract_risk_high_background"/><corners android:radius="@dimen/dp_12"/></shape>

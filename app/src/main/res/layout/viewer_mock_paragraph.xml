@@ -1,0 +1,6 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/dp_20" android:orientation="vertical">
+    <View android:layout_width="match_parent" android:layout_height="@dimen/dp_4" android:background="@color/legal_lens_input_stroke" />
+    <View android:layout_width="match_parent" android:layout_height="@dimen/dp_4" android:layout_marginTop="@dimen/dp_8" android:background="@color/legal_lens_input_stroke" />
+    <View android:layout_width="match_parent" android:layout_height="@dimen/dp_4" android:layout_marginTop="@dimen/dp_8" android:background="@color/legal_lens_input_stroke" />
+    <View android:layout_width="@dimen/dp_160" android:layout_height="@dimen/dp_4" android:layout_marginTop="@dimen/dp_8" android:background="@color/legal_lens_input_stroke" />
+</LinearLayout>

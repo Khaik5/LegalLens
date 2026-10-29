@@ -15,6 +15,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.lagallens.R
 import com.example.lagallens.databinding.ActivityUploadErrorBinding
+import com.example.lagallens.presentation.common.utils.bindPressFeedback
 import com.example.lagallens.presentation.feature.upload.error.contract.UploadErrorEffect
 import com.example.lagallens.presentation.feature.upload.error.contract.UploadErrorEvent
 import com.example.lagallens.presentation.feature.upload.error.contract.UploadErrorUiState
@@ -57,6 +58,7 @@ class UploadErrorActivity : AppCompatActivity() {
     }
 
     private fun bindEvents() = with(binding) {
+        listOf(uploadErrorBack, uploadErrorRetry, uploadErrorBackToList).forEach { it.bindPressFeedback() }
         uploadErrorBack.setOnClickListener {
             viewModel.onEvent(UploadErrorEvent.BackClicked)
         }

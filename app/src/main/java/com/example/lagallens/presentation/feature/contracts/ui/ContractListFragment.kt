@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
+import androidx.core.view.doOnPreDraw
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -15,8 +16,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.SimpleItemAnimator
 import com.example.lagallens.R
 import com.example.lagallens.databinding.FragmentContractListBinding
+import com.example.lagallens.presentation.common.utils.animateContentEntrance
 import com.example.lagallens.presentation.feature.contracts.adapter.ContractListAdapter
 import com.example.lagallens.presentation.feature.contracts.contract.ContractFilter
 import com.example.lagallens.presentation.feature.contracts.contract.ContractListUiEffect
@@ -31,6 +34,7 @@ class ContractListFragment : Fragment() {
     private var _binding: FragmentContractListBinding? = null
     private val binding get() = _binding!!
     private val viewModel by viewModels<ContractListViewModel>()
+    private var initialListAnimated = false
     private val contractAdapter = ContractListAdapter { contract ->
         viewModel.onEvent(ContractListUiEvent.ContractClicked(contract))
     }
@@ -56,6 +60,7 @@ class ContractListFragment : Fragment() {
         binding.rvContracts.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = contractAdapter
+            (itemAnimator as? SimpleItemAnimator)?.supportsChangeAnimations = false
         }
         binding.etSearch.doAfterTextChanged {
             viewModel.onEvent(ContractListUiEvent.QueryChanged(it?.toString().orEmpty()))
@@ -130,7 +135,19 @@ class ContractListFragment : Fragment() {
     }
 
     private fun render(state: ContractListUiState) {
-        contractAdapter.submitList(state.contracts)
+        contractAdapter.submitList(state.contracts) {
+            if (!initialListAnimated && state.contracts.isNotEmpty()) {
+                val list = _binding?.rvContracts ?: return@submitList
+                initialListAnimated = true
+                list.doOnPreDraw {
+                    if (_binding?.rvContracts !== list) return@doOnPreDraw
+                    val offset = resources.getDimension(R.dimen.dp_8)
+                    for (index in 0 until minOf(list.childCount, 6)) {
+                        list.getChildAt(index).animateContentEntrance(offset, startDelayMillis = 35L * index)
+                    }
+                }
+            }
+        }
         updateFilterStyle(binding.tvFilterAll, state.selectedFilter == ContractFilter.ALL)
         updateFilterStyle(binding.tvFilterAnalyzed, state.selectedFilter == ContractFilter.ANALYZED)
         updateFilterStyle(binding.tvFilterProcessing, state.selectedFilter == ContractFilter.PROCESSING)

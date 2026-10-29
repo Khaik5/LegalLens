@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/chatbot_document_card_height"
+    android:background="@drawable/bg_chatbot_source_document"
+    android:padding="@dimen/chatbot_document_card_padding">
+
+    <ImageView
+        android:id="@+id/chatbotSourceIcon"
+        android:layout_width="@dimen/chatbot_document_icon_size"
+        android:layout_height="@dimen/chatbot_document_icon_size"
+        android:background="@drawable/bg_chatbot_history_icon"
+        android:contentDescription="@null"
+        android:padding="@dimen/dp_10"
+        android:src="@drawable/ic_upload_pdf"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/chatbotSourceName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/chatbot_document_icon_gap"
+        android:ellipsize="end"
+        android:fontFamily="@font/manrope"
+        android:includeFontPadding="false"
+        android:maxLines="1"
+        android:textColor="@color/legal_lens_primary"
+        android:textSize="@dimen/chatbot_document_title_text_size"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/chatbotSourceIcon"
+        app:layout_constraintTop_toTopOf="@id/chatbotSourceIcon" />
+
+    <TextView android:fontFamily="@font/manrope"
+        android:id="@+id/chatbotSourceMetadata"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/chatbot_document_meta_margin_top"
+        android:ellipsize="end"
+        android:includeFontPadding="false"
+        android:maxLines="1"
+        android:text="@string/chatbot_document_uploaded_read_only"
+        android:textColor="@color/legal_lens_secondary_text"
+        android:textSize="@dimen/chatbot_document_meta_text_size"
+        app:layout_constraintEnd_toEndOf="@id/chatbotSourceName"
+        app:layout_constraintStart_toStartOf="@id/chatbotSourceName"
+        app:layout_constraintTop_toBottomOf="@id/chatbotSourceName" />
+
+    <TextView android:fontFamily="@font/manrope"
+        android:id="@+id/chatbotSourceBadge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/chatbot_document_badge_margin_top"
+        android:background="@drawable/bg_chatbot_source_badge"
+        android:includeFontPadding="false"
+        android:paddingStart="@dimen/chatbot_document_badge_padding_horizontal"
+        android:paddingTop="@dimen/chatbot_document_badge_padding_vertical"
+        android:paddingEnd="@dimen/chatbot_document_badge_padding_horizontal"
+        android:paddingBottom="@dimen/chatbot_document_badge_padding_vertical"
+        android:text="@string/chatbot_document_original"
+        android:textColor="@color/legal_lens_auth_accent"
+        android:textSize="@dimen/chatbot_document_badge_text_size"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/chatbotSourceIcon" />
+</androidx.constraintlayout.widget.ConstraintLayout>

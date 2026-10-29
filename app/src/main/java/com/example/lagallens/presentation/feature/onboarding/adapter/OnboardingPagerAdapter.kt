@@ -2,8 +2,12 @@ package com.example.lagallens.presentation.feature.onboarding.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.view.doOnPreDraw
 import androidx.recyclerview.widget.RecyclerView
+import com.example.lagallens.R
 import com.example.lagallens.databinding.ItemOnboardingPageBinding
+import com.example.lagallens.presentation.common.utils.MotionTokens
+import com.example.lagallens.presentation.common.utils.animateContentEntrance
 import com.example.lagallens.presentation.feature.onboarding.contract.OnboardingPage
 
 class OnboardingPagerAdapter(
@@ -32,6 +36,18 @@ class OnboardingPagerAdapter(
             onboardingIllustration.setImageResource(page.imageResId)
             onboardingTitle.setText(page.titleResId)
             onboardingDescription.setText(page.descriptionResId)
+            root.doOnPreDraw {
+                val offset = root.resources.getDimension(R.dimen.dp_16)
+                onboardingIllustration.animateContentEntrance(offset)
+                onboardingTitle.animateContentEntrance(
+                    translationDistanceY = offset,
+                    startDelayMillis = MotionTokens.FAST_DURATION_MILLIS
+                )
+                onboardingDescription.animateContentEntrance(
+                    translationDistanceY = offset,
+                    startDelayMillis = MotionTokens.FAST_DURATION_MILLIS * 2
+                )
+            }
         }
     }
 }

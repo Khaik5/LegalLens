@@ -110,7 +110,8 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/analysis_result_risk_card_height"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/analysis_result_risk_card_height"
                 android:layout_marginTop="@dimen/analysis_result_card_margin_top"
                 android:background="@drawable/bg_analysis_result_card_large"
                 android:gravity="center_vertical"
@@ -167,8 +168,9 @@
                         android:orientation="horizontal">
 
                         <TextView
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
+                            android:layout_weight="1"
                             android:text="@string/analysis_result_risk_heading"
                             android:textColor="@color/ocr_saved_navy"
                             android:textSize="@dimen/analysis_result_risk_heading_text_size"
