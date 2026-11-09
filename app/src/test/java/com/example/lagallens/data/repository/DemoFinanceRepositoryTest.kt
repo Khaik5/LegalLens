@@ -3,6 +3,7 @@ package com.example.lagallens.data.repository
 import com.example.lagallens.data.datasource.local.datastore.DemoSessionScope
 import com.example.lagallens.domain.model.payment.PaymentStatus
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.first
 import org.junit.Assert.*
 import org.junit.Test
 
@@ -107,10 +108,32 @@ class DemoFinanceRepositoryTest {
         repo.completeDemoPayment("p"); assertEquals(8, repo.balance.value)
     }
 
+    @Test fun priceAndCreditsComeFromTheCatalogueAndConfirmationCreditsOnce() = runBlocking {
+        val f = Fixture()
+        val repo = DemoFinanceRepository(f.store, { f.session }, { _, action -> action() }, { 123L }, confirmationDelayMillis = 0)
+        val created = repo.createPayment("p", "credits_15")
+        assertEquals(79_000L, created.amountVnd)
+        assertEquals(15, created.credits)
+        assertEquals(PaymentStatus.SUCCESS, repo.observePayment("p").first { it.status != PaymentStatus.PENDING }.status)
+        assertEquals(20, repo.balance.value)
+        assertEquals(PaymentStatus.SUCCESS, repo.observePayment("p").first { it.status != PaymentStatus.PENDING }.status)
+        assertEquals(20, repo.balance.value)
+    }
+
+    @Test fun unknownPackageAndCancelledPaymentAddNoCredits() = runBlocking {
+        val f = Fixture()
+        val repo = DemoFinanceRepository(f.store, { f.session }, { _, action -> action() }, { 123L }, confirmationDelayMillis = 0)
+        try { repo.createPayment("x", "credits_999"); fail() } catch (_: IllegalArgumentException) { }
+        repo.createPayment("p", "credits_5")
+        repo.cancelPayment("p")
+        assertEquals(PaymentStatus.CANCELLED, repo.observePayment("p").first().status)
+        assertEquals(5, repo.getTransactions().sumOf { it.creditDelta } + 5)
+    }
+
     @Test fun realPaymentIsUnconfiguredAndCannotCompleteDemo() = runBlocking {
         val remote = UnconfiguredRemotePaymentRepository()
         assertFalse(remote.isConfigured)
-        try { remote.completeDemoPayment("p"); fail() }
+        try { remote.createPayment("p", "credits_5"); fail() }
         catch (_: com.example.lagallens.core.network.BackendNotConfiguredException) { }
     }
 }

@@ -13,11 +13,12 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class CreditPurchaseSelectionTest {
+    @get:org.junit.Rule val demoSession = com.example.lagallens.DemoSessionRule()
     @Test fun confirmationShowsSelectedPackageAndPrice() {
         val context = ApplicationProvider.getApplicationContext<android.content.Context>()
         val samples = listOf(Triple("credits_5", "5 Credits", "29.000đ"), Triple("credits_15", "15 Credits", "79.000đ"), Triple("credits_30", "30 Credits", "149.000đ"), Triple("credits_100", "100 Credits", "449.000đ"))
         samples.forEach { (id, title, price) ->
-            ActivityScenario.launch<PurchaseConfirmationActivity>(PurchaseConfirmationActivity.createIntent(context, id, 5)).use {
+            ActivityScenario.launch<PurchaseConfirmationActivity>(PurchaseConfirmationActivity.createIntent(context, com.example.lagallens.presentation.feature.creditstore.contract.CreditPackage(id, id.removePrefix("credits_").toInt(), price.filter(Char::isDigit).toLong(), title, ""), 5)).use {
                 onView(withId(R.id.purchasePackageTitle)).check(matches(withText(title)))
                 onView(withId(R.id.purchaseSummaryPrice)).check(matches(withText(price)))
             }

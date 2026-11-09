@@ -14,22 +14,22 @@ import org.junit.runner.RunWith
 class ContractDemoDataSourceTest {
     @Test fun renameAndDeletePersistAcrossDataSourceRefresh() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val preferences = context.getSharedPreferences("contract_demo_data", android.content.Context.MODE_PRIVATE)
-        preferences.edit().clear().commit()
+        val name = "test_contract_${java.util.UUID.randomUUID()}"
+        val source = ContractDemoDataSource(name)
         try {
-            ContractDemoDataSource.initialize(context)
-            assertTrue(ContractDemoDataSource.rename("office-lease", "Hợp đồng đã đổi tên"))
-            assertEquals("Hợp đồng đã đổi tên", ContractDemoDataSource.getContract("office-lease")?.titleOverride)
-            assertTrue(ContractDemoDataSource.delete("collaborator"))
-            assertNull(ContractDemoDataSource.getContract("collaborator"))
+            source.initialize(context)
+            assertTrue(source.rename("office-lease", "Hợp đồng đã đổi tên"))
+            assertEquals("Hợp đồng đã đổi tên", source.getContract("office-lease")?.titleOverride)
+            assertTrue(source.delete("collaborator"))
+            assertNull(source.getContract("collaborator"))
 
-            ContractDemoDataSource.initialize(context)
+            val reopened = ContractDemoDataSource(name)
+            reopened.initialize(context)
 
-            assertEquals("Hợp đồng đã đổi tên", ContractDemoDataSource.getContract("office-lease")?.titleOverride)
-            assertFalse(ContractDemoDataSource.observableContracts.value.any { it.id == "collaborator" })
+            assertEquals("Hợp đồng đã đổi tên", reopened.getContract("office-lease")?.titleOverride)
+            assertFalse(reopened.observableContracts.value.any { it.id == "collaborator" })
         } finally {
-            preferences.edit().clear().commit()
-            ContractDemoDataSource.initialize(context)
+            context.deleteSharedPreferences(name)
         }
     }
 }

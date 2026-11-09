@@ -16,6 +16,7 @@ import com.example.lagallens.domain.model.ProfileLanguage
 import com.example.lagallens.presentation.feature.creditstore.flow.ui.PurchaseConfirmationActivity
 import com.example.lagallens.presentation.feature.creditstore.flow.ui.PurchaseSuccessActivity
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import java.util.UUID
 import org.junit.After
@@ -52,7 +53,7 @@ class EnglishCreditAuditTest {
     }
 
     @Test fun popularPackageDescriptionIsEnglish() {
-        val intent = PurchaseConfirmationActivity.createIntent(app, "credits_15", 5)
+        val intent = PurchaseConfirmationActivity.createIntent(app, com.example.lagallens.presentation.feature.creditstore.contract.CreditPackage("credits_15", 15, 79_000, "15 Credits", ""), 5)
         ActivityScenario.launch<PurchaseConfirmationActivity>(intent).use {
             awaitEnglish(it)
             onView(withText("Confirm Credit purchase")).check(matches(isDisplayed()))
@@ -66,7 +67,7 @@ class EnglishCreditAuditTest {
     @Test fun allPackagesShowSelectedAmountInEnglish() {
         val samples = listOf(Triple("credits_5", "5 Credits", "29.000đ"), Triple("credits_15", "15 Credits", "79.000đ"), Triple("credits_30", "30 Credits", "149.000đ"), Triple("credits_100", "100 Credits", "449.000đ"))
         samples.forEach { (id, title, price) ->
-            ActivityScenario.launch<PurchaseConfirmationActivity>(PurchaseConfirmationActivity.createIntent(app, id, 5)).use {
+            ActivityScenario.launch<PurchaseConfirmationActivity>(PurchaseConfirmationActivity.createIntent(app, com.example.lagallens.presentation.feature.creditstore.contract.CreditPackage(id, id.removePrefix("credits_").toInt(), price.filter(Char::isDigit).toLong(), title, ""), 5)).use {
                 awaitEnglish(it)
                 onView(withText("Confirm Credit purchase")).check(matches(isDisplayed()))
                 onView(withId(R.id.purchasePackageTitle)).check(matches(withText(title)))
@@ -79,11 +80,12 @@ class EnglishCreditAuditTest {
     @Test fun fiveCreditSuccessDoesNotDisplayFifteen() {
         val paymentId = UUID.randomUUID().toString()
         runBlocking {
-            app.paymentRepository.createOrGet(paymentId, "credits_5", 29000, 5)
-            app.paymentRepository.completeDemoPayment(paymentId)
+            app.paymentRepository.createPayment(paymentId, "credits_5")
+            app.paymentRepository.observePayment(paymentId).first { it.status != com.example.lagallens.domain.model.payment.PaymentStatus.PENDING }
         }
         val intent = Intent(app, PurchaseSuccessActivity::class.java)
             .putExtra("credit_purchase_package_id", "credits_5")
+            .putExtra("credit_purchase_credits", 5)
             .putExtra("credit_purchase_balance", 5)
             .putExtra("credit_purchase_id", paymentId)
         ActivityScenario.launch<PurchaseSuccessActivity>(intent).use {

@@ -58,7 +58,7 @@ class ChatbotDraftGenerationTest {
 
     private fun prepareDraft(previewError: Boolean): ChatbotViewModel {
         val repository = FakeChatbotRepository()
-        val model = ChatbotViewModel(OpenChatbotConversationUseCase(repository), SendChatbotMessageUseCase(repository), RetryChatbotMessageUseCase(repository))
+        val model = ChatbotViewModel(OpenChatbotConversationUseCase(repository), SendChatbotMessageUseCase(repository), RetryChatbotMessageUseCase(repository)) { com.example.lagallens.TestDraftAiRepository() }
         model.onEvent(ChatbotUiEvent.ScreenOpened("HĐ Thuê VP Bitexco", "Thuê văn phòng", startNewConversation = true, previewDraftError = previewError))
         model.onEvent(ChatbotUiEvent.NewDraftClicked("Yêu cầu mẫu", "Cần bổ sung gì?"))
         model.onEvent(ChatbotUiEvent.DraftDetailsSubmitted("Chi tiết mẫu", "Đã ghi nhận"))

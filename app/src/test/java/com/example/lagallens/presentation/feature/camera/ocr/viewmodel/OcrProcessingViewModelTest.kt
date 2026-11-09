@@ -2,7 +2,13 @@ package com.example.lagallens.presentation.feature.camera.ocr.viewmodel
 
 import com.example.lagallens.presentation.feature.camera.ocr.contract.OcrProcessingUiEffect
 import com.example.lagallens.presentation.feature.camera.ocr.contract.OcrProcessingUiEvent
+import com.example.lagallens.data.repository.FakeDocumentUploadRepository
+import com.example.lagallens.data.repository.FakeOcrRepository
+import com.example.lagallens.domain.model.processing.ProcessingState
+import com.example.lagallens.domain.repository.OcrRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -23,13 +29,13 @@ class OcrProcessingViewModelTest {
     fun successfulProcessingCompletesEveryStageBeforeNavigatingToResult() = runTest {
         Dispatchers.setMain(StandardTestDispatcher(testScheduler))
         try {
-            val viewModel = OcrProcessingViewModel()
+            val viewModel = OcrProcessingViewModel(FakeOcrRepository(), FakeDocumentUploadRepository())
             val effects = mutableListOf<OcrProcessingUiEffect>()
             val effectCollection = backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
                 viewModel.uiEffect.collect { effects.add(it) }
             }
 
-            viewModel.onEvent(OcrProcessingUiEvent.ScreenOpened(shouldSimulateFailure = false))
+            viewModel.onEvent(OcrProcessingUiEvent.ScreenOpened("document"))
             runCurrent()
             assertEquals(2, viewModel.uiState.value.activeStepId)
             assertTrue(effects.isEmpty())
@@ -57,17 +63,17 @@ class OcrProcessingViewModelTest {
     fun failedProcessingStopsAtImageAnalysisBeforeNavigatingToFailure() = runTest {
         Dispatchers.setMain(StandardTestDispatcher(testScheduler))
         try {
-            val viewModel = OcrProcessingViewModel()
+            val failing = object : OcrRepository {
+                override fun process(documentId: String): Flow<ProcessingState> = flowOf(ProcessingState.Failed())
+                override suspend fun getResult(documentId: String) = error("unexpected")
+            }
+            val viewModel = OcrProcessingViewModel(failing, FakeDocumentUploadRepository())
             val effects = mutableListOf<OcrProcessingUiEffect>()
             val effectCollection = backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
                 viewModel.uiEffect.collect { effects.add(it) }
             }
 
-            viewModel.onEvent(OcrProcessingUiEvent.ScreenOpened(shouldSimulateFailure = true))
-            runCurrent()
-            assertEquals(2, viewModel.uiState.value.activeStepId)
-
-            advanceTimeBy(900L)
+            viewModel.onEvent(OcrProcessingUiEvent.ScreenOpened("document"))
             runCurrent()
             assertEquals(2, viewModel.uiState.value.activeStepId)
             assertTrue(effects.single() is OcrProcessingUiEffect.NavigateToOcrFailure)

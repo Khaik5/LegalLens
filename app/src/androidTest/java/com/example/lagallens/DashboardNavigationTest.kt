@@ -13,6 +13,7 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class DashboardNavigationTest {
+    @get:org.junit.Rule val demoSession = com.example.lagallens.DemoSessionRule()
     @Test fun viewAllThenHomeReturnsToDashboard() {
         ActivityScenario.launch(MainActivity::class.java).use {
             onView(withId(R.id.tvViewAllContracts)).perform(click())

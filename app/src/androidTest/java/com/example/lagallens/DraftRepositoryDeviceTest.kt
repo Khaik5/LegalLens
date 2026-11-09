@@ -18,12 +18,11 @@ class DraftRepositoryDeviceTest {
     @Test
     fun legacyDraftMigrationVersioningAndReopenKeepEverySavedContent() = runBlocking {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val repositoryPreferencesName = "draft_repository_test_migration"
-        val legacyPreferencesName = "draft_legacy_test_migration"
+        val id = java.util.UUID.randomUUID().toString()
+        val repositoryPreferencesName = "draft_repository_test_$id"
+        val legacyPreferencesName = "draft_legacy_test_$id"
         val repositoryPreferences = context.getSharedPreferences(repositoryPreferencesName, Context.MODE_PRIVATE)
         val legacyPreferences = context.getSharedPreferences(legacyPreferencesName, Context.MODE_PRIVATE)
-        repositoryPreferences.edit().clear().commit()
-        legacyPreferences.edit().clear().commit()
         val oldContent = "HỢP ĐỒNG LAO ĐỘNG\nĐIỀU 1. Nội dung đã lưu trước Phase 3."
         val oldUpdatedAt = 1_760_000_000_000L
         legacyPreferences.edit()
@@ -84,8 +83,8 @@ class DraftRepositoryDeviceTest {
             assertEquals(copy?.draftId, reopened.getLatestDraft(DraftStage.COPY)?.draftId)
             assertTrue(reopened.getDrafts().size >= 4)
         } finally {
-            repositoryPreferences.edit().clear().commit()
-            legacyPreferences.edit().clear().commit()
+            context.deleteSharedPreferences(repositoryPreferencesName)
+            context.deleteSharedPreferences(legacyPreferencesName)
         }
     }
 }

@@ -2,7 +2,6 @@ package com.example.lagallens
 
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.Espresso.pressBack
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.closeSoftKeyboard
 import androidx.test.espresso.action.ViewActions.replaceText
@@ -20,6 +19,7 @@ import android.os.SystemClock
 import org.junit.Test
 
 class ChatbotDraftActivityTest {
+    @get:org.junit.Rule val demoSession = com.example.lagallens.DemoSessionRule()
     @Test
     fun newConversationCanReviewLocalDraftRequest() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
@@ -33,9 +33,13 @@ class ChatbotDraftActivityTest {
             onView(withId(R.id.chatbotEmptyState)).check(matches(isDisplayed()))
             onView(withId(R.id.chatbotNewSuggestionRisk)).perform(click())
             onView(withText(R.string.chatbot_draft_clarification)).check(matches(isDisplayed()))
+            // An open keyboard would take the first Back press instead of the attachment sheet.
+            onView(withId(R.id.chatbotInput)).perform(closeSoftKeyboard())
             onView(withId(R.id.chatbotAttach)).perform(click())
             onView(withId(R.id.chatbotAttachmentCancel)).check(matches(isDisplayed()))
-            pressBack()
+            // A system Back key, as from the navigation bar; Espresso's injected Back does not reach the sheet on Android 17.
+            InstrumentationRegistry.getInstrumentation().uiAutomation.executeShellCommand("input keyevent 4").close()
+            SystemClock.sleep(800)
             onView(withId(R.id.chatbotInput))
                 .perform(replaceText(context.getString(R.string.chatbot_draft_sample_details)))
             onView(withId(R.id.chatbotInput)).perform(closeSoftKeyboard())

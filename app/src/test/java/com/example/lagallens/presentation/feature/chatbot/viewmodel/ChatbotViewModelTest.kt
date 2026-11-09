@@ -129,12 +129,35 @@ class ChatbotViewModelTest {
         assertEquals(false, viewModel.uiState.value.isReplyPending)
     }
 
-    private fun viewModel(): ChatbotViewModel {
-        val repository = FakeChatbotRepository()
+    @Test
+    fun failedSendIsSavedWithItsRetryQuestion() = runTest {
+        val stored = FakeChatbotRepository()
+        val failing = object : com.example.lagallens.domain.repository.ChatbotRepository by stored {
+            override suspend fun sendForSession(
+                sessionKey: String?, conversationId: String, message: String,
+                attachment: com.example.lagallens.domain.model.chatbot.ChatbotAttachment?
+            ): com.example.lagallens.domain.model.chatbot.ChatbotReply = throw IllegalStateException("offline")
+        }
+        val viewModel = viewModel(failing)
+        openScreen(viewModel)
+        viewModel.onEvent(ChatbotUiEvent.MessageChanged("Điều khoản thanh toán thế nào?"))
+
+        viewModel.onEvent(ChatbotUiEvent.SendClicked)
+        advanceUntilIdle()
+
+        val transcript = stored.getConversations().single().messages
+        val error = transcript.last()
+        assertEquals(false, error.isUser)
+        assertEquals("Điều khoản thanh toán thế nào?", error.retryQuestion)
+        assertEquals(true, error.errorRetryLabel != null)
+    }
+
+    private fun viewModel(repository: com.example.lagallens.domain.repository.ChatbotRepository = FakeChatbotRepository()): ChatbotViewModel {
         return ChatbotViewModel(
             openConversation = OpenChatbotConversationUseCase(repository),
             sendMessage = SendChatbotMessageUseCase(repository),
-            retryMessage = RetryChatbotMessageUseCase(repository)
+            retryMessage = RetryChatbotMessageUseCase(repository),
+            draftAi = { com.example.lagallens.TestDraftAiRepository() }
         )
     }
 

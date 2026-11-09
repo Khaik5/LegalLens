@@ -10,7 +10,7 @@ import org.junit.Test
 import java.lang.reflect.Proxy
 
 class EmploymentPersistenceTest {
-    private fun preferences(): SharedPreferences {
+    internal fun preferences(): SharedPreferences {
         val values = mutableMapOf<String, Any?>()
         return Proxy.newProxyInstance(javaClass.classLoader, arrayOf(SharedPreferences::class.java)) { _, method, args ->
             when (method.name) {

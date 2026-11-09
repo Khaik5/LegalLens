@@ -5,6 +5,17 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class UploadFileValidatorTest {
+    @Test fun countsAFileOfUnknownSize() {
+        assertTrue(UploadFileValidator.countBytes(ByteArray(1_000).inputStream()) == 1_000L)
+    }
+
+    @Test fun stopsCountingOnceOverTheLimit() {
+        val stream = ByteArray(100_000).inputStream()
+        val counted = UploadFileValidator.countBytes(stream, limit = 10_000)
+        assertTrue(counted > 10_000)
+        assertTrue(stream.available() > 0)
+    }
+
     @Test fun acceptsSupportedMimeTypes() {
         assertTrue(UploadFileValidator.isSupported(UploadFileValidator.PDF_MIME))
         assertTrue(UploadFileValidator.isSupported(UploadFileValidator.DOCX_MIME))

@@ -57,6 +57,29 @@ class OcrResultViewModelTest {
         assertEquals(true, viewModel.uiState.value.isReviewConfirmed)
     }
 
+    @Test fun changedSessionCannotSaveOldReview() {
+        var ownerIsCurrent = true
+        val contracts = MemoryContractRepository()
+        val documents = MemoryDocumentRepository()
+        val vm = OcrResultViewModel(GetOcrResultUseCase(FakeOcrRepository()), documents, contracts) { ownerIsCurrent }
+        vm.onEvent(OcrResultUiEvent.ScreenOpened("A", "PDF", "doc-a", initialContent = "private A"))
+        ownerIsCurrent = false
+        vm.onEvent(OcrResultUiEvent.ReviewConfirmed("private A", "doc-a", null))
+        assertEquals("", vm.uiState.value.documentText)
+        assertEquals(0, contracts.records.size)
+        assertEquals(null, kotlinx.coroutines.runBlocking { documents.getDocument("doc-a") }?.contractId)
+    }
+
+    @Test fun unknownExistingContractCannotCreateAReplacementDocument() {
+        val contracts = MemoryContractRepository()
+        val documents = MemoryDocumentRepository()
+        val vm = viewModel(contracts, documents)
+        vm.onEvent(OcrResultUiEvent.ScreenOpened("A", "PDF", "doc-a", contractId = "missing", initialContent = "private A"))
+        assertNotNull(vm.uiState.value.errorMessageRes)
+        assertEquals(null, kotlinx.coroutines.runBlocking { documents.getDocument("doc-a") })
+        assertEquals(0, contracts.records.size)
+    }
+
     private fun viewModel(
         contracts: MemoryContractRepository = MemoryContractRepository(),
         documents: MemoryDocumentRepository = MemoryDocumentRepository()
