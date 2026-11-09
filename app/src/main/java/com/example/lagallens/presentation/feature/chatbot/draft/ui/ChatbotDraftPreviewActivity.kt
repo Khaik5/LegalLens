@@ -15,7 +15,6 @@ import androidx.activity.viewModels
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import androidx.core.view.WindowCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -26,20 +25,18 @@ import com.example.lagallens.R
 import com.example.lagallens.databinding.ActivityChatbotDraftPreviewBinding
 import com.example.lagallens.databinding.DialogChatbotDraftRegenerationBinding
 import com.example.lagallens.presentation.common.utils.applySystemBarInsets
-import com.example.lagallens.presentation.feature.chatbot.draft.DraftContentFactory
 import com.example.lagallens.presentation.feature.chatbot.draft.adapter.ChatbotDraftPageAdapter
 import com.example.lagallens.presentation.feature.chatbot.draft.contract.ChatbotDraftPage
 import com.example.lagallens.presentation.feature.chatbot.draft.contract.ChatbotDraftSection
 import com.example.lagallens.presentation.feature.chatbot.draft.contract.ChatbotDraftUiEvent
 import com.example.lagallens.presentation.feature.chatbot.draft.contract.ChatbotDraftUiState
-import com.example.lagallens.domain.model.DraftStage
 import com.example.lagallens.presentation.feature.chatbot.draft.viewmodel.ChatbotDraftViewModel
 import com.example.lagallens.presentation.feature.chatbot.draft.save.SaveDraftCopyBottomSheet
-import com.example.lagallens.presentation.feature.chatbot.draft.save.SavedDraftCopyStore
 import com.example.lagallens.presentation.feature.chatbot.draft.save.detail.SavedDraftCopyDetailActivity
 import kotlinx.coroutines.launch
 
-class ChatbotDraftPreviewActivity : AppCompatActivity() {
+class ChatbotDraftPreviewActivity : DraftSessionActivity() {
+    override fun onStart() { super.onStart(); if (!DraftSessionGuard.valid(application as com.example.lagallens.LegalLensApplication, intent)) finish() }
     private lateinit var binding: ActivityChatbotDraftPreviewBinding
     private val viewModel by viewModels<ChatbotDraftViewModel>()
     private var renderedContent: String? = null
@@ -48,6 +45,7 @@ class ChatbotDraftPreviewActivity : AppCompatActivity() {
         ChatbotDraftPageAdapter(if (savedContent != null) savedContentPages(savedContent) else draftPages(intent.getStringExtra(EXTRA_VERSION) ?: ChatbotDraftUiState.DRAFT_VERSION, intent.getStringExtra(EXTRA_MANUAL_BODY)))
     }
     private val aiEditResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (!isDraftSessionValid()) return@registerForActivityResult
         if (result.resultCode == RESULT_EDIT_REQUEST) {
             showAiEditSheet(
                 result.data?.getStringExtra(ChatbotDraftAiEditingActivity.EXTRA_SCOPE)
@@ -59,13 +57,12 @@ class ChatbotDraftPreviewActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        window.statusBarColor = Color.TRANSPARENT
-        window.navigationBarColor = Color.TRANSPARENT
-        WindowCompat.getInsetsController(window, window.decorView).apply {
-            isAppearanceLightStatusBars = true
-            isAppearanceLightNavigationBars = true
-        }
+        if (!guardDraftCreate()) return
+        if (!DraftSessionGuard.valid(application as com.example.lagallens.LegalLensApplication, intent)) { finish(); return }
+        lifecycleScope.launch { (application as com.example.lagallens.LegalLensApplication).observeSessionKeys().collect {
+            if (!DraftSessionGuard.valid(application as com.example.lagallens.LegalLensApplication, intent)) finish()
+        } }
+        useEdgeToEdgeSystemBars()
         binding = ActivityChatbotDraftPreviewBinding.inflate(layoutInflater)
         setContentView(binding.root)
         binding.root.applySystemBarInsets()
@@ -81,7 +78,7 @@ class ChatbotDraftPreviewActivity : AppCompatActivity() {
             ChatbotDraftUiEvent.Opened(
                 version = version,
                 initialTitle = getString(R.string.chatbot_draft_document_name, version),
-                initialContent = intent.getStringExtra(EXTRA_SAVED_CONTENT) ?: draftContent(version),
+                initialContent = intent.getStringExtra(EXTRA_SAVED_CONTENT),
                 contractId = intent.getStringExtra(EXTRA_CONTRACT_ID),
                 draftId = intent.getStringExtra(EXTRA_DRAFT_ID)
             )
@@ -107,8 +104,8 @@ class ChatbotDraftPreviewActivity : AppCompatActivity() {
         draftRegenerate.setOnClickListener { showRegenerationConfirmation() }
         draftExport.setOnClickListener {
             val version = viewModel.uiState.value.version
-            if (SavedDraftCopyStore.isSaved(this@ChatbotDraftPreviewActivity, version)) {
-                startActivity(SavedDraftCopyDetailActivity.createIntent(this@ChatbotDraftPreviewActivity, version, openExport = true))
+            if (viewModel.uiState.value.isSaved) {
+                startActivity(SavedDraftCopyDetailActivity.createIntent(this@ChatbotDraftPreviewActivity, version, openExport = true, draftId = viewModel.uiState.value.draftId, contractId = viewModel.uiState.value.contractId))
             } else {
                 androidx.appcompat.app.AlertDialog.Builder(this@ChatbotDraftPreviewActivity)
                     .setTitle(R.string.draft_export_unsaved_title)
@@ -127,14 +124,20 @@ class ChatbotDraftPreviewActivity : AppCompatActivity() {
     private fun showSaveDraftCopy(version: String) {
         if (supportFragmentManager.findFragmentByTag(SaveDraftCopyBottomSheet.TAG) == null) {
         val state = viewModel.uiState.value
-        SaveDraftCopyBottomSheet.newInstance(version, state.content ?: draftContent(version), state.contractId, state.draftId)
+        SaveDraftCopyBottomSheet.newInstance(version, state.content.orEmpty(), state.contractId, state.draftId)
             .show(supportFragmentManager, SaveDraftCopyBottomSheet.TAG)
         }
     }
 
     private fun render(state: ChatbotDraftUiState) = with(binding) {
-        draftContractName.text = state.title ?: SavedDraftCopyStore.name(this@ChatbotDraftPreviewActivity, state.version)
-            ?: getString(R.string.chatbot_draft_document_name, state.version)
+        if (state.isLoadFailed) {
+            android.widget.Toast.makeText(this@ChatbotDraftPreviewActivity, R.string.chatbot_draft_load_failed, android.widget.Toast.LENGTH_LONG).show()
+            finish()
+            return@with
+        }
+        val hasContent = !state.content.isNullOrBlank()
+        listOf(draftEdit, draftRegenerate, draftExport, draftAskAi, draftSave).forEach { it.isEnabled = hasContent }
+        draftContractName.text = state.title ?: getString(R.string.chatbot_draft_document_name, state.version)
         draftVersion.setText(
             if (state.version == ChatbotDraftUiState.REGENERATED_VERSION) {
                 R.string.chatbot_draft_regenerated_version_metadata
@@ -226,6 +229,7 @@ class ChatbotDraftPreviewActivity : AppCompatActivity() {
             val text = sheetBinding.draftAiRequest.text?.toString().orEmpty().trim()
             if (text.isNotEmpty()) {
                 sheet.dismiss()
+                if (!isDraftSessionValid()) return@setOnClickListener
                 aiEditResultLauncher.launch(
                     ChatbotDraftAiEditingActivity.createIntent(
                         this,
@@ -234,7 +238,8 @@ class ChatbotDraftPreviewActivity : AppCompatActivity() {
                         BuildConfig.DEBUG && intent.getBooleanExtra(EXTRA_PREVIEW_AI_ERROR, false),
                         BuildConfig.DEBUG && intent.getBooleanExtra(EXTRA_PREVIEW_APPLY_ERROR, false),
                         viewModel.uiState.value.draftId,
-                        viewModel.uiState.value.contractId
+                        viewModel.uiState.value.contractId,
+                        viewModel.uiState.value.conversationId
                     )
                 )
             } else sheetBinding.draftAiRequest.error = getString(R.string.chatbot_draft_ai_prompt_required)
@@ -290,12 +295,6 @@ class ChatbotDraftPreviewActivity : AppCompatActivity() {
         )
     )
 
-    private fun draftContent(version: String): String {
-        val manualBody = intent.getStringExtra(EXTRA_MANUAL_BODY)
-        val stage = DraftStage.fromLegacyKey(version) ?: DraftStage.ORIGINAL
-        return DraftContentFactory.create(this, stage, manualBody)
-    }
-
     companion object {
         private const val EXTRA_VERSION = "chatbot_draft_version"
         const val EXTRA_PREVIEW_REGENERATION_ERROR = "chatbot_draft_preview_regeneration_error"
@@ -324,5 +323,6 @@ class ChatbotDraftPreviewActivity : AppCompatActivity() {
             .putExtra(EXTRA_SAVED_CONTENT, savedContent)
             .putExtra(EXTRA_CONTRACT_ID, contractId)
             .putExtra(EXTRA_DRAFT_ID, draftId)
+            .also { DraftSessionGuard.stamp(context, it) }
     }
 }

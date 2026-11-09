@@ -5,10 +5,11 @@ import com.example.lagallens.presentation.feature.contracts.contract.ContractLis
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-object ContractDemoDataSource {
-    private const val PREFERENCES_NAME = "contract_demo_data"
-    private const val DELETED_IDS_KEY = "deleted_contract_ids"
-    private const val RENAMED_TITLE_PREFIX = "renamed_title_"
+class ContractDemoDataSource(private val preferencesName: String = "contract_demo_data") {
+    private companion object {
+        const val DELETED_IDS_KEY = "deleted_contract_ids"
+        const val RENAMED_TITLE_PREFIX = "renamed_title_"
+    }
     private val contracts = MutableStateFlow<List<ContractListItem>>(emptyList())
     val observableContracts = contracts.asStateFlow()
     private var initialized = false
@@ -17,7 +18,7 @@ object ContractDemoDataSource {
     @Synchronized
     fun initialize(context: Context) {
         if (!initialized) {
-            preferences = context.applicationContext.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
+            preferences = context.applicationContext.getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
             initialized = true
         }
         refresh()

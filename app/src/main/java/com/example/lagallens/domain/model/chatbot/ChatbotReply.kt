@@ -28,8 +28,11 @@ sealed interface ChatbotReply {
 data class ChatbotCitation(
     val title: String,
     val description: String,
-    val actionLabel: String
+    val actionLabel: String,
+    val referenceId: String? = null
 )
+
+data class ChatbotAttachment(val uri: String, val name: String)
 
 data class ChatbotReference(
     val title: String,

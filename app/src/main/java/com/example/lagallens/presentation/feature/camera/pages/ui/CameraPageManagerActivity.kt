@@ -26,7 +26,7 @@ import com.example.lagallens.presentation.feature.camera.pages.viewmodel.CameraP
 import kotlinx.coroutines.launch
 import java.io.File
 
-class CameraPageManagerActivity : AppCompatActivity() {
+class CameraPageManagerActivity : com.example.lagallens.presentation.feature.ocr.OcrSessionActivity() {
     private val binding by lazy { ActivityCameraPageManagerBinding.inflate(layoutInflater) }
     private val viewModel by viewModels<CameraPageManagerViewModel>()
     private val pageAdapter = CameraPageAdapter { page ->
@@ -36,6 +36,7 @@ class CameraPageManagerActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (isFinishing || !isOcrSessionValid()) { finish(); return }
         WindowCompat.setDecorFitsSystemWindows(window, false)
         window.statusBarColor = Color.TRANSPARENT
         window.navigationBarColor = Color.TRANSPARENT
@@ -63,7 +64,7 @@ class CameraPageManagerActivity : AppCompatActivity() {
     private fun initializePages() {
         val warningPaths = intent.getStringArrayListExtra(EXTRA_WARNING_PATHS).orEmpty().toSet()
         viewModel.setPages(
-            intent.getStringArrayListExtra(EXTRA_PAGE_PATHS).orEmpty().map { ScanPage(it, it in warningPaths) }
+            intent.getStringArrayListExtra(EXTRA_PAGE_PATHS).orEmpty().filter { File(it).exists() }.map { ScanPage(it, it in warningPaths) }
         )
     }
 
@@ -128,13 +129,13 @@ class CameraPageManagerActivity : AppCompatActivity() {
         const val EXTRA_PAGE_PATHS = "camera_page_paths"
         const val EXTRA_WARNING_PATHS = "camera_warning_paths"
 
-        fun createIntent(context: Context, pages: List<ScanPage>): Intent = Intent(
+        fun createIntent(context: Context, pages: List<ScanPage>): Intent = com.example.lagallens.presentation.feature.ocr.OcrSession.stamp(context, Intent(
             context,
             CameraPageManagerActivity::class.java
         ).putStringArrayListExtra(EXTRA_PAGE_PATHS, ArrayList(pages.map(ScanPage::path)))
             .putStringArrayListExtra(
                 EXTRA_WARNING_PATHS,
                 ArrayList(pages.filter(ScanPage::hasQualityWarning).map(ScanPage::path))
-            )
+            ))
     }
 }

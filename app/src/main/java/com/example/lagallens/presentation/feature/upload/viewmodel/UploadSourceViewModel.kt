@@ -5,9 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.lagallens.presentation.feature.upload.contract.UploadSourceUiEffect
 import com.example.lagallens.presentation.feature.upload.contract.UploadSourceUiEvent
 import com.example.lagallens.presentation.feature.upload.contract.UploadSourceUiState
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
@@ -15,8 +15,8 @@ class UploadSourceViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(UploadSourceUiState())
     val uiState = _uiState.asStateFlow()
 
-    private val _uiEffect = MutableSharedFlow<UploadSourceUiEffect>()
-    val uiEffect = _uiEffect.asSharedFlow()
+    private val _uiEffect = Channel<UploadSourceUiEffect>(Channel.BUFFERED)
+    val uiEffect = _uiEffect.receiveAsFlow()
 
     fun onEvent(event: UploadSourceUiEvent) {
         when (event) {
@@ -36,6 +36,6 @@ class UploadSourceViewModel : ViewModel() {
     }
 
     private fun emitEffect(effect: UploadSourceUiEffect) {
-        viewModelScope.launch { _uiEffect.emit(effect) }
+        viewModelScope.launch { _uiEffect.send(effect) }
     }
 }

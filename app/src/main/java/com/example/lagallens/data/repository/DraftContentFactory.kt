@@ -1,4 +1,4 @@
-package com.example.lagallens.presentation.feature.chatbot.draft
+package com.example.lagallens.data.repository
 
 import android.content.Context
 import com.example.lagallens.R
@@ -15,12 +15,18 @@ internal object DraftContentFactory {
     }.trim()
 
     fun applyAiProposal(context: Context, sourceContent: String): String {
-        val sectionTitle = context.getString(R.string.chatbot_draft_section_3_title)
-        val nextSectionTitle = context.getString(R.string.chatbot_draft_section_4_title)
+        val sourceContext = listOf("vi", "en").map { tag ->
+            context.createConfigurationContext(android.content.res.Configuration(context.resources.configuration).apply {
+                setLocale(java.util.Locale.forLanguageTag(tag))
+            })
+        }.firstOrNull { sourceContent.contains(it.getString(R.string.chatbot_draft_section_3_title)) }
+            ?: error("The source clause is unavailable")
+        val sectionTitle = sourceContext.getString(R.string.chatbot_draft_section_3_title)
+        val nextSectionTitle = sourceContext.getString(R.string.chatbot_draft_section_4_title)
         val start = sourceContent.indexOf(sectionTitle)
         val next = if (start >= 0) sourceContent.indexOf(nextSectionTitle, start + sectionTitle.length) else -1
-        val replacement = "$sectionTitle\n${context.getString(R.string.chatbot_draft_section_3_approved_body)}\n\n"
-        if (start < 0 || next < 0) return sourceContent
+        val replacement = "$sectionTitle\n${sourceContext.getString(R.string.chatbot_draft_section_3_approved_body)}\n\n"
+        check(start >= 0 && next > start) { "The source clause is unavailable" }
         return sourceContent.replaceRange(start, next, replacement)
     }
 

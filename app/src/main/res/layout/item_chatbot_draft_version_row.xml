@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/dp_8"
+    android:background="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true"
+    android:fontFamily="@font/manrope"
+    android:minHeight="@dimen/dp_44"
+    android:gravity="center_vertical"
+    android:textColor="@color/legal_lens_primary"
+    android:textSize="@dimen/sp_14" />

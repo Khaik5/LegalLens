@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="dashboard_recent_empty">No contracts yet. Upload your first contract.</string>
+    <string name="dashboard_load_failed">Contracts could not be loaded. Please try again.</string>
+    <string name="dashboard_retry">Try again</string>
+    <string name="dashboard_upcoming_empty">No important dates yet.</string>
+    <string name="dashboard_contract_subtitle">%1$s · %2$s</string>
+</resources>

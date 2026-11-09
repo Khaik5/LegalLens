@@ -17,8 +17,8 @@ sealed interface CameraCaptureUiEvent {
     ) : CameraCaptureUiEvent
     data object CaptureFailed : CameraCaptureUiEvent
     data class GalleryPagesQualityChecked(val pages: List<Pair<ScanPage, DocumentQualityResult>>) : CameraCaptureUiEvent
-    data object KeepWarningPage : CameraCaptureUiEvent
-    data object DiscardWarningPage : CameraCaptureUiEvent
+    data class KeepWarningPage(val path: String) : CameraCaptureUiEvent
+    data class DiscardPage(val path: String) : CameraCaptureUiEvent
     data class PagesUpdated(val pages: List<ScanPage>) : CameraCaptureUiEvent
     data object ContinueClicked : CameraCaptureUiEvent
 }

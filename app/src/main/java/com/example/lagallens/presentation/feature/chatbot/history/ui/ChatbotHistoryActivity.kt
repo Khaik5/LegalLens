@@ -32,6 +32,10 @@ import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.launch
 
 class ChatbotHistoryActivity : AppCompatActivity() {
+    private val ownerSession by lazy { (application as LegalLensApplication).currentSessionKey() }
+    private fun isOwnerSession() = (application as LegalLensApplication).let {
+        (ownerSession != null && ownerSession == it.currentSessionKey())
+    }
     private lateinit var binding: ActivityChatbotHistoryBinding
     private val viewModel by viewModels<ChatbotHistoryViewModel> {
         object : ViewModelProvider.Factory {
@@ -44,6 +48,12 @@ class ChatbotHistoryActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (!isOwnerSession()) { finish(); return }
+        lifecycleScope.launch {
+            (application as LegalLensApplication).observeSessionKeys().collect {
+                if (!isOwnerSession()) finish()
+            }
+        }
         WindowCompat.setDecorFitsSystemWindows(window, false)
         window.statusBarColor = Color.TRANSPARENT
         window.navigationBarColor = Color.TRANSPARENT
@@ -73,6 +83,7 @@ class ChatbotHistoryActivity : AppCompatActivity() {
         chatbotHistoryBack.setOnClickListener { viewModel.onEvent(ChatbotHistoryUiEvent.BackClicked) }
         chatbotHistorySearch.setOnClickListener { viewModel.onEvent(ChatbotHistoryUiEvent.SearchClicked) }
         chatbotHistoryNewChat.setOnClickListener {
+            if (!isOwnerSession()) return@setOnClickListener
             startActivity(
                 ChatbotActivity.createNewConversationIntent(
                     this@ChatbotHistoryActivity,
@@ -112,6 +123,7 @@ class ChatbotHistoryActivity : AppCompatActivity() {
     }
 
     private fun handleEffect(effect: ChatbotHistoryUiEffect) {
+        if (!isOwnerSession()) return
         when (effect) {
             ChatbotHistoryUiEffect.NavigateBack -> finish()
             is ChatbotHistoryUiEffect.OpenConversation -> startActivity(
@@ -125,6 +137,7 @@ class ChatbotHistoryActivity : AppCompatActivity() {
                     ChatbotActivity.createHistoryIntent(
                         this,
                         effect.conversation.contractName,
+                        effect.conversation.contractType.ifBlank { getString(R.string.chatbot_default_contract_type) },
                         effect.conversation.id,
                         effect.conversation.contractId
                     )
@@ -139,7 +152,7 @@ class ChatbotHistoryActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        binding.chatbotHistoryList.adapter = null
+        if (::binding.isInitialized) binding.chatbotHistoryList.adapter = null
         super.onDestroy()
     }
 

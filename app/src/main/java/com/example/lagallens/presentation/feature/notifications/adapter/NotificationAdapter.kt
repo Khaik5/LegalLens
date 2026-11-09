@@ -41,9 +41,9 @@ class NotificationAdapter(
             binding.ivNotificationIcon.imageTintList = ColorStateList.valueOf(
                 ContextCompat.getColor(context, item.iconTintRes)
             )
-            binding.tvTitle.setText(item.titleRes)
-            binding.tvDescription.setText(item.descriptionRes)
-            binding.tvTime.setText(item.timeRes)
+            binding.tvTitle.text = item.title
+            binding.tvDescription.text = item.description
+            binding.tvTime.text = android.text.format.DateUtils.getRelativeTimeSpanString(item.createdAtMillis)
             binding.viewUnread.isVisible = item.isUnread
             binding.root.setOnClickListener { onNotificationClicked(item) }
         }

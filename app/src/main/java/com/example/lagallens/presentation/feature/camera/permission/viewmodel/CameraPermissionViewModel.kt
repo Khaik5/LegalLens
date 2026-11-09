@@ -5,9 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.lagallens.presentation.feature.camera.permission.contract.CameraPermissionUiEffect
 import com.example.lagallens.presentation.feature.camera.permission.contract.CameraPermissionUiEvent
 import com.example.lagallens.presentation.feature.camera.permission.contract.CameraPermissionUiState
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -16,8 +16,8 @@ class CameraPermissionViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(CameraPermissionUiState())
     val uiState = _uiState.asStateFlow()
 
-    private val _uiEffect = MutableSharedFlow<CameraPermissionUiEffect>()
-    val uiEffect = _uiEffect.asSharedFlow()
+    private val _uiEffect = Channel<CameraPermissionUiEffect>(Channel.BUFFERED)
+    val uiEffect = _uiEffect.receiveAsFlow()
 
     fun onEvent(event: CameraPermissionUiEvent) {
         when (event) {
@@ -40,6 +40,6 @@ class CameraPermissionViewModel : ViewModel() {
     }
 
     private fun emitEffect(effect: CameraPermissionUiEffect) {
-        viewModelScope.launch { _uiEffect.emit(effect) }
+        viewModelScope.launch { _uiEffect.send(effect) }
     }
 }

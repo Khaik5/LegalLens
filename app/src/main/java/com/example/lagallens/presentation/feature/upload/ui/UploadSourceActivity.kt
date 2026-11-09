@@ -25,9 +25,11 @@ import com.example.lagallens.presentation.feature.upload.contract.UploadSourceUi
 import com.example.lagallens.presentation.feature.upload.progress.ui.UploadProgressActivity
 import com.example.lagallens.presentation.feature.upload.viewmodel.UploadSourceViewModel
 import com.example.lagallens.presentation.feature.upload.UploadFileValidator
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-class UploadSourceActivity : AppCompatActivity() {
+class UploadSourceActivity : com.example.lagallens.presentation.feature.ocr.OcrSessionActivity() {
     private val binding by lazy { ActivityUploadSourceBinding.inflate(layoutInflater) }
     private val viewModel by viewModels<UploadSourceViewModel>()
     private val documentPicker = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
@@ -38,7 +40,10 @@ class UploadSourceActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        if (!intent.hasExtra(com.example.lagallens.presentation.feature.ocr.OcrSession.EXTRA_OWNER))
+            intent.putExtra(com.example.lagallens.presentation.feature.ocr.OcrSession.EXTRA_OWNER, (application as com.example.lagallens.LegalLensApplication).currentSessionKey())
         super.onCreate(savedInstanceState)
+        if (isFinishing || !isOcrSessionValid()) { finish(); return }
         WindowCompat.setDecorFitsSystemWindows(window, false)
         window.statusBarColor = Color.TRANSPARENT
         window.navigationBarColor = Color.TRANSPARENT
@@ -96,6 +101,7 @@ class UploadSourceActivity : AppCompatActivity() {
     }
 
     private fun handleEffect(effect: UploadSourceUiEffect) {
+        if (!isOcrSessionValid()) return
         when (effect) {
             UploadSourceUiEffect.NavigateBack -> finish()
             UploadSourceUiEffect.NavigateToCameraPermission -> startActivity(
@@ -112,10 +118,11 @@ class UploadSourceActivity : AppCompatActivity() {
     }
 
     private fun openUploadProgress(uri: android.net.Uri) {
+        if (!isOcrSessionValid()) return
         runCatching {
             contentResolver.takePersistableUriPermission(uri, android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
-        val fileMetadata = contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+        val fileMetadata = try { contentResolver.query(uri, null, null, null, null)?.use { cursor ->
             val nameColumn = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
             val sizeColumn = cursor.getColumnIndex(OpenableColumns.SIZE)
             if (cursor.moveToFirst()) {
@@ -125,26 +132,34 @@ class UploadSourceActivity : AppCompatActivity() {
             } else {
                 null
             }
-        }
+        } } catch (_: Exception) { showMessage(R.string.upload_source_file_unreadable); return }
         val fileName = fileMetadata?.first ?: getString(R.string.upload_source_selected_file)
         val byteCount = fileMetadata?.second
-        val mimeType = contentResolver.getType(uri).orEmpty()
+        val mimeType = try { contentResolver.getType(uri).orEmpty() }
+            catch (_: Exception) { showMessage(R.string.upload_source_file_unreadable); return }
         if (!UploadFileValidator.isSupported(mimeType)) {
             showMessage(R.string.upload_source_unsupported_file)
             return
         }
-        if (byteCount != null && byteCount > UploadFileValidator.MAX_BYTES) {
-            showMessage(R.string.upload_source_file_too_large)
-            return
+        lifecycleScope.launch {
+            // Some providers report no size, so the limit is enforced on the stream itself.
+            val measuredBytes = withContext(Dispatchers.IO) {
+                try { contentResolver.openInputStream(uri)?.use { byteCount ?: UploadFileValidator.countBytes(it) } }
+                catch (_: Exception) { null }
+            }
+            if (!isOcrSessionValid()) return@launch
+            when {
+                measuredBytes == null -> showMessage(R.string.upload_source_file_unreadable)
+                measuredBytes > UploadFileValidator.MAX_BYTES -> showMessage(R.string.upload_source_file_too_large)
+                measuredBytes == 0L -> showMessage(R.string.upload_source_file_empty)
+                else -> {
+                    val fileSize = Formatter.formatShortFileSize(this@UploadSourceActivity, measuredBytes)
+                    val fileType = mimeType.takeIf(String::isNotBlank)?.let(::formatFileType).orEmpty()
+                    val fileDetails = listOf(fileType, fileSize).filter(String::isNotBlank).joinToString(" · ")
+                    startActivity(UploadProgressActivity.newIntent(this@UploadSourceActivity, fileName, fileDetails, uri.toString(), java.util.UUID.randomUUID().toString(), mimeType))
+                }
+            }
         }
-        if (byteCount == 0L) {
-            showMessage(R.string.upload_source_file_empty)
-            return
-        }
-        val fileSize = byteCount?.let { Formatter.formatShortFileSize(this, it) }
-        val fileType = mimeType.takeIf(String::isNotBlank)?.let(::formatFileType).orEmpty()
-        val fileDetails = listOfNotNull(fileType.takeIf { it.isNotBlank() }, fileSize).joinToString(" · ")
-        startActivity(UploadProgressActivity.newIntent(this, fileName, fileDetails, uri.toString(), java.util.UUID.randomUUID().toString()))
     }
 
     private fun formatFileType(mimeType: String): String {

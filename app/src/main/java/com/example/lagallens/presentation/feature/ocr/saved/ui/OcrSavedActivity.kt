@@ -25,12 +25,13 @@ import com.example.lagallens.presentation.feature.ocr.saved.contract.OcrSavedUiS
 import com.example.lagallens.presentation.feature.ocr.saved.viewmodel.OcrSavedViewModel
 import kotlinx.coroutines.launch
 
-class OcrSavedActivity : AppCompatActivity() {
+class OcrSavedActivity : com.example.lagallens.presentation.feature.ocr.OcrSessionActivity() {
     private lateinit var binding: ActivityOcrSavedBinding
     private val viewModel by viewModels<OcrSavedViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (isFinishing || !isOcrSessionValid()) { finish(); return }
         WindowCompat.setDecorFitsSystemWindows(window, false)
         window.statusBarColor = Color.TRANSPARENT
         window.navigationBarColor = Color.TRANSPARENT
@@ -55,12 +56,8 @@ class OcrSavedActivity : AppCompatActivity() {
                 documentName = intent.getStringExtra(EXTRA_DOCUMENT_NAME)
                     .orEmpty()
                     .ifBlank { getString(R.string.ocr_saved_document_name) },
-                documentVersion = intent.getStringExtra(EXTRA_DOCUMENT_VERSION)
-                    .orEmpty()
-                    .ifBlank { getString(R.string.ocr_saved_document_version) },
-                documentStatus = intent.getStringExtra(EXTRA_DOCUMENT_STATUS)
-                    .orEmpty()
-                    .ifBlank { getString(R.string.ocr_saved_document_status) },
+                documentVersion = intent.getStringExtra(EXTRA_DOCUMENT_VERSION).orEmpty(),
+                documentStatus = intent.getStringExtra(EXTRA_DOCUMENT_STATUS).orEmpty(),
                 documentId = intent.getStringExtra(EXTRA_DOCUMENT_ID).orEmpty(),
                 contractId = intent.getStringExtra(EXTRA_CONTRACT_ID).orEmpty()
             )
@@ -89,17 +86,20 @@ class OcrSavedActivity : AppCompatActivity() {
     private fun render(state: OcrSavedUiState) = with(binding) {
         ocrSavedDocumentName.text = state.documentName
         ocrSavedDocumentVersion.text = state.documentVersion
+        ocrSavedDocumentVersion.visibility = if (state.documentVersion.isBlank()) android.view.View.GONE else android.view.View.VISIBLE
         ocrSavedDocumentStatus.text = state.documentStatus
+        ocrSavedDocumentStatus.visibility = if (state.documentStatus.isBlank()) android.view.View.GONE else android.view.View.VISIBLE
     }
 
     private fun handleEffect(effect: OcrSavedUiEffect) {
+        if (!isOcrSessionValid()) return
         when (effect) {
             OcrSavedUiEffect.NavigateBack -> {
                 startActivity(Intent(this, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP))
                 finish()
             }
             is OcrSavedUiEffect.NavigateToAnalysis -> {
-                startActivity(AnalysisStartActivity.createIntent(this, effect.documentName).putExtra("analysis_return_home", true))
+                startActivity(AnalysisStartActivity.createIntent(this, effect.documentName, contractId = effect.contractId, documentId = effect.documentId).putExtra("analysis_return_home", true))
             }
         }
     }
@@ -120,12 +120,12 @@ class OcrSavedActivity : AppCompatActivity() {
             documentUri: String? = null,
             documentId: String = "",
             contractId: String = ""
-        ): Intent = Intent(context, OcrSavedActivity::class.java)
+        ): Intent = com.example.lagallens.presentation.feature.ocr.OcrSession.stamp(context, Intent(context, OcrSavedActivity::class.java)
             .putExtra(EXTRA_DOCUMENT_NAME, documentName)
             .putExtra(EXTRA_DOCUMENT_VERSION, documentVersion)
             .putExtra(EXTRA_DOCUMENT_STATUS, documentStatus)
             .putExtra(EXTRA_DOCUMENT_URI, documentUri)
             .putExtra(EXTRA_DOCUMENT_ID, documentId)
-            .putExtra(EXTRA_CONTRACT_ID, contractId)
+            .putExtra(EXTRA_CONTRACT_ID, contractId))
     }
 }

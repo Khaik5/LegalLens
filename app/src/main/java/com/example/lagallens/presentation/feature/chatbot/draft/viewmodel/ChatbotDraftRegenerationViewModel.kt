@@ -4,30 +4,31 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.lagallens.LegalLensApplication
-import com.example.lagallens.R
-import com.example.lagallens.domain.model.DraftStage
-import com.example.lagallens.presentation.feature.chatbot.draft.DraftContentFactory
 import com.example.lagallens.presentation.feature.chatbot.draft.contract.ChatbotDraftRegenerationStatus
 import com.example.lagallens.presentation.feature.chatbot.draft.contract.ChatbotDraftRegenerationUiEvent
 import com.example.lagallens.presentation.feature.chatbot.draft.contract.ChatbotDraftRegenerationUiState
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class ChatbotDraftRegenerationViewModel(application: Application) : AndroidViewModel(application) {
+    private val app = application as LegalLensApplication
+    private val ownerSession = app.currentSessionKey()
     private val state = MutableStateFlow(ChatbotDraftRegenerationUiState())
     val uiState = state.asStateFlow()
     private var previewFailure = false
     private var sourceVersion = "D1"
     private var sourceDraftId: String? = null
     private var contractId: String? = null
+    init { viewModelScope.launch { app.observeSessionKeys().collect { if (it != ownerSession) {
+        sourceVersion = "D1"; sourceDraftId = null; contractId = null
+        state.value = ChatbotDraftRegenerationUiState()
+    } } } }
 
     fun onEvent(event: ChatbotDraftRegenerationUiEvent) {
+        if (ownerSession != app.currentSessionKey()) return
         when (event) {
             is ChatbotDraftRegenerationUiEvent.Opened -> if (!state.value.isInitialized) {
                 previewFailure = event.previewFailure
@@ -46,40 +47,23 @@ class ChatbotDraftRegenerationViewModel(application: Application) : AndroidViewM
     }
 
     private fun generate() {
+        val repository = try { app.draftAiRepository(ownerSession) } catch (_: Exception) { return }
+        val originalVersion = sourceVersion
+        val originalDraftId = sourceDraftId
+        val originalContractId = contractId
         viewModelScope.launch {
             val shouldFail = previewFailure
             previewFailure = false
             try {
-                delay(GENERATION_DELAY_MS)
                 if (shouldFail) error("Preview failure")
-                val draft = withContext(Dispatchers.IO) {
-                    val context = getApplication<Application>()
-                    val repository = getApplication<LegalLensApplication>().draftRepository
-                    val sourceStage = DraftStage.fromLegacyKey(sourceVersion) ?: DraftStage.ORIGINAL
-                    val source = sourceDraftId?.let { repository.getDraft(it) }
-                        ?: repository.getDraft(sourceVersion)
-                        ?: repository.saveDraft(
-                            sourceStage,
-                            context.getString(R.string.chatbot_draft_document_name, sourceVersion),
-                            DraftContentFactory.create(context, sourceStage),
-                            contractId
-                        )
-                    repository.createCopy(
-                        source.draftId,
-                        context.getString(R.string.chatbot_draft_document_name, DraftStage.REGENERATED.legacyKey),
-                        DraftStage.REGENERATED
-                    ) ?: error("Regenerated draft could not be created")
-                }
-                state.update { it.copy(status = ChatbotDraftRegenerationStatus.SUCCESS, draftId = draft.draftId) }
+                val draft = repository.regenerate(originalDraftId, originalVersion, originalContractId)
+                if (ownerSession == app.currentSessionKey()) state.update { it.copy(status = ChatbotDraftRegenerationStatus.SUCCESS, draftId = draft.draftId) }
             } catch (cancellationException: CancellationException) {
                 throw cancellationException
             } catch (_: Exception) {
-                state.update { it.copy(status = ChatbotDraftRegenerationStatus.ERROR) }
+                if (ownerSession == app.currentSessionKey()) state.update { it.copy(status = ChatbotDraftRegenerationStatus.ERROR) }
             }
         }
     }
 
-    private companion object {
-        const val GENERATION_DELAY_MS = 1800L
-    }
 }

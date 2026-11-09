@@ -6,9 +6,9 @@ import com.example.lagallens.presentation.feature.documentviewer.contract.Docume
 import com.example.lagallens.presentation.feature.documentviewer.contract.DocumentViewerUiEffect
 import com.example.lagallens.presentation.feature.documentviewer.contract.DocumentViewerUiEvent
 import com.example.lagallens.presentation.feature.documentviewer.contract.DocumentViewerUiState
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -16,8 +16,8 @@ import kotlinx.coroutines.launch
 class DocumentViewerViewModel : ViewModel() {
     private val state = MutableStateFlow(DocumentViewerUiState())
     val uiState = state.asStateFlow()
-    private val effects = MutableSharedFlow<DocumentViewerUiEffect>()
-    val uiEffect = effects.asSharedFlow()
+    private val effects = Channel<DocumentViewerUiEffect>(Channel.BUFFERED)
+    val uiEffect = effects.receiveAsFlow()
 
     fun onEvent(event: DocumentViewerUiEvent) {
         when (event) {
@@ -34,7 +34,7 @@ class DocumentViewerViewModel : ViewModel() {
             DocumentViewerUiEvent.NextClicked -> state.update { it.copy(currentPage = (it.currentPage + 1).coerceAtMost(it.pageCount)) }
             DocumentViewerUiEvent.ZoomOutClicked -> state.update { it.copy(zoomPercent = (it.zoomPercent - 25).coerceAtLeast(75)) }
             DocumentViewerUiEvent.ZoomInClicked -> state.update { it.copy(zoomPercent = (it.zoomPercent + 25).coerceAtMost(150)) }
-            DocumentViewerUiEvent.BackClicked -> viewModelScope.launch { effects.emit(DocumentViewerUiEffect.NavigateBack) }
+            DocumentViewerUiEvent.BackClicked -> viewModelScope.launch { effects.send(DocumentViewerUiEffect.NavigateBack) }
         }
     }
 

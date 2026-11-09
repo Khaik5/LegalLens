@@ -21,12 +21,13 @@ import com.example.lagallens.presentation.feature.ocr.failure.contract.OcrFailur
 import com.example.lagallens.presentation.feature.ocr.failure.viewmodel.OcrFailureViewModel
 import kotlinx.coroutines.launch
 
-class OcrFailureActivity : AppCompatActivity() {
+class OcrFailureActivity : com.example.lagallens.presentation.feature.ocr.OcrSessionActivity() {
     private lateinit var binding: ActivityOcrFailureBinding
     private val viewModel by viewModels<OcrFailureViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (isFinishing || !isOcrSessionValid() || intent.getStringExtra(EXTRA_DOCUMENT_ID).isNullOrBlank()) { finish(); return }
         WindowCompat.setDecorFitsSystemWindows(window, false)
         window.statusBarColor = Color.TRANSPARENT
         window.navigationBarColor = Color.TRANSPARENT
@@ -67,6 +68,7 @@ class OcrFailureActivity : AppCompatActivity() {
     }
 
     private fun handleEffect(effect: OcrFailureUiEffect) {
+        if (!isOcrSessionValid()) return
         when (effect) {
             OcrFailureUiEffect.NavigateBack -> finish()
             is OcrFailureUiEffect.RetryOcr -> {
@@ -74,7 +76,11 @@ class OcrFailureActivity : AppCompatActivity() {
                     OcrProcessingActivity.createIntent(
                         context = this,
                         documentName = effect.documentName,
-                        documentDetails = effect.documentDetails
+                        documentDetails = effect.documentDetails,
+                        documentId = intent.getStringExtra(EXTRA_DOCUMENT_ID).orEmpty(),
+                        documentUri = intent.getStringExtra(EXTRA_DOCUMENT_URI),
+                        pagePaths = intent.getStringArrayListExtra(EXTRA_PAGE_PATHS).orEmpty(),
+                        mimeType = intent.getStringExtra(EXTRA_MIME_TYPE).orEmpty()
                     )
                 )
                 finish()
@@ -85,13 +91,25 @@ class OcrFailureActivity : AppCompatActivity() {
     companion object {
         private const val EXTRA_DOCUMENT_NAME = "ocr_failure_document_name"
         private const val EXTRA_DOCUMENT_DETAILS = "ocr_failure_document_details"
+        private const val EXTRA_DOCUMENT_ID = "ocr_failure_document_id"
+        private const val EXTRA_DOCUMENT_URI = "ocr_failure_document_uri"
+        private const val EXTRA_PAGE_PATHS = "ocr_failure_page_paths"
+        private const val EXTRA_MIME_TYPE = "ocr_failure_mime_type"
 
         fun createIntent(
             context: Context,
             documentName: String,
-            documentDetails: String
-        ): Intent = Intent(context, OcrFailureActivity::class.java)
+            documentDetails: String,
+            documentId: String,
+            documentUri: String?,
+            pagePaths: List<String> = emptyList(),
+            mimeType: String = ""
+        ): Intent = com.example.lagallens.presentation.feature.ocr.OcrSession.stamp(context, Intent(context, OcrFailureActivity::class.java)
             .putExtra(EXTRA_DOCUMENT_NAME, documentName)
             .putExtra(EXTRA_DOCUMENT_DETAILS, documentDetails)
+            .putExtra(EXTRA_DOCUMENT_ID, documentId)
+            .putExtra(EXTRA_DOCUMENT_URI, documentUri)
+            .putExtra(EXTRA_MIME_TYPE, mimeType)
+            .putStringArrayListExtra(EXTRA_PAGE_PATHS, ArrayList(pagePaths)))
     }
 }

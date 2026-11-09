@@ -5,6 +5,7 @@ import com.example.lagallens.presentation.feature.contracts.contract.ContractSta
 import com.example.lagallens.presentation.feature.contracts.contract.ContractType
 
 sealed interface ContractFilterUiEvent {
+    data class Initialized(val selection: com.example.lagallens.presentation.feature.contracts.contract.ContractFilterSelection) : ContractFilterUiEvent
     data class ContractTypeToggled(val contractType: ContractType) : ContractFilterUiEvent
     data class StatusSelected(val status: ContractStatusFilter) : ContractFilterUiEvent
     data class RiskLevelSelected(val riskLevel: ContractRiskLevel) : ContractFilterUiEvent

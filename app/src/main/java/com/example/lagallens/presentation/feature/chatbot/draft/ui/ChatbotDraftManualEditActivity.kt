@@ -10,8 +10,6 @@ import android.view.Gravity
 import android.view.WindowManager
 import android.widget.Toast
 import android.text.Editable
-import android.text.Spannable
-import android.text.style.StyleSpan
 import android.graphics.Typeface
 import android.text.TextWatcher
 import androidx.activity.viewModels
@@ -30,7 +28,8 @@ import com.example.lagallens.presentation.feature.chatbot.draft.contract.Chatbot
 import com.example.lagallens.presentation.feature.chatbot.draft.viewmodel.ChatbotDraftManualEditViewModel
 import kotlinx.coroutines.launch
 
-class ChatbotDraftManualEditActivity : AppCompatActivity() {
+class ChatbotDraftManualEditActivity : DraftSessionActivity() {
+    override fun onStart() { super.onStart(); if (!DraftSessionGuard.valid(application as com.example.lagallens.LegalLensApplication, intent)) finish() }
     private lateinit var binding: ActivityChatbotDraftManualEditBinding
     private val viewModel by viewModels<ChatbotDraftManualEditViewModel>()
     private var rendering = false
@@ -41,6 +40,11 @@ class ChatbotDraftManualEditActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (!guardDraftCreate()) return
+        if (!DraftSessionGuard.valid(application as com.example.lagallens.LegalLensApplication, intent)) { finish(); return }
+        lifecycleScope.launch { (application as com.example.lagallens.LegalLensApplication).observeSessionKeys().collect {
+            if (!DraftSessionGuard.valid(application as com.example.lagallens.LegalLensApplication, intent)) finish()
+        } }
         WindowCompat.setDecorFitsSystemWindows(window, false)
         binding = ActivityChatbotDraftManualEditBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -60,6 +64,7 @@ class ChatbotDraftManualEditActivity : AppCompatActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiEffect.collect { effect ->
+                    if (!viewModel.isOwnerSession()) return@collect
                     when (effect) {
                         is ChatbotDraftManualEditUiEffect.Saved -> {
                             startActivity(ChatbotDraftManualSavedActivity.createIntent(this@ChatbotDraftManualEditActivity, effect.draftId))
@@ -73,6 +78,9 @@ class ChatbotDraftManualEditActivity : AppCompatActivity() {
     }
 
     private fun bindActions() = with(binding) {
+        onBackPressedDispatcher.addCallback(this@ChatbotDraftManualEditActivity, object : androidx.activity.OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() = requestClose()
+        })
         draftManualBack.setOnClickListener { requestClose() }
         draftManualCancel.setOnClickListener { requestClose() }
         draftManualSave.setOnClickListener {
@@ -87,8 +95,11 @@ class ChatbotDraftManualEditActivity : AppCompatActivity() {
             val start = draftManualClauseBody.selectionStart.coerceAtLeast(0)
             draftManualClauseBody.text?.insert(start, "• ")
         }
-        draftFormatBold.setOnClickListener { toggleFormat(Typeface.BOLD) }
-        draftFormatItalic.setOnClickListener { toggleFormat(Typeface.ITALIC) }
+        listOf(draftFormatBold, draftFormatItalic).forEach {
+            it.isEnabled = false
+            it.alpha = 0.38f
+            it.contentDescription = getString(R.string.editor_formatting_unavailable)
+        }
     }
 
     private fun watcher(onChanged: (String) -> Unit) = object : TextWatcher {
@@ -97,13 +108,6 @@ class ChatbotDraftManualEditActivity : AppCompatActivity() {
             if (!rendering) onChanged(s?.toString().orEmpty())
         }
         override fun afterTextChanged(s: Editable?) = Unit
-    }
-
-    private fun toggleFormat(style: Int) {
-        val edit = binding.draftManualClauseBody
-        val start = edit.selectionStart.coerceAtLeast(0)
-        val end = edit.selectionEnd.coerceAtLeast(start)
-        if (start < end) edit.text?.setSpan(StyleSpan(style), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
     }
 
     private fun requestClose() {
@@ -138,5 +142,6 @@ class ChatbotDraftManualEditActivity : AppCompatActivity() {
                 .putExtra(EXTRA_ADDITION, addition)
                 .putExtra(EXTRA_SOURCE_DRAFT_ID, sourceDraftId)
                 .putExtra(EXTRA_CONTRACT_ID, contractId)
+                .also { DraftSessionGuard.stamp(context, it) }
     }
 }

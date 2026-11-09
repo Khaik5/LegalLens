@@ -23,5 +23,5 @@
     <string name="ocr_result_review">Cần xem lại</string>
     <string name="ocr_result_national_title" translatable="false">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</string>
     <string name="ocr_result_national_subtitle" translatable="false">Độc lập - Tự do - Hạnh phúc</string>
-    <string name="ocr_result_contract_title" translatable="false">HỢP ĐỒNG THUÊ VĂN PHÒNG</string>
+    <string name="ocr_result_contract_title">HỢP ĐỒNG LAO ĐỘNG</string>
 </resources>

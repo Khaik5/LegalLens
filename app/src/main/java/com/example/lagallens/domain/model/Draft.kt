@@ -22,5 +22,9 @@ data class Draft(
     val createdAt: Long,
     val updatedAt: Long,
     val parentDraftId: String? = null,
-    val lineageId: String = draftId
+    val lineageId: String = draftId,
+    val conversationId: String? = null,
+    /** True only after the user explicitly saved this version. */
+    val isSaved: Boolean = false,
+    val isTitleGenerated: Boolean = false
 )

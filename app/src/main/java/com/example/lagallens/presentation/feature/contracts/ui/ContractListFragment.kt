@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
+import androidx.core.view.isVisible
 import androidx.core.view.doOnPreDraw
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
@@ -111,10 +112,12 @@ class ContractListFragment : Fragment() {
                 viewModel.uiEffect.collect { effect ->
                     when (effect) {
                         ContractListUiEffect.ShowFilterBottomSheet -> {
-                            ContractFilterBottomSheet().show(
-                                parentFragmentManager,
-                                ContractFilterBottomSheet.TAG
-                            )
+                            if (parentFragmentManager.findFragmentByTag(ContractFilterBottomSheet.TAG) == null) {
+                                ContractFilterBottomSheet.newInstance(viewModel.uiState.value.filterSelection).show(
+                                    parentFragmentManager,
+                                    ContractFilterBottomSheet.TAG
+                                )
+                            }
                         }
                         is ContractListUiEffect.NavigateToDetail -> {
                             val navController = findNavController()
@@ -148,6 +151,7 @@ class ContractListFragment : Fragment() {
                 }
             }
         }
+        binding.tvContractsEmpty.isVisible = state.contracts.isEmpty()
         updateFilterStyle(binding.tvFilterAll, state.selectedFilter == ContractFilter.ALL)
         updateFilterStyle(binding.tvFilterAnalyzed, state.selectedFilter == ContractFilter.ANALYZED)
         updateFilterStyle(binding.tvFilterProcessing, state.selectedFilter == ContractFilter.PROCESSING)

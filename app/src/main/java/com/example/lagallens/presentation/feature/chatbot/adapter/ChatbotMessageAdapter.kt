@@ -20,7 +20,7 @@ import com.example.lagallens.presentation.feature.chatbot.contract.ChatbotMessag
 import com.example.lagallens.presentation.feature.chatbot.contract.ChatbotMessageAuthor
 
 class ChatbotMessageAdapter(
-    private val onCitationClicked: () -> Unit,
+    private val onCitationClicked: (String?) -> Unit,
     private val onRetryClicked: (Long) -> Unit
 ) : ListAdapter<ChatbotMessage, RecyclerView.ViewHolder>(DiffCallback) {
     override fun getItemViewType(position: Int): Int = when {
@@ -91,14 +91,17 @@ class ChatbotMessageAdapter(
 
     private class AssistantCitationMessageViewHolder(
         private val binding: ItemChatbotAssistantCitationMessageBinding,
-        onCitationClicked: () -> Unit
+        onCitationClicked: (String?) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
+        private var referenceId: String? = null
+
         init {
-            binding.chatbotCitationCard.setOnClickListener { onCitationClicked() }
+            binding.chatbotCitationCard.setOnClickListener { onCitationClicked(referenceId) }
         }
 
         fun bind(item: ChatbotMessage) = with(binding) {
             val citation = requireNotNull(item.citation)
+            referenceId = citation.referenceId
             chatbotAssistantCitationMessage.text = item.content
             chatbotCitationTitle.text = citation.title
             chatbotCitationDescription.text = citation.description
@@ -145,8 +148,8 @@ class ChatbotMessageAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: ChatbotMessage) = with(binding) {
             val error = requireNotNull(item.error)
-            chatbotErrorTitle.text = error.title
-            chatbotErrorRetryLabel.text = error.retryLabel
+            chatbotErrorTitle.text = error.titleRes?.let { root.context.getString(it) } ?: error.title.ifBlank { root.context.getString(R.string.operation_failed) }
+            chatbotErrorRetryLabel.text = error.retryLabel.ifBlank { root.context.getString(R.string.freeze_retry) }
             chatbotErrorRetry.setOnClickListener { onRetryClicked(item.id) }
         }
     }

@@ -9,7 +9,7 @@ data class ContractListUiState(
     val query: String = "",
     val selectedFilter: ContractFilter = ContractFilter.ALL,
     val filterSelection: ContractFilterSelection = ContractFilterSelection(),
-    val contracts: List<ContractListItem> = ContractListItem.allSamples
+    val contracts: List<ContractListItem> = emptyList()
 )
 
 data class ContractFilterSelection(
@@ -54,15 +54,15 @@ enum class ContractRiskLevel {
 
 data class ContractListItem(
     val id: String,
-    @StringRes val titleRes: Int,
-    @StringRes val subtitleRes: Int,
+    @StringRes val titleRes: Int = 0,
+    @StringRes val subtitleRes: Int = 0,
     @StringRes val statusRes: Int,
     @StringRes val riskRes: Int,
     @StringRes val detailTypeRes: Int,
-    @StringRes val createdAtRes: Int,
-    @StringRes val updatedAtRes: Int,
-    @StringRes val pageCountRes: Int,
-    @StringRes val fileFormatRes: Int,
+    @StringRes val createdAtRes: Int = 0,
+    @StringRes val updatedAtRes: Int = 0,
+    @StringRes val pageCountRes: Int = 0,
+    @StringRes val fileFormatRes: Int = 0,
     val contractType: ContractType,
     val processingStatus: ContractProcessingStatus,
     val riskLevel: ContractRiskLevel,

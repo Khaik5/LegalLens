@@ -41,7 +41,7 @@ class ContractSearchAdapter(
         override fun areItemsTheSame(
             oldItem: ContractSearchResult,
             newItem: ContractSearchResult
-        ): Boolean = oldItem.titleRes == newItem.titleRes
+        ): Boolean = oldItem.contractId == newItem.contractId
 
         override fun areContentsTheSame(
             oldItem: ContractSearchResult,

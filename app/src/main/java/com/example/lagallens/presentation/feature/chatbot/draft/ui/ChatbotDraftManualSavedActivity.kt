@@ -9,12 +9,13 @@ import com.example.lagallens.databinding.ActivityChatbotDraftManualSavedBinding
 import com.example.lagallens.presentation.common.utils.applySystemBarInsets
 import com.example.lagallens.presentation.feature.chatbot.draft.contract.ChatbotDraftUiState
 
-class ChatbotDraftManualSavedActivity : AppCompatActivity() {
+class ChatbotDraftManualSavedActivity : DraftSessionActivity() {
     private lateinit var binding: ActivityChatbotDraftManualSavedBinding
     private val draftId by lazy { intent.getStringExtra(EXTRA_DRAFT_ID).orEmpty() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (!guardDraftCreate()) return
         WindowCompat.setDecorFitsSystemWindows(window, false)
         binding = ActivityChatbotDraftManualSavedBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -29,5 +30,6 @@ class ChatbotDraftManualSavedActivity : AppCompatActivity() {
     companion object {
         private const val EXTRA_DRAFT_ID = "chatbot_draft_manual_saved_draft_id"
         fun createIntent(context: Context, draftId: String) = Intent(context, ChatbotDraftManualSavedActivity::class.java).putExtra(EXTRA_DRAFT_ID, draftId)
+            .also { DraftSessionGuard.stamp(context, it) }
     }
 }

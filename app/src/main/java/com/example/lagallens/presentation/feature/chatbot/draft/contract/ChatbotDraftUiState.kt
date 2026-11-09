@@ -7,9 +7,12 @@ data class ChatbotDraftUiState(
     val zoomPercent: Int = 100,
     val draftId: String? = null,
     val contractId: String? = null,
+    val conversationId: String? = null,
     val title: String? = null,
     val content: String? = null,
-    val isLoading: Boolean = false
+    val isLoading: Boolean = false,
+    val isLoadFailed: Boolean = false,
+    val isSaved: Boolean = false
 ) {
     companion object {
         const val DRAFT_VERSION = "D1"

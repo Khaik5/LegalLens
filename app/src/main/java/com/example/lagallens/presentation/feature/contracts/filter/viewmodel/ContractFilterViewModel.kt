@@ -9,9 +9,9 @@ import com.example.lagallens.presentation.feature.contracts.contract.ContractTyp
 import com.example.lagallens.presentation.feature.contracts.filter.contract.ContractFilterUiEffect
 import com.example.lagallens.presentation.feature.contracts.filter.contract.ContractFilterUiEvent
 import com.example.lagallens.presentation.feature.contracts.filter.contract.ContractFilterUiState
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -20,11 +20,12 @@ class ContractFilterViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(ContractFilterUiState())
     val uiState = _uiState.asStateFlow()
 
-    private val _uiEffect = MutableSharedFlow<ContractFilterUiEffect>()
-    val uiEffect = _uiEffect.asSharedFlow()
+    private val _uiEffect = Channel<ContractFilterUiEffect>(Channel.BUFFERED)
+    val uiEffect = _uiEffect.receiveAsFlow()
 
     fun onEvent(event: ContractFilterUiEvent) {
         when (event) {
+            is ContractFilterUiEvent.Initialized -> _uiState.update { if (it.isInitialized) it else it.copy(selection = event.selection, isInitialized = true) }
             is ContractFilterUiEvent.ContractTypeToggled -> toggleContractType(event.contractType)
             is ContractFilterUiEvent.StatusSelected -> selectStatus(event.status)
             is ContractFilterUiEvent.RiskLevelSelected -> selectRiskLevel(event.riskLevel)
@@ -50,7 +51,7 @@ class ContractFilterViewModel : ViewModel() {
 
     private fun selectRiskLevel(riskLevel: ContractRiskLevel) {
         _uiState.update { state ->
-            state.copy(selection = state.selection.copy(riskLevel = riskLevel))
+            state.copy(selection = state.selection.copy(riskLevel = riskLevel.takeUnless { it == state.selection.riskLevel }))
         }
     }
 
@@ -60,7 +61,7 @@ class ContractFilterViewModel : ViewModel() {
 
     private fun applyFilters() {
         viewModelScope.launch {
-            _uiEffect.emit(ContractFilterUiEffect.ApplyFilters(_uiState.value.selection))
+            _uiEffect.send(ContractFilterUiEffect.ApplyFilters(_uiState.value.selection))
         }
     }
 }

@@ -132,10 +132,6 @@ class CompareResultActivity : AppCompatActivity() {
             }
             compareResultNotice.text = getString(R.string.compare_result_demo_notice)
         }
-        comparePaymentDetails.isVisible = "payment" in state.expandedSections
-        compareTermDetails.isVisible = "term" in state.expandedSections
-        compareTrialDetails.isVisible = "trial" in state.expandedSections
-        compareCycleDetails.isVisible = "cycle" in state.expandedSections
         listOf(compareTabOverview to CompareResultTab.OVERVIEW, compareTabRisk to CompareResultTab.RISK, compareTabClauses to CompareResultTab.CLAUSES).forEach { (view, tab) ->
             updateTab(view, state.selectedTab == tab, ready)
         }

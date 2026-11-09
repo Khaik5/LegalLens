@@ -41,6 +41,10 @@ class SaveDraftCopyBottomSheet : BottomSheetDialogFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        if ((activity as? com.example.lagallens.presentation.feature.chatbot.draft.ui.DraftSessionActivity)?.isDraftSessionValid() != true) {
+            dismissAllowingStateLoss()
+            return
+        }
         val version = arguments?.getString(KEY_VERSION).orEmpty().ifBlank { "D2" }
         viewModel.setDraft(
             version,
@@ -57,10 +61,12 @@ class SaveDraftCopyBottomSheet : BottomSheetDialogFragment() {
         binding.saveDraftCancel.setOnClickListener { dismiss() }
         binding.saveDraftReturn.setOnClickListener { dismiss() }
         binding.saveDraftViewSaved.setOnClickListener {
+            if ((activity as? com.example.lagallens.presentation.feature.chatbot.draft.ui.DraftSessionActivity)?.isDraftSessionValid() != true) return@setOnClickListener
             startActivity(SavedDraftCopyDetailActivity.createIntent(requireContext(), version))
             dismiss()
         }
         binding.saveDraftExportPdf.setOnClickListener {
+            if ((activity as? com.example.lagallens.presentation.feature.chatbot.draft.ui.DraftSessionActivity)?.isDraftSessionValid() != true) return@setOnClickListener
             startActivity(SavedDraftCopyDetailActivity.createIntent(requireContext(), version, openExport = true))
             dismiss()
         }

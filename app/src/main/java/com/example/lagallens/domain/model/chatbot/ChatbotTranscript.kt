@@ -4,7 +4,14 @@ data class ChatbotTranscriptMessage(
     val messageId: String,
     val isUser: Boolean,
     val content: String,
-    val createdAtEpochMillis: Long
+    val createdAtEpochMillis: Long,
+    val citation: ChatbotCitation? = null,
+    val referenceSectionTitle: String? = null,
+    val references: List<ChatbotReference> = emptyList(),
+    val noEvidenceTitle: String? = null,
+    val errorRetryLabel: String? = null,
+    val retryQuestion: String? = null,
+    val showDraftNotice: Boolean = false
 )
 
 data class ChatbotTranscript(

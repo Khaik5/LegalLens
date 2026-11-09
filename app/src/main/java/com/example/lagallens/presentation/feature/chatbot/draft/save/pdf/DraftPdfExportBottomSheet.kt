@@ -24,7 +24,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewModelScope
 import com.example.lagallens.R
 import com.example.lagallens.databinding.BottomSheetDraftPdfExportBinding
-import com.example.lagallens.presentation.feature.chatbot.draft.save.SavedDraftCopyStore
 import com.example.lagallens.presentation.feature.chatbot.draft.contract.ChatbotDraftUiState
 import com.example.lagallens.LegalLensApplication
 import com.example.lagallens.domain.model.DraftStage
@@ -41,6 +40,8 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import java.io.File
 
 internal enum class DraftPdfStatus { OPTIONS, LOADING, ERROR, READY }
@@ -52,51 +53,72 @@ internal sealed interface DraftPdfEffect {
 }
 
 internal class DraftPdfExportViewModel(application: Application) : AndroidViewModel(application) {
+    private val app = application as LegalLensApplication
+    private val ownerSession = app.currentSessionKey()
+    fun isOwnerSession() = ownerSession == app.currentSessionKey()
     private val state = MutableStateFlow(DraftPdfState())
     val uiState = state.asStateFlow()
     private val effectChannel = Channel<DraftPdfEffect>(Channel.BUFFERED)
     val effects = effectChannel.receiveAsFlow()
     private var draftKey = ChatbotDraftUiState.APPROVED_AI_VERSION
 
-    fun setVersion(value: String) { draftKey = value }
+    init { viewModelScope.launch { app.observeSessionKeys().collect { if (it != ownerSession) {
+        draftKey = ChatbotDraftUiState.APPROVED_AI_VERSION
+        state.value = DraftPdfState()
+        while (effectChannel.tryReceive().isSuccess) { }
+    } } } }
+
+    fun setVersion(value: String) { if (isOwnerSession()) draftKey = value }
 
     fun export(shareWhenReady: Boolean = false) {
+        if (!isOwnerSession()) return
         val current = state.value
         if (current.status == DraftPdfStatus.LOADING) return
         if (current.status == DraftPdfStatus.READY) {
             if (shareWhenReady) current.filePath?.let { effectChannel.trySend(DraftPdfEffect.Share(it)) }
             return
         }
+        val repository = try { app.draftRepository.forSession(ownerSession) } catch (_: Exception) { return }
+        val capturedDraftKey = draftKey
         state.update { it.copy(status = DraftPdfStatus.LOADING, saving = false) }
         viewModelScope.launch {
             try {
                 val file = withContext(Dispatchers.IO) {
-                    val repository = getApplication<LegalLensApplication>().draftRepository
-                    val stage = DraftStage.fromLegacyKey(draftKey)
-                    val draft = repository.getDraft(draftKey) ?: stage?.let { repository.getLatestDraft(it) }
+                    val jobContext = currentCoroutineContext()
+                    val guard: (() -> Unit) -> Unit = { action -> jobContext.ensureActive(); app.withSession(ownerSession, action) }
+                    guard { }
+                    val stage = DraftStage.fromLegacyKey(capturedDraftKey)
+                    val draft = repository.getDraft(capturedDraftKey) ?: stage?.let { repository.getLatestDraft(it) }
                         ?: error("Saved draft not found")
                     check(draft.content.isNotBlank())
-                    draft to DraftPdfDocumentWriter.generate(getApplication(), draft.title, draft.content)
+                    draft to DraftPdfDocumentWriter.generate(getApplication(), draft.title, draft.content, guard)
                 }
-                state.update { it.copy(status = DraftPdfStatus.READY, filePath = file.second.absolutePath, title = file.first.title) }
-                if (shareWhenReady) effectChannel.send(DraftPdfEffect.Share(file.second.absolutePath))
+                if (isOwnerSession()) {
+                    state.update { it.copy(status = DraftPdfStatus.READY, filePath = file.second.absolutePath, title = file.first.title) }
+                    if (shareWhenReady) effectChannel.send(DraftPdfEffect.Share(file.second.absolutePath))
+                } else {
+                    file.second.delete()
+                }
             } catch (cancellationException: CancellationException) {
                 throw cancellationException
             } catch (exception: Exception) {
                 android.util.Log.e("DraftPdfExport", exception.javaClass.simpleName)
-                state.update { it.copy(status = DraftPdfStatus.ERROR, filePath = null) }
+                if (isOwnerSession()) state.update { it.copy(status = DraftPdfStatus.ERROR, filePath = null) }
             }
         }
     }
 
     fun saveTo(uri: Uri) {
+        if (!isOwnerSession()) return
         val filePath = state.value.filePath ?: return
         if (state.value.saving) return
         state.update { it.copy(saving = true) }
         viewModelScope.launch {
             val saved = try {
                 withContext(Dispatchers.IO) {
-                    DraftPdfDocumentWriter.copyToUri(getApplication(), File(filePath), uri)
+                    val jobContext = currentCoroutineContext()
+                    val guard: (() -> Unit) -> Unit = { action -> jobContext.ensureActive(); app.withSession(ownerSession, action) }
+                    DraftPdfDocumentWriter.copyToUri(getApplication(), File(filePath), uri, guard)
                 }
                 true
             } catch (cancellationException: CancellationException) {
@@ -104,8 +126,10 @@ internal class DraftPdfExportViewModel(application: Application) : AndroidViewMo
             } catch (_: Exception) {
                 false
             }
-            state.update { it.copy(saving = false) }
-            effectChannel.send(if (saved) DraftPdfEffect.Saved else DraftPdfEffect.SaveFailed)
+            if (isOwnerSession()) {
+                state.update { it.copy(saving = false) }
+                effectChannel.send(if (saved) DraftPdfEffect.Saved else DraftPdfEffect.SaveFailed)
+            }
         }
     }
 }
@@ -132,6 +156,10 @@ class DraftPdfExportBottomSheet : BottomSheetDialogFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        if ((activity as? com.example.lagallens.presentation.feature.chatbot.draft.ui.DraftSessionActivity)?.isDraftSessionValid() != true) {
+            dismissAllowingStateLoss()
+            return
+        }
         val version = arguments?.getString(KEY_VERSION) ?: ChatbotDraftUiState.APPROVED_AI_VERSION
         viewModel.setVersion(version)
         binding.pdfCreate.setOnClickListener { viewModel.export() }
@@ -154,7 +182,8 @@ class DraftPdfExportBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun render(state: DraftPdfState) = with(binding) {
-        pdfDocumentTitle.text = state.title.ifBlank { SavedDraftCopyStore.name(requireContext(), arguments?.getString(KEY_VERSION) ?: ChatbotDraftUiState.APPROVED_AI_VERSION).orEmpty() }
+        if (!viewModel.isOwnerSession()) { dismissAllowingStateLoss(); return@with }
+        pdfDocumentTitle.text = state.title.ifBlank { getString(R.string.chatbot_draft_document_name, arguments?.getString(KEY_VERSION) ?: ChatbotDraftUiState.APPROVED_AI_VERSION) }
         pdfOptions.isVisible = state.status == DraftPdfStatus.OPTIONS
         pdfLoading.isVisible = state.status == DraftPdfStatus.LOADING
         pdfError.isVisible = state.status == DraftPdfStatus.ERROR
@@ -164,10 +193,11 @@ class DraftPdfExportBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun launchSavePicker() {
+        if (!viewModel.isOwnerSession()) return
         val state = viewModel.uiState.value
         if (state.saving || state.filePath == null) return
         val version = arguments?.getString(KEY_VERSION) ?: ChatbotDraftUiState.APPROVED_AI_VERSION
-        val title = state.title.ifBlank { SavedDraftCopyStore.name(requireContext(), version).orEmpty() }
+        val title = state.title.ifBlank { getString(R.string.chatbot_draft_document_name, version) }
             .replace(Regex("[^\\p{L}\\p{N} ._-]"), "")
             .trim()
             .take(80)
@@ -176,6 +206,7 @@ class DraftPdfExportBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun openPdfPreview() {
+        if (!viewModel.isOwnerSession()) return
         val state = viewModel.uiState.value
         val path = state.filePath ?: return
         runCatching {
@@ -190,6 +221,7 @@ class DraftPdfExportBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun handleEffect(effect: DraftPdfEffect) {
+        if (!viewModel.isOwnerSession()) return
         when (effect) {
             is DraftPdfEffect.Share -> sharePdf(effect.filePath)
             DraftPdfEffect.Saved -> Toast.makeText(requireContext(), R.string.draft_pdf_saved_to_device, Toast.LENGTH_SHORT).show()
@@ -198,6 +230,7 @@ class DraftPdfExportBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun sharePdf(filePath: String) {
+        if (!viewModel.isOwnerSession()) return
         try {
             val file = File(filePath)
             val uri = FileProvider.getUriForFile(requireContext(), "${requireContext().packageName}.draftpdf", file)

@@ -6,9 +6,6 @@ import com.example.lagallens.presentation.feature.contracts.contract.ContractSta
 import com.example.lagallens.presentation.feature.contracts.contract.ContractType
 
 data class ContractFilterUiState(
-    val selection: ContractFilterSelection = ContractFilterSelection(
-        contractTypes = setOf(ContractType.EMPLOYMENT),
-        status = ContractStatusFilter.COMPLETE,
-        riskLevel = ContractRiskLevel.HIGH
-    )
+    val selection: ContractFilterSelection = ContractFilterSelection(),
+    val isInitialized: Boolean = false
 )

@@ -7,5 +7,6 @@ data class CompareSelectUiState(
     val selectedIds: List<String> = emptyList(),
     val initialContractId: String? = null,
     val query: String = "",
-    val isInitialized: Boolean = false
+    val isInitialized: Boolean = false,
+    val hasAppliedInitialSelection: Boolean = false
 )

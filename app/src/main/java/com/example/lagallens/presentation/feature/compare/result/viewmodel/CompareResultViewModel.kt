@@ -9,21 +9,34 @@ import com.example.lagallens.presentation.feature.compare.result.contract.Compar
 import com.example.lagallens.presentation.feature.compare.result.contract.CompareResultUiEvent
 import com.example.lagallens.presentation.feature.compare.result.contract.CompareResultUiState
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class CompareResultViewModel(application: Application) : AndroidViewModel(application) {
-    private val repository = (application as LegalLensApplication).contractRepository
+    private val app = application as LegalLensApplication
+    private val repository = app.contractRepository
+    private val ownerSession = app.currentSessionKey()
     private val state = MutableStateFlow(CompareResultUiState())
     val uiState = state.asStateFlow()
-    private val effects = MutableSharedFlow<CompareResultUiEffect>()
-    val uiEffect = effects.asSharedFlow()
+    private val effects = Channel<CompareResultUiEffect>(Channel.BUFFERED)
+    val uiEffect = effects.receiveAsFlow()
     private var firstId = ""
     private var secondId = ""
+
+    init {
+        viewModelScope.launch {
+            app.observeSessionKeys().collect { session ->
+                if (session != ownerSession) {
+                    state.value = CompareResultUiState()
+                    effects.send(CompareResultUiEffect.NavigateBack)
+                }
+            }
+        }
+    }
 
     fun onEvent(event: CompareResultUiEvent) {
         when (event) {
@@ -38,7 +51,7 @@ class CompareResultViewModel(application: Application) : AndroidViewModel(applic
                 current.copy(expandedSections = if (event.id in current.expandedSections) current.expandedSections - event.id else current.expandedSections + event.id)
             }
             CompareResultUiEvent.RetryClicked -> if (state.value.status == CompareResultStatus.ERROR) load(false)
-            CompareResultUiEvent.BackClicked -> viewModelScope.launch { effects.emit(CompareResultUiEffect.NavigateBack) }
+            CompareResultUiEvent.BackClicked -> viewModelScope.launch { effects.send(CompareResultUiEffect.NavigateBack) }
         }
     }
 
@@ -48,6 +61,7 @@ class CompareResultViewModel(application: Application) : AndroidViewModel(applic
             try {
                 if (showError) throw IllegalStateException("Demo error preview")
                 val comparison = repository.compareContracts(firstId, secondId)
+                if (app.currentSessionKey() != ownerSession) return@launch
                 if (comparison == null) {
                     state.update { it.copy(status = CompareResultStatus.NO_EXAMPLE) }
                 } else {

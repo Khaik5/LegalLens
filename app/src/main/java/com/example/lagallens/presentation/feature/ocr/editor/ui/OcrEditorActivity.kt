@@ -5,9 +5,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
-import android.text.Spannable
 import android.text.TextWatcher
-import android.text.style.StyleSpan
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -26,12 +24,13 @@ import com.example.lagallens.presentation.feature.ocr.editor.contract.OcrEditorU
 import com.example.lagallens.presentation.feature.ocr.editor.viewmodel.OcrEditorViewModel
 import kotlinx.coroutines.launch
 
-class OcrEditorActivity : AppCompatActivity() {
+class OcrEditorActivity : com.example.lagallens.presentation.feature.ocr.OcrSessionActivity() {
     private lateinit var binding: ActivityOcrEditorBinding
     private val viewModel by viewModels<OcrEditorViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (isFinishing || !isOcrSessionValid()) { finish(); return }
         WindowCompat.setDecorFitsSystemWindows(window, false)
         window.statusBarColor = Color.TRANSPARENT
         window.navigationBarColor = Color.TRANSPARENT
@@ -63,8 +62,11 @@ class OcrEditorActivity : AppCompatActivity() {
         ocrEditorBack.setOnClickListener { viewModel.onEvent(OcrEditorUiEvent.BackClicked) }
         ocrEditorRestore.setOnClickListener { viewModel.onEvent(OcrEditorUiEvent.RestoreOriginalClicked) }
         ocrEditorSave.setOnClickListener { viewModel.onEvent(OcrEditorUiEvent.SaveClicked) }
-        ocrEditorBold.setOnClickListener { applyStyle(android.graphics.Typeface.BOLD) }
-        ocrEditorItalic.setOnClickListener { applyStyle(android.graphics.Typeface.ITALIC) }
+        listOf(ocrEditorBold, ocrEditorItalic).forEach {
+            it.isEnabled = false
+            it.alpha = 0.38f
+            it.contentDescription = getString(R.string.editor_formatting_unavailable)
+        }
         ocrEditorList.setOnClickListener { insertBullet() }
         ocrEditorText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
@@ -87,6 +89,7 @@ class OcrEditorActivity : AppCompatActivity() {
     }
 
     private fun render(state: OcrEditorUiState) = with(binding) {
+        if (!isOcrSessionValid()) { root.visibility = android.view.View.INVISIBLE; return@with }
         ocrEditorRevision.setText(
             if (state.isOriginalText) R.string.ocr_editor_original_revision else R.string.ocr_editor_edited_revision
         )
@@ -101,18 +104,13 @@ class OcrEditorActivity : AppCompatActivity() {
     }
 
     private fun handleEffect(effect: OcrEditorUiEffect) {
+        if (!isOcrSessionValid()) return
         when (effect) {
             OcrEditorUiEffect.NavigateBack -> finish()
             is OcrEditorUiEffect.FinishWithSavedText -> {
                 setResult(RESULT_OK, Intent().putExtra(EXTRA_EDITED_TEXT, effect.text))
                 finish()
             }
-        }
-    }
-
-    private fun applyStyle(style: Int) = with(binding.ocrEditorText) {
-        if (selectionStart != selectionEnd) {
-            text.setSpan(StyleSpan(style), selectionStart, selectionEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
     }
 
@@ -126,8 +124,8 @@ class OcrEditorActivity : AppCompatActivity() {
         private const val EXTRA_INITIAL_TEXT = "extra_initial_text"
 
         fun createIntent(context: Context, originalText: String): Intent {
-            return Intent(context, OcrEditorActivity::class.java)
-                .putExtra(EXTRA_INITIAL_TEXT, originalText)
+            return com.example.lagallens.presentation.feature.ocr.OcrSession.stamp(context, Intent(context, OcrEditorActivity::class.java)
+                .putExtra(EXTRA_INITIAL_TEXT, originalText))
         }
     }
 }

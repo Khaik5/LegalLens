@@ -61,16 +61,20 @@ class ChatbotActivity : AppCompatActivity() {
         ChatbotViewModel.Factory(
             openConversation = app.openChatbotConversationUseCase,
             sendMessage = app.sendChatbotMessageUseCase,
-            retryMessage = app.retryChatbotMessageUseCase
+            retryMessage = app.retryChatbotMessageUseCase,
+            draftAi = { app.draftAiRepository(app.currentSessionKey()) }
         )
     }
     private val messageAdapter = ChatbotMessageAdapter(
-        onCitationClicked = { viewModel.onEvent(ChatbotUiEvent.CitationClicked) },
+        onCitationClicked = { referenceId -> viewModel.onEvent(ChatbotUiEvent.CitationClicked(referenceId)) },
         onRetryClicked = { messageId -> viewModel.onEvent(ChatbotUiEvent.ErrorRetryClicked(messageId)) }
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val app = application as LegalLensApplication
+        val expected = intent.getStringExtra(EXTRA_SESSION_KEY)
+        if (expected == null || expected != app.currentSessionKey()) { finish(); return }
         WindowCompat.setDecorFitsSystemWindows(window, false)
         window.statusBarColor = Color.TRANSPARENT
         window.navigationBarColor = Color.TRANSPARENT
@@ -275,12 +279,15 @@ class ChatbotActivity : AppCompatActivity() {
     }
 
     private fun handleEffect(effect: ChatbotUiEffect) {
+        val app = application as LegalLensApplication
+        if (intent.getStringExtra(EXTRA_SESSION_KEY) == null || intent.getStringExtra(EXTRA_SESSION_KEY) != app.currentSessionKey()) return
         when (effect) {
-            ChatbotUiEffect.ShowDraftPreview -> startActivity(
+            is ChatbotUiEffect.ShowDraftPreview -> startActivity(
                 ChatbotDraftPreviewActivity.createIntent(
                     this,
                     previewRegenerationError = BuildConfig.DEBUG && intent.getBooleanExtra(EXTRA_PREVIEW_REGENERATION_ERROR, false),
-                    contractId = intent.getStringExtra(EXTRA_CONTRACT_ID)
+                    contractId = intent.getStringExtra(EXTRA_CONTRACT_ID),
+                    draftId = effect.draftId
                 )
             )
             ChatbotUiEffect.NavigateBack -> finish()
@@ -289,10 +296,10 @@ class ChatbotActivity : AppCompatActivity() {
             ChatbotUiEffect.OpenAttachmentPicker -> attachmentPicker.launch(arrayOf("application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "image/*"))
             ChatbotUiEffect.OpenAttachmentSheet -> showAttachmentSheet()
             ChatbotUiEffect.OpenCamera -> startActivity(com.example.lagallens.presentation.feature.camera.permission.ui.CameraPermissionActivity.createIntent(this))
-            ChatbotUiEffect.NavigateToLegalReference -> startActivity(
+            is ChatbotUiEffect.NavigateToLegalReference -> startActivity(
                 AnalysisLegalReferenceDetailActivity.createIntent(
                     context = this,
-                    referenceId = CHATBOT_COMMERCIAL_LAW_REFERENCE_ID,
+                    referenceId = effect.referenceId,
                     documentName = binding.chatbotContractName.text.toString(),
                     documentMetadata = binding.chatbotContractType.text.toString()
                 )
@@ -331,7 +338,7 @@ class ChatbotActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        binding.chatbotMessages.adapter = null
+        if (::binding.isInitialized) binding.chatbotMessages.adapter = null
         super.onDestroy()
     }
 
@@ -348,6 +355,7 @@ class ChatbotActivity : AppCompatActivity() {
 
     companion object {
         private const val EXTRA_CONTRACT_NAME = "chatbot_contract_name"
+        private const val EXTRA_SESSION_KEY = "chatbot_session_key"
         private const val EXTRA_CONTRACT_TYPE = "chatbot_contract_type"
         private const val EXTRA_CONTRACT_ID = "chatbot_contract_id"
         private const val EXTRA_CONVERSATION_ID = "chatbot_conversation_id"
@@ -356,16 +364,16 @@ class ChatbotActivity : AppCompatActivity() {
         private const val EXTRA_CONTINUE_DRAFT = "chatbot_continue_draft"
         private const val EXTRA_PREVIEW_DRAFT_ERROR = "chatbot_preview_draft_error"
         private const val EXTRA_PREVIEW_REGENERATION_ERROR = "chatbot_preview_regeneration_error"
-        private const val CHATBOT_COMMERCIAL_LAW_REFERENCE_ID = "commercial_law_2005_article_301"
 
         fun createIntent(context: Context, contractName: String, contractType: String, contractId: String? = null): Intent =
             Intent(context, ChatbotActivity::class.java)
+                .putExtra(EXTRA_SESSION_KEY, (context.applicationContext as? LegalLensApplication)?.currentSessionKey())
                 .putExtra(EXTRA_CONTRACT_NAME, contractName)
                 .putExtra(EXTRA_CONTRACT_TYPE, contractType)
                 .putExtra(EXTRA_CONTRACT_ID, contractId)
 
-        fun createHistoryIntent(context: Context, contractName: String, conversationId: String, contractId: String?): Intent =
-            createIntent(context, contractName, "Hợp đồng lao động", contractId).putExtra(EXTRA_CONVERSATION_ID, conversationId)
+        fun createHistoryIntent(context: Context, contractName: String, contractType: String, conversationId: String, contractId: String?): Intent =
+            createIntent(context, contractName, contractType, contractId).putExtra(EXTRA_CONVERSATION_ID, conversationId)
 
         fun createNewConversationIntent(
             context: Context,

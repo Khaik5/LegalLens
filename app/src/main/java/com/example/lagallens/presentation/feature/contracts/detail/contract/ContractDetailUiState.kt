@@ -4,6 +4,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
 import com.example.lagallens.R
+import com.example.lagallens.domain.model.EmploymentContract
 import com.example.lagallens.presentation.feature.contracts.contract.ContractListItem
 import com.example.lagallens.presentation.feature.contracts.contract.ContractRiskLevel
 
@@ -12,14 +13,13 @@ data class ContractDetailUiState(
     val documentId: String = "",
     val documentText: String = "",
     val renamedTitle: String? = null,
-    @StringRes val titleRes: Int = R.string.contract_office_lease,
-    @StringRes val contractTypeRes: Int = R.string.contract_detail_type_service,
-    @StringRes val statusRes: Int = R.string.contract_complete_status,
-    @StringRes val riskRes: Int = R.string.contract_low_risk,
-    @StringRes val createdAtRes: Int = R.string.contract_detail_office_created_at,
-    @StringRes val updatedAtRes: Int = R.string.contract_detail_office_updated_at,
-    @StringRes val pageCountRes: Int = R.string.contract_detail_office_page_count,
-    @StringRes val fileFormatRes: Int = R.string.contract_detail_office_file_format,
+    @StringRes val contractTypeRes: Int = R.string.contract_detail_type_employment,
+    @StringRes val statusRes: Int = R.string.contract_draft_status,
+    @StringRes val riskRes: Int = R.string.contract_not_analyzed_risk,
+    val createdAtMillis: Long = 0,
+    val updatedAtMillis: Long = 0,
+    val pageCount: Int? = null,
+    val fileFormat: String = "",
     @DrawableRes val statusBackgroundRes: Int = R.drawable.bg_contract_status_complete,
     @ColorRes val statusTextColorRes: Int = R.color.contract_complete,
     @DrawableRes val riskBackgroundRes: Int = R.drawable.bg_contract_detail_risk,
@@ -27,27 +27,33 @@ data class ContractDetailUiState(
     val assistantActions: List<ContractAssistantAction> = ContractAssistantAction.entries
 ) {
     companion object {
-        fun from(contract: ContractListItem): ContractDetailUiState = ContractDetailUiState(
-            contractId = contract.id,
-            documentId = contract.documentId,
-            documentText = contract.content,
-            renamedTitle = contract.titleOverride,
-            titleRes = contract.titleRes,
-            contractTypeRes = contract.detailTypeRes,
-            statusRes = contract.statusRes,
-            riskRes = contract.riskRes,
-            createdAtRes = contract.createdAtRes,
-            updatedAtRes = contract.updatedAtRes,
-            pageCountRes = contract.pageCountRes,
-            fileFormatRes = contract.fileFormatRes,
-            statusBackgroundRes = contract.statusBackgroundRes,
-            statusTextColorRes = contract.statusTextColorRes,
-            riskBackgroundRes = when (contract.riskLevel) {
+        fun from(item: ContractListItem, contract: EmploymentContract): ContractDetailUiState = ContractDetailUiState(
+            contractId = item.id,
+            documentId = item.documentId,
+            documentText = item.content,
+            renamedTitle = item.titleOverride,
+            contractTypeRes = item.detailTypeRes,
+            statusRes = item.statusRes,
+            riskRes = item.riskRes,
+            createdAtMillis = contract.createdAtMillis,
+            updatedAtMillis = contract.updatedAtMillis,
+            pageCount = contract.pageCount,
+            fileFormat = contract.displayFileFormat(),
+            statusBackgroundRes = item.statusBackgroundRes,
+            statusTextColorRes = item.statusTextColorRes,
+            riskBackgroundRes = when (item.riskLevel) {
                 ContractRiskLevel.HIGH, ContractRiskLevel.CRITICAL -> R.drawable.bg_contract_detail_risk_high
                 else -> R.drawable.bg_contract_detail_risk
             },
-            riskTextColorRes = contract.riskTextColorRes
+            riskTextColorRes = item.riskTextColorRes
         )
+
+        private fun EmploymentContract.displayFileFormat(): String = when {
+            mimeType.contains("pdf", ignoreCase = true) -> "PDF"
+            mimeType.contains("word", ignoreCase = true) -> "Word"
+            mimeType.startsWith("image/") -> mimeType.substringAfter('/').uppercase()
+            else -> fileName.substringAfterLast('.', "").uppercase()
+        }
     }
 }
 

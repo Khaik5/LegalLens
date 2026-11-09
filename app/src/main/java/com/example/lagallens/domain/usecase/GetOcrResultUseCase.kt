@@ -6,6 +6,5 @@ import com.example.lagallens.domain.repository.OcrRepository
 class GetOcrResultUseCase(
     private val repository: OcrRepository
 ) {
-    suspend operator fun invoke(documentName: String, documentDetails: String): OcrResult =
-        repository.getResult(documentName, documentDetails)
+    suspend operator fun invoke(documentId: String): OcrResult = repository.getResult(documentId)
 }

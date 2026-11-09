@@ -26,13 +26,17 @@ import com.example.lagallens.presentation.feature.ocr.result.ui.OcrResultActivit
 import com.example.lagallens.presentation.feature.camera.ocr.viewmodel.OcrProcessingViewModel
 import kotlinx.coroutines.launch
 
-class OcrProcessingActivity : AppCompatActivity() {
+class OcrProcessingActivity : com.example.lagallens.presentation.feature.ocr.OcrSessionActivity() {
     private val binding by lazy { ActivityOcrProcessingBinding.inflate(layoutInflater) }
-    private val viewModel by viewModels<OcrProcessingViewModel>()
+    private val viewModel by viewModels<OcrProcessingViewModel> {
+        val app = application as com.example.lagallens.LegalLensApplication
+        OcrProcessingViewModel.Factory(app.ocrRepository, app.documentUploadRepository)
+    }
     private val stepAdapter = ProcessingTimelineStepAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (isFinishing || !isOcrSessionValid() || intent.getStringExtra(EXTRA_DOCUMENT_ID).isNullOrBlank()) { finish(); return }
         WindowCompat.setDecorFitsSystemWindows(window, false)
         window.statusBarColor = Color.TRANSPARENT
         window.navigationBarColor = Color.TRANSPARENT
@@ -48,7 +52,8 @@ class OcrProcessingActivity : AppCompatActivity() {
         collectState()
         viewModel.onEvent(
             OcrProcessingUiEvent.ScreenOpened(
-                shouldSimulateFailure = intent.getBooleanExtra(EXTRA_SHOULD_SIMULATE_FAILURE, false)
+                documentId = intent.getStringExtra(EXTRA_DOCUMENT_ID).orEmpty(),
+                pagePaths = intent.getStringArrayListExtra(EXTRA_PAGE_PATHS).orEmpty()
             )
         )
     }
@@ -97,6 +102,7 @@ class OcrProcessingActivity : AppCompatActivity() {
     }
 
     private fun handleEffect(effect: OcrProcessingUiEffect) {
+        if (!isOcrSessionValid()) return
         when (effect) {
             is OcrProcessingUiEffect.NavigateToOcrResult -> {
                 startActivity(
@@ -105,7 +111,8 @@ class OcrProcessingActivity : AppCompatActivity() {
                         documentName = effect.documentName,
                         documentDetails = effect.documentDetails,
                         documentUri = intent.getStringExtra(EXTRA_DOCUMENT_URI),
-                        documentId = intent.getStringExtra(EXTRA_DOCUMENT_ID).orEmpty().ifBlank { java.util.UUID.randomUUID().toString() }
+                        documentId = intent.getStringExtra(EXTRA_DOCUMENT_ID).orEmpty(),
+                        mimeType = intent.getStringExtra(EXTRA_MIME_TYPE).orEmpty()
                     )
                 )
                 finish()
@@ -115,7 +122,11 @@ class OcrProcessingActivity : AppCompatActivity() {
                     OcrFailureActivity.createIntent(
                         context = this,
                         documentName = effect.documentName,
-                        documentDetails = effect.documentDetails
+                        documentDetails = effect.documentDetails,
+                        documentId = intent.getStringExtra(EXTRA_DOCUMENT_ID).orEmpty(),
+                        documentUri = intent.getStringExtra(EXTRA_DOCUMENT_URI),
+                        pagePaths = intent.getStringArrayListExtra(EXTRA_PAGE_PATHS).orEmpty(),
+                        mimeType = intent.getStringExtra(EXTRA_MIME_TYPE).orEmpty()
                     )
                 )
                 finish()
@@ -129,33 +140,35 @@ class OcrProcessingActivity : AppCompatActivity() {
         private const val EXTRA_DOCUMENT_DETAILS = "ocr_document_details"
         private const val EXTRA_DOCUMENT_URI = "ocr_document_uri"
         private const val EXTRA_DOCUMENT_ID = "ocr_document_id"
-        private const val EXTRA_SHOULD_SIMULATE_FAILURE = "ocr_should_simulate_failure"
+        private const val EXTRA_MIME_TYPE = "ocr_mime_type"
 
         fun createIntent(
             context: Context,
-            pages: List<ScanPage>,
-            shouldSimulateFailure: Boolean = false
-        ): Intent = Intent(
+            pages: List<ScanPage>
+        ): Intent = com.example.lagallens.presentation.feature.ocr.OcrSession.stamp(context, Intent(
             context,
             OcrProcessingActivity::class.java
         ).putStringArrayListExtra(EXTRA_PAGE_PATHS, ArrayList(pages.map(ScanPage::path)))
             .putExtra(EXTRA_DOCUMENT_ID, java.util.UUID.randomUUID().toString())
-            .putExtra(EXTRA_SHOULD_SIMULATE_FAILURE, shouldSimulateFailure)
+            .putExtra(EXTRA_MIME_TYPE, "image/jpeg")
+            .putExtra(EXTRA_DOCUMENT_URI, pages.firstOrNull()?.let { android.net.Uri.fromFile(java.io.File(it.path)).toString() }))
 
         fun createIntent(
             context: Context,
             documentName: String,
             documentDetails: String,
-            shouldSimulateFailure: Boolean = false,
             documentUri: String? = null,
-            documentId: String = java.util.UUID.randomUUID().toString()
-        ): Intent = Intent(
+            documentId: String = java.util.UUID.randomUUID().toString(),
+            pagePaths: List<String> = emptyList(),
+            mimeType: String = ""
+        ): Intent = com.example.lagallens.presentation.feature.ocr.OcrSession.stamp(context, Intent(
             context,
             OcrProcessingActivity::class.java
         ).putExtra(EXTRA_DOCUMENT_NAME, documentName)
             .putExtra(EXTRA_DOCUMENT_DETAILS, documentDetails)
             .putExtra(EXTRA_DOCUMENT_URI, documentUri)
+            .putExtra(EXTRA_MIME_TYPE, mimeType)
             .putExtra(EXTRA_DOCUMENT_ID, documentId)
-            .putExtra(EXTRA_SHOULD_SIMULATE_FAILURE, shouldSimulateFailure)
+            .putStringArrayListExtra(EXTRA_PAGE_PATHS, ArrayList(pagePaths)))
     }
 }
