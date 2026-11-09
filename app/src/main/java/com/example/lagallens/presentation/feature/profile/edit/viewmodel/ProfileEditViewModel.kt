@@ -6,9 +6,9 @@ import com.example.lagallens.R
 import com.example.lagallens.presentation.feature.profile.edit.contract.ProfileEditUiEffect
 import com.example.lagallens.presentation.feature.profile.edit.contract.ProfileEditUiEvent
 import com.example.lagallens.presentation.feature.profile.edit.contract.ProfileEditUiState
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -17,8 +17,8 @@ class ProfileEditViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(ProfileEditUiState())
     val uiState = _uiState.asStateFlow()
 
-    private val _uiEffect = MutableSharedFlow<ProfileEditUiEffect>()
-    val uiEffect = _uiEffect.asSharedFlow()
+    private val _uiEffect = Channel<ProfileEditUiEffect>(Channel.BUFFERED)
+    val uiEffect = _uiEffect.receiveAsFlow()
 
     fun onEvent(event: ProfileEditUiEvent) {
         when (event) {
@@ -74,7 +74,7 @@ class ProfileEditViewModel : ViewModel() {
 
     private fun emitEffect(effect: ProfileEditUiEffect) {
         viewModelScope.launch {
-            _uiEffect.emit(effect)
+            _uiEffect.send(effect)
         }
     }
 

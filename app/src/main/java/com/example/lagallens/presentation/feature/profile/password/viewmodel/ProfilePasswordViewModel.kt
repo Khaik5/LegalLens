@@ -7,22 +7,20 @@ import com.example.lagallens.R
 import com.example.lagallens.presentation.feature.profile.password.contract.ProfilePasswordUiEffect
 import com.example.lagallens.presentation.feature.profile.password.contract.ProfilePasswordUiEvent
 import com.example.lagallens.presentation.feature.profile.password.contract.ProfilePasswordUiState
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import com.example.lagallens.LegalLensApplication
 
 class ProfilePasswordViewModel(application: Application) : AndroidViewModel(application) {
     private val _uiState = MutableStateFlow(ProfilePasswordUiState())
     val uiState = _uiState.asStateFlow()
 
-    private val _uiEffect = MutableSharedFlow<ProfilePasswordUiEffect>()
-    val uiEffect = _uiEffect.asSharedFlow()
+    private val _uiEffect = Channel<ProfilePasswordUiEffect>(Channel.BUFFERED)
+    val uiEffect = _uiEffect.receiveAsFlow()
 
     fun onEvent(event: ProfilePasswordUiEvent) {
         when (event) {
@@ -76,7 +74,7 @@ class ProfilePasswordViewModel(application: Application) : AndroidViewModel(appl
         _uiState.update { it.copy(isSubmitting = true) }
         viewModelScope.launch {
             val app = getApplication<Application>() as LegalLensApplication
-            val result = runCatching { withContext(Dispatchers.IO) { app.changeCurrentDemoPassword(state.currentPassword, state.newPassword) } }
+            val result = runCatching { app.changeCurrentPassword(state.currentPassword, state.newPassword) }
             when {
                 result.isFailure -> {
                     _uiState.update { it.copy(isSubmitting = false) }
@@ -96,7 +94,7 @@ class ProfilePasswordViewModel(application: Application) : AndroidViewModel(appl
 
     private fun emitEffect(effect: ProfilePasswordUiEffect) {
         viewModelScope.launch {
-            _uiEffect.emit(effect)
+            _uiEffect.send(effect)
         }
     }
 }

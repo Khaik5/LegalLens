@@ -1,13 +1,16 @@
 package com.example.lagallens.presentation.feature.register.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.lagallens.R
-import kotlinx.coroutines.flow.MutableSharedFlow
+import com.example.lagallens.domain.model.auth.AuthResult
+import com.example.lagallens.domain.usecase.RegisterAccountUseCase
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -15,12 +18,12 @@ import com.example.lagallens.presentation.feature.register.contract.RegisterUiEf
 import com.example.lagallens.presentation.feature.register.contract.RegisterUiEvent
 import com.example.lagallens.presentation.feature.register.contract.RegisterUiState
 
-class RegisterViewModel : ViewModel() {
+class RegisterViewModel(private val registerAccount: RegisterAccountUseCase) : ViewModel() {
     private val _uiState = MutableStateFlow(RegisterUiState())
     val uiState: StateFlow<RegisterUiState> = _uiState.asStateFlow()
 
-    private val _uiEffect = MutableSharedFlow<RegisterUiEffect>()
-    val uiEffect: SharedFlow<RegisterUiEffect> = _uiEffect.asSharedFlow()
+    private val _uiEffect = Channel<RegisterUiEffect>(Channel.BUFFERED)
+    val uiEffect = _uiEffect.receiveAsFlow()
 
     fun onEvent(event: RegisterUiEvent) {
         when (event) {
@@ -38,6 +41,7 @@ class RegisterViewModel : ViewModel() {
 
     private fun register() {
         val state = _uiState.value
+        if (state.isLoading) return
         val fullNameErrorResId = if (state.fullName.trim().isEmpty()) R.string.register_full_name_required else null
         val emailErrorResId = if (!EMAIL_PATTERN.matches(state.email.trim())) R.string.register_email_invalid else null
         val passwordErrorResId = when {
@@ -61,13 +65,35 @@ class RegisterViewModel : ViewModel() {
             }
             return
         }
-        sendEffect(RegisterUiEffect.NavigateToOtp(state.email.trim()))
+        _uiState.update { it.copy(isLoading = true) }
+        viewModelScope.launch {
+            val result = try {
+                registerAccount(state.fullName.trim(), state.email.trim(), state.password)
+            } catch (cancellation: CancellationException) {
+                throw cancellation
+            } catch (_: Exception) {
+                AuthResult.REJECTED
+            }
+            _uiState.update {
+                it.copy(
+                    isLoading = false,
+                    emailErrorResId = R.string.register_email_taken.takeIf { result == AuthResult.EMAIL_TAKEN },
+                    passwordErrorResId = R.string.auth_backend_not_configured.takeIf { result == AuthResult.REJECTED }
+                )
+            }
+            if (result == AuthResult.SUCCESS) sendEffect(RegisterUiEffect.NavigateToOtp(state.email.trim()))
+        }
     }
 
     private fun sendEffect(effect: RegisterUiEffect) {
         viewModelScope.launch {
-            _uiEffect.emit(effect)
+            _uiEffect.send(effect)
         }
+    }
+
+    class Factory(private val registerAccount: RegisterAccountUseCase) : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T = RegisterViewModel(registerAccount) as T
     }
 
     private companion object {

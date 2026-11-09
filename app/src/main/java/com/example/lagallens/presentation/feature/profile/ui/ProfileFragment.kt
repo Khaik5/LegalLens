@@ -131,6 +131,8 @@ class ProfileFragment : Fragment() {
                         )
                         ProfileUiEffect.ShowLogoutConfirmation -> showLogoutConfirmation()
                         ProfileUiEffect.NavigateToAuthentication -> navigateToAuthentication()
+                        ProfileUiEffect.ShowLogoutFailed -> Toast.makeText(requireContext(), R.string.profile_logout_failed, Toast.LENGTH_LONG).show()
+                        ProfileUiEffect.ProfileSaveSucceeded, ProfileUiEffect.ProfileSaveFailed -> Unit
                     }
                 }
             }
@@ -148,10 +150,12 @@ class ProfileFragment : Fragment() {
         binding.ivProfileAvatar.isVisible = state.photoUri != null
         binding.ivProfileAvatar.setImageURI(state.photoUri?.let(Uri::parse))
         binding.tvProfileStatus.setText(state.statusRes)
-        binding.tvProfileContractCount.setText(state.contractCountRes)
-        binding.tvProfileAnalysisCount.setText(state.analysisCountRes)
-        binding.tvProfileChatCount.setText(state.chatCountRes)
+        binding.tvProfileContractCount.text = state.contractCount.toCountText()
+        binding.tvProfileAnalysisCount.text = state.analysisCount.toCountText()
+        binding.tvProfileChatCount.text = state.chatCount.toCountText()
     }
+
+    private fun Int?.toCountText(): String = this?.let { java.text.NumberFormat.getIntegerInstance().format(it) } ?: "–"
 
     private fun showActionUnavailable(actionTitleRes: Int) {
         Toast.makeText(
@@ -171,12 +175,14 @@ class ProfileFragment : Fragment() {
     }
 
     private fun navigateToAuthentication() {
-        (requireActivity().application as com.example.lagallens.LegalLensApplication).logoutDemoSession()
+        // MainActivity also reacts to the signed-out session; whichever runs first finishes it.
+        if (requireActivity().isFinishing) return
         startActivity(
             Intent(requireContext(), HomeActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             }
         )
+        requireActivity().finish()
     }
 
     private fun String.initials(): String =

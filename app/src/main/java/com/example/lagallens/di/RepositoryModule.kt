@@ -46,8 +46,19 @@ import com.example.lagallens.data.repository.UnconfiguredRemoteProfileRepository
 import com.example.lagallens.data.repository.SessionScopedDraftRepository
 import com.example.lagallens.data.datasource.local.datastore.AccountStorageName
 import com.example.lagallens.data.repository.SessionScopedEmploymentRepositories
+import com.example.lagallens.data.repository.tokenSessionKey
 
 object RepositoryModule {
+    fun provideAnalysisUnlockRepository(context: Context): com.example.lagallens.domain.repository.AnalysisUnlockRepository =
+        when (DataModeConfig.current) {
+            AppDataMode.DEMO -> com.example.lagallens.data.repository.DemoAnalysisUnlockRepository(
+                AuthLocalDataSource(context.applicationContext),
+                provideAnalysisIdentityRepository(context),
+                finance(context)
+            )
+            AppDataMode.REAL -> com.example.lagallens.data.repository.UnconfiguredRemoteAnalysisUnlockRepository()
+        }
+
     private var financeRepository: com.example.lagallens.data.repository.DemoFinanceRepository? = null
 
     @Synchronized
@@ -57,7 +68,8 @@ object RepositoryModule {
             val repository = com.example.lagallens.data.repository.DemoFinanceRepository(
                 com.example.lagallens.data.datasource.local.datastore.AtomicFinanceStorage(context),
                 auth::currentSessionScope,
-                { scope, action -> auth.withSession(scope, action) }
+                { scope, action -> auth.withSession(scope, action) },
+                catalog = { com.example.lagallens.data.repository.demoCreditOffers(context.applicationContext) }
             )
             auth.withSessionState {
                 auth.addSessionListener { repository.refreshSession() }
@@ -72,9 +84,21 @@ object RepositoryModule {
     private fun employmentRepositories(context: Context): SessionScopedEmploymentRepositories =
         employmentRepositories ?: SessionScopedEmploymentRepositories(context.applicationContext).also { employmentRepositories = it }
 
+    fun provideAnalysisIdentityRepository(context: Context): com.example.lagallens.domain.repository.AnalysisIdentityRepository {
+        if (DataModeConfig.current == AppDataMode.DEMO) return employmentRepositories(context).analysisIdentities
+        return object : com.example.lagallens.domain.repository.AnalysisIdentityRepository {
+            private val session = remoteSessionKey(context)
+            override fun sessionKey(): String? = session()
+            override suspend fun create(operationId: String, contractId: String, documentId: String, sessionKey: String): com.example.lagallens.domain.model.analysis.AnalysisIdentity =
+                throw IllegalStateException("Analysis backend unavailable")
+            override suspend fun get(resultId: String, sessionKey: String): com.example.lagallens.domain.model.analysis.AnalysisIdentity? = null
+            override suspend fun latest(contractId: String, sessionKey: String): com.example.lagallens.domain.model.analysis.AnalysisIdentity? = null
+        }
+    }
+
     fun provideContractRepository(context: Context): ContractRepository = when (DataModeConfig.current) {
         AppDataMode.DEMO -> employmentRepositories(context).contracts
-        AppDataMode.REAL -> UnconfiguredRemoteContractRepository()
+        AppDataMode.REAL -> UnconfiguredRemoteContractRepository(remoteSessionKey(context))
     }
 
     fun provideDocumentRepository(context: Context): DocumentRepository = when (DataModeConfig.current) {
@@ -86,25 +110,45 @@ object RepositoryModule {
         AppDataMode.DEMO -> {
             val appContext = context.applicationContext
             val auth = AuthLocalDataSource(appContext)
-            SessionScopedDraftRepository(auth::currentSessionScope) { userId ->
+            SessionScopedDraftRepository(auth::currentSessionScope) { scope ->
                 FakeDraftRepository(appContext,
-                    AccountStorageName.forUser("draft_repository_v1", userId),
-                    AccountStorageName.forUser("saved_draft_copies", userId))
+                    AccountStorageName.forUser("draft_repository_v1", scope.userId),
+                    AccountStorageName.forUser("saved_draft_copies", scope.userId),
+                    { action -> auth.withSession(scope, action) })
             }
         }
         AppDataMode.REAL -> UnconfiguredRemoteDraftRepository()
     }
 
-    fun provideAuthRepository(context: Context): AuthRepository {
-        return when (DataModeConfig.current) {
-            AppDataMode.DEMO -> LocalAuthRepository(AuthLocalDataSource(context))
-            AppDataMode.REAL -> UnconfiguredRemoteAuthRepository()
+    fun provideDraftAiRepository(context: Context, drafts: DraftRepository): com.example.lagallens.domain.repository.DraftAiRepository =
+        when (DataModeConfig.current) {
+            AppDataMode.DEMO -> com.example.lagallens.data.repository.FakeDraftAiRepository(context.applicationContext, drafts)
+            AppDataMode.REAL -> com.example.lagallens.data.repository.UnconfiguredRemoteDraftAiRepository()
         }
+
+    fun provideAuthRepository(context: Context, onAccountCreated: suspend (String) -> Unit = {}): AuthRepository {
+        return when (DataModeConfig.current) {
+            AppDataMode.DEMO -> LocalAuthRepository(AuthLocalDataSource(context), onAccountCreated)
+            AppDataMode.REAL -> UnconfiguredRemoteAuthRepository(
+                com.example.lagallens.data.datasource.local.datastore.EncryptedTokenStore(context)
+            )
+        }
+    }
+
+    /** REAL session identity shared by remote repositories; derived from the stored token without exposing it. */
+    private fun remoteSessionKey(context: Context): () -> String? {
+        val tokens = com.example.lagallens.data.datasource.local.datastore.EncryptedTokenStore(context)
+        return { tokenSessionKey(tokens) }
     }
 
     fun provideChatbotRepository(context: Context): ChatbotRepository = when (DataModeConfig.current) {
         AppDataMode.DEMO -> FakeChatbotRepository(context.applicationContext)
-        AppDataMode.REAL -> UnconfiguredRemoteChatbotRepository()
+        AppDataMode.REAL -> UnconfiguredRemoteChatbotRepository(remoteSessionKey(context))
+    }
+
+    fun provideDocumentUploadRepository(): com.example.lagallens.domain.repository.DocumentUploadRepository = when (DataModeConfig.current) {
+        AppDataMode.DEMO -> com.example.lagallens.data.repository.FakeDocumentUploadRepository()
+        AppDataMode.REAL -> com.example.lagallens.data.repository.UnconfiguredRemoteDocumentUploadRepository()
     }
 
     fun provideOcrRepository(): OcrRepository = when (DataModeConfig.current) {
@@ -112,8 +156,13 @@ object RepositoryModule {
         AppDataMode.REAL -> UnconfiguredRemoteOcrRepository()
     }
 
-    fun provideAnalysisRepository(): AnalysisRepository = when (DataModeConfig.current) {
-        AppDataMode.DEMO -> FakeAnalysisRepository()
+    fun provideAnalysisRepository(context: Context): AnalysisRepository = when (DataModeConfig.current) {
+        AppDataMode.DEMO -> {
+            val app = context.applicationContext
+            FakeAnalysisRepository(provideAnalysisIdentityRepository(app), { language ->
+                app.getString(if (language == "en") com.example.lagallens.R.string.analysis_snapshot_english_unavailable else com.example.lagallens.R.string.analysis_result_unavailable)
+            })
+        }
         AppDataMode.REAL -> UnconfiguredRemoteAnalysisRepository()
     }
 
@@ -141,12 +190,12 @@ object RepositoryModule {
     }
 
     fun provideCreditRepository(context: Context): CreditRepository = when (DataModeConfig.current) {
-        AppDataMode.DEMO -> finance(context)
-        AppDataMode.REAL -> UnconfiguredRemoteCreditRepository()
+        AppDataMode.DEMO -> com.example.lagallens.data.repository.IoFinanceRepository(finance(context))
+        AppDataMode.REAL -> UnconfiguredRemoteCreditRepository(remoteSessionKey(context))
     }
 
     fun providePaymentRepository(context: Context, creditRepository: CreditRepository): PaymentRepository = when (DataModeConfig.current) {
-        AppDataMode.DEMO -> finance(context)
-        AppDataMode.REAL -> UnconfiguredRemotePaymentRepository()
+        AppDataMode.DEMO -> com.example.lagallens.data.repository.IoFinanceRepository(finance(context))
+        AppDataMode.REAL -> UnconfiguredRemotePaymentRepository(remoteSessionKey(context))
     }
 }

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="register_email_taken">Email này đã được đăng ký</string>
+    <string name="reset_password_new_title">Đặt mật khẩu mới</string>
+    <string name="reset_password_submit">Lưu mật khẩu mới</string>
+    <string name="reset_password_success">Đã đổi mật khẩu. Vui lòng đăng nhập lại.</string>
+    <string name="reset_password_failed">Không thể đặt lại mật khẩu cho email này.</string>
+    <string name="profile_logout_failed">Không thể đăng xuất. Vui lòng thử lại.</string>
+    <string name="credit_hub_unlock_hint">Hãy mở một kết quả phân tích để mở khóa bằng Credit.</string>
+    <string name="contract_page_count_format">%1$d trang</string>
+</resources>

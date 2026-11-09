@@ -19,4 +19,8 @@ class ProfileSettingsRepositoryImpl(
     override suspend fun updateLanguage(language: ProfileLanguage) {
         localDataSource.updateLanguage(language)
     }
+
+    override suspend fun updateNotificationPreferences(isPushEnabled: Boolean, isEmailEnabled: Boolean, isInAppEnabled: Boolean) {
+        localDataSource.updateNotificationPreferences(isPushEnabled, isEmailEnabled, isInAppEnabled)
+    }
 }

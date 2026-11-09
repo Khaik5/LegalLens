@@ -4,7 +4,6 @@ data class ProfileSettingsUiState(
     val isPushEnabled: Boolean = true,
     val isEmailEnabled: Boolean = true,
     val isInAppEnabled: Boolean = false,
-    val isBiometricEnabled: Boolean = true,
     val appearance: ProfileAppearance = ProfileAppearance.SYSTEM,
     val language: ProfileLanguage = ProfileLanguage.VIETNAMESE
 )

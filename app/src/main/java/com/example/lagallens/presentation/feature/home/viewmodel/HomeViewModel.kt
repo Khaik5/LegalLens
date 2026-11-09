@@ -5,11 +5,10 @@ import com.example.lagallens.presentation.feature.home.contract.HomeUiEffect
 import com.example.lagallens.presentation.feature.home.contract.HomeUiEvent
 import com.example.lagallens.presentation.feature.home.contract.HomeUiState
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
@@ -17,8 +16,8 @@ class HomeViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
-    private val _uiEffect = MutableSharedFlow<HomeUiEffect>()
-    val uiEffect: SharedFlow<HomeUiEffect> = _uiEffect.asSharedFlow()
+    private val _uiEffect = Channel<HomeUiEffect>(Channel.BUFFERED)
+    val uiEffect = _uiEffect.receiveAsFlow()
 
     fun onEvent(event: HomeUiEvent) {
         when (event) {
@@ -29,7 +28,7 @@ class HomeViewModel : ViewModel() {
 
     private fun sendEffect(effect: HomeUiEffect) {
         viewModelScope.launch {
-            _uiEffect.emit(effect)
+            _uiEffect.send(effect)
         }
     }
 }

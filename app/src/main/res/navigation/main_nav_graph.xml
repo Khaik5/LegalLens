@@ -36,8 +36,7 @@
         android:label="@string/contract_detail_title">
         <argument
             android:name="contractId"
-            app:argType="string"
-            android:defaultValue="office-lease" />
+            app:argType="string" />
     </fragment>
 
     <fragment

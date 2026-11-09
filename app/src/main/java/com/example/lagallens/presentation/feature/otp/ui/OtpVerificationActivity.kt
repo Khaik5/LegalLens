@@ -17,6 +17,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.lagallens.R
+import com.example.lagallens.domain.model.auth.OtpPurpose
+import com.example.lagallens.presentation.feature.resetpassword.ui.ResetPasswordActivity
 import com.example.lagallens.databinding.ActivityOtpVerificationBinding
 import com.example.lagallens.presentation.feature.success.ui.SuccessActivity
 import com.example.lagallens.presentation.feature.otp.contract.OtpVerificationUiEffect
@@ -30,7 +32,10 @@ import kotlinx.coroutines.launch
 
 class OtpVerificationActivity : AppCompatActivity() {
     private val binding by lazy { ActivityOtpVerificationBinding.inflate(layoutInflater) }
-    private val viewModel by viewModels<OtpVerificationViewModel>()
+    private val viewModel by viewModels<OtpVerificationViewModel> {
+        val app = application as com.example.lagallens.LegalLensApplication
+        OtpVerificationViewModel.Factory(app.verifyOtpUseCase, app.resendOtpUseCase)
+    }
     private val otpInputs by lazy {
         listOf(
             binding.otpInput1,
@@ -48,7 +53,10 @@ class OtpVerificationActivity : AppCompatActivity() {
         setContentView(binding.root)
         playEntranceMotion()
         bindView()
-        viewModel.onEvent(OtpVerificationUiEvent.Initialized(intent.getStringExtra(EXTRA_EMAIL).orEmpty()))
+        viewModel.onEvent(OtpVerificationUiEvent.Initialized(
+            intent.getStringExtra(EXTRA_EMAIL).orEmpty(),
+            OtpPurpose.valueOf(intent.getStringExtra(EXTRA_PURPOSE) ?: OtpPurpose.REGISTRATION.name)
+        ))
         collectState()
         collectEffect()
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
@@ -167,6 +175,12 @@ class OtpVerificationActivity : AppCompatActivity() {
                         OtpVerificationUiEffect.NavigateToSuccess -> {
                             startActivity(Intent(this@OtpVerificationActivity, SuccessActivity::class.java))
                         }
+                        is OtpVerificationUiEffect.NavigateToResetPassword -> startActivity(
+                            ResetPasswordActivity.createIntent(this@OtpVerificationActivity, effect.email)
+                        )
+                        is OtpVerificationUiEffect.ShowMessage -> android.widget.Toast.makeText(
+                            this@OtpVerificationActivity, effect.messageRes, android.widget.Toast.LENGTH_LONG
+                        ).show()
                     }
                 }
             }
@@ -175,9 +189,12 @@ class OtpVerificationActivity : AppCompatActivity() {
 
     companion object {
         private const val EXTRA_EMAIL = "extra_email"
+        private const val EXTRA_PURPOSE = "extra_otp_purpose"
 
-        fun createIntent(context: Context, email: String): Intent {
-            return Intent(context, OtpVerificationActivity::class.java).putExtra(EXTRA_EMAIL, email)
+        fun createIntent(context: Context, email: String, purpose: OtpPurpose): Intent {
+            return Intent(context, OtpVerificationActivity::class.java)
+                .putExtra(EXTRA_EMAIL, email)
+                .putExtra(EXTRA_PURPOSE, purpose.name)
         }
     }
 }

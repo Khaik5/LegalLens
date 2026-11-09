@@ -29,7 +29,7 @@ class SplashActivity : AppCompatActivity() {
     private val viewModel by viewModels<SplashViewModel> {
         SplashViewModel.Factory(
             (application as LegalLensApplication).isOnboardingCompletedUseCase,
-            com.example.lagallens.di.RepositoryModule.provideAuthRepository(applicationContext)
+            (application as LegalLensApplication).authRepository
         )
     }
     private var splashProgressAnimation: SplashProgressAnimation? = null

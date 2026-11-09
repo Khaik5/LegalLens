@@ -2,6 +2,7 @@ package com.example.lagallens.data.datasource.local.datastore
 
 import android.content.Context
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -20,7 +21,10 @@ class ProfileSettingsLocalDataSource(
         return context.profileSettingsDataStore.data.map { preferences ->
             ProfileSettings(
                 appearance = preferences[APPEARANCE_KEY].toAppearance(),
-                language = preferences[LANGUAGE_KEY].toLanguage()
+                language = preferences[LANGUAGE_KEY].toLanguage(),
+                isPushEnabled = preferences[PUSH_KEY] ?: true,
+                isEmailEnabled = preferences[EMAIL_KEY] ?: true,
+                isInAppEnabled = preferences[IN_APP_KEY] ?: false
             )
         }
     }
@@ -37,6 +41,14 @@ class ProfileSettingsLocalDataSource(
         }
     }
 
+    suspend fun updateNotificationPreferences(isPushEnabled: Boolean, isEmailEnabled: Boolean, isInAppEnabled: Boolean) {
+        context.profileSettingsDataStore.edit { preferences ->
+            preferences[PUSH_KEY] = isPushEnabled
+            preferences[EMAIL_KEY] = isEmailEnabled
+            preferences[IN_APP_KEY] = isInAppEnabled
+        }
+    }
+
     private fun String?.toAppearance(): ProfileAppearance {
         return ProfileAppearance.entries.find { it.name == this } ?: ProfileAppearance.SYSTEM
     }
@@ -48,6 +60,9 @@ class ProfileSettingsLocalDataSource(
     private companion object {
         val APPEARANCE_KEY: Preferences.Key<String> = stringPreferencesKey("appearance")
         val LANGUAGE_KEY: Preferences.Key<String> = stringPreferencesKey("language")
+        val PUSH_KEY: Preferences.Key<Boolean> = booleanPreferencesKey("notification_push")
+        val EMAIL_KEY: Preferences.Key<Boolean> = booleanPreferencesKey("notification_email")
+        val IN_APP_KEY: Preferences.Key<Boolean> = booleanPreferencesKey("notification_in_app")
     }
 }
 

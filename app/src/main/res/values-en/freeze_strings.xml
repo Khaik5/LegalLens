@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="operation_network_error">Unable to connect. Check your network and try again.</string>
+    <string name="operation_session_error">Your session is invalid. Please sign in again.</string>
+    <string name="operation_access_error">You do not have permission to perform this action.</string>
+    <string name="operation_data_error">The data is invalid or no longer available.</string>
+    <string name="operation_rate_error">Too many requests. Please try again later.</string>
+    <string name="operation_server_error">The service encountered an error. Please try again later.</string>
+    <string name="operation_failed">Unable to complete the action. Please try again.</string>
+    <string name="editor_formatting_unavailable">Saving bold or italic formatting is not supported yet.</string>
+    <string name="register_terms_pending">The official terms of service and privacy policy are awaiting approval.</string>
+    <string name="freeze_severity_high">High</string>
+    <string name="freeze_severity_medium">Medium</string>
+    <string name="freeze_severity_low">Low</string>
+    <string name="credit_history_analysis_unlock">Analysis result unlock</string>
+    <string name="credit_history_credit_adjustment">Credit added</string>
+    <string name="credit_history_completed">Completed</string>
+    <string name="credit_history_pending">Pending</string>
+    <string name="credit_history_failed">Failed</string>
+    <string name="credit_history_recorded">Recorded</string>
+    <string name="freeze_retry">Retry</string>
+    <string name="ocr_result_saved_content_label">DEMO · Saved content</string>
+</resources>

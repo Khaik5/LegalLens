@@ -31,7 +31,9 @@ import kotlinx.coroutines.launch
 
 class RegisterActivity : AppCompatActivity() {
     private val binding by lazy { ActivityRegisterBinding.inflate(layoutInflater) }
-    private val viewModel by viewModels<RegisterViewModel>()
+    private val viewModel by viewModels<RegisterViewModel> {
+        RegisterViewModel.Factory((application as com.example.lagallens.LegalLensApplication).registerAccountUseCase)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -82,10 +84,7 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun bindText() {
-        binding.termsText.text = styleText(
-            getString(R.string.register_terms),
-            listOf(getString(R.string.terms_of_service), getString(R.string.privacy_policy))
-        )
+        binding.termsText.setText(R.string.register_terms_pending)
         binding.loginText.text = styleText(
             getString(R.string.register_login_prompt),
             listOf(getString(R.string.login))
@@ -126,11 +125,11 @@ class RegisterActivity : AppCompatActivity() {
                     when (effect) {
                         RegisterUiEffect.CloseScreen -> finish()
                         RegisterUiEffect.NavigateToLogin -> {
-                            startActivity(Intent(this@RegisterActivity, LoginActivity::class.java))
+                            startActivity(Intent(this@RegisterActivity, LoginActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP))
                             finish()
                         }
                         is RegisterUiEffect.NavigateToOtp -> {
-                            startActivity(OtpVerificationActivity.createIntent(this@RegisterActivity, effect.email))
+                            startActivity(OtpVerificationActivity.createIntent(this@RegisterActivity, effect.email, com.example.lagallens.domain.model.auth.OtpPurpose.REGISTRATION))
                         }
                     }
                 }

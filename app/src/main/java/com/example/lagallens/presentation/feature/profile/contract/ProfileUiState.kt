@@ -9,8 +9,11 @@ data class ProfileUiState(
     val phone: String = "",
     val photoUri: String? = null,
     val isBackendUnavailable: Boolean = false,
+    val isLoading: Boolean = true,
+    val isSaving: Boolean = false,
     @param:StringRes val statusRes: Int = R.string.profile_active,
-    @param:StringRes val contractCountRes: Int = R.string.profile_contract_count,
-    @param:StringRes val analysisCountRes: Int = R.string.profile_analysis_count,
-    @param:StringRes val chatCountRes: Int = R.string.profile_chat_count
+    /** Null until loaded, or when the source is unavailable. */
+    val contractCount: Int? = null,
+    val analysisCount: Int? = null,
+    val chatCount: Int? = null
 )
