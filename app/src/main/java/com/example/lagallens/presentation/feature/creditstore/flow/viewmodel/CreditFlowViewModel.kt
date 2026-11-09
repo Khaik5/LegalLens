@@ -8,9 +8,12 @@ import com.example.lagallens.domain.model.payment.PaymentStatus
 import com.example.lagallens.presentation.feature.creditstore.flow.contract.CreditFlowUiEffect
 import com.example.lagallens.presentation.feature.creditstore.flow.contract.CreditFlowUiEvent
 import com.example.lagallens.presentation.feature.creditstore.flow.contract.CreditFlowUiState
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -20,19 +23,21 @@ class CreditFlowViewModel(private val paymentRepository: PaymentRepository) : Vi
     private val _uiState = MutableStateFlow(CreditFlowUiState(isBackendUnavailable = !paymentRepository.isConfigured))
     val uiState = _uiState.asStateFlow()
 
-    private val _uiEffect = MutableSharedFlow<CreditFlowUiEffect>()
-    val uiEffect = _uiEffect.asSharedFlow()
+    private val _uiEffect = Channel<CreditFlowUiEffect>(Channel.BUFFERED)
+    val uiEffect = _uiEffect.receiveAsFlow()
+    private var paymentJob: Job? = null
     private var activePaymentId: String? = null
     private var activePaymentSession: String? = null
 
     fun onEvent(event: CreditFlowUiEvent) {
-        if ((event is CreditFlowUiEvent.StartPayment || event is CreditFlowUiEvent.CompletePayment || event == CreditFlowUiEvent.RequestPaymentClicked)
+        if ((event is CreditFlowUiEvent.StartPayment || event == CreditFlowUiEvent.RequestPaymentClicked)
             && paymentRepository.activeSessionKey() != ownerSession) return
         when (event) {
             CreditFlowUiEvent.BackClicked -> {
                 val session = activePaymentSession
+                paymentJob?.cancel()
                 activePaymentId?.let { id -> viewModelScope.launch {
-                    if (paymentRepository.activeSessionKey() == session) runCatching { paymentRepository.updateStatus(id, PaymentStatus.CANCELLED) }
+                    if (paymentRepository.activeSessionKey() == session) runCatching { paymentRepository.cancelPayment(id) }
                 } }
                 emitEffect(CreditFlowUiEffect.NavigateBack)
             }
@@ -48,7 +53,6 @@ class CreditFlowViewModel(private val paymentRepository: PaymentRepository) : Vi
 
             CreditFlowUiEvent.RequestPaymentClicked -> requestPayment()
             is CreditFlowUiEvent.StartPayment -> startPayment(event)
-            is CreditFlowUiEvent.CompletePayment -> completePayment(event.paymentId)
         }
     }
 
@@ -65,32 +69,30 @@ class CreditFlowViewModel(private val paymentRepository: PaymentRepository) : Vi
     }
 
     private fun startPayment(event: CreditFlowUiEvent.StartPayment) {
+        // The screen restarts on rotation while this ViewModel and its payment stay alive.
+        if (activePaymentId == event.paymentId) return
         val repository = paymentRepository
         activePaymentId = event.paymentId
         val session = repository.activeSessionKey()
         activePaymentSession = session
-        viewModelScope.launch {
+        paymentJob = viewModelScope.launch {
             if (repository.activeSessionKey() != session) return@launch
-            runCatching { repository.createOrGet(event.paymentId, event.packageId, event.amountVnd, event.credits) }
-                .onFailure { emitEffect(CreditFlowUiEffect.PaymentFailed, session) }
-        }
-    }
-
-    private fun completePayment(paymentId: String) {
-        val repository = paymentRepository
-        if (paymentId != activePaymentId) return
-        val session = activePaymentSession
-        viewModelScope.launch {
-            if (repository.activeSessionKey() != session) return@launch
-            runCatching { repository.completeDemoPayment(paymentId) }
-                .onSuccess { payment -> if (repository.activeSessionKey() == session) { if (payment.status == PaymentStatus.SUCCESS) emitEffect(CreditFlowUiEffect.PaymentSucceeded(payment), session) else emitEffect(CreditFlowUiEffect.PaymentFailed, session) } }
-                .onFailure { emitEffect(CreditFlowUiEffect.PaymentFailed, session) }
+            val finalEffect = try {
+                repository.createPayment(event.paymentId, event.packageId)
+                val payment = repository.observePayment(event.paymentId).first { it.status != PaymentStatus.PENDING }
+                if (payment.status == PaymentStatus.SUCCESS) CreditFlowUiEffect.PaymentSucceeded(payment) else CreditFlowUiEffect.PaymentFailed
+            } catch (cancellation: CancellationException) {
+                throw cancellation
+            } catch (_: Exception) {
+                CreditFlowUiEffect.PaymentFailed
+            }
+            emitEffect(finalEffect, session)
         }
     }
 
     private fun emitEffect(effect: CreditFlowUiEffect, session: String? = paymentRepository.activeSessionKey()) {
         viewModelScope.launch {
-            if (paymentRepository.activeSessionKey() == session) _uiEffect.emit(effect)
+            if (paymentRepository.activeSessionKey() == session) _uiEffect.send(effect)
         }
     }
 

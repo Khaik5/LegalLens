@@ -25,9 +25,12 @@ import com.example.lagallens.presentation.feature.analysis.summary.contract.Anal
 import com.example.lagallens.presentation.feature.analysis.summary.viewmodel.AnalysisSummaryViewModel
 import kotlinx.coroutines.launch
 
-class AnalysisSummaryActivity : AppCompatActivity() {
+class AnalysisSummaryActivity : com.example.lagallens.presentation.feature.analysis.AnalysisScopedActivity() {
+    override val requiresUnlock = false
+    override val observesUnlock = true
     private lateinit var binding: ActivityAnalysisSummaryBinding
     private val viewModel by viewModels<AnalysisSummaryViewModel>()
+    private val lockedAdapter = com.example.lagallens.presentation.feature.analysis.adapter.AnalysisLockedPreviewAdapter { openUnlockConfirmation(viewModel.uiState.value.documentName) }
     private val summaryAdapter = AnalysisSummaryAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,20 +58,26 @@ class AnalysisSummaryActivity : AppCompatActivity() {
         }
         binding.analysisSummarySections.apply {
             layoutManager = LinearLayoutManager(this@AnalysisSummaryActivity)
-            adapter = summaryAdapter
+            adapter = androidx.recyclerview.widget.ConcatAdapter(summaryAdapter, lockedAdapter)
             isNestedScrollingEnabled = false
         }
         observeViewModel()
         viewModel.onEvent(
             AnalysisSummaryUiEvent.ScreenOpened(
                 documentName = intent.getStringExtra(EXTRA_DOCUMENT_NAME)
-                    .orEmpty()
-                    .ifBlank { getString(R.string.analysis_start_document_name) },
+                    .orEmpty(),
                 documentMetadata = intent.getStringExtra(EXTRA_DOCUMENT_METADATA)
                     .orEmpty()
-                    .ifBlank { getString(R.string.analysis_start_document_metadata) }
             )
         )
+    }
+
+    override fun onAnalysisInvalidated() { viewModel.clearResult() }
+
+    override fun onAnalysisValidated(identity: com.example.lagallens.domain.model.analysis.AnalysisIdentity, detail: com.example.lagallens.domain.model.analysis.AnalysisDetail) {
+        viewModel.setResult(identity, detail, validatedUnlockStatus?.isUnlocked == true)
+        showContentStatus(viewModel.uiState.value.status)
+        render(viewModel.uiState.value)
     }
 
     private fun observeViewModel() {
@@ -81,9 +90,11 @@ class AnalysisSummaryActivity : AppCompatActivity() {
     }
 
     private fun render(state: AnalysisSummaryUiState) = with(binding) {
+        analysisContentEmpty.visibility = if (state.status == com.example.lagallens.presentation.feature.analysis.SnapshotContentStatus.EMPTY) android.view.View.VISIBLE else android.view.View.GONE
         analysisSummaryDocumentName.text = state.documentName
-        analysisSummaryDocumentMetadata.text = state.documentMetadata
+        analysisSummaryDocumentMetadata.text = getString(R.string.analysis_snapshot_demo_metadata, state.documentMetadata)
         summaryAdapter.submitList(state.sections)
+        lockedAdapter.update(state.lockedCount, validatedUnlockStatus?.cost)
     }
 
     private fun handleEffect(effect: AnalysisSummaryUiEffect) {

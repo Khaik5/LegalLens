@@ -4,5 +4,6 @@ data class AnalysisOverview(
     val score: Int,
     val keyFactsCount: Int,
     val riskCount: Int,
-    val referenceCount: Int
+    val referenceCount: Int,
+    val severity: AnalysisSeverity? = null
 )

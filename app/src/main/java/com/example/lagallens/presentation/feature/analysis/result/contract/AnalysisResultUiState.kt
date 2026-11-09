@@ -6,10 +6,15 @@ data class AnalysisResultUiState(
     val documentName: String = "",
     val documentMetadata: String = "",
     val score: Int = 0,
+    val severity: com.example.lagallens.domain.model.analysis.AnalysisSeverity? = null,
     val keyFactsCount: Int = 0,
     val riskCount: Int = 0,
     val referenceCount: Int = 0,
     val errorMessageRes: Int? = null,
+    val isLoading: Boolean = true,
+    val resultId: String = "",
+    val isUnlocked: Boolean = false,
+    val unlockCost: Int = 0,
     val items: List<AnalysisResultItem> = listOf(
         AnalysisResultItem(
             iconRes = R.drawable.ic_ocr_saved_document,

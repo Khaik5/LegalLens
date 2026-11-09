@@ -53,9 +53,12 @@
         android:background="@color/legal_lens_input_stroke" />
 
     <LinearLayout
+        android:id="@+id/analysis_obligation_source"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/dp_10"
+        android:clickable="true"
+        android:focusable="true"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 

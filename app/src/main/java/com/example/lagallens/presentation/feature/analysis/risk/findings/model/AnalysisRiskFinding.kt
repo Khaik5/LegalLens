@@ -8,10 +8,10 @@ import com.example.lagallens.R
 data class AnalysisRiskFinding(
     val id: String,
     val severity: AnalysisRiskSeverity,
-    @StringRes val clauseRes: Int,
-    @StringRes val titleRes: Int,
-    @StringRes val descriptionRes: Int,
-    @StringRes val consequenceRes: Int
+    val clause: String,
+    val title: String,
+    val description: String,
+    val consequence: String
 )
 
 enum class AnalysisRiskSeverity(
@@ -35,3 +35,7 @@ enum class AnalysisRiskSeverity(
         labelColorRes = R.color.contract_complete
     )
 }
+
+internal fun com.example.lagallens.domain.model.analysis.AnalysisFinding.toRiskFinding() = AnalysisRiskFinding(
+    id, AnalysisRiskSeverity.valueOf(severity.name), clause, title, description, consequence
+)

@@ -7,20 +7,21 @@ import com.example.lagallens.domain.repository.CreditRepository
 import com.example.lagallens.presentation.feature.creditstore.unlock.contract.UnlockConfirmationUiEffect
 import com.example.lagallens.presentation.feature.creditstore.unlock.contract.UnlockConfirmationUiEvent
 import com.example.lagallens.presentation.feature.creditstore.unlock.contract.UnlockConfirmationUiState
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class UnlockConfirmationViewModel(private val creditRepository: CreditRepository) : ViewModel() {
+class UnlockConfirmationViewModel(private val creditRepository: CreditRepository,
+    private val unlockRepository: com.example.lagallens.domain.repository.AnalysisUnlockRepository? = null) : ViewModel() {
     private val ownerSession = creditRepository.activeSessionKey()
     private val _uiState = MutableStateFlow(UnlockConfirmationUiState())
     val uiState = _uiState.asStateFlow()
 
-    private val _uiEffect = MutableSharedFlow<UnlockConfirmationUiEffect>()
-    val uiEffect = _uiEffect.asSharedFlow()
+    private val _uiEffect = Channel<UnlockConfirmationUiEffect>(Channel.BUFFERED)
+    val uiEffect = _uiEffect.receiveAsFlow()
 
     fun onEvent(event: UnlockConfirmationUiEvent) {
         when (event) {
@@ -40,47 +41,44 @@ class UnlockConfirmationViewModel(private val creditRepository: CreditRepository
     }
 
     private fun requestUnlock() {
-        if (creditRepository.activeSessionKey() != ownerSession) return
+        val session = ownerSession
         val state = _uiState.value
-        if (state.isConfirmationRequested || state.isInsufficientCreditsRequested) {
-            return
+        val service = unlockRepository
+        if (session.isNullOrBlank() || creditRepository.activeSessionKey() != session || state.analysisResultId.isBlank() || state.unlockCost <= 0 || service == null) {
+            emitEffect(UnlockConfirmationUiEffect.ShowBackendUnavailable); return
         }
-        if (!creditRepository.isConfigured) {
-            emitEffect(UnlockConfirmationUiEffect.ShowBackendUnavailable)
-            return
-        }
-        if (state.availableCredits < state.unlockCost) {
-            _uiState.update { it.copy(isInsufficientCreditsRequested = true) }
-            emitEffect(UnlockConfirmationUiEffect.NavigateToInsufficientCredits)
-            return
-        }
-        val repository = creditRepository
-        val session = repository.activeSessionKey()
+        if (state.isConfirmationRequested || state.isInsufficientCreditsRequested) return
         _uiState.update { it.copy(isConfirmationRequested = true) }
         viewModelScope.launch {
-            if (repository.activeSessionKey() != session) return@launch
-            val receipt = runCatching { repository.spend("unlock:${state.analysisResultId}", state.unlockCost) }.getOrNull()
-            if (repository.activeSessionKey() != session) return@launch
-            if (receipt == null || (!receipt.applied && receipt.balance < state.unlockCost)) {
-                _uiState.update { it.copy(availableCredits = receipt?.balance ?: repository.balance.value, isConfirmationRequested = false, isInsufficientCreditsRequested = true) }
-                emitEffect(UnlockConfirmationUiEffect.NavigateToInsufficientCredits)
-                return@launch
-            }
-            _uiState.update { it.copy(availableCredits = receipt.balance) }
-            viewModelScope.launch {
-                if (repository.activeSessionKey() == session) _uiEffect.emit(UnlockConfirmationUiEffect.UnlockRequested(state.analysisResultId, state.unlockCost))
+            val outcome = try { service.unlock(session, state.analysisResultId) }
+            catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
+            catch (_: Exception) { com.example.lagallens.domain.repository.AnalysisUnlockOutcome.Unavailable }
+            if (creditRepository.activeSessionKey() != session) return@launch
+            when (outcome) {
+                is com.example.lagallens.domain.repository.AnalysisUnlockOutcome.Unlocked -> {
+                    _uiState.update { it.copy(availableCredits = outcome.balance) }
+                    _uiEffect.send(UnlockConfirmationUiEffect.UnlockRequested(state.analysisResultId, state.unlockCost))
+                }
+                is com.example.lagallens.domain.repository.AnalysisUnlockOutcome.Insufficient -> {
+                    _uiState.update { it.copy(availableCredits = outcome.balance, isConfirmationRequested = false, isInsufficientCreditsRequested = true) }
+                    _uiEffect.send(UnlockConfirmationUiEffect.NavigateToInsufficientCredits)
+                }
+                com.example.lagallens.domain.repository.AnalysisUnlockOutcome.Unavailable -> {
+                    _uiState.update { it.copy(isConfirmationRequested = false) }
+                    _uiEffect.send(UnlockConfirmationUiEffect.ShowBackendUnavailable)
+                }
             }
         }
     }
 
     private fun emitEffect(effect: UnlockConfirmationUiEffect) {
         viewModelScope.launch {
-            _uiEffect.emit(effect)
+            _uiEffect.send(effect)
         }
     }
 
-    class Factory(private val repository: CreditRepository) : ViewModelProvider.Factory {
+    class Factory(private val repository: CreditRepository, private val unlock: com.example.lagallens.domain.repository.AnalysisUnlockRepository? = null) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T = UnlockConfirmationViewModel(repository) as T
+        override fun <T : ViewModel> create(modelClass: Class<T>): T = UnlockConfirmationViewModel(repository, unlock) as T
     }
 }

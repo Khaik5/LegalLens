@@ -7,6 +7,7 @@ import com.example.lagallens.presentation.common.model.ProcessingTimelineStepSta
 data class AnalysisProcessingUiState(
     val documentName: String = "",
     val documentMetadata: String = "",
+    val completion: AnalysisProcessingUiEffect? = null,
     val activeStepId: Int = 2,
     val steps: List<ProcessingTimelineStep> = processingSteps(activeStepId)
 ) {

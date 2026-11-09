@@ -13,6 +13,7 @@ class AnalysisRiskFindingsAdapter(
     private val onFindingClicked: (String) -> Unit
 ) : ListAdapter<AnalysisRiskFinding, AnalysisRiskFindingsAdapter.AnalysisRiskFindingViewHolder>(DiffCallback) {
 
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AnalysisRiskFindingViewHolder {
         val binding = ItemAnalysisRiskFindingBinding.inflate(
             LayoutInflater.from(parent.context),
@@ -37,10 +38,10 @@ class AnalysisRiskFindingsAdapter(
             analysisRiskFindingSeverity.setTextColor(
                 itemView.context.getColor(item.severity.labelColorRes)
             )
-            analysisRiskFindingClause.setText(item.clauseRes)
-            analysisRiskFindingTitle.setText(item.titleRes)
-            analysisRiskFindingDescription.setText(item.descriptionRes)
-            analysisRiskFindingConsequence.setText(item.consequenceRes)
+            analysisRiskFindingClause.text = item.clause
+            analysisRiskFindingTitle.text = item.title
+            analysisRiskFindingDescription.text = item.description
+            analysisRiskFindingConsequence.text = item.consequence
             root.setOnClickListener { onFindingClicked(item.id) }
             analysisRiskFindingSolution.setOnClickListener { onFindingClicked(item.id) }
         }

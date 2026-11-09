@@ -192,6 +192,7 @@
                     android:background="@color/legal_lens_input_stroke" />
 
                 <TextView
+                    android:id="@+id/unlockConfirmationContractLabel"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/dp_12"
@@ -202,12 +203,13 @@
                     android:textSize="@dimen/sp_13" />
 
                 <TextView
+                    android:id="@+id/unlockConfirmationContractName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/dp_4"
                     android:fontFamily="sans-serif"
                     android:includeFontPadding="false"
-                    android:text="@string/contract_office_lease"
+                    tools:text="@string/contract_demo_labor_indefinite"
                     android:textColor="@color/legal_lens_primary"
                     android:textSize="@dimen/sp_14"
                     android:textStyle="bold" />

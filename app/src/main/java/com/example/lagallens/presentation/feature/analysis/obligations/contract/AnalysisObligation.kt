@@ -1,9 +1,3 @@
 package com.example.lagallens.presentation.feature.analysis.obligations.contract
 
-import androidx.annotation.StringRes
-
-data class AnalysisObligation(
-    @StringRes val titleRes: Int,
-    @StringRes val clauseRes: Int,
-    @StringRes val descriptionRes: Int
-)
+data class AnalysisObligation(val id: String, val title: String, val clause: String, val description: String, val source: com.example.lagallens.presentation.feature.analysis.keyfacts.contract.AnalysisClauseSource? = null)

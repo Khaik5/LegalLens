@@ -184,7 +184,8 @@
                             android:gravity="center"
                             android:paddingStart="@dimen/analysis_result_medium_badge_padding_horizontal"
                             android:paddingEnd="@dimen/analysis_result_medium_badge_padding_horizontal"
-                            android:text="@string/analysis_result_medium"
+                            android:id="@+id/analysis_result_severity"
+                            android:visibility="gone"
                             android:textColor="@color/contract_pending"
                             android:textSize="@dimen/analysis_result_medium_badge_text_size"
                             android:textStyle="bold" />
@@ -196,6 +197,7 @@
                         android:layout_marginTop="@dimen/analysis_result_risk_description_margin_top"
                         android:lineSpacingExtra="@dimen/analysis_result_risk_description_line_spacing"
                         android:text="@string/analysis_result_risk_assessment_description"
+                            android:visibility="gone"
                         android:textColor="@color/ocr_saved_body"
                         android:textSize="@dimen/analysis_result_risk_description_text_size" />
                 </LinearLayout>

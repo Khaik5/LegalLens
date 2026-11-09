@@ -10,8 +10,9 @@ import com.example.lagallens.databinding.ItemAnalysisObligationsSectionBinding
 import com.example.lagallens.presentation.feature.analysis.obligations.contract.AnalysisObligation
 import com.example.lagallens.presentation.feature.analysis.obligations.contract.AnalysisObligationsListItem
 
-class AnalysisObligationsAdapter :
+class AnalysisObligationsAdapter(private val onSourceClicked: (String) -> Unit = {}) :
     ListAdapter<AnalysisObligationsListItem, RecyclerView.ViewHolder>(DiffCallback) {
+
     override fun getItemViewType(position: Int): Int = when (getItem(position)) {
         is AnalysisObligationsListItem.Section -> VIEW_TYPE_SECTION
         is AnalysisObligationsListItem.Obligation -> VIEW_TYPE_OBLIGATION
@@ -38,7 +39,7 @@ class AnalysisObligationsAdapter :
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (val item = getItem(position)) {
             is AnalysisObligationsListItem.Section -> (holder as SectionViewHolder).bind(item)
-            is AnalysisObligationsListItem.Obligation -> (holder as ObligationViewHolder).bind(item.obligation)
+            is AnalysisObligationsListItem.Obligation -> (holder as ObligationViewHolder).bind(item.obligation, onSourceClicked)
         }
     }
 
@@ -46,17 +47,18 @@ class AnalysisObligationsAdapter :
         private val binding: ItemAnalysisObligationsSectionBinding
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: AnalysisObligationsListItem.Section) = with(binding) {
-            analysisObligationsSectionTitle.setText(item.titleRes)
+            analysisObligationsSectionTitle.text = item.title
         }
     }
 
     class ObligationViewHolder(
         private val binding: ItemAnalysisObligationBinding
     ) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(item: AnalysisObligation) = with(binding) {
-            analysisObligationTitle.setText(item.titleRes)
-            analysisObligationClause.setText(item.clauseRes)
-            analysisObligationDescription.setText(item.descriptionRes)
+        fun bind(item: AnalysisObligation, onSourceClicked: (String) -> Unit) = with(binding) {
+            analysisObligationTitle.text = item.title
+            analysisObligationClause.text = item.clause
+            analysisObligationDescription.text = item.description
+            analysisObligationSource.setOnClickListener { onSourceClicked(item.id) }
         }
     }
 
@@ -66,10 +68,10 @@ class AnalysisObligationsAdapter :
             newItem: AnalysisObligationsListItem
         ): Boolean = when {
             oldItem is AnalysisObligationsListItem.Section && newItem is AnalysisObligationsListItem.Section ->
-                oldItem.titleRes == newItem.titleRes
+                oldItem.id == newItem.id
 
             oldItem is AnalysisObligationsListItem.Obligation && newItem is AnalysisObligationsListItem.Obligation ->
-                oldItem.obligation.titleRes == newItem.obligation.titleRes
+                oldItem.obligation.id == newItem.obligation.id
 
             else -> false
         }

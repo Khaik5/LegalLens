@@ -46,7 +46,7 @@ open class CreditDemoLedger(initialBalance: Int = DEFAULT_BALANCE) : CreditRepos
     override suspend fun getTransactions(): List<CreditTransaction> =
         synchronized(this) { transactions.sortedByDescending { it.createdAtEpochMillis } }
 
-    override suspend fun addPurchasedCredits(
+    suspend fun addPurchasedCredits(
         paymentId: String,
         packageId: String,
         amountVnd: Long,

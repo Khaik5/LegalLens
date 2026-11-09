@@ -26,8 +26,8 @@ class PurchaseConfirmationActivity : CreditFlowActivity() {
         setContentView(binding.root)
         val creditPackage = selection.creditPackage
         val price = selection.priceText
-        binding.purchasePackageTitle.setText(creditPackage.titleRes)
-        binding.purchaseSummaryPackage.setText(creditPackage.titleRes)
+        binding.purchasePackageTitle.text = creditPackage.title
+        binding.purchaseSummaryPackage.text = creditPackage.title
         binding.purchasePackageDescription.setText(if (creditPackage.credits == 15) R.string.credit_flow_package_description else R.string.credit_purchase_no_expiry)
         binding.purchasePackagePrice.text = price
         binding.purchaseSummaryPrice.text = price
@@ -76,9 +76,7 @@ class PurchaseConfirmationActivity : CreditFlowActivity() {
     }
 
     companion object {
-        fun createIntent(context: Context, packageId: String, balanceCredits: Int): Intent {
-            val selected = requireNotNull(com.example.lagallens.presentation.feature.creditstore.contract.CreditPackage.samples.firstOrNull { it.id == packageId })
-            return CreditPurchaseSelection(selected, balanceCredits).putInto(Intent(context, PurchaseConfirmationActivity::class.java))
-        }
+        fun createIntent(context: Context, creditPackage: com.example.lagallens.presentation.feature.creditstore.contract.CreditPackage, balanceCredits: Int, fromAnalysis: Boolean = false): Intent =
+            CreditPurchaseSelection(creditPackage, balanceCredits, returnsToUnlockOrigin = fromAnalysis).putInto(Intent(context, PurchaseConfirmationActivity::class.java))
     }
 }

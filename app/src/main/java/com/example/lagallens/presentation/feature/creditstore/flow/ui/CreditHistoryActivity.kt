@@ -25,22 +25,32 @@ import com.example.lagallens.presentation.feature.creditstore.ui.CreditStoreActi
 
 class CreditHistoryActivity : CreditFlowActivity() {
     private val binding by lazy { ActivityCreditHistoryBinding.inflate(layoutInflater) }
+    private val owner by lazy { intent.getStringExtra(EXTRA_OWNER).orEmpty() }
+    private fun isOwner(): Boolean = owner.isNotBlank() && (application as LegalLensApplication).creditRepository.activeSessionKey() == owner
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.decorView.alpha = 0f
+        if (!isOwner()) { finish(); return }
         enableEdgeToEdge()
         setContentView(binding.root)
         val repository = (application as LegalLensApplication).creditRepository
+        binding.creditHistoryBalance.setText(R.string.credit_backend_not_configured)
+        renderTransactions(emptyList(), loading = true)
+        lifecycleScope.launch {
+            repository.observeSessionKeys().collect { if (!isOwner()) { window.decorView.alpha = 0f; finish() } }
+        }
         if (!repository.isConfigured) {
             binding.creditHistoryBalance.setText(R.string.credit_backend_not_configured)
             renderTransactions(emptyList(), backendUnavailable = true)
         } else {
             lifecycleScope.launch {
-                repository.balance.collect { binding.creditHistoryBalance.text = getString(R.string.credit_store_balance_credits, it) }
+                repository.balance.collect { if (isOwner()) binding.creditHistoryBalance.text = getString(R.string.credit_store_balance_credits, it) else { window.decorView.alpha = 0f; finish() } }
             }
             lifecycleScope.launch {
                 val transactions = runCatching { repository.getTransactions() }.getOrNull()
-                if (transactions == null) renderTransactions(emptyList(), backendUnavailable = true)
+                if (!isOwner() || isFinishing || isDestroyed) return@launch
+                if (transactions == null) renderTransactions(emptyList(), failed = true)
                 else renderTransactions(transactions)
             }
         }
@@ -56,9 +66,18 @@ class CreditHistoryActivity : CreditFlowActivity() {
         collectEffects(::handleEffect)
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (!isOwner()) { window.decorView.alpha = 0f; finish() } else window.decorView.alpha = 1f
+    }
+
+    override fun onPause() { window.decorView.alpha = 0f; super.onPause() }
+
     private fun renderTransactions(
         transactions: List<com.example.lagallens.domain.model.credit.CreditTransaction>,
-        backendUnavailable: Boolean = false
+        backendUnavailable: Boolean = false,
+        loading: Boolean = false,
+        failed: Boolean = false
     ) {
         val scrollView = (0 until binding.creditHistoryRoot.childCount)
             .mapNotNull { binding.creditHistoryRoot.getChildAt(it) as? ScrollView }.firstOrNull() ?: return
@@ -68,6 +87,14 @@ class CreditHistoryActivity : CreditFlowActivity() {
         (header?.getChildAt(1) as? TextView)?.visibility = android.view.View.GONE
         while (content.childCount > 4) content.removeViewAt(4)
         val rows = transactions.sortedByDescending { it.createdAtEpochMillis }
+        if (loading) {
+            content.addView(row(getString(R.string.credit_history_loading)))
+            return
+        }
+        if (failed) {
+            content.addView(row(getString(R.string.credit_history_error)))
+            return
+        }
         if (backendUnavailable) {
             content.addView(row(getString(R.string.credit_history_backend_not_configured)))
             return
@@ -80,9 +107,14 @@ class CreditHistoryActivity : CreditFlowActivity() {
             val sign = if (transaction.creditDelta > 0) "+" else "−"
             val detail = if (transaction.amountVnd > 0) getString(
                 R.string.credit_history_purchase_detail, transaction.packageId.orEmpty(), transaction.amountVnd
-            ) else getString(R.string.credit_history_usage_detail, transaction.transactionId)
+            ) else getString(if (transaction.creditDelta < 0) R.string.credit_history_analysis_unlock else R.string.credit_history_credit_adjustment)
             val date = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(Date(transaction.createdAtEpochMillis))
-            content.addView(row(getString(R.string.credit_history_row, sign, kotlin.math.abs(transaction.creditDelta), transaction.status, "$date · $detail")))
+            content.addView(row(getString(R.string.credit_history_row, sign, kotlin.math.abs(transaction.creditDelta), getString(when (transaction.status.uppercase(Locale.ROOT)) {
+                "SUCCESS", "COMPLETED", "APPLIED" -> R.string.credit_history_completed
+                "PENDING" -> R.string.credit_history_pending
+                "FAILED" -> R.string.credit_history_failed
+                else -> R.string.credit_history_recorded
+            }), "$date · $detail")))
         }
     }
 
@@ -106,6 +138,8 @@ class CreditHistoryActivity : CreditFlowActivity() {
     }
 
     companion object {
+        private const val EXTRA_OWNER = "credit_history_owner"
         fun createIntent(context: Context): Intent = Intent(context, CreditHistoryActivity::class.java)
+            .putExtra(EXTRA_OWNER, (context.applicationContext as LegalLensApplication).creditRepository.activeSessionKey())
     }
 }

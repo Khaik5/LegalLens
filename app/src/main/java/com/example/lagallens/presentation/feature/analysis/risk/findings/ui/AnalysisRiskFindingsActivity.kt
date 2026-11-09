@@ -26,9 +26,12 @@ import com.example.lagallens.presentation.feature.analysis.risk.findings.viewmod
 import com.example.lagallens.presentation.feature.analysis.risk.detail.ui.AnalysisRiskDetailActivity
 import kotlinx.coroutines.launch
 
-class AnalysisRiskFindingsActivity : AppCompatActivity() {
+class AnalysisRiskFindingsActivity : com.example.lagallens.presentation.feature.analysis.AnalysisScopedActivity() {
+    override val requiresUnlock = false
+    override val observesUnlock = true
     private lateinit var binding: ActivityAnalysisRiskFindingsBinding
     private val viewModel by viewModels<AnalysisRiskFindingsViewModel>()
+    private val lockedAdapter = com.example.lagallens.presentation.feature.analysis.adapter.AnalysisLockedPreviewAdapter { openUnlockConfirmation(viewModel.uiState.value.documentName) }
     private val findingsAdapter = AnalysisRiskFindingsAdapter { findingId ->
         viewModel.onEvent(AnalysisRiskFindingsUiEvent.FindingClicked(findingId))
     }
@@ -54,7 +57,7 @@ class AnalysisRiskFindingsActivity : AppCompatActivity() {
         }
         binding.analysisRiskFindingsItems.apply {
             layoutManager = LinearLayoutManager(this@AnalysisRiskFindingsActivity)
-            adapter = findingsAdapter
+            adapter = androidx.recyclerview.widget.ConcatAdapter(findingsAdapter, lockedAdapter)
         }
         bindFilters()
         observeViewModel()
@@ -64,6 +67,13 @@ class AnalysisRiskFindingsActivity : AppCompatActivity() {
                 documentMetadata = intent.getStringExtra(EXTRA_DOCUMENT_METADATA).orEmpty()
             )
         )
+    }
+
+    override fun onAnalysisInvalidated() { viewModel.clearResult() }
+
+    override fun onAnalysisValidated(identity: com.example.lagallens.domain.model.analysis.AnalysisIdentity, detail: com.example.lagallens.domain.model.analysis.AnalysisDetail) {
+        viewModel.setResult(identity, detail, validatedUnlockStatus?.isUnlocked == true)
+        showContentStatus(viewModel.uiState.value.status)
     }
 
     private fun bindFilters() = with(binding) {
@@ -91,7 +101,9 @@ class AnalysisRiskFindingsActivity : AppCompatActivity() {
     }
 
     private fun render(state: AnalysisRiskFindingsUiState) = with(binding) {
+        analysisContentEmpty.visibility = if (state.status == com.example.lagallens.presentation.feature.analysis.SnapshotContentStatus.EMPTY) android.view.View.VISIBLE else android.view.View.GONE
         findingsAdapter.submitList(state.findings)
+        lockedAdapter.update(state.lockedCount, validatedUnlockStatus?.cost)
         setFilterAppearance(analysisRiskFindingsFilterAll, state.selectedFilter == AnalysisRiskFilter.ALL)
         setFilterAppearance(analysisRiskFindingsFilterHigh, state.selectedFilter == AnalysisRiskFilter.HIGH)
         setFilterAppearance(analysisRiskFindingsFilterMedium, state.selectedFilter == AnalysisRiskFilter.MEDIUM)

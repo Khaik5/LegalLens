@@ -6,5 +6,7 @@ data class AnalysisLegalReferencesUiState(
     val documentName: String = "",
     val documentMetadata: String = "",
     val query: String = "",
-    val references: List<AnalysisLegalReference> = emptyList()
+    val references: List<AnalysisLegalReference> = emptyList(),
+    val lockedCount: Int = 0,
+    val isDemo: Boolean = false
 )

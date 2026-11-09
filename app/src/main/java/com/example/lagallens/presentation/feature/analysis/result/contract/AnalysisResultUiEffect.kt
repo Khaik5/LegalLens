@@ -3,6 +3,8 @@ package com.example.lagallens.presentation.feature.analysis.result.contract
 sealed interface AnalysisResultUiEffect {
     data object NavigateBack : AnalysisResultUiEffect
 
+    data class NavigateToUnlock(val resultId: String, val cost: Int) : AnalysisResultUiEffect
+
     data class NavigateToSummary(
         val documentName: String,
         val documentMetadata: String

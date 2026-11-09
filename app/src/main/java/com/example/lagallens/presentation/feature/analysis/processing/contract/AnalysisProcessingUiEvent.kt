@@ -4,6 +4,9 @@ sealed interface AnalysisProcessingUiEvent {
     data class ScreenOpened(
         val documentName: String,
         val documentMetadata: String,
-        val shouldSimulateFailure: Boolean
+        val operationId: String,
+        val contractId: String,
+        val documentId: String,
+        val sessionKey: String
     ) : AnalysisProcessingUiEvent
 }

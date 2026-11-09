@@ -3,7 +3,9 @@ package com.example.lagallens.presentation.feature.analysis.result.contract
 sealed interface AnalysisResultUiEvent {
     data class ScreenOpened(
         val documentName: String,
-        val documentMetadata: String
+        val documentMetadata: String,
+        val resultId: String,
+        val sessionKey: String
     ) : AnalysisResultUiEvent
 
     data class ItemClicked(
@@ -11,4 +13,5 @@ sealed interface AnalysisResultUiEvent {
     ) : AnalysisResultUiEvent
 
     data object BackClicked : AnalysisResultUiEvent
+    data object EntitlementChanged : AnalysisResultUiEvent
 }

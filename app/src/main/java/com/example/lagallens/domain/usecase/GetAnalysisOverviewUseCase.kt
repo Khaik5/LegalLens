@@ -6,6 +6,6 @@ import com.example.lagallens.domain.repository.AnalysisRepository
 class GetAnalysisOverviewUseCase(
     private val repository: AnalysisRepository
 ) {
-    suspend operator fun invoke(documentName: String, documentMetadata: String): AnalysisOverview =
-        repository.getOverview(documentName, documentMetadata)
+    suspend operator fun invoke(identity: com.example.lagallens.domain.model.analysis.AnalysisIdentity): AnalysisOverview =
+        repository.getOverview(identity)
 }

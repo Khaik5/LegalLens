@@ -30,9 +30,13 @@ class AnalysisStartActivity : AppCompatActivity() {
     private lateinit var binding: ActivityAnalysisStartBinding
     private val viewModel by viewModels<AnalysisStartViewModel>()
     private val benefitAdapter = AnalysisStartBenefitAdapter()
+    private var ownerSession: String? = null
+    private var navigated = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        ownerSession = savedInstanceState?.getString("ownerSession")
+            ?: (application as com.example.lagallens.LegalLensApplication).currentSessionKey()
         WindowCompat.setDecorFitsSystemWindows(window, false)
         window.statusBarColor = Color.TRANSPARENT
         window.navigationBarColor = Color.TRANSPARENT
@@ -53,11 +57,9 @@ class AnalysisStartActivity : AppCompatActivity() {
         viewModel.onEvent(
             AnalysisStartUiEvent.ScreenOpened(
                 documentName = intent.getStringExtra(EXTRA_DOCUMENT_NAME)
-                    .orEmpty()
-                    .ifBlank { getString(R.string.analysis_start_document_name) },
+                    .orEmpty(),
                 documentMetadata = intent.getStringExtra(EXTRA_DOCUMENT_METADATA)
                     .orEmpty()
-                    .ifBlank { getString(R.string.analysis_start_document_metadata) }
             )
         )
     }
@@ -101,28 +103,49 @@ class AnalysisStartActivity : AppCompatActivity() {
         when (effect) {
             AnalysisStartUiEffect.NavigateBack -> finish()
             is AnalysisStartUiEffect.NavigateToAnalysisProcessing -> {
+                val session = ownerSession
+                if (navigated) return
+                if (session.isNullOrBlank() || session != (application as com.example.lagallens.LegalLensApplication).currentSessionKey()) {
+                    android.widget.Toast.makeText(this, R.string.auth_backend_not_configured, android.widget.Toast.LENGTH_LONG).show()
+                    return
+                }
+                navigated = true
                 startActivity(
                     AnalysisProcessingActivity.createIntent(
                         context = this,
                         documentName = effect.documentName,
                         documentMetadata = effect.documentMetadata
-                    ).putExtra("analysis_return_home", intent.getBooleanExtra("analysis_return_home", false))
+                    ).putExtra(AnalysisProcessingActivity.EXTRA_OPERATION_ID, java.util.UUID.randomUUID().toString())
+                        .putExtra(AnalysisProcessingActivity.EXTRA_SESSION_KEY, session)
+                        .putExtra(EXTRA_CONTRACT_ID, intent.getStringExtra(EXTRA_CONTRACT_ID))
+                        .putExtra(EXTRA_DOCUMENT_ID, intent.getStringExtra(EXTRA_DOCUMENT_ID)).putExtra("analysis_return_home", intent.getBooleanExtra("analysis_return_home", false))
                 )
                 finish()
             }
         }
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putString("ownerSession", ownerSession)
+        super.onSaveInstanceState(outState)
+    }
+
     companion object {
+        const val EXTRA_CONTRACT_ID = "analysis_contract_id"
+        const val EXTRA_DOCUMENT_ID = "analysis_document_id"
         private const val EXTRA_DOCUMENT_NAME = "analysis_start_document_name"
         private const val EXTRA_DOCUMENT_METADATA = "analysis_start_document_metadata"
 
         fun createIntent(
             context: Context,
             documentName: String,
-            documentMetadata: String = context.getString(R.string.analysis_start_document_metadata)
+            documentMetadata: String = "",
+            contractId: String = "",
+            documentId: String = ""
         ): Intent = Intent(context, AnalysisStartActivity::class.java)
             .putExtra(EXTRA_DOCUMENT_NAME, documentName)
             .putExtra(EXTRA_DOCUMENT_METADATA, documentMetadata)
+            .putExtra(EXTRA_CONTRACT_ID, contractId)
+            .putExtra(EXTRA_DOCUMENT_ID, documentId)
     }
 }

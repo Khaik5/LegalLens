@@ -12,7 +12,7 @@ class FakeCreditRepository(context: Context) : CreditRepository {
     private val ledger = CreditDemoLedgerStore.also { it.initialize(context.applicationContext) }
     override val balance: StateFlow<Int> = ledger.balance
     override suspend fun getTransactions(): List<CreditTransaction> = ledger.getTransactions()
-    override suspend fun addPurchasedCredits(paymentId: String, packageId: String, amountVnd: Long, credits: Int): CreditReceipt =
+    suspend fun addPurchasedCredits(paymentId: String, packageId: String, amountVnd: Long, credits: Int): CreditReceipt =
         ledger.addPurchasedCredits(paymentId, packageId, amountVnd, credits)
     override suspend fun spend(transactionId: String, credits: Int): CreditReceipt = ledger.spend(transactionId, credits)
 }

@@ -25,9 +25,12 @@ import com.example.lagallens.presentation.feature.analysis.keyfacts.contract.Ana
 import com.example.lagallens.presentation.feature.analysis.keyfacts.viewmodel.AnalysisKeyFactsViewModel
 import kotlinx.coroutines.launch
 
-class AnalysisKeyFactsActivity : AppCompatActivity() {
+class AnalysisKeyFactsActivity : com.example.lagallens.presentation.feature.analysis.AnalysisScopedActivity(), com.example.lagallens.presentation.feature.analysis.keyfacts.contract.AnalysisClauseSourceOwner {
+    override val requiresUnlock = false
+    override val observesUnlock = true
     private lateinit var binding: ActivityAnalysisKeyFactsBinding
     private val viewModel by viewModels<AnalysisKeyFactsViewModel>()
+    private val lockedAdapter = com.example.lagallens.presentation.feature.analysis.adapter.AnalysisLockedPreviewAdapter { openUnlockConfirmation(viewModel.uiState.value.documentName) }
     private val keyFactsAdapter = AnalysisKeyFactsAdapter { source ->
         viewModel.onEvent(AnalysisKeyFactsUiEvent.SourceClicked(source))
     }
@@ -53,20 +56,26 @@ class AnalysisKeyFactsActivity : AppCompatActivity() {
         }
         binding.analysisKeyFactsItems.apply {
             layoutManager = LinearLayoutManager(this@AnalysisKeyFactsActivity)
-            adapter = keyFactsAdapter
+            adapter = androidx.recyclerview.widget.ConcatAdapter(keyFactsAdapter, lockedAdapter)
             isNestedScrollingEnabled = false
         }
         observeViewModel()
         viewModel.onEvent(
             AnalysisKeyFactsUiEvent.ScreenOpened(
                 documentName = intent.getStringExtra(EXTRA_DOCUMENT_NAME)
-                    .orEmpty()
-                    .ifBlank { getString(R.string.analysis_start_document_name) },
+                    .orEmpty(),
                 documentMetadata = intent.getStringExtra(EXTRA_DOCUMENT_METADATA)
                     .orEmpty()
-                    .ifBlank { getString(R.string.analysis_start_document_metadata) }
             )
         )
+    }
+
+    override fun onAnalysisInvalidated() { viewModel.clearResult() }
+
+    override fun onAnalysisValidated(identity: com.example.lagallens.domain.model.analysis.AnalysisIdentity, detail: com.example.lagallens.domain.model.analysis.AnalysisDetail) {
+        viewModel.setResult(identity, detail, validatedUnlockStatus?.isUnlocked == true)
+        showContentStatus(viewModel.uiState.value.status)
+        render(viewModel.uiState.value)
     }
 
     private fun observeViewModel() {
@@ -79,9 +88,11 @@ class AnalysisKeyFactsActivity : AppCompatActivity() {
     }
 
     private fun render(state: AnalysisKeyFactsUiState) = with(binding) {
+        analysisContentEmpty.visibility = if (state.status == com.example.lagallens.presentation.feature.analysis.SnapshotContentStatus.EMPTY) android.view.View.VISIBLE else android.view.View.GONE
         analysisKeyFactsDocumentName.text = state.documentName
-        analysisKeyFactsDocumentMetadata.text = state.documentMetadata
+        analysisKeyFactsDocumentMetadata.text = getString(R.string.analysis_snapshot_demo_metadata, state.documentMetadata)
         keyFactsAdapter.submitList(state.facts)
+        lockedAdapter.update(state.lockedCount, validatedUnlockStatus?.cost)
     }
 
     private fun handleEffect(effect: AnalysisKeyFactsUiEffect) {
@@ -99,6 +110,9 @@ class AnalysisKeyFactsActivity : AppCompatActivity() {
             )
         }
     }
+
+    override fun isVerifiedClause(source: AnalysisClauseSource): Boolean =
+        hasValidatedAnalysis() && viewModel.uiState.value.facts.any { fact -> fact.source == source }
 
     override fun onDestroy() {
         binding.analysisKeyFactsItems.adapter = null

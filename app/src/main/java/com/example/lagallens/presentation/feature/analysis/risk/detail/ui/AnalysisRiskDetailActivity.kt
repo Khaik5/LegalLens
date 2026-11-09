@@ -24,7 +24,9 @@ import com.example.lagallens.presentation.feature.analysis.risk.detail.contract.
 import com.example.lagallens.presentation.feature.analysis.risk.detail.viewmodel.AnalysisRiskDetailViewModel
 import kotlinx.coroutines.launch
 
-class AnalysisRiskDetailActivity : AppCompatActivity() {
+class AnalysisRiskDetailActivity : com.example.lagallens.presentation.feature.analysis.AnalysisScopedActivity() {
+    override val requiresUnlock = false
+    override val observesUnlock = true
     private lateinit var binding: ActivityAnalysisRiskDetailBinding
     private val viewModel by viewModels<AnalysisRiskDetailViewModel>()
 
@@ -52,7 +54,20 @@ class AnalysisRiskDetailActivity : AppCompatActivity() {
             viewModel.onEvent(AnalysisRiskDetailUiEvent.LegalReferenceClicked)
         }
         observeViewModel()
-        viewModel.loadFinding(intent.getStringExtra(EXTRA_FINDING_ID) ?: "penalty-cap")
+
+    }
+
+    override fun onAnalysisInvalidated() { viewModel.clearResult() }
+
+    override fun onAnalysisValidated(identity: com.example.lagallens.domain.model.analysis.AnalysisIdentity, detail: com.example.lagallens.domain.model.analysis.AnalysisDetail) {
+        val id = intent.getStringExtra(EXTRA_FINDING_ID)
+        val count = com.example.lagallens.domain.model.analysis.AnalysisPreview.visibleCount(detail.findings.size, validatedUnlockStatus?.isUnlocked == true)
+        if (id == null || detail.findings.take(count).none { it.id == id } || !viewModel.loadFinding(id, identity, detail)) {
+            android.widget.Toast.makeText(this, R.string.analysis_locked_item_unavailable, android.widget.Toast.LENGTH_LONG).show()
+            finish()
+            return
+        }
+        render(viewModel.uiState.value)
     }
 
     private fun observeViewModel() {
@@ -68,24 +83,26 @@ class AnalysisRiskDetailActivity : AppCompatActivity() {
         analysisRiskDetailSeverity.setText(state.severityRes)
         analysisRiskDetailSeverity.setBackgroundResource(state.severityBackgroundRes)
         analysisRiskDetailSeverity.setTextColor(getColor(state.severityColorRes))
-        analysisRiskDetailTitle.setText(state.titleRes)
-        analysisRiskDetailAttentionReason.setText(state.attentionReasonRes)
-        analysisRiskDetailClauseExcerpt.setText(state.clauseExcerptRes)
-        analysisRiskDetailClauseReference.setText(state.clauseReferenceRes)
+        analysisRiskDetailTitle.text = state.title
+        analysisRiskDetailTitle.text = getString(R.string.analysis_snapshot_demo_metadata, analysisRiskDetailTitle.text)
+        analysisRiskDetailAttentionReason.text = state.attentionReason
+        analysisRiskDetailClauseExcerpt.text = state.clauseExcerpt
+        analysisRiskDetailClauseReference.text = state.clauseReference
         analysisRiskDetailClauseHeading.setText(if (state.isDetailedExample) R.string.analysis_risk_detail_clause_heading else R.string.analysis_risk_finding_summary)
-        analysisRiskDetailLegalHeading.isVisible = state.isDetailedExample
-        analysisRiskDetailLegalExplanation.isVisible = state.isDetailedExample
-        analysisRiskDetailLegalReference.isVisible = state.isDetailedExample
-        analysisRiskDetailRecommendationCard.isVisible = state.isDetailedExample
-        analysisRiskDetailLegalExplanation.setText(state.legalExplanationRes)
+        analysisRiskDetailLegalHeading.isVisible = state.legalExplanation != null
+        analysisRiskDetailLegalExplanation.isVisible = state.legalExplanation != null
+        analysisRiskDetailLegalReference.isVisible = false
+        analysisRiskDetailRecommendationCard.isVisible = state.recommendation != null
+        state.legalExplanation?.let { analysisRiskDetailLegalExplanation.text = it }
         analysisRiskDetailLegalReferenceTitle.setText(state.legalReferenceTitleRes)
         analysisRiskDetailLegalReferenceSubtitle.setText(state.legalReferenceSubtitleRes)
-        analysisRiskDetailRecommendation.setText(state.recommendationRes)
+        state.recommendation?.let { analysisRiskDetailRecommendation.text = it }
     }
 
     private fun handleEffect(effect: AnalysisRiskDetailUiEffect) {
         when (effect) {
             AnalysisRiskDetailUiEffect.NavigateBack -> finish()
+            AnalysisRiskDetailUiEffect.CitationUnavailable -> android.widget.Toast.makeText(this, R.string.analysis_citation_unavailable, android.widget.Toast.LENGTH_LONG).show()
             AnalysisRiskDetailUiEffect.NavigateToCitation -> startActivity(
                 AnalysisRiskCitationActivity.createIntent(this)
             )
@@ -94,7 +111,7 @@ class AnalysisRiskDetailActivity : AppCompatActivity() {
 
     companion object {
         private const val EXTRA_FINDING_ID = "analysis_risk_detail_finding_id"
-        fun createIntent(context: Context, findingId: String = "penalty-cap"): Intent =
+        fun createIntent(context: Context, findingId: String = ""): Intent =
             Intent(context, AnalysisRiskDetailActivity::class.java).putExtra(EXTRA_FINDING_ID, findingId)
     }
 }

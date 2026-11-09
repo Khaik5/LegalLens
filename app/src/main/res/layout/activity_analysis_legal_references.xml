@@ -54,6 +54,20 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <TextView
+        android:id="@+id/analysisLegalReferencesDemo"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dp_16"
+        android:layout_marginEnd="@dimen/dp_16"
+        android:layout_marginTop="@dimen/dp_12"
+        android:text="@string/analysis_legal_demo_notice"
+        android:textColor="@color/legal_lens_secondary_text"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/analysisLegalReferencesHeader" />
+
+    <TextView
         android:id="@+id/analysisLegalReferencesSectionTitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -69,7 +83,7 @@
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/analysisLegalReferencesHeader" />
+        app:layout_constraintTop_toBottomOf="@id/analysisLegalReferencesDemo" />
 
     <EditText
         android:id="@+id/analysisLegalReferencesSearch"
@@ -105,8 +119,51 @@
         android:layout_marginEnd="@dimen/dp_16"
         android:clipToPadding="false"
         android:paddingBottom="@dimen/dp_16"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/analysisLegalReferencesLocked"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/analysisLegalReferencesSearch" />
+    <LinearLayout
+        android:id="@+id/analysisLegalReferencesLocked"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/dp_16"
+        android:background="@drawable/bg_analysis_legal_reference_card"
+        android:orientation="vertical"
+        android:padding="@dimen/dp_16"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:alpha="0.35"
+            android:importantForAccessibility="no"
+            android:text="••••••••••••••••••••••••••••••••••••"
+            android:textColor="@color/legal_lens_secondary_text" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:alpha="0.20"
+            android:importantForAccessibility="no"
+            android:text="••••••••••••••••••••••••••••••••••••"
+            android:textColor="@color/legal_lens_secondary_text" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/analysis_legal_locked_notice"
+            android:textColor="@color/legal_lens_secondary_text" />
+        <TextView
+            android:id="@+id/analysisLegalReferencesUnlock"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_50"
+            android:layout_marginTop="@dimen/dp_8"
+            android:background="@drawable/bg_chatbot_primary_action"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:textStyle="bold" />
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
