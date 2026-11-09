@@ -3,12 +3,14 @@ package com.example.lagallens.presentation.feature.camera.permission.ui
 import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -26,7 +28,7 @@ import com.example.lagallens.presentation.feature.camera.permission.contract.Cam
 import com.example.lagallens.presentation.feature.camera.permission.viewmodel.CameraPermissionViewModel
 import kotlinx.coroutines.launch
 
-class CameraPermissionActivity : AppCompatActivity() {
+class CameraPermissionActivity : com.example.lagallens.presentation.feature.ocr.OcrSessionActivity() {
     private val binding by lazy { ActivityCameraPermissionBinding.inflate(layoutInflater) }
     private val viewModel by viewModels<CameraPermissionViewModel>()
     private val permissionLauncher = registerForActivityResult(
@@ -37,6 +39,13 @@ class CameraPermissionActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (isFinishing || !isOcrSessionValid()) { finish(); return }
+        // The explanation is only needed before the first grant.
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+            startActivity(CameraCaptureActivity.createIntent(this))
+            finish()
+            return
+        }
         WindowCompat.setDecorFitsSystemWindows(window, false)
         window.statusBarColor = Color.TRANSPARENT
         window.navigationBarColor = Color.TRANSPARENT
@@ -86,6 +95,7 @@ class CameraPermissionActivity : AppCompatActivity() {
     }
 
     private fun handleEffect(effect: CameraPermissionUiEffect) {
+        if (!isOcrSessionValid()) return
         when (effect) {
             CameraPermissionUiEffect.RequestCameraPermission -> permissionLauncher.launch(Manifest.permission.CAMERA)
             CameraPermissionUiEffect.NavigateBack -> finish()
@@ -100,6 +110,6 @@ class CameraPermissionActivity : AppCompatActivity() {
     }
 
     companion object {
-        fun createIntent(context: Context): Intent = Intent(context, CameraPermissionActivity::class.java)
+        fun createIntent(context: Context): Intent = com.example.lagallens.presentation.feature.ocr.OcrSession.stamp(context, Intent(context, CameraPermissionActivity::class.java))
     }
 }

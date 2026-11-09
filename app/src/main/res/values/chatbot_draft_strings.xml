@@ -143,7 +143,7 @@ Các điều khoản còn lại và thông tin trong [ngoặc vuông] không đ�
     <string name="chatbot_draft_ai_review_before">Thời hạn hợp đồng lao động minh họa là 24 tháng kể từ ngày bắt đầu làm việc do hai bên thỏa thuận.</string>
     <string name="chatbot_draft_ai_review_after_label">SAU · ĐỀ XUẤT AI, CHƯA ÁP DỤNG</string>
     <string name="chatbot_draft_ai_review_after">Thời hạn hợp đồng lao động minh họa là 30 tháng kể từ ngày bắt đầu làm việc do hai bên thỏa thuận.</string>
-    <string name="chatbot_draft_ai_review_reason">Lý do: thực hiện yêu cầu tăng thời hạn thêm 6 tháng. Mốc bàn giao và quy định gia hạn giữ nguyên.</string>
+    <string name="chatbot_draft_ai_review_reason">Lý do: thực hiện yêu cầu tăng thời hạn thêm 6 tháng. Ngày bắt đầu làm việc và quy định gia hạn giữ nguyên.</string>
     <string name="chatbot_draft_ai_review_accept">Chấp nhận</string>
     <string name="chatbot_draft_ai_review_accept_selected">✓ Chấp nhận</string>
     <string name="chatbot_draft_ai_review_reject">Từ chối</string>

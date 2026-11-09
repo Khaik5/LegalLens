@@ -22,6 +22,8 @@ data class SaveDraftCopyUiState(
 )
 
 class SaveDraftCopyViewModel(application: Application) : AndroidViewModel(application) {
+    private val app = application as LegalLensApplication
+    private val ownerSession = app.currentSessionKey()
     private val state = MutableStateFlow(SaveDraftCopyUiState())
     val uiState = state.asStateFlow()
     private var version: String? = null
@@ -29,7 +31,22 @@ class SaveDraftCopyViewModel(application: Application) : AndroidViewModel(applic
     private var contractId: String? = null
     private var sourceDraftId: String? = null
 
+    init {
+        viewModelScope.launch {
+            app.observeSessionKeys().collect { session ->
+                if (session != ownerSession) {
+                    version = null
+                    content = ""
+                    contractId = null
+                    sourceDraftId = null
+                    state.value = SaveDraftCopyUiState()
+                }
+            }
+        }
+    }
+
     fun setDraft(value: String, savedContent: String, linkedContractId: String?, parentDraftId: String?) {
+        if (ownerSession != app.currentSessionKey()) return
         if (version == value && content == savedContent && contractId == linkedContractId && sourceDraftId == parentDraftId) return
         version = value
         content = savedContent
@@ -38,22 +55,30 @@ class SaveDraftCopyViewModel(application: Application) : AndroidViewModel(applic
         state.update { it.copy(name = getApplication<Application>().getString(R.string.chatbot_draft_document_name, value)) }
     }
 
-    fun setName(value: String) = state.update { it.copy(name = value) }
-    fun setAcknowledged(value: Boolean) = state.update { it.copy(acknowledged = value) }
+    fun setName(value: String) { if (ownerSession == app.currentSessionKey()) state.update { it.copy(name = value) } }
+    fun setAcknowledged(value: Boolean) { if (ownerSession == app.currentSessionKey()) state.update { it.copy(acknowledged = value) } }
 
     fun save() {
+        if (ownerSession != app.currentSessionKey()) return
         if (!state.value.acknowledged || state.value.name.isBlank() || state.value.status == SaveDraftCopyStatus.LOADING) return
+        val repository = try { app.draftRepository.forSession(ownerSession) } catch (_: Exception) { return }
+        val draftVersion = version
+        val draftName = state.value.name
+        val draftContent = content
+        val linkedContract = contractId
+        val parentDraft = sourceDraftId
         state.update { it.copy(status = SaveDraftCopyStatus.LOADING) }
         viewModelScope.launch {
             val saved = try {
                 withContext(Dispatchers.IO) {
-                    val stage = DraftStage.fromLegacyKey(version.orEmpty()) ?: DraftStage.ORIGINAL
-                    getApplication<LegalLensApplication>().draftRepository.saveDraft(
+                    val stage = DraftStage.fromLegacyKey(draftVersion.orEmpty()) ?: DraftStage.ORIGINAL
+                    repository.saveDraft(
                         stage = stage,
-                        title = state.value.name,
-                        content = content,
-                        contractId = contractId,
-                        sourceDraftId = sourceDraftId
+                        title = draftName,
+                        content = draftContent,
+                        contractId = linkedContract,
+                        sourceDraftId = parentDraft,
+                        isSaved = true
                     )
                 }
                 true
@@ -62,7 +87,7 @@ class SaveDraftCopyViewModel(application: Application) : AndroidViewModel(applic
             } catch (_: Exception) {
                 false
             }
-            state.update { it.copy(status = if (saved) SaveDraftCopyStatus.SUCCESS else SaveDraftCopyStatus.ERROR) }
+            if (ownerSession == app.currentSessionKey()) state.update { it.copy(status = if (saved) SaveDraftCopyStatus.SUCCESS else SaveDraftCopyStatus.ERROR) }
         }
     }
 

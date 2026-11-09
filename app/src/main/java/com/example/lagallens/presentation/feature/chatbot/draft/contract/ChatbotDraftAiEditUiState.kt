@@ -6,6 +6,10 @@ data class ChatbotDraftAiEditUiState(
     val status: ChatbotDraftAiEditStatus = ChatbotDraftAiEditStatus.LOADING,
     val scope: String = SELECTED_CLAUSE_SCOPE,
     val request: String = "",
+    val draftId: String? = null,
+    val contractId: String? = null,
+    val conversationId: String? = null,
+    val proposal: com.example.lagallens.domain.repository.DraftEditProposal? = null,
     val isInitialized: Boolean = false
 ) {
     companion object {

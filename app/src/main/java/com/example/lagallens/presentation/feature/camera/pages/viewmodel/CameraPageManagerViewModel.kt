@@ -6,9 +6,9 @@ import com.example.lagallens.domain.model.camera.ScanPage
 import com.example.lagallens.presentation.feature.camera.pages.contract.CameraPageManagerUiEffect
 import com.example.lagallens.presentation.feature.camera.pages.contract.CameraPageManagerUiEvent
 import com.example.lagallens.presentation.feature.camera.pages.contract.CameraPageManagerUiState
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -17,10 +17,15 @@ class CameraPageManagerViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(CameraPageManagerUiState())
     val uiState = _uiState.asStateFlow()
 
-    private val _uiEffect = MutableSharedFlow<CameraPageManagerUiEffect>()
-    val uiEffect = _uiEffect.asSharedFlow()
+    private val _uiEffect = Channel<CameraPageManagerUiEffect>(Channel.BUFFERED)
+    val uiEffect = _uiEffect.receiveAsFlow()
 
+    private var isInitialized = false
+
+    /** The screen calls this on every recreation; edits made since the first call must survive. */
     fun setPages(pages: List<ScanPage>) {
+        if (isInitialized) return
+        isInitialized = true
         _uiState.value = CameraPageManagerUiState(pages)
     }
 
@@ -52,6 +57,6 @@ class CameraPageManagerViewModel : ViewModel() {
     }
 
     private fun emitEffect(effect: CameraPageManagerUiEffect) {
-        viewModelScope.launch { _uiEffect.emit(effect) }
+        viewModelScope.launch { _uiEffect.send(effect) }
     }
 }

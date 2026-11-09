@@ -27,12 +27,16 @@ import com.example.lagallens.presentation.feature.analysis.risk.citation.contrac
 import com.example.lagallens.presentation.feature.analysis.risk.citation.viewmodel.AnalysisRiskCitationViewModel
 import kotlinx.coroutines.launch
 
-class AnalysisRiskCitationActivity : AppCompatActivity() {
+class AnalysisRiskCitationActivity : com.example.lagallens.presentation.feature.analysis.AnalysisScopedActivity() {
     private lateinit var binding: ActivityAnalysisRiskCitationBinding
     private val viewModel by viewModels<AnalysisRiskCitationViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // The fixed commercial-contract sample is not a verified employment-contract citation.
+        android.widget.Toast.makeText(this, R.string.analysis_citation_unavailable, android.widget.Toast.LENGTH_LONG).show()
+        finish()
+        return
         WindowCompat.setDecorFitsSystemWindows(window, false)
         window.statusBarColor = Color.TRANSPARENT
         window.navigationBarColor = Color.TRANSPARENT

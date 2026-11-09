@@ -18,20 +18,21 @@ class SessionScopedDraftRepositoryTest {
         override suspend fun getDrafts(): List<Draft> { wait?.await(); return data.toList() }
         override suspend fun getDraft(draftId: String) = data.find { it.draftId == draftId }
         override suspend fun getLatestDraft(stage: DraftStage) = data.lastOrNull { it.stage == stage }
-        override suspend fun saveDraft(stage: DraftStage, title: String, content: String, contractId: String?, sourceDraftId: String?): Draft {
+        override suspend fun saveDraft(stage: DraftStage, title: String, content: String, contractId: String?, sourceDraftId: String?, conversationId: String?, isSaved: Boolean, isTitleGenerated: Boolean): Draft {
             val source = data.find { it.draftId == sourceDraftId }
             val draft = Draft("id-${data.size}", contractId, title, content, stage, data.size + 1, 1L, 1L, source?.draftId, source?.lineageId ?: "lineage")
             data += draft
             return draft
         }
-        override suspend fun createCopy(sourceDraftId: String, title: String, stage: DraftStage) = getDraft(sourceDraftId)?.let { saveDraft(stage, title, it.content, it.contractId, sourceDraftId) }
+        override suspend fun createCopy(sourceDraftId: String, title: String, stage: DraftStage, isTitleGenerated: Boolean) = getDraft(sourceDraftId)?.let { saveDraft(stage, title, it.content, it.contractId, sourceDraftId) }
         override suspend fun updateDraft(draftId: String, title: String, content: String) = getDraft(draftId)?.let { saveDraft(it.stage, title, content, it.contractId, draftId) }
         override suspend fun deleteDraft(draftId: String) = data.removeAll { it.draftId == draftId }
     }
 
     @Test fun accountsDoNotShareDraftsAndLogoutKeepsThem() = runTest {
         var session: DemoSessionScope? = DemoSessionScope("a", "1")
-        val repo = SessionScopedDraftRepository({ session }) { MemoryDrafts() }
+        val accounts = mutableMapOf<String, MemoryDrafts>()
+        val repo = SessionScopedDraftRepository({ session }) { scope -> accounts.getOrPut(scope.userId) { MemoryDrafts() } }
         val first = repo.saveDraft(DraftStage.ORIGINAL, "A", "A private", null, null)
         val next = repo.saveDraft(DraftStage.MANUAL_EDIT, "A2", "edited", null, first.draftId)
         assertEquals(first.lineageId, next.lineageId)
@@ -43,6 +44,21 @@ class SessionScopedDraftRepositoryTest {
         try { repo.getDrafts(); fail("missing session") } catch (_: IllegalStateException) { }
         session = DemoSessionScope("a", "3")
         assertEquals(listOf(first, next), repo.getDrafts())
+    }
+
+    @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+    @Test fun boundWriteCannotStartAfterLogoutOrSameAccountNewGeneration() = runTest {
+        var session: DemoSessionScope? = DemoSessionScope("a", "1")
+        val accounts = mutableMapOf<String, MemoryDrafts>()
+        val repo = SessionScopedDraftRepository({ session }) { scope -> accounts.getOrPut(scope.userId) { MemoryDrafts() } }
+        val bound = repo.forSession("a:1")
+        session = null
+        assertTrue(runCatching { bound.saveDraft(DraftStage.ORIGINAL, "A", "private", null, null) }.isFailure)
+        session = DemoSessionScope("b", "2")
+        assertTrue(runCatching { bound.saveDraft(DraftStage.ORIGINAL, "A", "private", null, null) }.isFailure)
+        session = DemoSessionScope("a", "3")
+        assertTrue(runCatching { bound.saveDraft(DraftStage.ORIGINAL, "A", "private", null, null) }.isFailure)
+        assertTrue(accounts.values.all { it.data.isEmpty() })
     }
 
     @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)

@@ -84,6 +84,7 @@
             </LinearLayout>
 
             <TextView
+                android:id="@+id/ocr_review_warning_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/ocr_review_side_padding"

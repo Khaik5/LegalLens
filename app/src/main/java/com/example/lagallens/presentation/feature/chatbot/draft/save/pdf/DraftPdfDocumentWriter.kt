@@ -17,11 +17,13 @@ internal object DraftPdfDocumentWriter {
     private const val PAGE_HEIGHT = 842
     private const val PAGE_MARGIN = 48f
 
-    fun generate(context: Context, contractName: String, content: String): File {
+    fun generate(context: Context, contractName: String, content: String, guard: (() -> Unit) -> Unit = { it() }): File {
         require(content.isNotBlank())
-        val directory = File(context.cacheDir, "draft-pdfs")
+        val fixture = (context.applicationContext as? com.example.lagallens.LegalLensApplication)?.sandboxDraftPdfDirectory
+        val directory = File(context.cacheDir, if (fixture == null) "draft-pdfs" else "draft-pdfs/$fixture")
         check(directory.isDirectory || directory.mkdirs())
-        val output = File.createTempFile("draft-d2-", ".pdf", directory)
+        val output = File.createTempFile("draft-d2-", ".pending", directory)
+        val published = File(directory, "draft-${java.util.UUID.randomUUID()}.pdf")
         try {
             val document = PdfDocument()
             try {
@@ -38,17 +40,19 @@ internal object DraftPdfDocumentWriter {
             } finally {
                 document.close()
             }
-            return output
+            guard { check(output.renameTo(published)) { "Unable to publish PDF" } }
+            return published
         } catch (exception: Exception) {
             output.delete()
             throw exception
         }
     }
 
-    fun copyToUri(context: Context, source: File, destination: Uri) {
+    fun copyToUri(context: Context, source: File, destination: Uri, guard: (() -> Unit) -> Unit = { it() }) {
         check(source.isFile && source.length() > 0L)
-        val output = context.contentResolver.openOutputStream(destination, "w") ?: error("Unable to open the selected PDF destination")
-        output.use { destinationStream -> source.inputStream().use { input -> input.copyTo(destinationStream) } }
+        var output: java.io.OutputStream? = null
+        guard { output = context.contentResolver.openOutputStream(destination, "w") ?: error("Unable to open the selected PDF destination") }
+        checkNotNull(output).use { destinationStream -> source.inputStream().use { input -> copyWithSessionGuard(input, destinationStream, guard) } }
     }
 
     private class PdfFlow(private val context: Context, private val document: PdfDocument) {

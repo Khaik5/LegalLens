@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="register_email_taken">This email is already registered</string>
+    <string name="reset_password_new_title">Set a new password</string>
+    <string name="reset_password_submit">Save new password</string>
+    <string name="reset_password_success">Password changed. Please sign in again.</string>
+    <string name="reset_password_failed">The password could not be reset for this email.</string>
+    <string name="profile_logout_failed">Could not sign out. Please try again.</string>
+    <string name="credit_hub_unlock_hint">Open an analysis result to unlock it with Credits.</string>
+    <string name="contract_page_count_format">%1$d pages</string>
+</resources>

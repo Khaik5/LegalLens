@@ -28,7 +28,7 @@ import kotlinx.coroutines.launch
 
 class CreditStoreActivity : AppCompatActivity() {
     private val binding by lazy { ActivityCreditStoreBinding.inflate(layoutInflater) }
-    private val viewModel by viewModels<CreditStoreViewModel> { CreditStoreViewModel.Factory((application as LegalLensApplication).creditRepository) }
+    private val viewModel by viewModels<CreditStoreViewModel> { CreditStoreViewModel.Factory((application as LegalLensApplication).creditRepository, (application as LegalLensApplication).paymentRepository) }
     private val creditPackageAdapter = CreditPackageAdapter { creditPackage ->
         viewModel.onEvent(CreditStoreUiEvent.PackageClicked(creditPackage.id))
     }
@@ -75,19 +75,20 @@ class CreditStoreActivity : AppCompatActivity() {
 
     private fun render(state: CreditStoreUiState) = with(binding) {
         creditStoreBalance.text = if (state.isBackendUnavailable) getString(R.string.credit_backend_not_configured)
-        else getString(R.string.credit_store_balance_credits, state.balanceCredits)
-        creditPackageAdapter.submitList(state.packages)
+        else getString(R.string.credit_store_balance_credits, if (viewModel.isOwnerSession()) state.balanceCredits else 0)
+        creditPackageAdapter.submitList(if (viewModel.isOwnerSession()) state.packages else CreditStoreUiState(balanceCredits = 0).packages)
     }
 
     private fun handleEffect(effect: CreditStoreUiEffect) {
+        if (!viewModel.isOwnerSession()) return
         when (effect) {
             CreditStoreUiEffect.ShowBackendUnavailable -> Toast.makeText(this, R.string.credit_backend_not_configured, Toast.LENGTH_SHORT).show()
             CreditStoreUiEffect.NavigateBack -> finish()
             is CreditStoreUiEffect.NavigateToPurchaseConfirmation -> {
-                startActivity(PurchaseConfirmationActivity.createIntent(this, effect.packageId, effect.balanceCredits))
+                startActivity(PurchaseConfirmationActivity.createIntent(this, effect.creditPackage, effect.balanceCredits, intent.getBooleanExtra(EXTRA_FROM_ANALYSIS, false)).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP))
             }
             CreditStoreUiEffect.NavigateToCreditHistory -> {
-                startActivity(CreditHistoryActivity.createIntent(this))
+                startActivity(CreditHistoryActivity.createIntent(this).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP))
             }
         }
     }
@@ -98,6 +99,7 @@ class CreditStoreActivity : AppCompatActivity() {
     }
 
     companion object {
-        fun createIntent(context: Context): Intent = Intent(context, CreditStoreActivity::class.java)
+        private const val EXTRA_FROM_ANALYSIS = "credit_store_from_analysis"
+        fun createIntent(context: Context, fromAnalysis: Boolean = false): Intent = Intent(context, CreditStoreActivity::class.java).putExtra(EXTRA_FROM_ANALYSIS, fromAnalysis)
     }
 }

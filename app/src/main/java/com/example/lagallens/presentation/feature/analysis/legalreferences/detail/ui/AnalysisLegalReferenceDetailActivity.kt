@@ -24,7 +24,9 @@ import com.example.lagallens.presentation.feature.analysis.legalreferences.detai
 import com.example.lagallens.presentation.feature.analysis.risk.detail.ui.AnalysisRiskDetailActivity
 import kotlinx.coroutines.launch
 
-class AnalysisLegalReferenceDetailActivity : AppCompatActivity() {
+class AnalysisLegalReferenceDetailActivity : com.example.lagallens.presentation.feature.analysis.AnalysisScopedActivity() {
+    override val requiresUnlock = false
+    override val observesUnlock = true
     private lateinit var binding: ActivityAnalysisLegalReferenceDetailBinding
     private val viewModel by viewModels<AnalysisLegalReferenceDetailViewModel>()
 
@@ -39,6 +41,7 @@ class AnalysisLegalReferenceDetailActivity : AppCompatActivity() {
         }
         binding = ActivityAnalysisLegalReferenceDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        binding.root.visibility = android.view.View.INVISIBLE
         ViewCompat.setOnApplyWindowInsetsListener(binding.analysisLegalReferenceDetailRoot) { view, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -46,6 +49,18 @@ class AnalysisLegalReferenceDetailActivity : AppCompatActivity() {
         }
         bindEvents()
         observeViewModel()
+    }
+
+    override fun onAnalysisInvalidated() { if (::binding.isInitialized) binding.root.visibility = android.view.View.INVISIBLE }
+
+    override fun onAnalysisValidated(identity: com.example.lagallens.domain.model.analysis.AnalysisIdentity, detail: com.example.lagallens.domain.model.analysis.AnalysisDetail) {
+        val referenceId = intent.getStringExtra(EXTRA_REFERENCE_ID).orEmpty()
+        if (com.example.lagallens.di.DataModeConfig.current != com.example.lagallens.di.AppDataMode.DEMO ||
+            !com.example.lagallens.presentation.feature.analysis.legalreferences.model.DemoLegalReferences.canView(referenceId, validatedUnlockStatus?.isUnlocked == true)) {
+            android.widget.Toast.makeText(this, R.string.analysis_citation_unavailable, android.widget.Toast.LENGTH_LONG).show()
+            finish()
+            return
+        }
         viewModel.onEvent(
             AnalysisLegalReferenceDetailUiEvent.ScreenOpened(
                 referenceId = intent.getStringExtra(EXTRA_REFERENCE_ID).orEmpty(),
@@ -53,6 +68,7 @@ class AnalysisLegalReferenceDetailActivity : AppCompatActivity() {
                 documentMetadata = intent.getStringExtra(EXTRA_DOCUMENT_METADATA).orEmpty()
             )
         )
+        binding.root.visibility = android.view.View.VISIBLE
     }
 
     private fun bindEvents() = with(binding) {
@@ -79,10 +95,10 @@ class AnalysisLegalReferenceDetailActivity : AppCompatActivity() {
         analysisLegalReferenceDetailArticle.setText(state.articleRes)
         analysisLegalReferenceDetailEffectiveDate.setText(state.effectiveDateRes)
         analysisLegalReferenceDetailFullText.setText(state.fullTextRes)
-        analysisLegalReferenceDetailTextHeading.setText(if (state.isDetailedExample) R.string.analysis_legal_reference_detail_full_text_heading else R.string.analysis_reference_summary_heading)
-        analysisLegalReferenceDetailMetadata.isVisible = state.isDetailedExample
-        analysisLegalReferenceDetailRiskHeading.isVisible = state.isDetailedExample
-        analysisLegalReferenceDetailRisk.isVisible = state.isDetailedExample
+        analysisLegalReferenceDetailTextHeading.setText(R.string.analysis_legal_demo_notice)
+        analysisLegalReferenceDetailMetadata.isVisible = false
+        analysisLegalReferenceDetailRiskHeading.isVisible = false
+        analysisLegalReferenceDetailRisk.isVisible = false
         analysisLegalReferenceDetailIssuerValue.setText(state.issuerRes)
         analysisLegalReferenceDetailDocumentTypeValue.setText(state.documentTypeRes)
         analysisLegalReferenceDetailStatus.setText(state.statusRes)
@@ -93,9 +109,8 @@ class AnalysisLegalReferenceDetailActivity : AppCompatActivity() {
     private fun handleEffect(effect: AnalysisLegalReferenceDetailUiEffect) {
         when (effect) {
             AnalysisLegalReferenceDetailUiEffect.NavigateBack -> finish()
-            AnalysisLegalReferenceDetailUiEffect.NavigateToRelatedRisk -> startActivity(
-                AnalysisRiskDetailActivity.createIntent(this)
-            )
+            AnalysisLegalReferenceDetailUiEffect.NavigateToRelatedRisk ->
+                android.widget.Toast.makeText(this, R.string.analysis_citation_unavailable, android.widget.Toast.LENGTH_LONG).show()
         }
     }
 

@@ -38,23 +38,22 @@
                     android:textSize="@dimen/sp_14" />
 
                 <TextView
+                    android:id="@+id/tvDashboardUserName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/dp_4"
                     android:includeFontPadding="false"
-                    android:text="@string/dashboard_user_name"
                     android:textColor="@color/dashboard_primary_text"
                     android:textSize="@dimen/sp_22"
                     android:textStyle="bold" />
             </LinearLayout>
 
             <TextView
+                android:id="@+id/tvDashboardAvatar"
                 android:layout_width="@dimen/dp_48"
                 android:layout_height="@dimen/dp_48"
                 android:background="@drawable/bg_dashboard_fab"
-                android:contentDescription="@string/dashboard_avatar_description"
                 android:gravity="center"
-                android:text="NA"
                 android:textColor="@color/white"
                 android:textSize="@dimen/sp_14"
                 android:textStyle="bold" />
@@ -140,6 +139,29 @@
             layout="@layout/item_dashboard_contract_review" />
 
         <TextView
+            android:id="@+id/tvDashboardRecentMessage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_14"
+            android:gravity="center"
+            android:textColor="@color/dashboard_secondary_text"
+            android:textSize="@dimen/sp_14"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/btnDashboardRetry"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="@dimen/dp_8"
+            android:text="@string/dashboard_retry"
+            android:textColor="@color/dashboard_teal"
+            android:textSize="@dimen/sp_14"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/dp_28"
@@ -149,47 +171,16 @@
             android:textSize="@dimen/sp_17"
             android:textStyle="bold" />
 
-        <LinearLayout
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/dp_14"
             android:background="@drawable/bg_dashboard_date"
             android:gravity="center_vertical"
             android:minHeight="@dimen/dp_76"
-            android:orientation="horizontal"
-            android:padding="@dimen/dp_16">
-
-            <ImageView
-                android:layout_width="@dimen/dp_24"
-                android:layout_height="@dimen/dp_24"
-                android:contentDescription="@null"
-                android:src="@drawable/ic_dashboard_calendar" />
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/dp_12"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:includeFontPadding="false"
-                    android:text="@string/dashboard_probation_end"
-                    android:textColor="@color/dashboard_primary_text"
-                    android:textSize="@dimen/sp_14"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/dp_4"
-                    android:includeFontPadding="false"
-                    android:text="@string/dashboard_probation_date"
-                    android:textColor="@color/dashboard_secondary_text"
-                    android:textSize="@dimen/sp_12" />
-            </LinearLayout>
-        </LinearLayout>
+            android:padding="@dimen/dp_16"
+            android:text="@string/dashboard_upcoming_empty"
+            android:textColor="@color/dashboard_secondary_text"
+            android:textSize="@dimen/sp_14" />
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

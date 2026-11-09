@@ -9,7 +9,7 @@
         android:required="false" />
     <application
         android:name=".LegalLensApplication"
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@drawable/legallens_logo"
@@ -153,6 +153,10 @@
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".presentation.feature.otp.ui.OtpVerificationActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".presentation.feature.resetpassword.ui.ResetPasswordActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity

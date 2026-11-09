@@ -82,6 +82,7 @@
             android:orientation="vertical"
             android:padding="@dimen/dp_16">
             <TextView
+                android:id="@+id/compareDraftClause"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/manrope"
@@ -105,6 +106,7 @@
                     android:textSize="@dimen/sp_11"
                     android:textStyle="bold" />
                 <TextView
+                    android:id="@+id/compareDraftBefore"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/dp_8"
@@ -130,6 +132,7 @@
                     android:textSize="@dimen/sp_11"
                     android:textStyle="bold" />
                 <TextView
+                    android:id="@+id/compareDraftAfter"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/dp_8"

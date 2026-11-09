@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -27,12 +27,13 @@ import kotlinx.coroutines.launch
 class ProfileSettingsFragment : Fragment() {
     private var _binding: FragmentProfileSettingsBinding? = null
     private val binding get() = _binding!!
-    private val viewModel by activityViewModels<ProfileSettingsViewModel> {
+    private val viewModel by viewModels<ProfileSettingsViewModel> {
         val application = requireActivity().application as LegalLensApplication
         ProfileSettingsViewModelFactory(
             application.observeProfileSettingsUseCase,
             application.updateProfileAppearanceUseCase,
-            application.updateProfileLanguageUseCase
+            application.updateProfileLanguageUseCase,
+            application.updateNotificationPreferencesUseCase
         )
     }
 
@@ -74,12 +75,9 @@ class ProfileSettingsFragment : Fragment() {
             R.string.profile_settings_in_app_description,
             ProfileSettingsUiEvent::InAppToggled
         )
-        bindToggle(
-            binding.toggleBiometric,
-            R.string.profile_settings_biometric_title,
-            R.string.profile_settings_biometric_description,
-            ProfileSettingsUiEvent::BiometricToggled
-        )
+        // No biometric lock exists yet, so the control is not offered.
+        (binding.toggleBiometric.root.parent as View).visibility = View.GONE
+        binding.tvAccountSecurityTitle.visibility = View.GONE
         binding.btnSystemAppearance.setOnClickListener {
             viewModel.onEvent(ProfileSettingsUiEvent.AppearanceSelected(ProfileAppearance.SYSTEM))
         }
@@ -107,6 +105,8 @@ class ProfileSettingsFragment : Fragment() {
     ) {
         toggleBinding.tvSettingTitle.setText(titleRes)
         toggleBinding.tvSettingDescription.setText(descriptionRes)
+        // All rows share one view ID, so restored view state would overwrite the wrong setting.
+        toggleBinding.swSetting.isSaveEnabled = false
         toggleBinding.swSetting.setOnCheckedChangeListener { _, isChecked ->
             viewModel.onEvent(event(isChecked))
         }
@@ -142,7 +142,6 @@ class ProfileSettingsFragment : Fragment() {
         updateToggle(binding.togglePush.swSetting, state.isPushEnabled)
         updateToggle(binding.toggleEmail.swSetting, state.isEmailEnabled)
         updateToggle(binding.toggleInApp.swSetting, state.isInAppEnabled)
-        updateToggle(binding.toggleBiometric.swSetting, state.isBiometricEnabled)
         renderAppearanceOption(binding.btnSystemAppearance, state.appearance != ProfileAppearance.LIGHT)
         renderAppearanceOption(binding.btnLightAppearance, state.appearance == ProfileAppearance.LIGHT)
         binding.tvLanguageValue.setText(state.language.toDisplayName())

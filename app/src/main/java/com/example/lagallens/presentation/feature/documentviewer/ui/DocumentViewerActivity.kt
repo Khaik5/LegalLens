@@ -24,7 +24,6 @@ import com.example.lagallens.databinding.ActivityDocumentViewerBinding
 import com.example.lagallens.presentation.common.utils.animateContentEntrance
 import com.example.lagallens.presentation.common.utils.applySystemBarInsets
 import com.example.lagallens.presentation.common.utils.bindPressFeedback
-import com.example.lagallens.presentation.feature.contracts.contract.ContractListItem
 import com.example.lagallens.presentation.feature.documentviewer.contract.DocumentViewerStatus
 import com.example.lagallens.presentation.feature.documentviewer.contract.DocumentViewerUiEffect
 import com.example.lagallens.presentation.feature.documentviewer.contract.DocumentViewerUiEvent
@@ -32,11 +31,18 @@ import com.example.lagallens.presentation.feature.documentviewer.contract.Docume
 import com.example.lagallens.presentation.feature.documentviewer.viewmodel.DocumentViewerViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class DocumentViewerActivity : AppCompatActivity() {
+    private val app get() = application as com.example.lagallens.LegalLensApplication
+    private var ownerSession: String? = null
+    private fun validOwner(): Boolean = app.currentSessionKey() == ownerSession &&
+        (!com.example.lagallens.presentation.feature.chatbot.draft.ui.DraftSessionGuard.isBound(intent) ||
+            com.example.lagallens.presentation.feature.chatbot.draft.ui.DraftSessionGuard.valid(app, intent))
+    override fun onStart() { super.onStart(); if (!validOwner()) finish() }
     private lateinit var binding: ActivityDocumentViewerBinding
     private val viewModel by viewModels<DocumentViewerViewModel>()
     private var descriptor: ParcelFileDescriptor? = null
@@ -44,8 +50,12 @@ class DocumentViewerActivity : AppCompatActivity() {
     private var documentUri: Uri? = null
     private var renderJob: Job? = null
     private var renderedKey: String? = null
+    private var openJob: Job? = null
+    private val pdfLock = Any()
+    @Volatile private var documentClosed = false
 
     private val documentPicker = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (!validOwner()) return@registerForActivityResult
         if (uri == null) {
             viewModel.onEvent(DocumentViewerUiEvent.PdfLoadFailed)
         } else {
@@ -58,6 +68,9 @@ class DocumentViewerActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        ownerSession = savedInstanceState?.getString(KEY_OWNER_SESSION) ?: app.currentSessionKey()
+        if (!validOwner()) { finish(); return }
+        lifecycleScope.launch { app.observeSessionKeys().collect { if (!validOwner()) finish() } }
         WindowCompat.setDecorFitsSystemWindows(window, false)
         window.statusBarColor = Color.TRANSPARENT
         window.navigationBarColor = Color.TRANSPARENT
@@ -71,18 +84,14 @@ class DocumentViewerActivity : AppCompatActivity() {
         if (savedInstanceState == null) binding.viewerToolbar.doOnPreDraw { it.animateContentEntrance(-resources.getDimension(R.dimen.dp_8)) }
         binding.root.applySystemBarInsets()
 
-        val contract = ContractListItem.allSamples.find { it.id == intent.getStringExtra(EXTRA_CONTRACT_ID) }
         val initialUri = savedInstanceState?.getString(KEY_DOCUMENT_URI)?.let(Uri::parse) ?: intent.documentUri()
         val title = intent.getStringExtra(EXTRA_TITLE)
-            ?: contract?.let { getString(it.titleRes) }
             ?: initialUri?.lastPathSegment
             ?: getString(R.string.viewer_title)
-        val metadata = contract?.let {
-            getString(R.string.viewer_metadata, getString(it.fileFormatRes), getString(it.pageCountRes))
-        } ?: getString(R.string.viewer_metadata, "PDF", getString(R.string.viewer_page_count, 1, 1))
+        val metadata = getString(R.string.viewer_metadata, "PDF", getString(R.string.viewer_page_count, 1, 1))
 
         binding.viewerBack.setOnClickListener { viewModel.onEvent(DocumentViewerUiEvent.BackClicked) }
-        binding.viewerRetry.setOnClickListener { documentPicker.launch(arrayOf("application/pdf")) }
+        binding.viewerRetry.setOnClickListener { if (validOwner()) documentPicker.launch(arrayOf("application/pdf")) }
         binding.viewerShare.setOnClickListener { shareDocument() }
         binding.viewerPrevious.setOnClickListener { viewModel.onEvent(DocumentViewerUiEvent.PreviousClicked) }
         binding.viewerNext.setOnClickListener { viewModel.onEvent(DocumentViewerUiEvent.NextClicked) }
@@ -105,47 +114,56 @@ class DocumentViewerActivity : AppCompatActivity() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         documentUri?.toString()?.let { outState.putString(KEY_DOCUMENT_URI, it) }
+        outState.putString(KEY_OWNER_SESSION, ownerSession)
         super.onSaveInstanceState(outState)
     }
 
     override fun onDestroy() {
+        documentClosed = true
+        openJob?.cancel()
         renderJob?.cancel()
-        closeDocument()
+        // This short cleanup outlives lifecycle cancellation and runs behind any native render.
+        kotlinx.coroutines.CoroutineScope(Dispatchers.IO).launch { synchronized(pdfLock) { closeDocument() } }
         super.onDestroy()
     }
 
     private fun openPdf(uri: Uri) {
+        if (!validOwner()) return
         documentUri = uri
         renderedKey = null
         viewModel.onEvent(DocumentViewerUiEvent.PdfLoading)
         binding.viewerRetry.isEnabled = false
-        lifecycleScope.launch {
+        val previousOpen = openJob
+        previousOpen?.cancel()
+        openJob = lifecycleScope.launch {
+            previousOpen?.join()
             renderJob?.cancelAndJoin()
-            closeDocument()
-            val opened = withContext(Dispatchers.IO) {
-                runCatching {
-                    val fileDescriptor = contentResolver.openFileDescriptor(uri, "r") ?: error("PDF could not be opened")
+            val pageCount = withContext(Dispatchers.IO) {
+                synchronized(pdfLock) {
+                    closeDocument()
+                    if (documentClosed) return@synchronized null
                     try {
-                        val pdfRenderer = PdfRenderer(fileDescriptor)
-                        Triple(fileDescriptor, pdfRenderer, pdfRenderer.pageCount)
-                    } catch (exception: Exception) {
-                        fileDescriptor.close()
-                        throw exception
+                        val file = contentResolver.openFileDescriptor(uri, "r") ?: error("PDF could not be opened")
+                        descriptor = file
+                        renderer = PdfRenderer(file)
+                        renderer?.pageCount
+                    } catch (_: Exception) {
+                        closeDocument()
+                        null
                     }
-                }.getOrNull()
+                }
             }
-            if (opened == null || opened.third < 1) {
-                opened?.second?.close()
-                opened?.first?.close()
+            if (!validOwner() || documentClosed) return@launch
+            if (pageCount == null || pageCount < 1) {
+                withContext(Dispatchers.IO) { synchronized(pdfLock) { closeDocument() } }
                 documentUri = null
                 viewModel.onEvent(DocumentViewerUiEvent.PdfLoadFailed)
                 return@launch
             }
-            descriptor = opened.first
-            renderer = opened.second
-            val displayName = queryDisplayName(uri) ?: binding.viewerDocumentTitle.text.toString()
-            val metadata = getString(R.string.viewer_metadata, "PDF", getString(R.string.viewer_page_count, opened.third, opened.third))
-            viewModel.onEvent(DocumentViewerUiEvent.PdfLoaded(displayName, metadata, opened.third))
+            val displayName = withContext(Dispatchers.IO) { queryDisplayName(uri) }
+                ?: binding.viewerDocumentTitle.text.toString()
+            val metadata = getString(R.string.viewer_metadata, "PDF", getString(R.string.viewer_page_count, pageCount, pageCount))
+            viewModel.onEvent(DocumentViewerUiEvent.PdfLoaded(displayName, metadata, pageCount))
         }
     }
 
@@ -156,12 +174,14 @@ class DocumentViewerActivity : AppCompatActivity() {
     }.getOrNull()
 
     private fun render(state: DocumentViewerUiState) = with(binding) {
+        if (!validOwner()) return@with
         viewerDocumentTitle.text = state.title
         viewerDocumentMetadata.text = state.metadata
         viewerContent.isVisible = state.status == DocumentViewerStatus.READY
         viewerLoading.isVisible = state.status == DocumentViewerStatus.LOADING
         viewerError.isVisible = state.status == DocumentViewerStatus.ERROR
         viewerRetry.setText(R.string.viewer_choose_pdf)
+        viewerRetry.isEnabled = state.status != DocumentViewerStatus.LOADING
         viewerShare.isEnabled = state.status == DocumentViewerStatus.READY && documentUri != null
         viewerPageCount.text = getString(R.string.viewer_page_count, state.currentPage, state.pageCount)
         viewerPageNumber.text = state.currentPage.toString()
@@ -174,6 +194,7 @@ class DocumentViewerActivity : AppCompatActivity() {
     }
 
     private fun renderPage(state: DocumentViewerUiState) {
+        if (!validOwner()) return
         val activeRenderer = renderer ?: return
         if (state.status != DocumentViewerStatus.READY || binding.viewerPageViewport.width <= 0) return
         val uri = documentUri ?: return
@@ -185,21 +206,25 @@ class DocumentViewerActivity : AppCompatActivity() {
         renderedKey = key
         renderJob?.cancel()
         renderJob = lifecycleScope.launch(Dispatchers.IO) {
-            val bitmap = runCatching {
+            val bitmap = synchronized(pdfLock) { runCatching {
+                if (documentClosed || renderer !== currentRenderer) return@runCatching null
                 val page = currentRenderer.openPage(state.currentPage - 1)
                 try {
                     val availableWidth = (viewportWidth - horizontalMargin).coerceAtLeast(1)
-                    val targetWidth = (availableWidth * state.zoomPercent / 100f).toInt().coerceAtLeast(1)
-                    val targetHeight = (targetWidth * page.height.toFloat() / page.width).toInt().coerceAtLeast(1)
+                    val desiredWidth = (availableWidth * state.zoomPercent / 100f).coerceAtLeast(1f)
+                    val ratio = page.height.toFloat() / page.width.coerceAtLeast(1)
+                    val targetWidth = minOf(desiredWidth, kotlin.math.sqrt(8_000_000f / ratio.coerceAtLeast(0.001f))).toInt().coerceIn(1, 4096)
+                    val targetHeight = (targetWidth * ratio).toInt().coerceIn(1, 8192)
                     Bitmap.createBitmap(targetWidth, targetHeight, Bitmap.Config.ARGB_8888).also {
                         page.render(it, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
                     }
                 } finally {
                     page.close()
                 }
-            }.getOrNull()
+            }.getOrNull() }
+            if (!kotlinx.coroutines.currentCoroutineContext().isActive) { bitmap?.recycle(); return@launch }
             withContext(Dispatchers.Main) {
-                if (!isFinishing && documentUri == uri && bitmap != null) {
+                if (validOwner() && !isFinishing && documentUri == uri && renderedKey == key && bitmap != null) {
                     binding.viewerPage.setImageBitmap(bitmap)
                     binding.viewerPage.layoutParams = binding.viewerPage.layoutParams.apply {
                         width = bitmap.width
@@ -209,14 +234,15 @@ class DocumentViewerActivity : AppCompatActivity() {
                         width = bitmap.width
                         height = bitmap.height
                     }
-                } else if (bitmap == null) {
+                } else if (validOwner() && renderedKey == key && bitmap == null) {
                     viewModel.onEvent(DocumentViewerUiEvent.PdfLoadFailed)
-                }
+                } else { bitmap?.recycle() }
             }
         }
     }
 
     private fun shareDocument() {
+        if (!validOwner()) return
         val uri = documentUri ?: return
         try {
             val sendIntent = Intent(Intent.ACTION_SEND).apply {
@@ -250,13 +276,16 @@ class DocumentViewerActivity : AppCompatActivity() {
         private const val EXTRA_DOCUMENT_URI = "viewer_document_uri"
         private const val EXTRA_TITLE = "viewer_document_title"
         private const val KEY_DOCUMENT_URI = "viewer_saved_uri"
+        private const val KEY_OWNER_SESSION = "viewer_owner_session"
 
-        fun createIntent(context: android.content.Context, contractId: String): Intent =
-            Intent(context, DocumentViewerActivity::class.java).putExtra(EXTRA_CONTRACT_ID, contractId)
+        fun createIntent(context: android.content.Context, contractId: String, title: String? = null): Intent =
+            Intent(context, DocumentViewerActivity::class.java).putExtra(EXTRA_CONTRACT_ID, contractId).putExtra(EXTRA_TITLE, title)
+                .also { com.example.lagallens.presentation.feature.chatbot.draft.ui.DraftSessionGuard.stampIfParentBound(context, it) }
 
         fun createIntent(context: android.content.Context, documentUri: Uri, title: String): Intent =
             Intent(context, DocumentViewerActivity::class.java)
                 .putExtra(EXTRA_DOCUMENT_URI, documentUri)
                 .putExtra(EXTRA_TITLE, title)
+                .also { com.example.lagallens.presentation.feature.chatbot.draft.ui.DraftSessionGuard.stampIfParentBound(context, it) }
     }
 }

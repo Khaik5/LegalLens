@@ -23,7 +23,8 @@ import com.example.lagallens.presentation.feature.analysis.risk.findings.ui.Anal
 import com.example.lagallens.presentation.feature.analysis.risk.viewmodel.AnalysisRiskOverviewViewModel
 import kotlinx.coroutines.launch
 
-class AnalysisRiskOverviewActivity : AppCompatActivity() {
+class AnalysisRiskOverviewActivity : com.example.lagallens.presentation.feature.analysis.AnalysisScopedActivity() {
+    override val requiresUnlock = false
     private lateinit var binding: ActivityAnalysisRiskOverviewBinding
     private val viewModel by viewModels<AnalysisRiskOverviewViewModel>()
 
@@ -59,6 +60,9 @@ class AnalysisRiskOverviewActivity : AppCompatActivity() {
         )
     }
 
+    override fun onAnalysisValidated(identity: com.example.lagallens.domain.model.analysis.AnalysisIdentity, detail: com.example.lagallens.domain.model.analysis.AnalysisDetail) { viewModel.setResult(identity, detail) }
+    override fun onAnalysisInvalidated() { viewModel.clearResult() }
+
     private fun observeViewModel() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -69,7 +73,13 @@ class AnalysisRiskOverviewActivity : AppCompatActivity() {
     }
 
     private fun render(state: AnalysisRiskOverviewUiState) = with(binding) {
-        analysisRiskOverviewScore.text = state.score.toString()
+        analysisRiskOverviewScore.text = state.score?.toString() ?: getString(R.string.analysis_result_unavailable)
+        analysisRiskOverviewSeverity.visibility = if (state.highestSeverity == null) android.view.View.GONE else android.view.View.VISIBLE
+        state.highestSeverity?.let { level ->
+            analysisRiskOverviewSeverity.setText(level.labelRes)
+            analysisRiskOverviewSeverity.setTextColor(getColor(level.labelColorRes))
+            analysisRiskOverviewSeverity.setBackgroundResource(level.badgeBackgroundRes)
+        }
         analysisRiskOverviewHighRiskCount.text = state.highRiskCount.toString()
         analysisRiskOverviewMediumRiskCount.text = state.mediumRiskCount.toString()
         analysisRiskOverviewLowRiskCount.text = state.lowRiskCount.toString()

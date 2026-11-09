@@ -14,7 +14,7 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class ProfileRealRepositoryTest {
-    @Test fun realModeSelectsUnavailableRemoteAndDoesNotReadOrWriteDemoProfile() {
+    @Test fun realModeSelectsUnavailableRemoteAndDoesNotReadOrWriteDemoProfile() = kotlinx.coroutines.runBlocking<Unit> {
         val context = ApplicationProvider.getApplicationContext<Context>()
         val preferences = context.getSharedPreferences("profile_demo_data", Context.MODE_PRIVATE)
         val previous = preferences.all.toMap()

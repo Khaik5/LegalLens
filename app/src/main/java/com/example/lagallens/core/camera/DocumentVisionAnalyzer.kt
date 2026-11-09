@@ -32,10 +32,30 @@ object DocumentVisionAnalyzer {
         }
     }
 
+    /** Detects the document in a decoded image, as used for still photos and gallery pages. */
+    fun detect(bitmap: Bitmap): DocumentDetection {
+        val rgba = Mat()
+        val gray = Mat()
+        return try {
+            Utils.bitmapToMat(bitmap, rgba)
+            Imgproc.cvtColor(rgba, gray, Imgproc.COLOR_RGBA2GRAY)
+            detect(gray)
+        } catch (_: Throwable) {
+            DocumentDetection.Unavailable
+        } finally {
+            gray.release()
+            rgba.release()
+        }
+    }
+
+    /**
+     * Only an unreadable image is rejected. A page where no document or a cut-off edge was found is a warning,
+     * so the user can still keep it: detection misses real documents on busy backgrounds or in dim light.
+     */
     fun checkQuality(file: File, shakeRisk: Boolean): DocumentQualityResult = runCatching {
         evaluateQuality(file, shakeRisk)
     }.getOrElse {
-        DocumentQualityResult(QualityDecision.REJECTED, listOf(QualityIssue.DOCUMENT_NOT_FOUND))
+        DocumentQualityResult(QualityDecision.WARNING, listOf(QualityIssue.DOCUMENT_NOT_FOUND))
     }
 
     private fun evaluateQuality(file: File, shakeRisk: Boolean): DocumentQualityResult {
@@ -66,13 +86,7 @@ object DocumentVisionAnalyzer {
                 DocumentDetection.NotFound,
                 DocumentDetection.Unavailable -> issues += QualityIssue.DOCUMENT_NOT_FOUND
             }
-            val decision = when {
-                QualityIssue.DOCUMENT_NOT_FOUND in issues || QualityIssue.CROP_RISK in issues -> {
-                    QualityDecision.REJECTED
-                }
-                issues.isEmpty() -> QualityDecision.ACCEPTED
-                else -> QualityDecision.WARNING
-            }
+            val decision = if (issues.isEmpty()) QualityDecision.ACCEPTED else QualityDecision.WARNING
             DocumentQualityResult(decision, issues.distinct())
         } finally {
             gray.release()
@@ -81,50 +95,126 @@ object DocumentVisionAnalyzer {
         }
     }
 
+    /**
+     * Finds the page as the largest convex quadrilateral. Two masks are tried, because each fails where the other
+     * works: a brightness mask (a light page on a darker surface, even with ruled lines or handwriting inside) and an
+     * edge mask with thresholds that follow the image brightness (a page on a light or patterned surface).
+     */
     private fun detect(gray: Mat): DocumentDetection {
+        val small = Mat()
         val blurred = Mat()
-        val edges = Mat()
-        val contours = mutableListOf<MatOfPoint>()
-        val hierarchy = Mat()
         return try {
-            Imgproc.GaussianBlur(gray, blurred, org.opencv.core.Size(5.0, 5.0), 0.0)
-            Imgproc.Canny(blurred, edges, 60.0, 160.0)
-            Imgproc.findContours(edges, contours, hierarchy, Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE)
-            val imageArea = gray.rows().toDouble() * gray.cols().toDouble()
-            val largest = contours.maxByOrNull { Imgproc.contourArea(it) }
-                ?: return DocumentDetection.NotFound
-            val contourArea = Imgproc.contourArea(largest)
-            val ratio = contourArea / imageArea
-            if (ratio < 0.08) return DocumentDetection.NotFound
-            val curve = MatOfPoint2f(*largest.toArray())
-            val approximation = MatOfPoint2f()
-            try {
-                Imgproc.approxPolyDP(curve, approximation, Imgproc.arcLength(curve, true) * 0.02, true)
-                val points = approximation.toArray()
-                if (points.size != 4 || !Imgproc.isContourConvex(MatOfPoint(*points))) {
-                    return DocumentDetection.Partial(ratio)
-                }
-                val centerX = points.map { it.x }.average() / gray.cols()
-                val centerY = points.map { it.y }.average() / gray.rows()
-                val isInsidePreview = points.all {
-                    it.x >= 0 && it.x <= gray.cols() && it.y >= 0 && it.y <= gray.rows()
-                }
-                if (!isInsidePreview) DocumentDetection.Partial(ratio) else {
-                    DocumentDetection.Ready(ratio, centerX, centerY)
-                }
-            } finally {
-                approximation.release()
-                curve.release()
-            }
+            val scale = DETECTION_SIZE / max(gray.cols(), gray.rows()).toDouble()
+            if (scale < 1.0) Imgproc.resize(gray, small, org.opencv.core.Size(), scale, scale, Imgproc.INTER_AREA) else gray.copyTo(small)
+            Imgproc.GaussianBlur(small, blurred, org.opencv.core.Size(5.0, 5.0), 0.0)
+            val candidates = listOfNotNull(bestQuad(brightnessMask(blurred), small), bestQuad(edgeMask(blurred), small))
+            val ready = candidates.filterIsInstance<DocumentDetection.Ready>().maxByOrNull { it.areaRatio }
+            ready ?: candidates.filterIsInstance<DocumentDetection.Partial>().maxByOrNull { it.areaRatio } ?: DocumentDetection.NotFound
         } catch (_: Throwable) {
             DocumentDetection.Unavailable
         } finally {
-            contours.forEach { contour -> contour.release() }
-            hierarchy.release()
-            edges.release()
             blurred.release()
+            small.release()
         }
     }
+
+    private fun brightnessMask(blurred: Mat): Mat {
+        val mask = Mat()
+        Imgproc.threshold(blurred, mask, 0.0, 255.0, Imgproc.THRESH_BINARY or Imgproc.THRESH_OTSU)
+        val kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, org.opencv.core.Size(9.0, 9.0))
+        Imgproc.morphologyEx(mask, mask, Imgproc.MORPH_CLOSE, kernel)
+        kernel.release()
+        return mask
+    }
+
+    private fun edgeMask(blurred: Mat): Mat {
+        val median = medianIntensity(blurred)
+        val edges = Mat()
+        Imgproc.Canny(blurred, edges, max(0.0, 0.66 * median), kotlin.math.min(255.0, 1.33 * median))
+        val kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, org.opencv.core.Size(3.0, 3.0))
+        Imgproc.dilate(edges, edges, kernel, org.opencv.core.Point(-1.0, -1.0), 2)
+        kernel.release()
+        return edges
+    }
+
+    /** Releases [mask]. Returns null when no region is large enough to be a page. */
+    private fun bestQuad(mask: Mat, image: Mat): DocumentDetection? {
+        val contours = mutableListOf<MatOfPoint>()
+        val hierarchy = Mat()
+        return try {
+            Imgproc.findContours(mask, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE)
+            val imageArea = image.rows().toDouble() * image.cols().toDouble()
+            val margin = max(image.cols(), image.rows()) * BORDER_MARGIN
+            var partial: DocumentDetection.Partial? = null
+            for (contour in contours.sortedByDescending { Imgproc.contourArea(it) }.take(CANDIDATES)) {
+                val ratio = Imgproc.contourArea(contour) / imageArea
+                if (ratio < MIN_AREA_RATIO) break
+                val points = quadrilateral(contour)
+                if (points == null) {
+                    if (partial == null) partial = DocumentDetection.Partial(ratio)
+                    continue
+                }
+                val quad = MatOfPoint(*points)
+                val quadRatio = Imgproc.contourArea(quad) / imageArea
+                quad.release()
+                val touchesBorder = points.any {
+                    it.x <= margin || it.y <= margin || it.x >= image.cols() - 1 - margin || it.y >= image.rows() - 1 - margin
+                }
+                if (touchesBorder) {
+                    if (partial == null) partial = DocumentDetection.Partial(quadRatio)
+                    continue
+                }
+                return DocumentDetection.Ready(
+                    quadRatio,
+                    points.map { it.x }.average() / image.cols(),
+                    points.map { it.y }.average() / image.rows()
+                )
+            }
+            partial
+        } finally {
+            contours.forEach { it.release() }
+            hierarchy.release()
+            mask.release()
+        }
+    }
+
+    /** The contour's convex hull simplified to four corners, or null when it is not a quadrilateral. */
+    private fun quadrilateral(contour: MatOfPoint): Array<org.opencv.core.Point>? {
+        val hullIndices = org.opencv.core.MatOfInt()
+        val curve = MatOfPoint2f()
+        val approximation = MatOfPoint2f()
+        return try {
+            Imgproc.convexHull(contour, hullIndices)
+            val all = contour.toArray()
+            curve.fromArray(*hullIndices.toArray().map { all[it] }.toTypedArray())
+            Imgproc.approxPolyDP(curve, approximation, Imgproc.arcLength(curve, true) * 0.02, true)
+            approximation.toArray().takeIf { it.size == 4 }
+        } finally {
+            approximation.release()
+            curve.release()
+            hullIndices.release()
+        }
+    }
+
+    private fun medianIntensity(gray: Mat): Double {
+        val bytes = ByteArray(gray.rows() * gray.cols())
+        val continuous = if (gray.isContinuous) gray else gray.clone()
+        continuous.get(0, 0, bytes)
+        if (continuous !== gray) continuous.release()
+        val histogram = IntArray(256)
+        bytes.forEach { histogram[it.toInt() and 0xFF]++ }
+        var seen = 0
+        histogram.forEachIndexed { value, count ->
+            seen += count
+            if (seen * 2 >= bytes.size) return value.toDouble()
+        }
+        return 128.0
+    }
+
+    private const val DETECTION_SIZE = 640.0
+    private const val MIN_AREA_RATIO = 0.08
+    private const val BORDER_MARGIN = 0.01
+    private const val CANDIDATES = 5
 
     private fun blurScore(gray: Mat): Double {
         val laplacian = Mat()

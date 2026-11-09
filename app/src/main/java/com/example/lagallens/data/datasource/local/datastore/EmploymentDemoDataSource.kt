@@ -5,6 +5,7 @@ import com.example.lagallens.R
 import com.example.lagallens.domain.model.EmploymentContract
 import com.example.lagallens.domain.model.EmploymentContractRisk
 import com.example.lagallens.domain.model.EmploymentContractStatus
+import com.example.lagallens.domain.model.EmploymentContractType
 import com.example.lagallens.domain.model.EmploymentDocument
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,7 +17,11 @@ import java.util.UUID
 class EmploymentDemoDataSource internal constructor(private val preferences: android.content.SharedPreferences, private val title: (Int) -> String) {
     constructor(context: Context, preferencesName: String = PREFERENCES_NAME) : this(
         context.applicationContext.getSharedPreferences(preferencesName, Context.MODE_PRIVATE),
-        { context.applicationContext.getString(it) }
+        { resource ->
+            val language = androidx.appcompat.app.AppCompatDelegate.getApplicationLocales().toLanguageTags().ifBlank { context.resources.configuration.locales.toLanguageTags() }
+            val config = android.content.res.Configuration(context.resources.configuration).apply { setLocale(java.util.Locale.forLanguageTag(language.substringBefore(','))) }
+            context.createConfigurationContext(config).getString(resource)
+        }
     )
     private val documents = loadDocuments().toMutableMap()
     private val contractsFlow = MutableStateFlow(loadContracts())
@@ -24,7 +29,17 @@ class EmploymentDemoDataSource internal constructor(private val preferences: and
     val contracts = contractsFlow.asStateFlow()
 
     @Synchronized
-    fun getContract(contractId: String): EmploymentContract? = contractsFlow.value.firstOrNull { it.id == contractId }
+    fun getContract(contractId: String): EmploymentContract? = contractsFlow.value.firstOrNull { it.id == contractId }?.let(::localize)
+
+    fun localizedContracts(resolveTitle: (Int) -> String = title): List<EmploymentContract> = contractsFlow.value.map { contract ->
+        val resource = SAMPLE_TITLES[contract.generatedTitleKey]
+        if (resource == null) contract else contract.copy(title = resolveTitle(resource), fileName = "${resolveTitle(resource)}.pdf")
+    }
+
+    private fun localize(contract: EmploymentContract): EmploymentContract {
+        val resource = SAMPLE_TITLES[contract.generatedTitleKey] ?: return contract
+        return contract.copy(title = title(resource), fileName = "${title(resource)}.pdf")
+    }
 
     @Synchronized
     fun createContract(contract: EmploymentContract): EmploymentContract {
@@ -57,7 +72,7 @@ class EmploymentDemoDataSource internal constructor(private val preferences: and
     fun renameContract(contractId: String, title: String): Boolean {
         if (title.isBlank()) return false
         val current = getContract(contractId) ?: return false
-        return updateContract(current.copy(title = title))
+        return updateContract(current.copy(title = title, generatedTitleKey = null))
     }
 
     @Synchronized
@@ -115,7 +130,7 @@ class EmploymentDemoDataSource internal constructor(private val preferences: and
         val now = System.currentTimeMillis()
         val legacyDeleted = preferences.getStringSet(LEGACY_DELETED_IDS_KEY, emptySet()).orEmpty()
         val seeds = sampleContracts(now).filterNot { it.id in legacyDeleted }.map { sample ->
-            sample.copy(title = preferences.getString(LEGACY_RENAMED_TITLE_PREFIX + sample.id, null) ?: sample.title)
+            preferences.getString(LEGACY_RENAMED_TITLE_PREFIX + sample.id, null)?.let { sample.copy(title = it, generatedTitleKey = null) } ?: sample
         }
         check(preferences.edit().putString(CONTRACTS_KEY, encodeContracts(seeds)).commit())
         if (preferences.getString(DOCUMENTS_KEY, null) == null) {
@@ -134,7 +149,7 @@ class EmploymentDemoDataSource internal constructor(private val preferences: and
         )
         return samples.mapIndexed { index, sample ->
             val contractId = sample.id
-            EmploymentContract(contractId, "document-$contractId", title(sample.titleRes), sample.content, now - (index + 1) * 86_400_000L, now - index * 86_400_000L, sample.status, sample.risk, "${title(sample.titleRes)}.pdf", null, "application/pdf")
+            EmploymentContract(contractId, "document-$contractId", title(sample.titleRes), sample.content, now - (index + 1) * 86_400_000L, now - index * 86_400_000L, sample.status, sample.risk, "${title(sample.titleRes)}.pdf", null, "application/pdf", pageCount = SAMPLE_PAGE_COUNTS[contractId], generatedTitleKey = contractId)
         }
     }
 
@@ -162,13 +177,17 @@ class EmploymentDemoDataSource internal constructor(private val preferences: and
     private fun EmploymentContract.toJson() = JSONObject().put("id", id).put("documentId", documentId).put("title", title).put("content", content)
         .put("createdAtMillis", createdAtMillis).put("updatedAtMillis", updatedAtMillis).put("status", status.name).put("risk", risk.name)
         .put("fileName", fileName).put("fileUri", fileUri).put("mimeType", mimeType)
+        .put("type", type.name).put("pageCount", pageCount).put("generatedTitleKey", generatedTitleKey)
 
     private fun JSONObject.toContract() = EmploymentContract(
         id = optString("id"), documentId = optString("documentId"), title = optString("title"), content = optString("content"),
         createdAtMillis = optLong("createdAtMillis"), updatedAtMillis = optLong("updatedAtMillis"),
         status = runCatching { EmploymentContractStatus.valueOf(optString("status")) }.getOrDefault(EmploymentContractStatus.DRAFT),
         risk = runCatching { EmploymentContractRisk.valueOf(optString("risk")) }.getOrDefault(EmploymentContractRisk.NOT_ANALYZED),
-        fileName = optString("fileName"), fileUri = optString("fileUri").takeIf(String::isNotBlank), mimeType = optString("mimeType")
+        fileName = optString("fileName"), fileUri = optString("fileUri").takeIf(String::isNotBlank), mimeType = optString("mimeType"),
+        type = runCatching { EmploymentContractType.valueOf(optString("type")) }.getOrDefault(EmploymentContractType.EMPLOYMENT),
+        pageCount = optInt("pageCount", 0).takeIf { it > 0 } ?: SAMPLE_PAGE_COUNTS[optString("id")],
+        generatedTitleKey = optString("generatedTitleKey").takeIf { it in SAMPLE_TITLES }
     )
 
     private fun EmploymentDocument.toJson() = JSONObject().put("id", id).put("contractId", contractId).put("displayName", displayName).put("uri", uri)
@@ -189,5 +208,12 @@ class EmploymentDemoDataSource internal constructor(private val preferences: and
         const val DOCUMENTS_KEY = "employment_documents_v1"
         const val LEGACY_DELETED_IDS_KEY = "deleted_contract_ids"
         const val LEGACY_RENAMED_TITLE_PREFIX = "renamed_title_"
+        val SAMPLE_TITLES = mapOf(
+            "office-lease" to R.string.contract_demo_labor_indefinite,
+            "collaborator" to R.string.contract_demo_labor_fixed_term,
+            "equipment-purchase" to R.string.contract_demo_labor_probation,
+            "vehicle-lease" to R.string.contract_demo_labor_part_time
+        )
+        val SAMPLE_PAGE_COUNTS = mapOf("office-lease" to 12, "collaborator" to 8, "equipment-purchase" to 6, "vehicle-lease" to 10)
     }
 }

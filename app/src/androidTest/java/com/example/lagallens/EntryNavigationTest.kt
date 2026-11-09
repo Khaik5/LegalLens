@@ -17,6 +17,7 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class EntryNavigationTest {
+    @get:org.junit.Rule val demoSession = com.example.lagallens.DemoSessionRule()
     private val context = ApplicationProvider.getApplicationContext<android.content.Context>()
 
     @Test fun onboardingSkipOpensWelcome() {
@@ -36,7 +37,7 @@ class EntryNavigationTest {
     }
 
     @Test fun analysisFromOcrSystemBackOpensHome() {
-        val intent = AnalysisResultActivity.createIntent(context, "sample.pdf", "PDF").putExtra("analysis_return_home", true)
+        val intent = com.example.lagallens.AnalysisTestFixture.scoped(AnalysisResultActivity.createIntent(context, "sample.pdf", "PDF").putExtra("analysis_return_home", true), unlocked = false)
         ActivityScenario.launch<AnalysisResultActivity>(intent).use {
             pressBack()
             onView(withId(R.id.mainRoot)).check(matches(isDisplayed()))

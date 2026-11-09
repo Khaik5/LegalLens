@@ -37,6 +37,14 @@ class AnalysisFailureActivity : AppCompatActivity() {
         }
         binding = ActivityAnalysisFailureBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        val owner = intent.getStringExtra(AnalysisProcessingActivity.EXTRA_SESSION_KEY).orEmpty()
+        val app = application as com.example.lagallens.LegalLensApplication
+        if (owner.isBlank() || app.currentSessionKey() != owner) { binding.root.visibility = android.view.View.INVISIBLE; finish(); return }
+        lifecycleScope.launch {
+            app.observeSessionKeys().collect { current ->
+                if (current != owner) { binding.root.visibility = android.view.View.INVISIBLE; finish() }
+            }
+        }
         ViewCompat.setOnApplyWindowInsetsListener(binding.analysisFailureRoot) { view, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -86,12 +94,17 @@ class AnalysisFailureActivity : AppCompatActivity() {
             }
 
             is AnalysisFailureUiEffect.RetryAnalysis -> {
+                if ((application as com.example.lagallens.LegalLensApplication).currentSessionKey() != intent.getStringExtra(AnalysisProcessingActivity.EXTRA_SESSION_KEY)) return
                 startActivity(
                     AnalysisProcessingActivity.createIntent(
                         context = this,
                         documentName = effect.documentName,
                         documentMetadata = effect.documentMetadata
-                    ).putExtra("analysis_return_home", intent.getBooleanExtra("analysis_return_home", false))
+                    ).putExtra(AnalysisProcessingActivity.EXTRA_OPERATION_ID, intent.getStringExtra(AnalysisProcessingActivity.EXTRA_OPERATION_ID))
+                        .putExtra(AnalysisProcessingActivity.EXTRA_SESSION_KEY, intent.getStringExtra(AnalysisProcessingActivity.EXTRA_SESSION_KEY))
+                        .putExtra(com.example.lagallens.presentation.feature.analysis.start.ui.AnalysisStartActivity.EXTRA_CONTRACT_ID, intent.getStringExtra(com.example.lagallens.presentation.feature.analysis.start.ui.AnalysisStartActivity.EXTRA_CONTRACT_ID))
+                        .putExtra(com.example.lagallens.presentation.feature.analysis.start.ui.AnalysisStartActivity.EXTRA_DOCUMENT_ID, intent.getStringExtra(com.example.lagallens.presentation.feature.analysis.start.ui.AnalysisStartActivity.EXTRA_DOCUMENT_ID))
+                        .putExtra("analysis_return_home", intent.getBooleanExtra("analysis_return_home", false))
                 )
                 finish()
             }

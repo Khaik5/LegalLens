@@ -11,9 +11,9 @@ import com.example.lagallens.presentation.feature.compare.select.contract.Compar
 import com.example.lagallens.presentation.feature.compare.select.contract.CompareSelectUiEvent
 import com.example.lagallens.presentation.feature.compare.select.contract.CompareSelectUiState
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -22,8 +22,8 @@ class CompareSelectViewModel(application: Application) : AndroidViewModel(applic
     private val repository = (application as LegalLensApplication).contractRepository
     private val state = MutableStateFlow(CompareSelectUiState())
     val uiState = state.asStateFlow()
-    private val effects = MutableSharedFlow<CompareSelectUiEffect>()
-    val uiEffect = effects.asSharedFlow()
+    private val effects = Channel<CompareSelectUiEffect>(Channel.BUFFERED)
+    val uiEffect = effects.receiveAsFlow()
     private var allContracts: List<CompareContract> = emptyList()
     private var isNavigating = false
 
@@ -32,11 +32,12 @@ class CompareSelectViewModel(application: Application) : AndroidViewModel(applic
             try {
                 repository.observeContracts().collect { contracts ->
                     allContracts = contracts.map(::toCompareContract)
-                    val initialId = state.value.initialContractId?.takeIf { id -> allContracts.any { it.id == id } }
                     state.update { current ->
-                        val selectedIds = current.selectedIds.filter { id -> allContracts.any { it.id == id } }
-                            .ifEmpty { listOfNotNull(initialId) }
-                        current.copy(contracts = allContracts.filter { it.title.contains(current.query, true) }, selectedIds = selectedIds, initialContractId = initialId, isInitialized = true)
+                        current.copy(
+                            contracts = allContracts.filter { it.title.contains(current.query.trim(), true) },
+                            selectedIds = current.selectedIds.filter { id -> allContracts.any { it.id == id } },
+                            isInitialized = true
+                        ).withInitialSelection(allContracts)
                     }
                 }
             } catch (cancellationException: CancellationException) {
@@ -47,9 +48,16 @@ class CompareSelectViewModel(application: Application) : AndroidViewModel(applic
         }
     }
 
+    /** The preselected contract is applied once, whichever of the screen event or the data arrives first. */
+    private fun CompareSelectUiState.withInitialSelection(available: List<CompareContract>): CompareSelectUiState {
+        val initialId = initialContractId
+        if (hasAppliedInitialSelection || initialId == null || available.none { it.id == initialId }) return this
+        return copy(selectedIds = (selectedIds + initialId).distinct().take(2), hasAppliedInitialSelection = true)
+    }
+
     fun onEvent(event: CompareSelectUiEvent) {
         when (event) {
-            is CompareSelectUiEvent.Initialize -> if (!state.value.isInitialized) state.update { it.copy(initialContractId = event.initialId) }
+            is CompareSelectUiEvent.Initialize -> state.update { it.copy(initialContractId = event.initialId).withInitialSelection(allContracts) }
             is CompareSelectUiEvent.QueryChanged -> state.update { current -> current.copy(query = event.query, contracts = allContracts.filter { it.title.contains(event.query.trim(), true) }) }
             is CompareSelectUiEvent.ContractClicked -> state.update { current ->
                 val selected = current.selectedIds
@@ -81,7 +89,7 @@ class CompareSelectViewModel(application: Application) : AndroidViewModel(applic
         return CompareContract(contract.id, title, context.getString(R.string.contract_demo_labor_subtitle))
     }
 
-    private fun emit(effect: CompareSelectUiEffect) { viewModelScope.launch { effects.emit(effect) } }
+    private fun emit(effect: CompareSelectUiEffect) { viewModelScope.launch { effects.send(effect) } }
 
     private companion object { val SAMPLE_IDS = setOf("office-lease", "collaborator", "equipment-purchase", "vehicle-lease") }
 }

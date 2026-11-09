@@ -24,10 +24,13 @@ import com.example.lagallens.presentation.feature.analysis.obligations.contract.
 import com.example.lagallens.presentation.feature.analysis.obligations.viewmodel.AnalysisObligationsViewModel
 import kotlinx.coroutines.launch
 
-class AnalysisObligationsActivity : AppCompatActivity() {
+class AnalysisObligationsActivity : com.example.lagallens.presentation.feature.analysis.AnalysisScopedActivity(), com.example.lagallens.presentation.feature.analysis.keyfacts.contract.AnalysisClauseSourceOwner {
+    override val requiresUnlock = false
+    override val observesUnlock = true
     private lateinit var binding: ActivityAnalysisObligationsBinding
     private val viewModel by viewModels<AnalysisObligationsViewModel>()
-    private val obligationsAdapter = AnalysisObligationsAdapter()
+    private val obligationsAdapter = AnalysisObligationsAdapter { id -> viewModel.onEvent(AnalysisObligationsUiEvent.SourceClicked(id)) }
+    private val lockedAdapter = com.example.lagallens.presentation.feature.analysis.adapter.AnalysisLockedPreviewAdapter { openUnlockConfirmation(viewModel.uiState.value.documentName) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,21 +53,30 @@ class AnalysisObligationsActivity : AppCompatActivity() {
                 viewModel.onEvent(AnalysisObligationsUiEvent.BackClicked)
             }
         })
+        binding.analysisObligationsBack.setOnClickListener { viewModel.onEvent(AnalysisObligationsUiEvent.BackClicked) }
+        binding.analysisObligationsTabRights.setOnClickListener { viewModel.onEvent(AnalysisObligationsUiEvent.TabSelected(com.example.lagallens.domain.model.analysis.AnalysisObligationTab.RIGHTS)) }
+        binding.analysisObligationsTabDuties.setOnClickListener { viewModel.onEvent(AnalysisObligationsUiEvent.TabSelected(com.example.lagallens.domain.model.analysis.AnalysisObligationTab.DUTIES)) }
         binding.analysisObligationsItems.apply {
             layoutManager = LinearLayoutManager(this@AnalysisObligationsActivity)
-            adapter = obligationsAdapter
+            adapter = androidx.recyclerview.widget.ConcatAdapter(obligationsAdapter, lockedAdapter)
         }
         observeViewModel()
         viewModel.onEvent(
             AnalysisObligationsUiEvent.ScreenOpened(
                 documentName = intent.getStringExtra(EXTRA_DOCUMENT_NAME)
-                    .orEmpty()
-                    .ifBlank { getString(R.string.analysis_start_document_name) },
+                    .orEmpty(),
                 documentMetadata = intent.getStringExtra(EXTRA_DOCUMENT_METADATA)
                     .orEmpty()
-                    .ifBlank { getString(R.string.analysis_start_document_metadata) }
             )
         )
+    }
+
+    override fun onAnalysisInvalidated() { viewModel.clearResult() }
+
+    override fun onAnalysisValidated(identity: com.example.lagallens.domain.model.analysis.AnalysisIdentity, detail: com.example.lagallens.domain.model.analysis.AnalysisDetail) {
+        viewModel.setResult(identity, detail, validatedUnlockStatus?.isUnlocked == true)
+        showContentStatus(viewModel.uiState.value.status)
+        render(viewModel.uiState.value)
     }
 
     private fun observeViewModel() {
@@ -77,16 +89,33 @@ class AnalysisObligationsActivity : AppCompatActivity() {
     }
 
     private fun render(state: AnalysisObligationsUiState) = with(binding) {
+        analysisContentEmpty.visibility = if (state.status == com.example.lagallens.presentation.feature.analysis.SnapshotContentStatus.EMPTY) android.view.View.VISIBLE else android.view.View.GONE
         analysisObligationsDocumentName.text = state.documentName
-        analysisObligationsDocumentMetadata.text = state.documentMetadata
+        analysisObligationsDocumentMetadata.text = getString(R.string.analysis_snapshot_demo_metadata, state.documentMetadata)
         obligationsAdapter.submitList(state.items)
+        lockedAdapter.update(state.lockedCount, validatedUnlockStatus?.cost)
+        val rights = state.selectedTab == com.example.lagallens.domain.model.analysis.AnalysisObligationTab.RIGHTS
+        analysisObligationsTabRights.setBackgroundResource(if (rights) R.drawable.bg_analysis_obligations_selected_tab else android.R.color.transparent)
+        analysisObligationsTabDuties.setBackgroundResource(if (!rights) R.drawable.bg_analysis_obligations_selected_tab else android.R.color.transparent)
+        analysisObligationsTabRights.setTextColor(getColor(if (rights) R.color.legal_lens_primary else R.color.legal_lens_secondary_text))
+        analysisObligationsTabDuties.setTextColor(getColor(if (!rights) R.color.legal_lens_primary else R.color.legal_lens_secondary_text))
+        analysisObligationsTabRights.isSelected = rights
+        analysisObligationsTabDuties.isSelected = !rights
     }
 
     private fun handleEffect(effect: AnalysisObligationsUiEffect) {
         when (effect) {
             AnalysisObligationsUiEffect.NavigateBack -> finish()
+            AnalysisObligationsUiEffect.SourceUnavailable -> android.widget.Toast.makeText(this, R.string.analysis_obligation_source_unavailable, android.widget.Toast.LENGTH_SHORT).show()
+            is AnalysisObligationsUiEffect.ShowSource -> {
+                val tag = com.example.lagallens.presentation.feature.analysis.keyfacts.dialog.AnalysisClauseSourceBottomSheet.TAG
+                if (supportFragmentManager.findFragmentByTag(tag) == null) com.example.lagallens.presentation.feature.analysis.keyfacts.dialog.AnalysisClauseSourceBottomSheet.newInstance(effect.source).show(supportFragmentManager, tag)
+            }
         }
     }
+
+    override fun isVerifiedClause(source: com.example.lagallens.presentation.feature.analysis.keyfacts.contract.AnalysisClauseSource): Boolean =
+        hasValidatedAnalysis() && viewModel.uiState.value.items.filterIsInstance<com.example.lagallens.presentation.feature.analysis.obligations.contract.AnalysisObligationsListItem.Obligation>().any { it.obligation.source == source }
 
     override fun onDestroy() {
         binding.analysisObligationsItems.adapter = null

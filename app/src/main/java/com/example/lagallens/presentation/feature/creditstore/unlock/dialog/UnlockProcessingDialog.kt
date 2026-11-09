@@ -45,7 +45,7 @@ class UnlockProcessingDialog : DialogFragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             delay(UNLOCK_PROCESSING_DELAY_MILLIS)
             parentFragmentManager.setFragmentResult(RESULT_KEY, Bundle.EMPTY)
-            dismiss()
+            dismissAllowingStateLoss()
         }
     }
 

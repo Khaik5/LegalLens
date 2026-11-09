@@ -9,6 +9,7 @@ import com.example.lagallens.databinding.ItemAnalysisSummarySectionBinding
 import com.example.lagallens.presentation.feature.analysis.summary.contract.AnalysisSummarySection
 
 class AnalysisSummaryAdapter : ListAdapter<AnalysisSummarySection, AnalysisSummaryAdapter.ViewHolder>(DiffCallback) {
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder = ViewHolder(
         ItemAnalysisSummarySectionBinding.inflate(LayoutInflater.from(parent.context), parent, false)
     )
@@ -21,14 +22,14 @@ class AnalysisSummaryAdapter : ListAdapter<AnalysisSummarySection, AnalysisSumma
         private val binding: ItemAnalysisSummarySectionBinding
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: AnalysisSummarySection) = with(binding) {
-            analysisSummarySectionTitle.setText(item.titleRes)
-            analysisSummarySectionDescription.setText(item.descriptionRes)
+            analysisSummarySectionTitle.text = item.title
+            analysisSummarySectionDescription.text = item.description
         }
     }
 
     private object DiffCallback : DiffUtil.ItemCallback<AnalysisSummarySection>() {
         override fun areItemsTheSame(oldItem: AnalysisSummarySection, newItem: AnalysisSummarySection): Boolean =
-            oldItem.titleRes == newItem.titleRes
+            oldItem.id == newItem.id
 
         override fun areContentsTheSame(oldItem: AnalysisSummarySection, newItem: AnalysisSummarySection): Boolean =
             oldItem == newItem

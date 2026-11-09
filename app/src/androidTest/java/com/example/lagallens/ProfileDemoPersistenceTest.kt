@@ -10,7 +10,7 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class ProfileDemoPersistenceTest {
-    @Test fun editedProfilePersistsWithoutHardcodedIdentity() {
+    @Test fun editedProfilePersistsWithoutHardcodedIdentity() = kotlinx.coroutines.runBlocking<Unit> {
         val context = ApplicationProvider.getApplicationContext<android.content.Context>()
         val accountId = java.util.UUID.randomUUID().toString()
         val repository = ProfileRepositoryImpl(ProfileLocalDataSource(context, { accountId }) { "demo.user@example.test" })
@@ -23,7 +23,7 @@ class ProfileDemoPersistenceTest {
         assertEquals(saved, restored)
     }
 
-    @Test fun logoutClearsProfileDataButKeepsPresentationSettings() {
+    @Test fun logoutClearsProfileDataButKeepsPresentationSettings() = kotlinx.coroutines.runBlocking<Unit> {
         val context = ApplicationProvider.getApplicationContext<android.content.Context>()
         var accountId: String? = java.util.UUID.randomUUID().toString()
         val originalId = accountId

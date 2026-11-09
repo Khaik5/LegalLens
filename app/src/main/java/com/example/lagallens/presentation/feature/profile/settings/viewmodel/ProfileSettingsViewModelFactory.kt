@@ -9,7 +9,8 @@ import com.example.lagallens.domain.usecase.UpdateProfileLanguageUseCase
 class ProfileSettingsViewModelFactory(
     private val observeProfileSettingsUseCase: ObserveProfileSettingsUseCase,
     private val updateProfileAppearanceUseCase: UpdateProfileAppearanceUseCase,
-    private val updateProfileLanguageUseCase: UpdateProfileLanguageUseCase
+    private val updateProfileLanguageUseCase: UpdateProfileLanguageUseCase,
+    private val updateNotificationPreferencesUseCase: com.example.lagallens.domain.usecase.UpdateNotificationPreferencesUseCase
 ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -17,7 +18,8 @@ class ProfileSettingsViewModelFactory(
             return ProfileSettingsViewModel(
                 observeProfileSettingsUseCase,
                 updateProfileAppearanceUseCase,
-                updateProfileLanguageUseCase
+                updateProfileLanguageUseCase,
+                updateNotificationPreferencesUseCase
             ) as T
         }
         throw IllegalArgumentException("Unsupported ViewModel class: ${modelClass.name}")

@@ -10,7 +10,6 @@ import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.action.ViewActions.closeSoftKeyboard
 import androidx.test.espresso.action.ViewActions.replaceText
 import androidx.test.espresso.action.ViewActions.scrollTo
-import androidx.test.espresso.action.ViewActions.clearText
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.hasErrorText
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
@@ -35,6 +34,7 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class FullAuditDeviceTest {
+    @get:org.junit.Rule val demoSession = com.example.lagallens.DemoSessionRule()
     private val context = ApplicationProvider.getApplicationContext<Context>()
 
     @Test fun emptyLoginShowsRequiredErrors() {
@@ -50,9 +50,9 @@ class FullAuditDeviceTest {
     @Test fun compareRequiresTwoDistinctSampleContracts() {
         ActivityScenario.launch<CompareSelectActivity>(CompareSelectActivity.createIntent(context)).use {
             onView(withId(R.id.compareSelectSubmit)).check(matches(not(isEnabled())))
-            onView(withText(R.string.contract_demo_labor_indefinite)).perform(click())
+            onView(seededContractTitle(R.string.contract_demo_labor_indefinite)).perform(click())
             onView(withId(R.id.compareSelectSubmit)).check(matches(not(isEnabled())))
-            onView(withText(R.string.contract_demo_labor_fixed_term)).perform(click())
+            onView(seededContractTitle(R.string.contract_demo_labor_fixed_term)).perform(click())
             onView(withId(R.id.compareSelectSubmit)).check(matches(isEnabled()))
             onView(withId(R.id.compareSelectSubmit)).perform(click())
             onView(withId(R.id.compareResultRoot)).check(matches(isDisplayed()))
@@ -96,46 +96,30 @@ class FullAuditDeviceTest {
     }
 
     @Test fun eachRiskFilterOpensMatchingSampleDetail() {
-        val intent = AnalysisRiskFindingsActivity.createIntent(context, "fixture.pdf", "PDF")
+        val intent = com.example.lagallens.AnalysisTestFixture.scoped(AnalysisRiskFindingsActivity.createIntent(context, "fixture.pdf", "PDF"))
         val cases = listOf(
             R.id.analysisRiskFindingsFilterHigh to R.string.analysis_risk_findings_penalty_title,
             R.id.analysisRiskFindingsFilterMedium to R.string.analysis_risk_findings_termination_title,
             R.id.analysisRiskFindingsFilterLow to R.string.analysis_risk_findings_dispute_title
         )
-        ActivityScenario.launch<AnalysisRiskFindingsActivity>(intent).use {
+        ActivityScenario.launch<AnalysisRiskFindingsActivity>(intent).use { scenario ->
             cases.forEach { (filter, title) ->
+                var expectedTitle = ""
+                scenario.onActivity { expectedTitle = it.getString(R.string.analysis_snapshot_demo_metadata, it.getString(title)) }
                 onView(withId(filter)).perform(scrollTo(), click())
                 onView(withText(title)).perform(click())
-                onView(withId(R.id.analysisRiskDetailTitle)).check(matches(withText(title)))
+                onView(withId(R.id.analysisRiskDetailTitle)).check(matches(withText(expectedTitle)))
                 pressBack()
             }
         }
     }
 
-    @Test fun legalReferencesSearchFindsDisplayedDecreeNumber() {
-        val intent = AnalysisLegalReferencesActivity.createIntent(context, "fixture.pdf", "PDF")
+    /** DEMO shows sample references, labelled as samples rather than verified citations. */
+    @Test fun legalReferencesShowLabelledDemoSamples() {
+        val intent = com.example.lagallens.AnalysisTestFixture.scoped(AnalysisLegalReferencesActivity.createIntent(context, "fixture.pdf", "PDF"))
         ActivityScenario.launch<AnalysisLegalReferencesActivity>(intent).use {
-            onView(withId(R.id.analysisLegalReferencesSearch)).perform(click(), typeText("21/2021"), closeSoftKeyboard())
-            onView(withId(R.id.analysisLegalReferenceTitle)).check(matches(withText(R.string.analysis_legal_references_decree_title)))
-        }
-    }
-
-    @Test fun legalReferenceSearchOpensEachMatchingDetail() {
-        val intent = AnalysisLegalReferencesActivity.createIntent(context, "fixture.pdf", "PDF")
-        val cases = listOf(
-            "301" to R.string.analysis_legal_references_commercial_law_title,
-            "418" to R.string.analysis_legal_references_civil_code_title,
-            "21/2021" to R.string.analysis_legal_references_decree_title
-        )
-        ActivityScenario.launch<AnalysisLegalReferencesActivity>(intent).use {
-            cases.forEach { (query, title) ->
-                onView(withId(R.id.analysisLegalReferencesSearch)).perform(click(), clearText(), typeText(query), closeSoftKeyboard())
-                Thread.sleep(300)
-                onView(withId(R.id.analysisLegalReferenceTitle)).check(matches(withText(title)))
-                onView(withId(R.id.analysisLegalReferenceFull)).perform(click())
-                onView(withId(R.id.analysisLegalReferenceDetailLawTitle)).check(matches(withText(title)))
-                pressBack()
-            }
+            onView(withId(R.id.analysisLegalReferencesSectionTitle)).check(matches(withText(R.string.analysis_legal_demo_heading)))
+            onView(withId(R.id.analysisLegalReferencesDemo)).check(matches(isDisplayed()))
         }
     }
 

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="contract_list_empty">Chưa có hợp đồng phù hợp.</string>
+    <string name="contract_action_failed">Không thể thực hiện thao tác. Vui lòng thử lại.</string>
+    <string name="chatbot_history_load_failed">Không thể tải hội thoại. Vui lòng thử lại.</string>
+    <string name="chatbot_save_failed">Không thể lưu hội thoại.</string>
+    <string name="chatbot_draft_load_failed">Không thể tải bản nháp.</string>
+    <string name="chatbot_draft_version_row">%1$s · %2$s</string>
+    <string name="ocr_edit_save_failed">Không thể lưu nội dung đã sửa.</string>
+    <string name="credit_success_transaction">%1$s · %2$s</string>
+</resources>

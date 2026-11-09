@@ -120,7 +120,7 @@ class NotificationFragment : Fragment() {
             binding.notificationEmptyTitle.setText(R.string.notification_empty_title)
             binding.notificationEmptyDescription.setText(R.string.notification_empty_description)
         }
-        binding.filterScrollView.isVisible = hasNotifications
+        binding.filterScrollView.isVisible = true
         binding.tvMarkAllRead.isVisible = hasNotifications
         updateFilterStyle(binding.tvFilterAll, state.selectedFilter == NotificationFilter.ALL)
         updateFilterStyle(binding.tvFilterAnalysis, state.selectedFilter == NotificationFilter.ANALYSIS)

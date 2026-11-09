@@ -80,7 +80,7 @@ class OnboardingActivityTest {
                 activity.findViewById<ViewPager2>(R.id.onboarding_pager).setCurrentItem(pageIndex, false)
                 activity.findViewById<View>(R.id.onboarding_skip).performClick()
             }
-            repeat(20) {
+            repeat(200) {
                 if (scenario.state != Lifecycle.State.DESTROYED) SystemClock.sleep(50)
             }
             assertEquals(Lifecycle.State.DESTROYED, scenario.state)

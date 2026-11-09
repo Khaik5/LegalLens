@@ -12,6 +12,7 @@ import androidx.core.view.WindowCompat
 import com.example.lagallens.R
 import com.example.lagallens.databinding.BottomSheetAnalysisClauseSourceBinding
 import com.example.lagallens.presentation.feature.analysis.keyfacts.contract.AnalysisClauseSource
+import com.example.lagallens.presentation.feature.analysis.keyfacts.ui.AnalysisKeyFactsActivity
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -51,9 +52,12 @@ class AnalysisClauseSourceBottomSheet : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.analysisClauseSourceReference.setText(requireArguments().getInt(REFERENCE_RES_KEY))
-        binding.analysisClauseSourceTitle.setText(requireArguments().getInt(TITLE_RES_KEY))
-        binding.analysisClauseSourceExcerpt.setText(requireArguments().getInt(EXCERPT_RES_KEY))
+        val args = requireArguments()
+        val source = AnalysisClauseSource(args.getString(REFERENCE_RES_KEY).orEmpty(), args.getString(TITLE_RES_KEY).orEmpty(), args.getString(EXCERPT_RES_KEY).orEmpty())
+        if ((activity as? com.example.lagallens.presentation.feature.analysis.keyfacts.contract.AnalysisClauseSourceOwner)?.isVerifiedClause(source) != true) { dismissAllowingStateLoss(); return }
+        binding.analysisClauseSourceReference.text = source.reference
+        binding.analysisClauseSourceTitle.text = source.title
+        binding.analysisClauseSourceExcerpt.text = source.excerpt
         binding.analysisClauseSourceCloseIcon.setOnClickListener { dismiss() }
         binding.analysisClauseSourceCloseButton.setOnClickListener { dismiss() }
     }
@@ -73,9 +77,9 @@ class AnalysisClauseSourceBottomSheet : BottomSheetDialogFragment() {
         fun newInstance(source: AnalysisClauseSource): AnalysisClauseSourceBottomSheet {
             return AnalysisClauseSourceBottomSheet().apply {
                 arguments = Bundle().apply {
-                    putInt(REFERENCE_RES_KEY, source.referenceRes)
-                    putInt(TITLE_RES_KEY, source.titleRes)
-                    putInt(EXCERPT_RES_KEY, source.excerptRes)
+                    putString(REFERENCE_RES_KEY, source.reference)
+                    putString(TITLE_RES_KEY, source.title)
+                    putString(EXCERPT_RES_KEY, source.excerpt)
                 }
             }
         }

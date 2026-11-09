@@ -11,4 +11,7 @@ sealed interface ProfileUiEffect {
     data object NavigateToChangePassword : ProfileUiEffect
     data object ShowLogoutConfirmation : ProfileUiEffect
     data object NavigateToAuthentication : ProfileUiEffect
+    data object ShowLogoutFailed : ProfileUiEffect
+    data object ProfileSaveSucceeded : ProfileUiEffect
+    data object ProfileSaveFailed : ProfileUiEffect
 }

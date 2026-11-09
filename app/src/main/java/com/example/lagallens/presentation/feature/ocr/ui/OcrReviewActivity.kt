@@ -11,6 +11,7 @@ import android.text.style.StyleSpan
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
+import androidx.core.view.isVisible
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -26,12 +27,13 @@ import com.example.lagallens.presentation.feature.ocr.contract.OcrReviewWarning
 import com.example.lagallens.presentation.feature.ocr.viewmodel.OcrReviewViewModel
 import kotlinx.coroutines.launch
 
-class OcrReviewActivity : AppCompatActivity() {
+class OcrReviewActivity : com.example.lagallens.presentation.feature.ocr.OcrSessionActivity() {
     private lateinit var binding: ActivityOcrReviewBinding
     private val viewModel by viewModels<OcrReviewViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (isFinishing || !isOcrSessionValid() || intent.getStringExtra(EXTRA_DOCUMENT_ID).isNullOrBlank()) { finish(); return }
         WindowCompat.setDecorFitsSystemWindows(window, false)
         window.statusBarColor = Color.TRANSPARENT
         window.navigationBarColor = Color.TRANSPARENT
@@ -56,7 +58,8 @@ class OcrReviewActivity : AppCompatActivity() {
         viewModel.onEvent(OcrReviewEvent.ScreenOpened(
             intent.getStringExtra(EXTRA_DOCUMENT_ID).orEmpty(),
             intent.getStringExtra(EXTRA_CONTRACT_ID),
-            intent.getStringExtra(EXTRA_DOCUMENT_TEXT).orEmpty()
+            intent.getStringExtra(EXTRA_DOCUMENT_TEXT).orEmpty(),
+            warningsFrom(intent)
         ))
         bindEvents()
         observeViewModel()
@@ -84,27 +87,19 @@ class OcrReviewActivity : AppCompatActivity() {
     }
 
     private fun render(state: OcrReviewUiState) = with(binding) {
+        if (!isOcrSessionValid()) { root.visibility = android.view.View.INVISIBLE; return@with }
         if (ocrReviewDocumentText.text.toString() != state.documentText) {
             ocrReviewDocumentText.setText(state.documentText)
             ocrReviewDocumentText.setSelection(state.documentText.length)
         }
+        ocrReviewWarningTitle.isVisible = state.warnings.isNotEmpty()
+        (ocrReviewWarningOneSection.parent.parent as android.view.View).isVisible = state.warnings.isNotEmpty()
+        (ocrReviewWarningTwoSection.parent.parent as android.view.View).isVisible = state.warnings.size > 1
         state.warnings.getOrNull(0)?.let { warning ->
-            renderWarning(
-                warning,
-                ocrReviewWarningOneSection,
-                ocrReviewWarningOneConfidence,
-                ocrReviewWarningOneRecognized,
-                ocrReviewWarningOneSource
-            )
+            renderWarning(warning, ocrReviewWarningOneSection, ocrReviewWarningOneConfidence, ocrReviewWarningOneRecognized, ocrReviewWarningOneSource)
         }
         state.warnings.getOrNull(1)?.let { warning ->
-            renderWarning(
-                warning,
-                ocrReviewWarningTwoSection,
-                ocrReviewWarningTwoConfidence,
-                ocrReviewWarningTwoRecognized,
-                ocrReviewWarningTwoSource
-            )
+            renderWarning(warning, ocrReviewWarningTwoSection, ocrReviewWarningTwoConfidence, ocrReviewWarningTwoRecognized, ocrReviewWarningTwoSource)
         }
     }
 
@@ -115,9 +110,9 @@ class OcrReviewActivity : AppCompatActivity() {
         recognized: android.widget.TextView,
         source: android.widget.TextView
     ) {
-        section.setText(warning.sectionRes)
-        confidence.setText(warning.confidenceRes)
-        val recognizedValue = getString(warning.recognizedValueRes)
+        section.text = warning.section
+        confidence.text = warning.confidence
+        val recognizedValue = warning.recognizedValue
         val renderedRecognized = getString(R.string.ocr_review_recognized_text, recognizedValue)
         recognized.text = Spannable.Factory.getInstance().newSpannable(renderedRecognized).apply {
             setSpan(
@@ -127,10 +122,11 @@ class OcrReviewActivity : AppCompatActivity() {
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
             )
         }
-        source.setText(warning.sourceRes)
+        source.text = warning.source
     }
 
     private fun handleEffect(effect: OcrReviewEffect) {
+        if (!isOcrSessionValid()) return
         when (effect) {
             OcrReviewEffect.NavigateBack -> finish()
             is OcrReviewEffect.FinishWithConfirmedReview -> {
@@ -150,10 +146,27 @@ class OcrReviewActivity : AppCompatActivity() {
         const val EXTRA_CONTRACT_ID = "ocr_review_contract_id"
         const val EXTRA_DOCUMENT_TEXT = "ocr_review_document_text"
 
-        fun createIntent(context: Context, documentId: String = "", contractId: String? = null, documentText: String = ""): Intent =
-            Intent(context, OcrReviewActivity::class.java)
+        private const val EXTRA_WARNING_SECTIONS = "ocr_review_warning_sections"
+        private const val EXTRA_WARNING_CONFIDENCES = "ocr_review_warning_confidences"
+        private const val EXTRA_WARNING_VALUES = "ocr_review_warning_values"
+        private const val EXTRA_WARNING_SOURCES = "ocr_review_warning_sources"
+
+        private fun warningsFrom(intent: Intent): List<OcrReviewWarning> {
+            val sections = intent.getStringArrayListExtra(EXTRA_WARNING_SECTIONS).orEmpty()
+            val confidences = intent.getStringArrayListExtra(EXTRA_WARNING_CONFIDENCES).orEmpty()
+            val values = intent.getStringArrayListExtra(EXTRA_WARNING_VALUES).orEmpty()
+            val sources = intent.getStringArrayListExtra(EXTRA_WARNING_SOURCES).orEmpty()
+            return sections.indices.map { OcrReviewWarning(sections[it], confidences[it], values[it], sources[it]) }
+        }
+
+        fun createIntent(context: Context, documentId: String = "", contractId: String? = null, documentText: String = "", warnings: List<com.example.lagallens.domain.model.ocr.OcrWarning> = emptyList()): Intent =
+            com.example.lagallens.presentation.feature.ocr.OcrSession.stamp(context, Intent(context, OcrReviewActivity::class.java)
                 .putExtra(EXTRA_DOCUMENT_ID, documentId)
                 .putExtra(EXTRA_CONTRACT_ID, contractId)
                 .putExtra(EXTRA_DOCUMENT_TEXT, documentText)
+                .putStringArrayListExtra(EXTRA_WARNING_SECTIONS, ArrayList(warnings.map { it.section }))
+                .putStringArrayListExtra(EXTRA_WARNING_CONFIDENCES, ArrayList(warnings.map { it.confidence }))
+                .putStringArrayListExtra(EXTRA_WARNING_VALUES, ArrayList(warnings.map { it.recognizedValue }))
+                .putStringArrayListExtra(EXTRA_WARNING_SOURCES, ArrayList(warnings.map { it.source })))
     }
 }

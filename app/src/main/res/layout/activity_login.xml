@@ -87,7 +87,8 @@
                 android:id="@+id/emailInput"
                 style="@style/AuthInput"
                 android:hint="@string/login_username_hint"
-                android:inputType="text" />
+                android:autofillHints="emailAddress"
+                android:inputType="textEmailAddress" />
 
             <TextView
                 android:id="@+id/passwordLabel"

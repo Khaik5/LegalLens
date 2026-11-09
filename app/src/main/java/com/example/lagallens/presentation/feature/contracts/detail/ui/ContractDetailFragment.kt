@@ -38,7 +38,8 @@ class ContractDetailFragment : Fragment() {
     private var _binding: FragmentContractDetailBinding? = null
     private val binding get() = _binding!!
     private val viewModel by viewModels<ContractDetailViewModel> {
-        ContractDetailViewModel.Factory((requireActivity().application as LegalLensApplication).contractRepository)
+        val app = requireActivity().application as LegalLensApplication
+        ContractDetailViewModel.Factory(app.contractRepository, app.syncContractRelatedDataUseCase)
     }
     private val assistantAdapter = ContractAssistantAdapter { action ->
         viewModel.onEvent(ContractDetailUiEvent.AssistantActionClicked(action))
@@ -98,29 +99,26 @@ class ContractDetailFragment : Fragment() {
                 viewModel.uiEffect.collect { effect ->
                     when (effect) {
                         ContractDetailUiEffect.NavigateBack -> findNavController().navigateUp()
-                        is ContractDetailUiEffect.NavigateToDocument -> startActivity(DocumentViewerActivity.createIntent(requireContext(), effect.contractId))
+                        is ContractDetailUiEffect.NavigateToDocument -> startActivity(
+                            effect.documentUri?.let { DocumentViewerActivity.createIntent(requireContext(), android.net.Uri.parse(it), effect.title) }
+                                ?: DocumentViewerActivity.createIntent(requireContext(), effect.contractId, effect.title)
+                        )
                         is ContractDetailUiEffect.NavigateToCompare -> startActivity(CompareSelectActivity.createIntent(requireContext(), effect.contractId))
-                        is ContractDetailUiEffect.NavigateToOcrText -> startActivity(
+                        is ContractDetailUiEffect.NavigateToOcrText -> if (effect.ownerSession != null && effect.ownerSession == (requireActivity().application as LegalLensApplication).currentSessionKey()) startActivity(
                             OcrResultActivity.createIntent(
                                 context = requireContext(),
                                 documentName = effect.documentName,
-                                documentDetails = getString(effect.documentDetailsRes),
+                                documentDetails = effect.documentDetails,
                                 documentId = effect.documentId,
                                 contractId = effect.contractId,
                                 initialContent = effect.content
-                            )
+                            ).putExtra(com.example.lagallens.presentation.feature.ocr.OcrSession.EXTRA_OWNER, effect.ownerSession)
                         )
-                        is ContractDetailUiEffect.NavigateToAnalysis -> startActivity(
-                            AnalysisStartActivity.createIntent(
-                                context = requireContext(),
-                                documentName = getString(effect.documentNameRes),
-                                documentMetadata = getString(effect.documentMetadataRes)
-                            )
-                        )
+                        is ContractDetailUiEffect.NavigateToAnalysis -> openAnalysis(effect)
                         is ContractDetailUiEffect.NavigateToChatbot -> startActivity(
                             ChatbotActivity.createIntent(
                                 requireContext(),
-                                getString(effect.contractNameRes),
+                                effect.contractName,
                                 getString(effect.contractTypeRes),
                                 effect.contractId
                             )
@@ -143,15 +141,58 @@ class ContractDetailFragment : Fragment() {
         }
     }
 
+    private fun openAnalysis(effect: ContractDetailUiEffect.NavigateToAnalysis) {
+        val app = requireActivity().application as LegalLensApplication
+        val repository = app.analysisIdentityRepository
+        val session = repository.sessionKey()
+        if (session.isNullOrBlank()) {
+            Toast.makeText(requireContext(), R.string.auth_backend_not_configured, Toast.LENGTH_LONG).show()
+            return
+        }
+        viewLifecycleOwner.lifecycleScope.launch {
+            val latest = try { repository.latest(effect.contractId, session) }
+            catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
+            catch (_: com.example.lagallens.domain.repository.AnalysisContentUnavailableException) {
+                if (repository.sessionKey() == session && isAdded) Toast.makeText(requireContext(), R.string.analysis_result_unavailable, Toast.LENGTH_LONG).show()
+                return@launch
+            } catch (_: Exception) {
+                if (repository.sessionKey() == session && isAdded) Toast.makeText(requireContext(), R.string.analysis_storage_error, Toast.LENGTH_LONG).show()
+                return@launch
+            }
+            if (repository.sessionKey() != session || !isAdded) return@launch
+            fun startNew() {
+                if (repository.sessionKey() != session || !isAdded) return
+                startActivity(AnalysisStartActivity.createIntent(requireContext(), effect.documentName,
+                    effect.documentMetadata, effect.contractId, effect.documentId))
+            }
+            if (latest == null) { startNew(); return@launch }
+            androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                .setMessage(R.string.analysis_existing_result_prompt)
+                .setPositiveButton(R.string.analysis_open_existing) { _, _ ->
+                    if (repository.sessionKey() == session && isAdded) {
+                        val target = com.example.lagallens.presentation.feature.analysis.result.ui.AnalysisResultActivity.createIntent(
+                            requireContext(), effect.documentName, effect.documentMetadata)
+                        target.putExtra(com.example.lagallens.presentation.feature.analysis.processing.ui.AnalysisProcessingActivity.EXTRA_RESULT_ID, latest.resultId)
+                        target.putExtra(com.example.lagallens.presentation.feature.analysis.processing.ui.AnalysisProcessingActivity.EXTRA_SESSION_KEY, session)
+                        startActivity(target)
+                    }
+                }
+                .setNegativeButton(R.string.analysis_start_new) { _, _ -> startNew() }
+                .setNeutralButton(android.R.string.cancel, null)
+                .show()
+        }
+    }
+
     private fun render(state: ContractDetailUiState) {
-        binding.tvContractTitle.text = state.renamedTitle ?: getString(state.titleRes)
+        binding.tvContractTitle.text = state.renamedTitle.orEmpty()
         binding.tvContractType.setText(state.contractTypeRes)
         binding.tvStatus.setText(state.statusRes)
         binding.tvRisk.setText(state.riskRes)
-        binding.tvCreatedAt.setText(state.createdAtRes)
-        binding.tvUpdatedAt.setText(state.updatedAtRes)
-        binding.tvPageCount.setText(state.pageCountRes)
-        binding.tvFileFormat.setText(state.fileFormatRes)
+        val dateFormat = java.text.DateFormat.getDateInstance(java.text.DateFormat.MEDIUM)
+        binding.tvCreatedAt.text = state.createdAtMillis.takeIf { it > 0 }?.let { dateFormat.format(java.util.Date(it)) } ?: UNKNOWN_VALUE
+        binding.tvUpdatedAt.text = state.updatedAtMillis.takeIf { it > 0 }?.let { dateFormat.format(java.util.Date(it)) } ?: UNKNOWN_VALUE
+        binding.tvPageCount.text = state.pageCount?.let { getString(R.string.contract_page_count_format, it) } ?: UNKNOWN_VALUE
+        binding.tvFileFormat.text = state.fileFormat.ifBlank { UNKNOWN_VALUE }
         binding.tvStatus.setBackgroundResource(state.statusBackgroundRes)
         binding.tvStatus.setTextColor(ContextCompat.getColor(requireContext(), state.statusTextColorRes))
         binding.tvRisk.setBackgroundResource(state.riskBackgroundRes)
@@ -172,6 +213,7 @@ class ContractDetailFragment : Fragment() {
     }
 
     companion object {
+        private const val UNKNOWN_VALUE = "\u2014"
         const val ARG_CONTRACT_ID = "contractId"
     }
 }

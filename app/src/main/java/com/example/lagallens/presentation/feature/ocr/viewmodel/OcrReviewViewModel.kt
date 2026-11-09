@@ -4,11 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.lagallens.presentation.feature.ocr.contract.OcrReviewEffect
 import com.example.lagallens.presentation.feature.ocr.contract.OcrReviewEvent
-import com.example.lagallens.presentation.feature.ocr.contract.OcrReviewSample
 import com.example.lagallens.presentation.feature.ocr.contract.OcrReviewUiState
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
@@ -16,15 +15,15 @@ class OcrReviewViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(OcrReviewUiState())
     val uiState = _uiState.asStateFlow()
 
-    private val _effects = MutableSharedFlow<OcrReviewEffect>()
-    val effects = _effects.asSharedFlow()
+    private val _effects = Channel<OcrReviewEffect>(Channel.BUFFERED)
+    val effects = _effects.receiveAsFlow()
 
     fun onEvent(event: OcrReviewEvent) {
         when (event) {
             is OcrReviewEvent.ScreenOpened -> {
                 val current = _uiState.value
                 if (current.documentId != event.documentId || event.documentId.isBlank()) {
-                    _uiState.value = current.copy(documentId = event.documentId, contractId = event.contractId, documentText = event.documentText)
+                    _uiState.value = current.copy(documentId = event.documentId, contractId = event.contractId, documentText = event.documentText, warnings = event.warnings)
                 }
             }
             is OcrReviewEvent.DocumentTextChanged -> _uiState.value = _uiState.value.copy(documentText = event.documentText)
@@ -37,6 +36,6 @@ class OcrReviewViewModel : ViewModel() {
     }
 
     private fun emitEffect(effect: OcrReviewEffect) {
-        viewModelScope.launch { _effects.emit(effect) }
+        viewModelScope.launch { _effects.send(effect) }
     }
 }

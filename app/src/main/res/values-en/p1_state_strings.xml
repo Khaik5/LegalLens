@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="contract_list_empty">No matching contracts.</string>
+    <string name="contract_action_failed">The action could not be completed. Please try again.</string>
+    <string name="chatbot_history_load_failed">The conversation could not be loaded. Please try again.</string>
+    <string name="chatbot_save_failed">The conversation could not be saved.</string>
+    <string name="chatbot_draft_load_failed">The draft could not be loaded.</string>
+    <string name="chatbot_draft_version_row">%1$s · %2$s</string>
+    <string name="ocr_edit_save_failed">The edited text could not be saved.</string>
+    <string name="credit_success_transaction">%1$s · %2$s</string>
+</resources>

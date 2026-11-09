@@ -16,13 +16,15 @@ data class ChatbotMessage(
     val error: ChatbotError? = null,
     val showDraftNotice: Boolean = false,
     val isDraftAction: Boolean = false,
-    val isDraftLoading: Boolean = false
+    val isDraftLoading: Boolean = false,
+    val createdAtEpochMillis: Long = System.currentTimeMillis()
 )
 
 data class ChatbotCitation(
     val title: String,
     val description: String,
-    val actionLabel: String
+    val actionLabel: String,
+    val referenceId: String? = null
 )
 
 data class ChatbotReference(
@@ -37,5 +39,6 @@ data class ChatbotNoEvidence(
 
 data class ChatbotError(
     val title: String,
-    val retryLabel: String
+    val retryLabel: String,
+    val titleRes: Int? = null
 )

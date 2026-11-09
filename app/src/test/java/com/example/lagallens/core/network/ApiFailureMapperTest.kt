@@ -1,6 +1,5 @@
 package com.example.lagallens.core.network
 
-import com.example.lagallens.data.repository.UnconfiguredRemoteAuthRepository
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
@@ -29,7 +28,7 @@ class ApiFailureMapperTest {
         assertEquals(ApiFailureKind.TIMEOUT, ApiFailureMapper.map(SocketTimeoutException()).kind)
         assertTrue(ApiFailureMapper.map(IOException()).retryable)
         assertEquals(ApiFailureKind.BACKEND_NOT_CONFIGURED, ApiFailureMapper.map(
-            runCatching { UnconfiguredRemoteAuthRepository().authenticate("a", "b") }.exceptionOrNull()!!
+            BackendNotConfiguredException("Auth")
         ).kind)
         assertEquals(ApiFailureKind.EMPTY_RESPONSE, ApiFailureMapper.map(EmptyApiResponseException("test")).kind)
         assertFalse(mapStatus(401).retryable)

@@ -12,6 +12,7 @@ import com.example.lagallens.presentation.feature.analysis.keyfacts.contract.Ana
 class AnalysisKeyFactsAdapter(
     private val onSourceClicked: (AnalysisClauseSource) -> Unit
 ) : ListAdapter<AnalysisKeyFact, AnalysisKeyFactsAdapter.ViewHolder>(DiffCallback) {
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder = ViewHolder(
         ItemAnalysisKeyFactBinding.inflate(LayoutInflater.from(parent.context), parent, false)
     )
@@ -25,12 +26,11 @@ class AnalysisKeyFactsAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(
             item: AnalysisKeyFact,
-            onSourceClicked: (AnalysisClauseSource) -> Unit
-        ) = with(binding) {
-            analysisKeyFactLabel.setText(item.labelRes)
-            analysisKeyFactReference.setText(item.referenceRes)
-            analysisKeyFactValue.setText(item.valueRes)
-            analysisKeyFactDescription.setText(item.descriptionRes)
+            onSourceClicked: (AnalysisClauseSource) -> Unit) = with(binding) {
+            analysisKeyFactLabel.text = item.label
+            analysisKeyFactReference.text = item.reference
+            analysisKeyFactValue.text = item.value
+            analysisKeyFactDescription.text = item.description
             analysisKeyFactSource.setOnClickListener { item.source?.let(onSourceClicked) }
             analysisKeyFactSource.isClickable = item.source != null
         }
@@ -38,7 +38,7 @@ class AnalysisKeyFactsAdapter(
 
     private object DiffCallback : DiffUtil.ItemCallback<AnalysisKeyFact>() {
         override fun areItemsTheSame(oldItem: AnalysisKeyFact, newItem: AnalysisKeyFact): Boolean =
-            oldItem.labelRes == newItem.labelRes
+            oldItem.id == newItem.id
 
         override fun areContentsTheSame(oldItem: AnalysisKeyFact, newItem: AnalysisKeyFact): Boolean =
             oldItem == newItem

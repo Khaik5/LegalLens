@@ -5,9 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.lagallens.presentation.feature.analysis.failure.contract.AnalysisFailureUiEffect
 import com.example.lagallens.presentation.feature.analysis.failure.contract.AnalysisFailureUiEvent
 import com.example.lagallens.presentation.feature.analysis.failure.contract.AnalysisFailureUiState
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -16,8 +16,8 @@ class AnalysisFailureViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(AnalysisFailureUiState())
     val uiState = _uiState.asStateFlow()
 
-    private val _uiEffect = MutableSharedFlow<AnalysisFailureUiEffect>()
-    val uiEffect = _uiEffect.asSharedFlow()
+    private val _uiEffect = Channel<AnalysisFailureUiEffect>(Channel.BUFFERED)
+    val uiEffect = _uiEffect.receiveAsFlow()
 
     fun onEvent(event: AnalysisFailureUiEvent) {
         when (event) {
@@ -40,6 +40,6 @@ class AnalysisFailureViewModel : ViewModel() {
     }
 
     private fun emitEffect(effect: AnalysisFailureUiEffect) {
-        viewModelScope.launch { _uiEffect.emit(effect) }
+        viewModelScope.launch { _uiEffect.send(effect) }
     }
 }

@@ -27,19 +27,22 @@ import com.example.lagallens.presentation.feature.ocr.saved.ui.OcrSavedActivity
 import com.example.lagallens.presentation.feature.ocr.ui.OcrReviewActivity
 import kotlinx.coroutines.launch
 
-class OcrResultActivity : AppCompatActivity() {
+class OcrResultActivity : com.example.lagallens.presentation.feature.ocr.OcrSessionActivity() {
     private lateinit var binding: ActivityOcrResultBinding
     private val viewModel by viewModels<OcrResultViewModel> {
+        val app = application as LegalLensApplication
+        val owner = ownerSession
         OcrResultViewModel.Factory(
-            (application as LegalLensApplication).getOcrResultUseCase,
-            (application as LegalLensApplication).documentRepository,
-            (application as LegalLensApplication).contractRepository
+            app.getOcrResultUseCase,
+            app.documentRepository.forSession(owner),
+            app.contractRepository.forSession(owner),
+            { owner.isNotBlank() && app.currentSessionKey() == owner }
         )
     }
     private val ocrReviewLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
-        if (result.resultCode == RESULT_OK) {
+        if (isOcrSessionValid() && result.resultCode == RESULT_OK) {
             if (result.data?.getBooleanExtra(OcrReviewActivity.EXTRA_REVIEW_CONFIRMED, false) == true) {
                 viewModel.onEvent(OcrResultUiEvent.ReviewConfirmed(
                     result.data?.getStringExtra(OcrReviewActivity.EXTRA_DOCUMENT_TEXT),
@@ -52,7 +55,7 @@ class OcrResultActivity : AppCompatActivity() {
     private val ocrEditorLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
-        if (result.resultCode == RESULT_OK) {
+        if (isOcrSessionValid() && result.resultCode == RESULT_OK) {
             result.data?.getStringExtra(OcrEditorActivity.EXTRA_EDITED_TEXT)?.let {
                 viewModel.onEvent(OcrResultUiEvent.DocumentUpdated(it))
             }
@@ -61,6 +64,7 @@ class OcrResultActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (isFinishing || !isOcrSessionValid() || intent.getStringExtra(EXTRA_DOCUMENT_ID).isNullOrBlank()) { finish(); return }
         WindowCompat.setDecorFitsSystemWindows(window, false)
         window.statusBarColor = Color.TRANSPARENT
         window.navigationBarColor = Color.TRANSPARENT
@@ -80,7 +84,8 @@ class OcrResultActivity : AppCompatActivity() {
                 documentId = intent.getStringExtra(EXTRA_DOCUMENT_ID).orEmpty(),
                 contractId = intent.getStringExtra(EXTRA_CONTRACT_ID),
                 initialContent = intent.getStringExtra(EXTRA_INITIAL_CONTENT).orEmpty(),
-                documentUri = intent.getStringExtra(EXTRA_DOCUMENT_URI)
+                documentUri = intent.getStringExtra(EXTRA_DOCUMENT_URI),
+                mimeType = intent.getStringExtra(EXTRA_MIME_TYPE).orEmpty()
             )
         )
         ViewCompat.setOnApplyWindowInsetsListener(binding.ocrResultRoot) { view, insets ->
@@ -109,18 +114,20 @@ class OcrResultActivity : AppCompatActivity() {
     }
 
     private fun render(state: OcrResultUiState) = with(binding) {
+        if (!isOcrSessionValid()) { root.visibility = android.view.View.INVISIBLE; return@with }
         if (state.errorMessageRes != null) {
             ocrResultConfidenceLabel.text = ""
             ocrResultConfidencePercentage.text = ""
             ocrResultDocument.setText(state.errorMessageRes)
         } else {
-            ocrResultConfidenceLabel.text = state.confidenceLabel
+            ocrResultConfidenceLabel.text = state.confidenceLabelRes?.let(::getString) ?: state.confidenceLabel
             ocrResultConfidencePercentage.text = state.confidencePercentage
             ocrResultDocument.text = state.documentText
         }
     }
 
     private fun handleEffect(effect: OcrResultUiEffect) {
+        if (!isOcrSessionValid()) return
         when (effect) {
             OcrResultUiEffect.NavigateBack -> finish()
             is OcrResultUiEffect.NavigateToEdit -> {
@@ -128,7 +135,7 @@ class OcrResultActivity : AppCompatActivity() {
             }
             OcrResultUiEffect.NavigateToReview -> {
                 val state = viewModel.uiState.value
-                ocrReviewLauncher.launch(OcrReviewActivity.createIntent(this, state.documentId, state.contractId, state.documentText))
+                ocrReviewLauncher.launch(OcrReviewActivity.createIntent(this, state.documentId, state.contractId, state.documentText, state.warnings))
             }
             is OcrResultUiEffect.NavigateToSaved -> {
                 startActivity(
@@ -154,6 +161,7 @@ class OcrResultActivity : AppCompatActivity() {
         private const val EXTRA_DOCUMENT_ID = "ocr_result_document_id"
         private const val EXTRA_CONTRACT_ID = "ocr_result_contract_id"
         private const val EXTRA_INITIAL_CONTENT = "ocr_result_initial_content"
+        private const val EXTRA_MIME_TYPE = "ocr_result_mime_type"
 
         fun createIntent(
             context: android.content.Context,
@@ -162,13 +170,15 @@ class OcrResultActivity : AppCompatActivity() {
             documentUri: String? = null,
             documentId: String = java.util.UUID.randomUUID().toString(),
             contractId: String? = null,
-            initialContent: String = ""
-        ): android.content.Intent = android.content.Intent(context, OcrResultActivity::class.java)
+            initialContent: String = "",
+            mimeType: String = ""
+        ): android.content.Intent = com.example.lagallens.presentation.feature.ocr.OcrSession.stamp(context, android.content.Intent(context, OcrResultActivity::class.java)
             .putExtra(EXTRA_DOCUMENT_NAME, documentName)
             .putExtra(EXTRA_DOCUMENT_DETAILS, documentDetails)
             .putExtra(EXTRA_DOCUMENT_URI, documentUri)
             .putExtra(EXTRA_DOCUMENT_ID, documentId)
             .putExtra(EXTRA_CONTRACT_ID, contractId)
             .putExtra(EXTRA_INITIAL_CONTENT, initialContent)
+            .putExtra(EXTRA_MIME_TYPE, mimeType))
     }
 }

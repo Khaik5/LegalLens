@@ -2,16 +2,17 @@ package com.example.lagallens.presentation.feature.login.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.lagallens.presentation.common.utils.toFailureMessage
 import com.example.lagallens.R
 import com.example.lagallens.domain.usecase.AuthenticateUserUseCase
 import com.example.lagallens.presentation.feature.login.contract.LoginUiEffect
 import com.example.lagallens.presentation.feature.login.contract.LoginUiEvent
 import com.example.lagallens.presentation.feature.login.contract.LoginUiState
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -22,8 +23,8 @@ class LoginViewModel(
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
 
-    private val _uiEffect = MutableSharedFlow<LoginUiEffect>()
-    val uiEffect: SharedFlow<LoginUiEffect> = _uiEffect.asSharedFlow()
+    private val _uiEffect = Channel<LoginUiEffect>(Channel.BUFFERED)
+    val uiEffect = _uiEffect.receiveAsFlow()
 
     fun onEvent(event: LoginUiEvent) {
         when (event) {
@@ -63,27 +64,29 @@ class LoginViewModel(
             return
         }
 
-        val authenticated = try {
-            authenticateUser(username, password)
-        } catch (_: Exception) {
-            _uiState.update {
-                it.copy(usernameErrorResId = null, passwordErrorResId = R.string.auth_backend_not_configured)
+        if (state.isLoading) return
+        _uiState.update { it.copy(usernameErrorResId = null, passwordErrorResId = null, isLoading = true) }
+        viewModelScope.launch {
+            val authenticated = try {
+                authenticateUser(username, password)
+            } catch (cancellation: CancellationException) {
+                throw cancellation
+            } catch (failure: Exception) {
+                _uiState.update { it.copy(passwordErrorResId = failure.toFailureMessage(), isLoading = false) }
+                return@launch
             }
-            return
-        }
-        if (authenticated) {
-            _uiState.update { it.copy(usernameErrorResId = null, passwordErrorResId = null) }
-            sendEffect(LoginUiEffect.NavigateToMain)
-        } else {
-            _uiState.update {
-                it.copy(usernameErrorResId = null, passwordErrorResId = R.string.login_invalid_credentials)
+            if (authenticated) {
+                _uiState.update { it.copy(isLoading = false) }
+                sendEffect(LoginUiEffect.NavigateToMain)
+            } else {
+                _uiState.update { it.copy(passwordErrorResId = R.string.login_invalid_credentials, isLoading = false) }
             }
         }
     }
 
     private fun sendEffect(effect: LoginUiEffect) {
         viewModelScope.launch {
-            _uiEffect.emit(effect)
+            _uiEffect.send(effect)
         }
     }
 

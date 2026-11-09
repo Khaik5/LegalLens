@@ -7,7 +7,8 @@ sealed interface OcrResultUiEvent {
         val documentId: String = "",
         val contractId: String? = null,
         val initialContent: String = "",
-        val documentUri: String? = null
+        val documentUri: String? = null,
+        val mimeType: String = ""
     ) : OcrResultUiEvent
 
     data object BackClicked : OcrResultUiEvent

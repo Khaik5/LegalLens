@@ -25,12 +25,15 @@ import com.example.lagallens.presentation.feature.upload.progress.contract.Uploa
 import com.example.lagallens.presentation.feature.upload.progress.viewmodel.UploadProgressViewModel
 import kotlinx.coroutines.launch
 
-class UploadProgressActivity : AppCompatActivity() {
+class UploadProgressActivity : com.example.lagallens.presentation.feature.ocr.OcrSessionActivity() {
     private lateinit var binding: ActivityUploadProgressBinding
-    private val viewModel by viewModels<UploadProgressViewModel>()
+    private val viewModel by viewModels<UploadProgressViewModel> {
+        UploadProgressViewModel.Factory((application as com.example.lagallens.LegalLensApplication).documentUploadRepository)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (isFinishing || !isOcrSessionValid()) { finish(); return }
         WindowCompat.setDecorFitsSystemWindows(window, false)
         window.statusBarColor = Color.TRANSPARENT
         window.navigationBarColor = Color.TRANSPARENT
@@ -56,7 +59,8 @@ class UploadProgressActivity : AppCompatActivity() {
                 fileName = intent.getStringExtra(EXTRA_FILE_NAME).orEmpty(),
                 fileDetails = intent.getStringExtra(EXTRA_FILE_DETAILS).orEmpty(),
                 documentUri = intent.getStringExtra(EXTRA_DOCUMENT_URI),
-                documentId = intent.getStringExtra(EXTRA_DOCUMENT_ID).orEmpty()
+                documentId = intent.getStringExtra(EXTRA_DOCUMENT_ID).orEmpty(),
+                mimeType = intent.getStringExtra(EXTRA_MIME_TYPE).orEmpty()
             )
         )
     }
@@ -87,17 +91,22 @@ class UploadProgressActivity : AppCompatActivity() {
     }
 
     private fun handleEffect(effect: UploadProgressEffect) {
+        if (!isOcrSessionValid()) return
         when (effect) {
             UploadProgressEffect.NavigateBack -> finish()
+            UploadProgressEffect.NavigateToUploadError -> {
+                startActivity(com.example.lagallens.presentation.feature.upload.error.ui.UploadErrorActivity.newIntent(this))
+                finish()
+            }
             is UploadProgressEffect.NavigateToOcrProcessing -> {
                 startActivity(
                     OcrProcessingActivity.createIntent(
                         this,
                         effect.fileName,
                         effect.fileDetails,
-                        shouldSimulateFailure = false,
                         documentUri = effect.documentUri,
-                        documentId = effect.documentId
+                        documentId = effect.documentId,
+                        mimeType = effect.mimeType
                     )
                 )
                 finish()
@@ -110,13 +119,15 @@ class UploadProgressActivity : AppCompatActivity() {
         private const val EXTRA_FILE_DETAILS = "extra_file_details"
         private const val EXTRA_DOCUMENT_URI = "extra_document_uri"
         private const val EXTRA_DOCUMENT_ID = "extra_document_id"
+        private const val EXTRA_MIME_TYPE = "extra_mime_type"
 
-        fun newIntent(context: Context, fileName: String, fileDetails: String, documentUri: String? = null, documentId: String = java.util.UUID.randomUUID().toString()): Intent {
-            return Intent(context, UploadProgressActivity::class.java)
+        fun newIntent(context: Context, fileName: String, fileDetails: String, documentUri: String? = null, documentId: String = java.util.UUID.randomUUID().toString(), mimeType: String = ""): Intent {
+            return com.example.lagallens.presentation.feature.ocr.OcrSession.stamp(context, Intent(context, UploadProgressActivity::class.java)
                 .putExtra(EXTRA_FILE_NAME, fileName)
                 .putExtra(EXTRA_FILE_DETAILS, fileDetails)
                 .putExtra(EXTRA_DOCUMENT_URI, documentUri)
                 .putExtra(EXTRA_DOCUMENT_ID, documentId)
+                .putExtra(EXTRA_MIME_TYPE, mimeType))
         }
     }
 }

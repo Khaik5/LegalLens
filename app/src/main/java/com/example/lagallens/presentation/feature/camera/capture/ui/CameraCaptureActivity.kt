@@ -27,6 +27,7 @@ import com.example.lagallens.R
 import com.example.lagallens.databinding.ActivityCameraCaptureBinding
 import com.example.lagallens.presentation.feature.camera.capture.contract.CameraCaptureUiEffect
 import com.example.lagallens.presentation.feature.camera.capture.contract.CameraCaptureUiEvent
+import com.example.lagallens.presentation.feature.camera.capture.contract.PendingQualityCheck
 import com.example.lagallens.presentation.feature.camera.capture.contract.CameraCaptureUiState
 import com.example.lagallens.presentation.feature.camera.capture.viewmodel.CameraCaptureViewModel
 import com.example.lagallens.domain.model.camera.DocumentDetection
@@ -41,12 +42,14 @@ import java.io.File
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-class CameraCaptureActivity : AppCompatActivity() {
+class CameraCaptureActivity : com.example.lagallens.presentation.feature.ocr.OcrSessionActivity() {
     private val binding by lazy { ActivityCameraCaptureBinding.inflate(layoutInflater) }
     private val viewModel by viewModels<CameraCaptureViewModel>()
     private val cameraExecutor: ExecutorService = Executors.newSingleThreadExecutor()
-    private lateinit var imageCapture: ImageCapture
+    private var imageCapture: ImageCapture? = null
     private var camera: Camera? = null
+    private var qualityDialog: AlertDialog? = null
+    private var shownQualityPath: String? = null
     private var openCvAvailable = false
     private var previousReadyDetection: DocumentDetection.Ready? = null
     private var shakeRisk = false
@@ -64,6 +67,7 @@ class CameraCaptureActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (isFinishing || !isOcrSessionValid()) { finish(); return }
         WindowCompat.setDecorFitsSystemWindows(window, false)
         window.statusBarColor = Color.TRANSPARENT
         window.navigationBarColor = Color.TRANSPARENT
@@ -97,6 +101,7 @@ class CameraCaptureActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        qualityDialog?.dismiss()
         cameraExecutor.shutdown()
         super.onDestroy()
     }
@@ -120,9 +125,10 @@ class CameraCaptureActivity : AppCompatActivity() {
             val preview = androidx.camera.core.Preview.Builder().build().also {
                 it.surfaceProvider = binding.cameraCapturePreview.surfaceProvider
             }
-            imageCapture = ImageCapture.Builder()
+            val capture = ImageCapture.Builder()
                 .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
                 .build()
+            imageCapture = capture
             val analysis = ImageAnalysis.Builder()
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .build()
@@ -133,7 +139,7 @@ class CameraCaptureActivity : AppCompatActivity() {
             }
             camera = runCatching {
                 provider.unbindAll()
-                provider.bindToLifecycle(this, CameraSelector.DEFAULT_BACK_CAMERA, preview, imageCapture, analysis)
+                provider.bindToLifecycle(this, CameraSelector.DEFAULT_BACK_CAMERA, preview, capture, analysis)
             }.getOrNull()
             if (camera == null) viewModel.onEvent(CameraCaptureUiEvent.DetectionUpdated(DocumentDetection.Unavailable))
         }, ContextCompat.getMainExecutor(this))
@@ -161,7 +167,8 @@ class CameraCaptureActivity : AppCompatActivity() {
         camera?.cameraControl?.enableTorch(state.isFlashEnabled)
         binding.cameraCaptureFlash.isSelected = state.isFlashEnabled
         binding.cameraCaptureCount.text = state.pages.size.toString()
-        binding.cameraCaptureShutter.isEnabled = state.detection is DocumentDetection.Ready && !state.isCapturing
+        showNextQualityCheck(state.pendingQualityChecks.firstOrNull())
+        binding.cameraCaptureShutter.isEnabled = !state.isCapturing && imageCapture != null
         binding.cameraCaptureShutter.alpha = if (binding.cameraCaptureShutter.isEnabled) 1f else 0.45f
         binding.cameraCaptureScanFrame.setBackgroundResource(
             when (state.detection) {
@@ -196,15 +203,15 @@ class CameraCaptureActivity : AppCompatActivity() {
             is CameraCaptureUiEffect.NavigateToPageManager -> pageManager.launch(
                 CameraPageManagerActivity.createIntent(this, effect.pages)
             )
-            is CameraCaptureUiEffect.ShowQualityResult -> showQualityResult(effect)
             is CameraCaptureUiEffect.ShowMessage -> Toast.makeText(this, effect.messageRes, Toast.LENGTH_SHORT).show()
         }
     }
 
     private fun capturePhoto() {
+        val capture = imageCapture ?: return viewModel.onEvent(CameraCaptureUiEvent.CaptureFailed)
         val outputFile = createSessionFile()
         val options = ImageCapture.OutputFileOptions.Builder(outputFile).build()
-        imageCapture.takePicture(options, cameraExecutor, object : ImageCapture.OnImageSavedCallback {
+        capture.takePicture(options, cameraExecutor, object : ImageCapture.OnImageSavedCallback {
             override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
                 val quality = DocumentVisionAnalyzer.checkQuality(outputFile, shakeRisk)
                 runOnUiThread {
@@ -242,24 +249,24 @@ class CameraCaptureActivity : AppCompatActivity() {
         }
     }
 
-    private fun showQualityResult(effect: CameraCaptureUiEffect.ShowQualityResult) {
-        val messages = effect.qualityResult.issues.joinToString("\n") { getString(it.messageResId()) }
-        val isWarning = effect.qualityResult.decision == QualityDecision.WARNING
-        AlertDialog.Builder(this)
+    private fun showNextQualityCheck(check: PendingQualityCheck?) {
+        if (check == null || check.page.path == shownQualityPath) return
+        shownQualityPath = check.page.path
+        val messages = check.qualityResult.issues.joinToString("\n") { getString(it.messageResId()) }
+        val isWarning = check.qualityResult.decision == QualityDecision.WARNING
+        fun discard() {
+            File(check.page.path).delete()
+            viewModel.onEvent(CameraCaptureUiEvent.DiscardPage(check.page.path))
+        }
+        qualityDialog = AlertDialog.Builder(this)
             .setTitle(if (isWarning) R.string.camera_quality_warning_title else R.string.camera_quality_retake_title)
             .setMessage(messages)
-            .setNegativeButton(R.string.camera_quality_retake) { _, _ ->
-                File(effect.page.path).delete()
-                if (isWarning) viewModel.onEvent(CameraCaptureUiEvent.DiscardWarningPage)
-            }
+            .setCancelable(false)
+            .setNegativeButton(R.string.camera_quality_retake) { _, _ -> discard() }
             .apply {
-                if (isWarning) {
-                    setPositiveButton(R.string.camera_quality_keep) { _, _ ->
-                        viewModel.onEvent(CameraCaptureUiEvent.KeepWarningPage)
-                    }
-                } else {
-                    setPositiveButton(R.string.camera_quality_ok, null)
-                }
+                if (isWarning) setPositiveButton(R.string.camera_quality_keep) { _, _ ->
+                    viewModel.onEvent(CameraCaptureUiEvent.KeepWarningPage(check.page.path))
+                } else setPositiveButton(R.string.camera_quality_ok) { _, _ -> discard() }
             }
             .show()
     }
@@ -279,6 +286,6 @@ class CameraCaptureActivity : AppCompatActivity() {
     }
 
     companion object {
-        fun createIntent(context: Context): Intent = Intent(context, CameraCaptureActivity::class.java)
+        fun createIntent(context: Context): Intent = com.example.lagallens.presentation.feature.ocr.OcrSession.stamp(context, Intent(context, CameraCaptureActivity::class.java))
     }
 }

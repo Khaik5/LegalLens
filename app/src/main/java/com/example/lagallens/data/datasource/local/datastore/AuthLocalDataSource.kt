@@ -6,6 +6,8 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 
+data class PendingRegistration(val fullName: String, val saltBase64: String, val hashBase64: String)
+
 /** Demo-only session storage. Passwords are never persisted. */
 class AuthLocalDataSource(context: Context, private val preferencesName: String = PREFERENCES_NAME) {
     private val preferences = context.applicationContext.getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
@@ -76,6 +78,35 @@ class AuthLocalDataSource(context: Context, private val preferencesName: String 
         val prefix = "credential_" + DemoAccountKeys.lookup(email)
         return preferences.edit().putString("${prefix}_salt", saltBase64)
             .putString("${prefix}_hash", hashBase64).commit()
+    }
+
+    /** Holds only the salted hash until OTP verification creates the account. */
+    fun savePendingRegistration(email: String, fullName: String, saltBase64: String, hashBase64: String): Boolean {
+        val prefix = "pending_" + DemoAccountKeys.lookup(email)
+        return preferences.edit().putString("${prefix}_name", fullName).putString("${prefix}_salt", saltBase64)
+            .putString("${prefix}_hash", hashBase64).commit()
+    }
+
+    fun readPendingRegistration(email: String): PendingRegistration? {
+        val prefix = "pending_" + DemoAccountKeys.lookup(email)
+        val name = preferences.getString("${prefix}_name", null) ?: return null
+        val salt = preferences.getString("${prefix}_salt", null) ?: return null
+        val hash = preferences.getString("${prefix}_hash", null) ?: return null
+        return PendingRegistration(name, salt, hash)
+    }
+
+    fun clearPendingRegistration(email: String): Boolean {
+        val prefix = "pending_" + DemoAccountKeys.lookup(email)
+        return preferences.edit().remove("${prefix}_name").remove("${prefix}_salt").remove("${prefix}_hash").commit()
+    }
+
+    fun markPasswordResetVerified(email: String): Boolean =
+        preferences.edit().putBoolean("reset_verified_" + DemoAccountKeys.lookup(email), true).commit()
+
+    fun consumePasswordResetVerified(email: String): Boolean {
+        val key = "reset_verified_" + DemoAccountKeys.lookup(email)
+        if (!preferences.getBoolean(key, false)) return false
+        return preferences.edit().remove(key).commit()
     }
 
     fun clearSession(): Boolean = synchronized(sessionLock) { preferences.edit()

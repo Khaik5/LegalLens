@@ -9,6 +9,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
+import androidx.core.view.isVisible
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -30,19 +31,27 @@ import com.example.lagallens.LegalLensApplication
 class UnlockConfirmationActivity : AppCompatActivity() {
     private val binding by lazy { ActivityUnlockConfirmationBinding.inflate(layoutInflater) }
     private val viewModel by viewModels<UnlockConfirmationViewModel> {
-        UnlockConfirmationViewModel.Factory((application as LegalLensApplication).creditRepository)
+        UnlockConfirmationViewModel.Factory((application as LegalLensApplication).creditRepository,
+            (application as LegalLensApplication).analysisUnlockRepository)
     }
+    private val owner by lazy { intent.getStringExtra(EXTRA_OWNER).orEmpty() }
+    private fun isOwner() = owner.isNotBlank() && (application as LegalLensApplication).creditRepository.activeSessionKey() == owner
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.decorView.alpha = 0f
+        if (!isOwner() || intent.getStringExtra(EXTRA_ANALYSIS_RESULT_ID).isNullOrBlank()) { finish(); return }
         enableEdgeToEdge()
         setContentView(binding.root)
+        lifecycleScope.launch { (application as LegalLensApplication).creditRepository.observeSessionKeys().collect {
+            if (!isOwner()) { window.decorView.alpha = 0f; finish() }
+        } }
         supportFragmentManager.setFragmentResultListener(UnlockSuccessDialog.RESULT_KEY, this) { _, _ ->
-            startActivity(UnlockedAnalysisResultActivity.createIntent(this))
+            // The result screen below refreshes its entitlement when it resumes.
             finish()
         }
         supportFragmentManager.setFragmentResultListener(UnlockProcessingDialog.RESULT_KEY, this) { _, _ ->
-            showUnlockSuccessDialog()
+            if (isOwner()) showUnlockSuccessDialog()
         }
         bindView()
         collectViewModel()
@@ -60,6 +69,9 @@ class UnlockConfirmationActivity : AppCompatActivity() {
             }
         })
     }
+
+    override fun onResume() { super.onResume(); if (!isOwner()) { window.decorView.alpha = 0f; finish() } else window.decorView.alpha = 1f }
+    override fun onPause() { window.decorView.alpha = 0f; super.onPause() }
 
     private fun bindView() = with(binding) {
         listOf(unlockConfirmationBack, unlockConfirmationCancel, unlockConfirmationConfirm).forEach { it.bindPressFeedback() }
@@ -92,6 +104,10 @@ class UnlockConfirmationActivity : AppCompatActivity() {
     }
 
     private fun render(state: UnlockConfirmationUiState) = with(binding) {
+        val contractName = intent.getStringExtra(EXTRA_CONTRACT_NAME).orEmpty()
+        unlockConfirmationContractName.text = contractName
+        unlockConfirmationContractLabel.isVisible = contractName.isNotBlank()
+        unlockConfirmationContractName.isVisible = contractName.isNotBlank()
         unlockConfirmationResultMeta.text = getString(
             R.string.unlock_confirmation_result_meta,
             state.analysisResultId
@@ -121,11 +137,12 @@ class UnlockConfirmationActivity : AppCompatActivity() {
     }
 
     private fun handleEffect(effect: UnlockConfirmationUiEffect) {
+        if (!isOwner()) return
         when (effect) {
             UnlockConfirmationUiEffect.ShowBackendUnavailable -> Toast.makeText(this, R.string.credit_backend_not_configured, Toast.LENGTH_SHORT).show()
             UnlockConfirmationUiEffect.NavigateBack -> finish()
             UnlockConfirmationUiEffect.NavigateToInsufficientCredits -> {
-                startActivity(InsufficientCreditsActivity.createIntent(this))
+                startActivity(InsufficientCreditsActivity.createIntent(this, intent.getBooleanExtra(EXTRA_FROM_ANALYSIS, false)))
                 finish()
             }
             is UnlockConfirmationUiEffect.UnlockRequested -> {
@@ -150,15 +167,23 @@ class UnlockConfirmationActivity : AppCompatActivity() {
         const val EXTRA_ANALYSIS_RESULT_ID = "extra_analysis_result_id"
         const val EXTRA_AVAILABLE_CREDITS = "extra_available_credits"
         const val EXTRA_UNLOCK_CREDIT_COST = "extra_unlock_credit_cost"
+        private const val EXTRA_OWNER = "unlock_owner_session"
+        private const val EXTRA_CONTRACT_NAME = "unlock_contract_name"
+        private const val EXTRA_FROM_ANALYSIS = "unlock_from_analysis"
 
         fun createIntent(
             context: Context,
             analysisResultId: String,
             availableCredits: Int,
-            unlockCost: Int
+            unlockCost: Int,
+            contractName: String? = null,
+            fromAnalysis: Boolean = false
         ): Intent = Intent(context, UnlockConfirmationActivity::class.java)
+            .putExtra(EXTRA_CONTRACT_NAME, contractName)
+            .putExtra(EXTRA_FROM_ANALYSIS, fromAnalysis)
             .putExtra(EXTRA_ANALYSIS_RESULT_ID, analysisResultId)
             .putExtra(EXTRA_AVAILABLE_CREDITS, availableCredits)
             .putExtra(EXTRA_UNLOCK_CREDIT_COST, unlockCost)
+            .putExtra(EXTRA_OWNER, (context.applicationContext as LegalLensApplication).creditRepository.activeSessionKey())
     }
 }

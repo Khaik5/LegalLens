@@ -13,6 +13,7 @@ class ChatbotDraftAiReviewViewModel : ViewModel() {
 
     fun onEvent(event: ChatbotDraftAiReviewUiEvent) {
         when (event) {
+            is ChatbotDraftAiReviewUiEvent.Opened -> state.update { if (it.proposal == null) it.copy(proposal = event.proposal) else it }
             ChatbotDraftAiReviewUiEvent.AcceptClicked -> state.update { it.copy(accepted = true) }
             ChatbotDraftAiReviewUiEvent.RejectClicked -> state.update { it.copy(accepted = false) }
         }

@@ -26,7 +26,9 @@ import com.example.lagallens.presentation.feature.analysis.legalreferences.detai
 import com.example.lagallens.presentation.feature.analysis.legalreferences.viewmodel.AnalysisLegalReferencesViewModel
 import kotlinx.coroutines.launch
 
-class AnalysisLegalReferencesActivity : AppCompatActivity() {
+class AnalysisLegalReferencesActivity : com.example.lagallens.presentation.feature.analysis.AnalysisScopedActivity() {
+    override val requiresUnlock = false
+    override val observesUnlock = true
     private lateinit var binding: ActivityAnalysisLegalReferencesBinding
     private val viewModel by viewModels<AnalysisLegalReferencesViewModel>()
     private val referencesAdapter = AnalysisLegalReferencesAdapter { referenceId ->
@@ -63,6 +65,7 @@ class AnalysisLegalReferencesActivity : AppCompatActivity() {
         analysisLegalReferencesBack.setOnClickListener {
             viewModel.onEvent(AnalysisLegalReferencesUiEvent.BackClicked)
         }
+        analysisLegalReferencesUnlock.setOnClickListener { openUnlockConfirmation(viewModel.uiState.value.documentName) }
         analysisLegalReferencesSearch.doAfterTextChanged { editable ->
             viewModel.onEvent(
                 AnalysisLegalReferencesUiEvent.QueryChanged(editable?.toString().orEmpty())
@@ -71,6 +74,14 @@ class AnalysisLegalReferencesActivity : AppCompatActivity() {
         analysisLegalReferencesList.apply {
             layoutManager = LinearLayoutManager(this@AnalysisLegalReferencesActivity)
             adapter = referencesAdapter
+        }
+    }
+
+    override fun onAnalysisInvalidated() { viewModel.clearResult() }
+
+    override fun onAnalysisValidated(identity: com.example.lagallens.domain.model.analysis.AnalysisIdentity, detail: com.example.lagallens.domain.model.analysis.AnalysisDetail) {
+        if (com.example.lagallens.di.DataModeConfig.current == com.example.lagallens.di.AppDataMode.DEMO) {
+            viewModel.setDemoReferences(com.example.lagallens.presentation.feature.analysis.legalreferences.model.DemoLegalReferences.items, validatedUnlockStatus?.isUnlocked == true)
         }
     }
 
@@ -84,6 +95,16 @@ class AnalysisLegalReferencesActivity : AppCompatActivity() {
     }
 
     private fun render(state: AnalysisLegalReferencesUiState) {
+        binding.analysisLegalReferencesSectionTitle.setText(when {
+            state.isDemo && state.references.isEmpty() && state.query.isNotBlank() -> R.string.analysis_legal_search_empty
+            state.isDemo -> R.string.analysis_legal_demo_heading
+            state.references.isEmpty() -> R.string.analysis_citation_unavailable
+            else -> R.string.analysis_legal_references_section_title
+        })
+        binding.analysisLegalReferencesDemo.visibility = if (state.isDemo) android.view.View.VISIBLE else android.view.View.GONE
+        binding.analysisLegalReferencesLocked.visibility = if (state.lockedCount > 0) android.view.View.VISIBLE else android.view.View.GONE
+        binding.analysisLegalReferencesUnlock.isEnabled = validatedUnlockStatus != null
+        validatedUnlockStatus?.let { binding.analysisLegalReferencesUnlock.text = getString(R.string.analysis_legal_unlock, it.cost) }
         referencesAdapter.submitList(state.references)
     }
 

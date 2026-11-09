@@ -19,6 +19,7 @@ import androidx.navigation.fragment.findNavController
 import com.example.lagallens.R
 import com.example.lagallens.databinding.FragmentProfileEditBinding
 import com.example.lagallens.presentation.common.utils.bindPressFeedback
+import com.example.lagallens.presentation.feature.profile.contract.ProfileUiEffect
 import com.example.lagallens.presentation.feature.profile.contract.ProfileUiEvent
 import com.example.lagallens.presentation.feature.profile.edit.contract.ProfileEditUiEffect
 import com.example.lagallens.presentation.feature.profile.edit.contract.ProfileEditUiEvent
@@ -54,6 +55,25 @@ class ProfileEditFragment : Fragment() {
         collectProfileState()
         collectUiState()
         collectUiEffect()
+        collectProfileEffect()
+    }
+
+    private fun collectProfileEffect() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                profileViewModel.uiEffect.collect { effect ->
+                    when (effect) {
+                        ProfileUiEffect.ProfileSaveSucceeded -> {
+                            Toast.makeText(requireContext(), R.string.profile_edit_save_success, Toast.LENGTH_SHORT).show()
+                            findNavController().navigateUp()
+                        }
+                        ProfileUiEffect.ProfileSaveFailed ->
+                            Toast.makeText(requireContext(), R.string.profile_backend_not_configured, Toast.LENGTH_SHORT).show()
+                        else -> Unit
+                    }
+                }
+            }
+        }
     }
 
     private fun bindView() {
@@ -79,6 +99,7 @@ class ProfileEditFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 profileViewModel.uiState.collect { profile ->
+                    if (profile.isLoading) return@collect
                     viewModel.onEvent(
                         ProfileEditUiEvent.Initialize(profile.name, profile.email, profile.phone, profile.photoUri)
                     )
@@ -135,12 +156,6 @@ class ProfileEditFragment : Fragment() {
 
     private fun saveProfile(effect: ProfileEditUiEffect.ProfileSaved) {
         profileViewModel.onEvent(ProfileUiEvent.ProfileUpdated(effect.name, effect.phone, effect.photoUri))
-        if (profileViewModel.uiState.value.isBackendUnavailable) {
-            Toast.makeText(requireContext(), R.string.profile_backend_not_configured, Toast.LENGTH_SHORT).show()
-            return
-        }
-        Toast.makeText(requireContext(), R.string.profile_edit_save_success, Toast.LENGTH_SHORT).show()
-        findNavController().navigateUp()
     }
 
     private fun String.initials(): String =

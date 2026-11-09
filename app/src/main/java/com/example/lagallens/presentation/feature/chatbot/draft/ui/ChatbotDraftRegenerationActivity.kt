@@ -2,11 +2,9 @@ package com.example.lagallens.presentation.feature.chatbot.draft.ui
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.WindowCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -22,7 +20,7 @@ import com.example.lagallens.presentation.feature.chatbot.draft.contract.Chatbot
 import com.example.lagallens.presentation.feature.chatbot.draft.viewmodel.ChatbotDraftRegenerationViewModel
 import kotlinx.coroutines.launch
 
-class ChatbotDraftRegenerationActivity : AppCompatActivity() {
+class ChatbotDraftRegenerationActivity : DraftSessionActivity() {
     private lateinit var binding: ActivityChatbotDraftRegenerationBinding
     private val viewModel by viewModels<ChatbotDraftRegenerationViewModel>()
     private var openingDraft = false
@@ -34,13 +32,8 @@ class ChatbotDraftRegenerationActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        window.statusBarColor = Color.TRANSPARENT
-        window.navigationBarColor = Color.TRANSPARENT
-        WindowCompat.getInsetsController(window, window.decorView).apply {
-            isAppearanceLightStatusBars = true
-            isAppearanceLightNavigationBars = true
-        }
+        if (!guardDraftCreate()) return
+        useEdgeToEdgeSystemBars()
         binding = ActivityChatbotDraftRegenerationBinding.inflate(layoutInflater)
         setContentView(binding.root)
         binding.root.applySystemBarInsets()
@@ -105,5 +98,6 @@ class ChatbotDraftRegenerationActivity : AppCompatActivity() {
                 .putExtra(EXTRA_PREVIEW_FAILURE, previewFailure)
                 .putExtra(EXTRA_SOURCE_DRAFT_ID, sourceDraftId)
                 .putExtra(EXTRA_CONTRACT_ID, contractId)
+            .also { DraftSessionGuard.stamp(context, it) }
     }
 }

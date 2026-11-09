@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="operation_network_error">Không thể kết nối. Kiểm tra mạng và thử lại.</string>
+    <string name="operation_session_error">Phiên đăng nhập không hợp lệ. Vui lòng đăng nhập lại.</string>
+    <string name="operation_access_error">Bạn không có quyền thực hiện thao tác này.</string>
+    <string name="operation_data_error">Dữ liệu không hợp lệ hoặc không còn tồn tại.</string>
+    <string name="operation_rate_error">Quá nhiều yêu cầu. Vui lòng thử lại sau.</string>
+    <string name="operation_server_error">Dịch vụ đang gặp lỗi. Vui lòng thử lại sau.</string>
+    <string name="operation_failed">Không thể hoàn tất thao tác. Vui lòng thử lại.</string>
+    <string name="editor_formatting_unavailable">Chưa hỗ trợ lưu chữ đậm hoặc nghiêng.</string>
+    <string name="register_terms_pending">Điều khoản sử dụng và chính sách quyền riêng tư chính thức đang chờ phê duyệt.</string>
+    <string name="freeze_severity_high">Cao</string>
+    <string name="freeze_severity_medium">Trung bình</string>
+    <string name="freeze_severity_low">Thấp</string>
+    <string name="credit_history_analysis_unlock">Mở khóa kết quả phân tích</string>
+    <string name="credit_history_credit_adjustment">Cộng Credit</string>
+    <string name="credit_history_completed">Hoàn tất</string>
+    <string name="credit_history_pending">Đang xử lý</string>
+    <string name="credit_history_failed">Thất bại</string>
+    <string name="credit_history_recorded">Đã ghi nhận</string>
+    <string name="freeze_retry">Thử lại</string>
+    <string name="ocr_result_saved_content_label">DEMO · Nội dung đã lưu</string>
+</resources>

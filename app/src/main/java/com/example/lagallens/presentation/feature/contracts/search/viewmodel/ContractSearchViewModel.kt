@@ -10,13 +10,19 @@ import com.example.lagallens.presentation.feature.contracts.search.contract.Cont
 import com.example.lagallens.presentation.feature.contracts.search.contract.ContractSearchUiEffect
 import com.example.lagallens.presentation.feature.contracts.search.contract.ContractSearchUiEvent
 import com.example.lagallens.presentation.feature.contracts.search.contract.ContractSearchUiState
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.CancellationException
+
+internal fun ContractSearchResult.matchesQuery(query: String): Boolean {
+    val normalizedQuery = query.trim().lowercase()
+    return normalizedQuery.isBlank() || titleOverride?.lowercase()?.contains(normalizedQuery) == true ||
+        searchKeywords.any { it.lowercase().contains(normalizedQuery) }
+}
 
 class ContractSearchViewModel(application: Application) : AndroidViewModel(application) {
     private val initialQuery = application.getString(R.string.contract_search_default_query)
@@ -27,8 +33,8 @@ class ContractSearchViewModel(application: Application) : AndroidViewModel(appli
     )
     val uiState = _uiState.asStateFlow()
 
-    private val _uiEffect = MutableSharedFlow<ContractSearchUiEffect>()
-    val uiEffect = _uiEffect.asSharedFlow()
+    private val _uiEffect = Channel<ContractSearchUiEffect>(Channel.BUFFERED)
+    val uiEffect = _uiEffect.receiveAsFlow()
 
     private var contracts: List<EmploymentContract> = emptyList()
 
@@ -62,15 +68,8 @@ class ContractSearchViewModel(application: Application) : AndroidViewModel(appli
         _uiState.update {
             it.copy(
                 query = query,
-                results = activeResults().filter { item -> item.matches(query) }
+                results = activeResults().filter { item -> item.matchesQuery(query) }
             )
-        }
-    }
-
-    private fun ContractSearchResult.matches(query: String): Boolean {
-        val normalizedQuery = query.trim().lowercase()
-        return normalizedQuery.isBlank() || titleOverride?.lowercase()?.contains(normalizedQuery) == true || searchKeywords.any { keyword ->
-            keyword.contains(normalizedQuery) || normalizedQuery.contains(keyword)
         }
     }
 
@@ -90,13 +89,13 @@ class ContractSearchViewModel(application: Application) : AndroidViewModel(appli
 
     private fun navigateBack() {
         viewModelScope.launch {
-            _uiEffect.emit(ContractSearchUiEffect.NavigateBack)
+            _uiEffect.send(ContractSearchUiEffect.NavigateBack)
         }
     }
 
     private fun navigateToDetail(contractId: String) {
         viewModelScope.launch {
-            _uiEffect.emit(ContractSearchUiEffect.NavigateToDetail(contractId))
+            _uiEffect.send(ContractSearchUiEffect.NavigateToDetail(contractId))
         }
     }
 }

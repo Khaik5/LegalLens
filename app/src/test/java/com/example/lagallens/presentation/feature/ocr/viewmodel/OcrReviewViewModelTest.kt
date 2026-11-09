@@ -2,7 +2,7 @@ package com.example.lagallens.presentation.feature.ocr.viewmodel
 
 import com.example.lagallens.MainDispatcherRule
 import com.example.lagallens.presentation.feature.ocr.contract.OcrReviewEvent
-import com.example.lagallens.presentation.feature.ocr.contract.OcrReviewSample
+import com.example.lagallens.presentation.feature.ocr.contract.OcrReviewWarning
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -12,20 +12,25 @@ class OcrReviewViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     @Test
-    fun reviewStateContainsTheTwoLocalWarnings() {
+    fun reviewShowsOnlyWarningsFromTheOcrResult() {
         val viewModel = OcrReviewViewModel()
+        assertEquals(emptyList<OcrReviewWarning>(), viewModel.uiState.value.warnings)
 
-        assertEquals(OcrReviewSample.warnings, viewModel.uiState.value.warnings)
-        assertEquals(2, viewModel.uiState.value.warnings.size)
+        val warning = OcrReviewWarning("Section", "60%", "value", "source")
+        viewModel.onEvent(OcrReviewEvent.ScreenOpened("doc", null, "text", listOf(warning)))
+
+        assertEquals(listOf(warning), viewModel.uiState.value.warnings)
     }
 
     @Test
     fun confirmClickDoesNotMutateTheDisplayedWarnings() {
         val viewModel = OcrReviewViewModel()
+        val warning = OcrReviewWarning("Section", "60%", "value", "source")
+        viewModel.onEvent(OcrReviewEvent.ScreenOpened("doc", null, "text", listOf(warning)))
 
         viewModel.onEvent(OcrReviewEvent.ConfirmClicked)
 
-        assertEquals(OcrReviewSample.warnings, viewModel.uiState.value.warnings)
+        assertEquals(listOf(warning), viewModel.uiState.value.warnings)
     }
 
     @Test

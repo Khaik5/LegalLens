@@ -167,6 +167,21 @@
         </LinearLayout>
     </HorizontalScrollView>
 
+    <TextView
+        android:id="@+id/tvContractsEmpty"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/dp_24"
+        android:layout_marginTop="@dimen/dp_40"
+        android:gravity="center"
+        android:text="@string/contract_list_empty"
+        android:textColor="@color/legal_lens_secondary_text"
+        android:textSize="@dimen/sp_14"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/filterScrollView" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvContracts"
         android:layout_width="0dp"

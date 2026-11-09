@@ -10,14 +10,17 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.util.UUID
 
-class FakeDraftRepository(
-    context: Context,
-    preferencesName: String = PREFERENCES_NAME,
-    legacyPreferencesName: String = LEGACY_PREFERENCES_NAME
+class FakeDraftRepository internal constructor(
+    private val preferences: android.content.SharedPreferences,
+    private val legacyPreferences: android.content.SharedPreferences,
+    private val generatedTitle: (DraftStage) -> String = { "Hợp đồng lao động DEMO ${it.legacyKey}" },
+    private val commitGuard: (() -> Unit) -> Unit = { it() }
 ) : DraftRepository {
-    private val appContext = context.applicationContext
-    private val preferences = appContext.getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
-    private val legacyPreferences = appContext.getSharedPreferences(legacyPreferencesName, Context.MODE_PRIVATE)
+    constructor(context: Context, preferencesName: String = PREFERENCES_NAME, legacyPreferencesName: String = LEGACY_PREFERENCES_NAME, commitGuard: (() -> Unit) -> Unit = { it() }) : this(
+        context.applicationContext.getSharedPreferences(preferencesName, Context.MODE_PRIVATE),
+        context.applicationContext.getSharedPreferences(legacyPreferencesName, Context.MODE_PRIVATE),
+        { stage -> context.getString(com.example.lagallens.R.string.chatbot_draft_document_name, stage.legacyKey) }, commitGuard
+    )
     private val mutex = Mutex()
 
     override suspend fun getDrafts(): List<Draft> = mutex.withLock {
@@ -41,18 +44,25 @@ class FakeDraftRepository(
         title: String,
         content: String,
         contractId: String?,
-        sourceDraftId: String?
+        sourceDraftId: String?,
+        conversationId: String?,
+        isSaved: Boolean,
+        isTitleGenerated: Boolean
     ): Draft = mutex.withLock {
         migrateLegacyDrafts()
         val source = sourceDraftId?.let { findDraft(it) }
-        val latestStageDraft = getLatestDraftInternal(stage)
+        val latestStageDraft = draftsForStage(stage).filter { contractId == null || it.contractId == contractId }
+            .maxWithOrNull(compareBy<Draft> { it.versionNo }.thenBy { it.updatedAt })
         val latest = latestStageDraft ?: source
         val normalizedTitle = title.trim().ifBlank { DEFAULT_TITLE }
         val resolvedContractId = contractId ?: source?.contractId ?: latestStageDraft?.contractId ?: latest?.contractId
-        if (latestStageDraft != null && latestStageDraft.title == normalizedTitle && latestStageDraft.content == content && latestStageDraft.contractId == resolvedContractId) {
+        val resolvedConversationId = conversationId ?: source?.conversationId ?: latest?.conversationId
+        if (latestStageDraft != null && latestStageDraft.title == normalizedTitle && latestStageDraft.content == content &&
+            latestStageDraft.isTitleGenerated == isTitleGenerated && latestStageDraft.contractId == resolvedContractId && latestStageDraft.conversationId == resolvedConversationId) {
             // Reconcile the Phase 1 compatibility mirror even when the canonical record is unchanged.
-            persist(latestStageDraft, mirrorLegacy = true)
-            return@withLock latestStageDraft
+            val unchanged = latestStageDraft.copy(isSaved = latestStageDraft.isSaved || isSaved)
+            persist(unchanged, mirrorLegacy = true)
+            return@withLock unchanged
         }
         val records = readDrafts()
         val lineageId = source?.lineageId ?: latest?.lineageId ?: UUID.randomUUID().toString()
@@ -68,13 +78,16 @@ class FakeDraftRepository(
             createdAt = now,
             updatedAt = now,
             parentDraftId = source?.draftId ?: latest?.draftId,
-            lineageId = lineageId
+            lineageId = lineageId,
+            conversationId = resolvedConversationId,
+            isSaved = isSaved,
+            isTitleGenerated = isTitleGenerated
         )
         persist(draft, mirrorLegacy = true)
         draft
     }
 
-    override suspend fun createCopy(sourceDraftId: String, title: String, stage: DraftStage): Draft? = mutex.withLock {
+    override suspend fun createCopy(sourceDraftId: String, title: String, stage: DraftStage, isTitleGenerated: Boolean): Draft? = mutex.withLock {
         migrateLegacyDrafts()
         val source = findDraft(sourceDraftId) ?: return@withLock null
         val now = System.currentTimeMillis()
@@ -86,7 +99,9 @@ class FakeDraftRepository(
             versionNo = versionNo,
             createdAt = now,
             updatedAt = now,
-            parentDraftId = source.draftId
+            parentDraftId = source.draftId,
+            isTitleGenerated = isTitleGenerated,
+            isSaved = false
         )
         persist(copy, mirrorLegacy = true)
         copy
@@ -104,7 +119,9 @@ class FakeDraftRepository(
             versionNo = versionNo,
             createdAt = now,
             updatedAt = now,
-            parentDraftId = existing.draftId
+            parentDraftId = existing.draftId,
+            isTitleGenerated = false,
+            isSaved = false
         )
         persist(updatedVersion, mirrorLegacy = true)
         updatedVersion
@@ -117,6 +134,8 @@ class FakeDraftRepository(
         val editor = preferences.edit().remove(recordKey(draft.draftId)).putString(KEY_IDS, JSONArray(ids).toString())
         val remainingStageDraft = draftsForStage(draft.stage).filterNot { it.draftId == draft.draftId }
             .maxWithOrNull(compareBy<Draft> { it.versionNo }.thenBy { it.updatedAt })
+        var deleted = false
+        commitGuard {
         if (remainingStageDraft == null) {
             legacyPreferences.edit().remove(legacyNameKey(draft.stage.legacyKey)).remove(legacyContentKey(draft.stage.legacyKey)).remove(legacyUpdatedKey(draft.stage.legacyKey)).apply()
         } else {
@@ -126,7 +145,9 @@ class FakeDraftRepository(
                 .putString(legacyUpdatedKey(draft.stage.legacyKey), remainingStageDraft.updatedAt.toString())
                 .apply()
         }
-        editor.commit()
+        deleted = editor.commit()
+        }
+        deleted
     }
 
     private fun migrateLegacyDrafts() {
@@ -155,7 +176,7 @@ class FakeDraftRepository(
             editor.putString(recordKey(draft.draftId), draft.toJson().toString())
             ids += draft.draftId
         }
-        check(editor.putString(KEY_IDS, JSONArray(ids.distinct()).toString()).commit())
+        commitGuard { check(editor.putString(KEY_IDS, JSONArray(ids.distinct()).toString()).commit()) }
     }
 
     private fun getLatestDraftInternal(stage: DraftStage): Draft? = draftsForStage(stage)
@@ -168,6 +189,7 @@ class FakeDraftRepository(
 
     private fun persist(draft: Draft, mirrorLegacy: Boolean) {
         val ids = readIds().toMutableSet().apply { add(draft.draftId) }
+        commitGuard {
         val saved = preferences.edit()
             .putString(recordKey(draft.draftId), draft.toJson().toString())
             .putString(KEY_IDS, JSONArray(ids.toList()).toString())
@@ -181,16 +203,18 @@ class FakeDraftRepository(
                 .putString(legacyUpdatedKey(alias), draft.updatedAt.toString())
                 .commit())
         }
+        }
     }
 
     private fun readDrafts(): List<Draft> = readIds().mapNotNull { id ->
-        preferences.getString(recordKey(id), null)?.let { raw -> runCatching { JSONObject(raw).toDraft() }.getOrNull() }
+        val raw = checkNotNull(preferences.getString(recordKey(id), null)) { "Missing saved draft record" }
+        JSONObject(raw).toDraft()
     }
 
-    private fun readIds(): List<String> = runCatching {
+    private fun readIds(): List<String> {
         val array = JSONArray(preferences.getString(KEY_IDS, "[]"))
-        List(array.length()) { index -> array.getString(index) }
-    }.getOrDefault(emptyList())
+        return List(array.length()) { index -> array.getString(index) }
+    }
 
     private fun Draft.toJson() = JSONObject().apply {
         put("draftId", draftId)
@@ -203,19 +227,25 @@ class FakeDraftRepository(
         put("updatedAt", updatedAt)
         put("parentDraftId", parentDraftId)
         put("lineageId", lineageId)
+        put("conversationId", conversationId)
+        put("isSaved", isSaved)
+        put("isTitleGenerated", isTitleGenerated)
     }
 
     private fun JSONObject.toDraft() = Draft(
         draftId = getString("draftId"),
         contractId = optString("contractId").takeIf(String::isNotBlank),
-        title = optString("title"),
+        title = if (optBoolean("isTitleGenerated")) generatedTitle(DraftStage.valueOf(getString("stage"))) else optString("title"),
         content = optString("content"),
         stage = DraftStage.valueOf(getString("stage")),
         versionNo = getInt("versionNo"),
         createdAt = getLong("createdAt"),
         updatedAt = getLong("updatedAt"),
         parentDraftId = optString("parentDraftId").takeIf(String::isNotBlank),
-        lineageId = optString("lineageId").ifBlank { getString("draftId") }
+        lineageId = optString("lineageId").ifBlank { getString("draftId") },
+        conversationId = optString("conversationId").takeIf(String::isNotBlank),
+        isSaved = optBoolean("isSaved"),
+        isTitleGenerated = optBoolean("isTitleGenerated")
     )
 
     private fun recordKey(id: String) = "draft_record_$id"

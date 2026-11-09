@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="dashboard_recent_empty">Chưa có hợp đồng nào. Hãy tải lên hợp đồng đầu tiên.</string>
+    <string name="dashboard_load_failed">Không thể tải hợp đồng. Vui lòng thử lại.</string>
+    <string name="dashboard_retry">Thử lại</string>
+    <string name="dashboard_upcoming_empty">Chưa có ngày quan trọng nào.</string>
+    <string name="dashboard_contract_subtitle">%1$s · %2$s</string>
+</resources>

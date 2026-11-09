@@ -15,7 +15,11 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.navOptions
+import androidx.lifecycle.lifecycleScope
+import com.example.lagallens.LegalLensApplication
 import com.example.lagallens.R
+import com.example.lagallens.presentation.feature.home.ui.HomeActivity
+import kotlinx.coroutines.launch
 import com.example.lagallens.databinding.ActivityMainBinding
 import com.example.lagallens.presentation.common.view.FloatingPremiumSticker
 import com.example.lagallens.presentation.common.utils.applySystemBarInsets
@@ -32,8 +36,16 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val app = application as LegalLensApplication
+        if (app.currentSessionKey() == null) {
+            openAuthentication()
+            return
+        }
         enableEdgeToEdge()
         setContentView(binding.root)
+        lifecycleScope.launch {
+            app.observeSessionKeys().collect { session -> if (session == null) openAuthentication() }
+        }
         binding.mainNavHost.applySystemBarInsets(top = true, bottom = false)
         binding.bottomNavigationContainer.applySystemBarInsets(
             top = false, bottom = true, expandHeightForBottomInset = true
@@ -47,8 +59,18 @@ class MainActivity : AppCompatActivity() {
         bindBottomNavigation(navController)
         binding.btnAddContract.bindPressFeedback()
         binding.btnAddContract.setOnClickListener {
-            startActivity(Intent(this, UploadSourceActivity::class.java))
+            startActivity(Intent(this, UploadSourceActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP))
         }
+    }
+
+    private fun openAuthentication() {
+        if (isFinishing) return
+        startActivity(
+            Intent(this, HomeActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+        )
+        finish()
     }
 
     override fun onResume() {
@@ -114,7 +136,7 @@ class MainActivity : AppCompatActivity() {
             )
         )
         premiumSticker.setOnStickerClick {
-            startActivity(CreditHubActivity.createIntent(this))
+            startActivity(CreditHubActivity.createIntent(this).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP))
         }
         ViewCompat.setOnApplyWindowInsetsListener(binding.premiumStickerLayer) { _, windowInsets ->
             premiumSticker.setSafeTopInset(

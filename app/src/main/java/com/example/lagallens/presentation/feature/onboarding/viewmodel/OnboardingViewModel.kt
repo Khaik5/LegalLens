@@ -8,9 +8,9 @@ import com.example.lagallens.presentation.feature.onboarding.contract.Onboarding
 import com.example.lagallens.presentation.feature.onboarding.contract.OnboardingUiEvent
 import com.example.lagallens.presentation.feature.onboarding.contract.OnboardingPage
 import com.example.lagallens.presentation.feature.onboarding.contract.OnboardingUiState
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -21,8 +21,8 @@ class OnboardingViewModel(
     private val _uiState = MutableStateFlow(OnboardingUiState())
     val uiState = _uiState.asStateFlow()
 
-    private val _uiEffect = MutableSharedFlow<OnboardingUiEffect>()
-    val uiEffect = _uiEffect.asSharedFlow()
+    private val _uiEffect = Channel<OnboardingUiEffect>(Channel.BUFFERED)
+    val uiEffect = _uiEffect.receiveAsFlow()
     private var isCompleting = false
 
     fun onEvent(event: OnboardingUiEvent) {
@@ -52,7 +52,7 @@ class OnboardingViewModel(
         isCompleting = true
         viewModelScope.launch {
             completeOnboardingUseCase()
-            _uiEffect.emit(OnboardingUiEffect.NavigateToHome)
+            _uiEffect.send(OnboardingUiEffect.NavigateToHome)
         }
     }
 

@@ -18,6 +18,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.lagallens"
+        testApplicationId = "com.example.lagallens.testsandbox.test"
         minSdk = 28
         targetSdk = 36
         versionCode = 1
@@ -49,6 +50,12 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+    }
+    bundle {
+        // The app switches between Vietnamese and English at runtime, so both must ship in every install.
+        language {
+            enableSplit = false
+        }
     }
 }
 

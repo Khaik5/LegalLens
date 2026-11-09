@@ -11,4 +11,6 @@ interface ProfileSettingsRepository {
     suspend fun updateAppearance(appearance: ProfileAppearance)
 
     suspend fun updateLanguage(language: ProfileLanguage)
+
+    suspend fun updateNotificationPreferences(isPushEnabled: Boolean, isEmailEnabled: Boolean, isInAppEnabled: Boolean)
 }

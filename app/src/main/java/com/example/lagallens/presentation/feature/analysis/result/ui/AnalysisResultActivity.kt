@@ -32,13 +32,16 @@ import com.example.lagallens.presentation.feature.analysis.summary.ui.AnalysisSu
 import com.example.lagallens.presentation.feature.analysis.result.viewmodel.AnalysisResultViewModel
 import kotlinx.coroutines.launch
 
-class AnalysisResultActivity : AppCompatActivity() {
+class AnalysisResultActivity : com.example.lagallens.presentation.feature.analysis.AnalysisScopedActivity() {
     private lateinit var binding: ActivityAnalysisResultBinding
     private val viewModel by viewModels<AnalysisResultViewModel> {
         AnalysisResultViewModel.Factory(
-            (application as LegalLensApplication).getAnalysisOverviewUseCase
+            (application as LegalLensApplication).getAnalysisOverviewUseCase,
+            (application as LegalLensApplication).analysisIdentityRepository,
+            (application as LegalLensApplication).analysisUnlockRepository
         )
     }
+    override val requiresUnlock = false
     private val resultAdapter = AnalysisResultAdapter { destination ->
         viewModel.onEvent(AnalysisResultUiEvent.ItemClicked(destination))
     }
@@ -71,16 +74,30 @@ class AnalysisResultActivity : AppCompatActivity() {
             isNestedScrollingEnabled = false
         }
         observeViewModel()
+        lifecycleScope.launch {
+            val owner = intent.getStringExtra(com.example.lagallens.presentation.feature.analysis.processing.ui.AnalysisProcessingActivity.EXTRA_SESSION_KEY)
+            (application as LegalLensApplication).observeSessionKeys().collect { current ->
+                if (owner.isNullOrBlank() || current != owner) {
+                    binding.root.visibility = android.view.View.INVISIBLE
+                    finish()
+                }
+            }
+        }
         viewModel.onEvent(
             AnalysisResultUiEvent.ScreenOpened(
                 documentName = intent.getStringExtra(EXTRA_DOCUMENT_NAME)
-                    .orEmpty()
-                    .ifBlank { getString(R.string.analysis_start_document_name) },
+                    .orEmpty(),
                 documentMetadata = intent.getStringExtra(EXTRA_DOCUMENT_METADATA)
-                    .orEmpty()
-                    .ifBlank { getString(R.string.analysis_start_document_metadata) }
+                    .orEmpty(),
+                resultId = intent.getStringExtra(com.example.lagallens.presentation.feature.analysis.processing.ui.AnalysisProcessingActivity.EXTRA_RESULT_ID).orEmpty(),
+                sessionKey = intent.getStringExtra(com.example.lagallens.presentation.feature.analysis.processing.ui.AnalysisProcessingActivity.EXTRA_SESSION_KEY).orEmpty()
             )
         )
+    }
+
+    override fun onAnalysisInvalidated() { viewModel.clearResult() }
+    override fun onAnalysisValidated(identity: com.example.lagallens.domain.model.analysis.AnalysisIdentity, detail: com.example.lagallens.domain.model.analysis.AnalysisDetail) {
+        viewModel.onEvent(AnalysisResultUiEvent.EntitlementChanged)
     }
 
     private fun observeViewModel() {
@@ -95,10 +112,26 @@ class AnalysisResultActivity : AppCompatActivity() {
     private fun render(state: AnalysisResultUiState) = with(binding) {
         analysisResultDocumentName.text = state.documentName
         analysisResultDocumentMetadata.text = state.errorMessageRes?.let { getString(it) } ?: state.documentMetadata
-        analysisResultScore.text = state.score.toString()
-        analysisResultKeyFactsValue.text = state.keyFactsCount.toString()
-        analysisResultRiskValue.text = state.riskCount.toString()
-        analysisResultReferenceValue.text = state.referenceCount.toString()
+        val unavailable = state.errorMessageRes != null
+        fun metric(value: Int) = when { state.isLoading -> "…"; unavailable -> "—"; else -> value.toString() }
+        analysisResultScore.text = metric(state.score)
+        analysisResultSeverity.visibility = if (!state.isLoading && !unavailable && state.severity != null) android.view.View.VISIBLE else android.view.View.GONE
+        state.severity?.let { severity ->
+            analysisResultSeverity.setText(when (severity) {
+                com.example.lagallens.domain.model.analysis.AnalysisSeverity.HIGH -> R.string.freeze_severity_high
+                com.example.lagallens.domain.model.analysis.AnalysisSeverity.MEDIUM -> R.string.freeze_severity_medium
+                com.example.lagallens.domain.model.analysis.AnalysisSeverity.LOW -> R.string.freeze_severity_low
+            })
+            analysisResultSeverity.setTextColor(androidx.core.content.ContextCompat.getColor(this@AnalysisResultActivity,
+                when (severity) {
+                    com.example.lagallens.domain.model.analysis.AnalysisSeverity.HIGH -> R.color.analysis_result_risk
+                    com.example.lagallens.domain.model.analysis.AnalysisSeverity.MEDIUM -> R.color.contract_pending
+                    com.example.lagallens.domain.model.analysis.AnalysisSeverity.LOW -> R.color.contract_complete
+                }))
+        }
+        analysisResultKeyFactsValue.text = metric(state.keyFactsCount)
+        analysisResultRiskValue.text = metric(state.riskCount)
+        analysisResultReferenceValue.text = metric(if (com.example.lagallens.di.DataModeConfig.current == com.example.lagallens.di.AppDataMode.DEMO) com.example.lagallens.presentation.feature.analysis.legalreferences.model.DemoLegalReferences.items.size else state.referenceCount)
         // Each destination row has a fixed resource height and bottom margin. The
         // surrounding ScrollView must see the height of every row, not only the
         // RecyclerView's first viewport, otherwise the final row is unreachable.
@@ -114,6 +147,12 @@ class AnalysisResultActivity : AppCompatActivity() {
     private fun handleEffect(effect: AnalysisResultUiEffect) {
         when (effect) {
             AnalysisResultUiEffect.NavigateBack -> returnFromResult()
+            is AnalysisResultUiEffect.NavigateToUnlock -> startActivity(
+                com.example.lagallens.presentation.feature.creditstore.unlock.ui.UnlockConfirmationActivity.createIntent(
+                    this, effect.resultId, (application as LegalLensApplication).creditRepository.balance.value, effect.cost,
+                    binding.analysisResultDocumentName.text.toString()
+                )
+            )
             is AnalysisResultUiEffect.NavigateToSummary -> startActivity(
                 AnalysisSummaryActivity.createIntent(
                     context = this,

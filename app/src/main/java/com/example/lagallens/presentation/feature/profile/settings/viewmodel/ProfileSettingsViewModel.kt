@@ -10,9 +10,9 @@ import com.example.lagallens.presentation.feature.profile.settings.contract.Prof
 import com.example.lagallens.presentation.feature.profile.settings.contract.ProfileSettingsUiEffect
 import com.example.lagallens.presentation.feature.profile.settings.contract.ProfileSettingsUiEvent
 import com.example.lagallens.presentation.feature.profile.settings.contract.ProfileSettingsUiState
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -20,13 +20,14 @@ import kotlinx.coroutines.launch
 class ProfileSettingsViewModel(
     observeProfileSettingsUseCase: ObserveProfileSettingsUseCase,
     private val updateProfileAppearanceUseCase: UpdateProfileAppearanceUseCase,
-    private val updateProfileLanguageUseCase: UpdateProfileLanguageUseCase
+    private val updateProfileLanguageUseCase: UpdateProfileLanguageUseCase,
+    private val updateNotificationPreferencesUseCase: com.example.lagallens.domain.usecase.UpdateNotificationPreferencesUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ProfileSettingsUiState())
     val uiState = _uiState.asStateFlow()
 
-    private val _uiEffect = MutableSharedFlow<ProfileSettingsUiEffect>()
-    val uiEffect = _uiEffect.asSharedFlow()
+    private val _uiEffect = Channel<ProfileSettingsUiEffect>(Channel.BUFFERED)
+    val uiEffect = _uiEffect.receiveAsFlow()
 
     init {
         viewModelScope.launch {
@@ -34,7 +35,10 @@ class ProfileSettingsViewModel(
                 _uiState.update {
                     it.copy(
                         appearance = profileAppearanceFrom(settings.appearance.name),
-                        language = profileLanguageFrom(settings.language.name)
+                        language = profileLanguageFrom(settings.language.name),
+                        isPushEnabled = settings.isPushEnabled,
+                        isEmailEnabled = settings.isEmailEnabled,
+                        isInAppEnabled = settings.isInAppEnabled
                     )
                 }
             }
@@ -43,18 +47,9 @@ class ProfileSettingsViewModel(
 
     fun onEvent(event: ProfileSettingsUiEvent) {
         when (event) {
-            is ProfileSettingsUiEvent.PushToggled -> _uiState.update {
-                it.copy(isPushEnabled = event.isEnabled)
-            }
-            is ProfileSettingsUiEvent.EmailToggled -> _uiState.update {
-                it.copy(isEmailEnabled = event.isEnabled)
-            }
-            is ProfileSettingsUiEvent.InAppToggled -> _uiState.update {
-                it.copy(isInAppEnabled = event.isEnabled)
-            }
-            is ProfileSettingsUiEvent.BiometricToggled -> _uiState.update {
-                it.copy(isBiometricEnabled = event.isEnabled)
-            }
+            is ProfileSettingsUiEvent.PushToggled -> saveNotifications { it.copy(isPushEnabled = event.isEnabled) }
+            is ProfileSettingsUiEvent.EmailToggled -> saveNotifications { it.copy(isEmailEnabled = event.isEnabled) }
+            is ProfileSettingsUiEvent.InAppToggled -> saveNotifications { it.copy(isInAppEnabled = event.isEnabled) }
             is ProfileSettingsUiEvent.AppearanceSelected -> updateAppearance(event.appearance)
             ProfileSettingsUiEvent.LanguageClicked -> emitEffect(
                 ProfileSettingsUiEffect.ShowLanguagePicker(_uiState.value.language)
@@ -68,9 +63,19 @@ class ProfileSettingsViewModel(
         }
     }
 
+    private fun saveNotifications(change: (ProfileSettingsUiState) -> ProfileSettingsUiState) {
+        val previous = _uiState.value
+        val updated = change(previous)
+        if (updated == previous) return
+        _uiState.value = updated
+        viewModelScope.launch {
+            updateNotificationPreferencesUseCase(updated.isPushEnabled, updated.isEmailEnabled, updated.isInAppEnabled)
+        }
+    }
+
     private fun emitEffect(effect: ProfileSettingsUiEffect) {
         viewModelScope.launch {
-            _uiEffect.emit(effect)
+            _uiEffect.send(effect)
         }
     }
 

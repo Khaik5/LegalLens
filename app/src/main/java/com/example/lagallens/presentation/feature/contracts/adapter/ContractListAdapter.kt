@@ -74,7 +74,7 @@ class ContractListAdapter(
 
     private object ContractDiffCallback : DiffUtil.ItemCallback<ContractListItem>() {
         override fun areItemsTheSame(oldItem: ContractListItem, newItem: ContractListItem): Boolean {
-            return oldItem.titleRes == newItem.titleRes
+            return oldItem.id == newItem.id
         }
 
         override fun areContentsTheSame(oldItem: ContractListItem, newItem: ContractListItem): Boolean {

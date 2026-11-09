@@ -25,7 +25,9 @@ import kotlinx.coroutines.launch
 
 class ForgotPasswordActivity : AppCompatActivity() {
     private val binding by lazy { ActivityForgotPasswordBinding.inflate(layoutInflater) }
-    private val viewModel by viewModels<ForgotPasswordViewModel>()
+    private val viewModel by viewModels<ForgotPasswordViewModel> {
+        ForgotPasswordViewModel.Factory((application as com.example.lagallens.LegalLensApplication).requestPasswordResetUseCase)
+    }
     private var wasLoading = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -100,7 +102,7 @@ class ForgotPasswordActivity : AppCompatActivity() {
                             finish()
                         }
                         is ForgotPasswordUiEffect.NavigateToOtp -> {
-                            startActivity(OtpVerificationActivity.createIntent(this@ForgotPasswordActivity, effect.email))
+                            startActivity(OtpVerificationActivity.createIntent(this@ForgotPasswordActivity, effect.email, com.example.lagallens.domain.model.auth.OtpPurpose.PASSWORD_RESET))
                         }
                     }
                 }

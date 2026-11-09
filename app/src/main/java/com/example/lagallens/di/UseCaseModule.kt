@@ -5,8 +5,10 @@ import com.example.lagallens.domain.repository.ChatbotRepository
 import com.example.lagallens.domain.repository.AnalysisRepository
 import com.example.lagallens.domain.repository.OcrRepository
 import com.example.lagallens.domain.repository.OnboardingRepository
+import com.example.lagallens.domain.repository.ProfileRepository
 import com.example.lagallens.domain.repository.ProfileSettingsRepository
 import com.example.lagallens.domain.usecase.AuthenticateUserUseCase
+import com.example.lagallens.domain.usecase.LogoutUseCase
 import com.example.lagallens.domain.usecase.OpenChatbotConversationUseCase
 import com.example.lagallens.domain.usecase.RetryChatbotMessageUseCase
 import com.example.lagallens.domain.usecase.SendChatbotMessageUseCase
@@ -22,6 +24,12 @@ object UseCaseModule {
     fun provideAuthenticateUserUseCase(repository: AuthRepository): AuthenticateUserUseCase {
         return AuthenticateUserUseCase(repository)
     }
+
+    fun provideLogoutUseCase(
+        authRepository: AuthRepository,
+        chatbotRepository: ChatbotRepository,
+        profileRepository: ProfileRepository
+    ): LogoutUseCase = LogoutUseCase(authRepository, chatbotRepository, profileRepository)
 
     fun provideOpenChatbotConversationUseCase(
         repository: ChatbotRepository
@@ -41,6 +49,9 @@ object UseCaseModule {
     fun provideGetAnalysisOverviewUseCase(repository: AnalysisRepository): GetAnalysisOverviewUseCase =
         GetAnalysisOverviewUseCase(repository)
 
+    fun provideGetAnalysisDetailUseCase(repository: AnalysisRepository): com.example.lagallens.domain.usecase.GetAnalysisDetailUseCase =
+        com.example.lagallens.domain.usecase.GetAnalysisDetailUseCase(repository)
+
     fun provideCompleteOnboardingUseCase(repository: OnboardingRepository): CompleteOnboardingUseCase {
         return CompleteOnboardingUseCase(repository)
     }
@@ -56,6 +67,11 @@ object UseCaseModule {
     fun provideUpdateProfileAppearanceUseCase(
         repository: ProfileSettingsRepository
     ): UpdateProfileAppearanceUseCase = UpdateProfileAppearanceUseCase(repository)
+
+    fun provideUpdateNotificationPreferencesUseCase(
+        repository: ProfileSettingsRepository
+    ): com.example.lagallens.domain.usecase.UpdateNotificationPreferencesUseCase =
+        com.example.lagallens.domain.usecase.UpdateNotificationPreferencesUseCase(repository)
 
     fun provideUpdateProfileLanguageUseCase(
         repository: ProfileSettingsRepository

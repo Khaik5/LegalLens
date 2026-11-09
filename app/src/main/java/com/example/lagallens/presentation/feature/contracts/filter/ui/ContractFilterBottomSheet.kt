@@ -68,6 +68,7 @@ class ContractFilterBottomSheet : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        viewModel.onEvent(ContractFilterUiEvent.Initialized(readSelection(requireArguments())))
         bindView()
         collectUiState()
         collectUiEffect()
@@ -195,6 +196,10 @@ class ContractFilterBottomSheet : BottomSheetDialogFragment() {
         private const val STATUS_KEY = "contract_filter_status"
         private const val RISK_LEVEL_KEY = "contract_filter_risk_level"
         private const val FIGMA_DIM_AMOUNT = 0.24f
+
+        fun newInstance(selection: ContractFilterSelection) = ContractFilterBottomSheet().apply {
+            arguments = selectionToBundle(selection)
+        }
 
         fun readSelection(bundle: Bundle): ContractFilterSelection {
             return ContractFilterSelection(

@@ -143,7 +143,7 @@ This is a proposal in a new D2 copy; D1 and the original contract remain unchang
     <string name="chatbot_draft_ai_review_before">The illustrative employment term is 24 months from the agreed start date.</string>
     <string name="chatbot_draft_ai_review_after_label">AFTER · AI PROPOSAL, NOT APPLIED</string>
     <string name="chatbot_draft_ai_review_after">The illustrative employment term is 30 months from the agreed start date.</string>
-    <string name="chatbot_draft_ai_review_reason">Reason: applies the request to extend the term by 6 months. The handover date and renewal terms stay unchanged.</string>
+    <string name="chatbot_draft_ai_review_reason">Reason: applies the request to extend the term by 6 months. The start date and renewal terms stay unchanged.</string>
     <string name="chatbot_draft_ai_review_accept">Accept</string>
     <string name="chatbot_draft_ai_review_accept_selected">✓ Accept</string>
     <string name="chatbot_draft_ai_review_reject">Reject</string>

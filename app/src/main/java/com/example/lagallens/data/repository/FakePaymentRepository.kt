@@ -4,18 +4,19 @@ import android.content.Context
 import com.example.lagallens.core.network.BackendNotConfiguredException
 import com.example.lagallens.domain.model.payment.PaymentRecord
 import com.example.lagallens.domain.model.payment.PaymentStatus
-import com.example.lagallens.domain.repository.CreditRepository
+import com.example.lagallens.domain.model.credit.CreditOffer
+import kotlinx.coroutines.flow.Flow
 import com.example.lagallens.domain.repository.PaymentRepository
 import org.json.JSONArray
 import org.json.JSONObject
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
-class FakePaymentRepository(context: Context, private val credits: CreditRepository, preferencesName: String = "payment_demo_records") : PaymentRepository {
+class FakePaymentRepository(context: Context, private val credits: com.example.lagallens.data.datasource.local.datastore.CreditDemoLedger, preferencesName: String = "payment_demo_records") {
     private val preferences = context.applicationContext.getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
     private val lock = Mutex()
 
-    override suspend fun createOrGet(paymentId: String, packageId: String, amountVnd: Long, credits: Int): PaymentRecord = lock.withLock {
+    suspend fun createOrGet(paymentId: String, packageId: String, amountVnd: Long, credits: Int): PaymentRecord = lock.withLock {
         require(paymentId.isNotBlank() && packageId.isNotBlank() && amountVnd >= 0 && credits > 0)
         val existing = read(paymentId)
         if (existing != null) {
@@ -28,7 +29,7 @@ class FakePaymentRepository(context: Context, private val credits: CreditReposit
         }
     }
 
-    override suspend fun updateStatus(paymentId: String, status: PaymentStatus): PaymentRecord = lock.withLock {
+    suspend fun updateStatus(paymentId: String, status: PaymentStatus): PaymentRecord = lock.withLock {
         val current = requireNotNull(read(paymentId)) { "Unknown paymentId" }
         require(status != PaymentStatus.SUCCESS || current.status == PaymentStatus.SUCCESS) {
             "Use completeDemoPayment to complete a DEMO payment"
@@ -42,9 +43,9 @@ class FakePaymentRepository(context: Context, private val credits: CreditReposit
         next
     }
 
-    override suspend fun get(paymentId: String): PaymentRecord? = lock.withLock { read(paymentId) }
+    suspend fun get(paymentId: String): PaymentRecord? = lock.withLock { read(paymentId) }
 
-    override suspend fun completeDemoPayment(paymentId: String): PaymentRecord = lock.withLock {
+    suspend fun completeDemoPayment(paymentId: String): PaymentRecord = lock.withLock {
         val current = requireNotNull(read(paymentId)) { "Unknown paymentId" }
         if (current.status != PaymentStatus.PENDING) return@withLock current
         // CreditRepository is idempotent by paymentId, so retry after process death cannot double-credit.
@@ -87,11 +88,13 @@ class FakePaymentRepository(context: Context, private val credits: CreditReposit
     private companion object { const val KEY_RECORDS = "records_v1" }
 }
 
-class UnconfiguredRemotePaymentRepository : PaymentRepository {
+class UnconfiguredRemotePaymentRepository(private val sessionKey: () -> String? = { null }) : PaymentRepository {
+    override fun activeSessionKey(): String? = sessionKey()
     override val isConfigured: Boolean = false
     private fun unavailable(): Nothing = throw BackendNotConfiguredException("Payment")
-    override suspend fun createOrGet(paymentId: String, packageId: String, amountVnd: Long, credits: Int): PaymentRecord = unavailable()
-    override suspend fun updateStatus(paymentId: String, status: PaymentStatus): PaymentRecord = unavailable()
+    override suspend fun getPackages(): List<CreditOffer> = unavailable()
+    override suspend fun createPayment(paymentId: String, packageId: String): PaymentRecord = unavailable()
+    override fun observePayment(paymentId: String): Flow<PaymentRecord> = unavailable()
+    override suspend fun cancelPayment(paymentId: String): PaymentRecord = unavailable()
     override suspend fun get(paymentId: String): PaymentRecord? = unavailable()
-    override suspend fun completeDemoPayment(paymentId: String): PaymentRecord = unavailable()
 }

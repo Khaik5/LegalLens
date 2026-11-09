@@ -16,20 +16,23 @@ import com.example.lagallens.presentation.feature.contracts.contract.ContractLis
 import com.example.lagallens.presentation.feature.contracts.contract.ContractProcessingStatus
 import com.example.lagallens.presentation.feature.contracts.contract.ContractRiskLevel
 import com.example.lagallens.presentation.feature.contracts.contract.ContractStatusFilter
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.CancellationException
 
+import com.example.lagallens.presentation.feature.contracts.contract.toContractListItem
+
 class ContractListViewModel(application: Application) : AndroidViewModel(application) {
     private val _uiState = MutableStateFlow(ContractListUiState())
     val uiState = _uiState.asStateFlow()
 
-    private val _uiEffect = MutableSharedFlow<ContractListUiEffect>()
-    val uiEffect = _uiEffect.asSharedFlow()
+    private val _uiEffect = Channel<ContractListUiEffect>(Channel.BUFFERED)
+    val uiEffect = _uiEffect.receiveAsFlow()
+    private var sourceContracts: List<ContractListItem> = emptyList()
 
     init {
         viewModelScope.launch {
@@ -47,67 +50,8 @@ class ContractListViewModel(application: Application) : AndroidViewModel(applica
         }
     }
 
-    private var sourceContracts: List<ContractListItem> = emptyList()
-
-    private fun toListItem(contract: EmploymentContract): ContractListItem {
-        val template = ContractListItem.allSamples.firstOrNull { it.id == contract.id }
-            ?: ContractListItem.allSamples.first()
-        val application = getApplication<Application>()
-        val status = when (contract.status) {
-            EmploymentContractStatus.COMPLETE -> ContractProcessingStatus.COMPLETE
-            EmploymentContractStatus.PROCESSING -> ContractProcessingStatus.PROCESSING
-            EmploymentContractStatus.DRAFT -> ContractProcessingStatus.DRAFT
-        }
-        val risk = when (contract.risk) {
-            EmploymentContractRisk.LOW -> ContractRiskLevel.LOW
-            EmploymentContractRisk.MEDIUM -> ContractRiskLevel.MEDIUM
-            EmploymentContractRisk.HIGH -> ContractRiskLevel.HIGH
-            EmploymentContractRisk.CRITICAL -> ContractRiskLevel.CRITICAL
-            EmploymentContractRisk.NOT_ANALYZED -> ContractRiskLevel.NOT_ANALYZED
-        }
-        val statusRes = when (status) {
-            ContractProcessingStatus.COMPLETE -> com.example.lagallens.R.string.contract_complete_status
-            ContractProcessingStatus.PROCESSING -> com.example.lagallens.R.string.contract_processing_status
-            ContractProcessingStatus.DRAFT -> com.example.lagallens.R.string.contract_draft_status
-        }
-        val riskRes = when (risk) {
-            ContractRiskLevel.LOW -> com.example.lagallens.R.string.contract_low_risk
-            ContractRiskLevel.MEDIUM -> com.example.lagallens.R.string.contract_medium_risk
-            ContractRiskLevel.HIGH, ContractRiskLevel.CRITICAL -> com.example.lagallens.R.string.contract_high_risk
-            ContractRiskLevel.NOT_ANALYZED -> com.example.lagallens.R.string.contract_not_analyzed_risk
-        }
-        val (statusBackgroundRes, statusTextColorRes) = when (status) {
-            ContractProcessingStatus.COMPLETE -> com.example.lagallens.R.drawable.bg_contract_status_complete to com.example.lagallens.R.color.contract_complete
-            ContractProcessingStatus.PROCESSING -> com.example.lagallens.R.drawable.bg_contract_status_processing to com.example.lagallens.R.color.contract_pending
-            ContractProcessingStatus.DRAFT -> com.example.lagallens.R.drawable.bg_contract_status_draft to com.example.lagallens.R.color.legal_lens_auth_accent
-        }
-        val riskIconRes = when (risk) {
-            ContractRiskLevel.HIGH, ContractRiskLevel.CRITICAL -> com.example.lagallens.R.drawable.ic_dashboard_risk_high
-            ContractRiskLevel.NOT_ANALYZED -> com.example.lagallens.R.drawable.ic_contract_risk_pending
-            else -> com.example.lagallens.R.drawable.ic_dashboard_risk_low
-        }
-        val riskTextColorRes = when (risk) {
-            ContractRiskLevel.HIGH, ContractRiskLevel.CRITICAL -> com.example.lagallens.R.color.contract_risk_high
-            ContractRiskLevel.NOT_ANALYZED -> com.example.lagallens.R.color.legal_lens_secondary_text
-            else -> com.example.lagallens.R.color.contract_complete
-        }
-        return template.copy(
-            id = contract.id,
-            titleOverride = contract.title,
-            subtitleOverride = application.getString(com.example.lagallens.R.string.contract_demo_labor_subtitle),
-            documentId = contract.documentId,
-            content = contract.content,
-            contractType = com.example.lagallens.presentation.feature.contracts.contract.ContractType.EMPLOYMENT,
-            processingStatus = status,
-            riskLevel = risk,
-            statusRes = statusRes,
-            riskRes = riskRes,
-            statusBackgroundRes = statusBackgroundRes,
-            statusTextColorRes = statusTextColorRes,
-            riskIconRes = riskIconRes,
-            riskTextColorRes = riskTextColorRes
-        )
-    }
+    private fun toListItem(contract: EmploymentContract): ContractListItem =
+        contract.toContractListItem(getApplication<Application>().getString(com.example.lagallens.R.string.contract_demo_labor_subtitle))
 
     fun onEvent(event: ContractListUiEvent) {
         when (event) {
@@ -140,7 +84,7 @@ class ContractListViewModel(application: Application) : AndroidViewModel(applica
         ContractFilter.ALL -> true
         ContractFilter.ANALYZED -> processingStatus == ContractProcessingStatus.COMPLETE
         ContractFilter.PROCESSING -> processingStatus == ContractProcessingStatus.PROCESSING
-        ContractFilter.HIGH_RISK -> riskLevel == ContractRiskLevel.HIGH
+        ContractFilter.HIGH_RISK -> riskLevel == ContractRiskLevel.HIGH || riskLevel == ContractRiskLevel.CRITICAL
     }
 
     private fun ContractListItem.matches(filterSelection: ContractFilterSelection): Boolean {
@@ -151,7 +95,8 @@ class ContractListViewModel(application: Application) : AndroidViewModel(applica
             ContractStatusFilter.PROCESSING -> processingStatus == ContractProcessingStatus.PROCESSING
             ContractStatusFilter.DRAFT -> processingStatus == ContractProcessingStatus.DRAFT
         }
-        val riskMatches = filterSelection.riskLevel == null || riskLevel == filterSelection.riskLevel
+        val riskMatches = filterSelection.riskLevel == null || riskLevel == filterSelection.riskLevel ||
+            (filterSelection.riskLevel == ContractRiskLevel.HIGH && riskLevel == ContractRiskLevel.CRITICAL)
         return typeMatches && statusMatches && riskMatches
     }
 
@@ -162,15 +107,15 @@ class ContractListViewModel(application: Application) : AndroidViewModel(applica
     }
 
     private fun navigateToDetail(contractId: String) {
-        val session = getApplication<LegalLensApplication>().currentDemoSessionKey()
+        val session = getApplication<LegalLensApplication>().currentSessionKey()
         viewModelScope.launch {
-            if (session == getApplication<LegalLensApplication>().currentDemoSessionKey()) _uiEffect.emit(ContractListUiEffect.NavigateToDetail(contractId))
+            if (session == getApplication<LegalLensApplication>().currentSessionKey()) _uiEffect.send(ContractListUiEffect.NavigateToDetail(contractId))
         }
     }
 
     private fun showFilterBottomSheet() {
         viewModelScope.launch {
-            _uiEffect.emit(ContractListUiEffect.ShowFilterBottomSheet)
+            _uiEffect.send(ContractListUiEffect.ShowFilterBottomSheet)
         }
     }
 }

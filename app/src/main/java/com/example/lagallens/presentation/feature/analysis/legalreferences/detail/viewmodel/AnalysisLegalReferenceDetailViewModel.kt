@@ -6,9 +6,9 @@ import com.example.lagallens.R
 import com.example.lagallens.presentation.feature.analysis.legalreferences.detail.contract.AnalysisLegalReferenceDetailUiEffect
 import com.example.lagallens.presentation.feature.analysis.legalreferences.detail.contract.AnalysisLegalReferenceDetailUiEvent
 import com.example.lagallens.presentation.feature.analysis.legalreferences.detail.contract.AnalysisLegalReferenceDetailUiState
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -17,8 +17,8 @@ class AnalysisLegalReferenceDetailViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(AnalysisLegalReferenceDetailUiState())
     val uiState = _uiState.asStateFlow()
 
-    private val _uiEffect = MutableSharedFlow<AnalysisLegalReferenceDetailUiEffect>()
-    val uiEffect = _uiEffect.asSharedFlow()
+    private val _uiEffect = Channel<AnalysisLegalReferenceDetailUiEffect>(Channel.BUFFERED)
+    val uiEffect = _uiEffect.receiveAsFlow()
 
     fun onEvent(event: AnalysisLegalReferenceDetailUiEvent) {
         when (event) {
@@ -58,6 +58,6 @@ class AnalysisLegalReferenceDetailViewModel : ViewModel() {
     }
 
     private fun emitEffect(effect: AnalysisLegalReferenceDetailUiEffect) {
-        viewModelScope.launch { _uiEffect.emit(effect) }
+        viewModelScope.launch { _uiEffect.send(effect) }
     }
 }

@@ -18,12 +18,20 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class ChatbotDraftManualEditViewModel(application: Application) : AndroidViewModel(application) {
+    private val app = application as LegalLensApplication
+    private val ownerSession = app.currentSessionKey()
+    fun isOwnerSession() = ownerSession == app.currentSessionKey()
     private val state = MutableStateFlow(ChatbotDraftManualEditUiState())
     val uiState = state.asStateFlow()
     private val effectChannel = Channel<ChatbotDraftManualEditUiEffect>(Channel.BUFFERED)
     val uiEffect = effectChannel.receiveAsFlow()
+    init { viewModelScope.launch { app.observeSessionKeys().collect { if (it != ownerSession) {
+        state.value = ChatbotDraftManualEditUiState()
+        while (effectChannel.tryReceive().isSuccess) { }
+    } } } }
 
     fun onEvent(event: ChatbotDraftManualEditUiEvent) {
+        if (ownerSession != app.currentSessionKey()) return
         when (event) {
             is ChatbotDraftManualEditUiEvent.Opened -> if (!state.value.isDirty) {
                 state.update { it.copy(body = event.body, addition = event.addition, isDirty = event.addition.isNotBlank()) }
@@ -39,6 +47,7 @@ class ChatbotDraftManualEditViewModel(application: Application) : AndroidViewMod
     }
 
     private fun save(sourceDraftId: String?, contractId: String?) {
+        val repository = try { app.draftRepository.forSession(ownerSession) } catch (_: Exception) { return }
         if (state.value.isSaving) return
         val content = listOf(state.value.body.trim(), state.value.addition.trim()).filter(String::isNotEmpty).joinToString("\n\n")
         if (content.isBlank()) {
@@ -48,20 +57,25 @@ class ChatbotDraftManualEditViewModel(application: Application) : AndroidViewMod
         state.update { it.copy(isSaving = true) }
         viewModelScope.launch {
             try {
-                val draft = getApplication<LegalLensApplication>().draftRepository.saveDraft(
+                val draft = repository.saveDraft(
                     stage = DraftStage.MANUAL_EDIT,
+                    isTitleGenerated = true,
                     title = getApplication<Application>().getString(R.string.chatbot_draft_document_name, DraftStage.MANUAL_EDIT.legacyKey),
                     content = content,
                     contractId = contractId,
                     sourceDraftId = sourceDraftId ?: DraftStage.ORIGINAL.legacyKey
                 )
-                state.update { it.copy(isSaving = false, isDirty = false) }
-                effectChannel.send(ChatbotDraftManualEditUiEffect.Saved(draft.draftId))
+                if (ownerSession == app.currentSessionKey()) {
+                    state.update { it.copy(isSaving = false, isDirty = false) }
+                    effectChannel.send(ChatbotDraftManualEditUiEffect.Saved(draft.draftId))
+                }
             } catch (cancellationException: CancellationException) {
                 throw cancellationException
             } catch (_: Exception) {
-                state.update { it.copy(isSaving = false) }
-                effectChannel.send(ChatbotDraftManualEditUiEffect.SaveFailed)
+                if (ownerSession == app.currentSessionKey()) {
+                    state.update { it.copy(isSaving = false) }
+                    effectChannel.send(ChatbotDraftManualEditUiEffect.SaveFailed)
+                }
             }
         }
     }

@@ -2,6 +2,8 @@
 <resources>
     <string name="credit_backend_not_configured">Ví Credit chưa thể tải hoặc thay đổi vì Backend chưa được cấu hình.</string>
     <string name="credit_history_backend_not_configured">Lịch sử Credit chưa thể tải vì Backend chưa được cấu hình.</string>
+    <string name="credit_history_loading">Đang tải lịch sử Credit…</string>
+    <string name="credit_history_error">Không thể tải lịch sử Credit. Vui lòng thử lại.</string>
     <string name="profile_backend_not_configured">Hồ sơ chưa thể tải hoặc lưu vì Backend chưa được cấu hình.</string>
     <string name="profile_demo_default_name">Người dùng DEMO</string>
     <string name="app_name">LegalLens</string>
@@ -434,11 +436,11 @@
     <string name="analysis_start_risk_title">Phát hiện rủi ro tiềm ẩn</string>
     <string name="analysis_start_risk_description">Cảnh báo điều khoản bất lợi, chồng chéo hoặc thiếu minh bạch</string>
     <string name="analysis_start_legal_title">Đối chiếu cơ sở pháp lý</string>
-    <string name="analysis_start_legal_description">Kiểm tra sự phù hợp với Bộ luật Dân sự, Luật Thương mại và lao động</string>
+    <string name="analysis_start_legal_description">Minh họa phân tích hợp đồng lao động; chưa xác minh căn cứ pháp lý.</string>
     <string name="analysis_start_disclaimer_title">Khuyến cáo pháp lý</string>
     <string name="analysis_start_disclaimer_body">Kết quả do LegalLens tạo ra chỉ nhằm mục đích tham khảo, không thay thế tư vấn của luật sư hoặc kết luận của cơ quan có thẩm quyền.</string>
     <string name="analysis_start_action">Bắt đầu phân tích</string>
-    <string name="analysis_processing_title">Đang xử lý phân tích</string>
+    <string name="analysis_processing_title">Mô phỏng phân tích · DEMO</string>
     <string name="analysis_processing_read_contract_title">Đọc hợp đồng</string>
     <string name="analysis_processing_read_contract_description">Đã hoàn thành phân tích tệp tin</string>
     <string name="analysis_processing_extract_clauses_title">Trích xuất điều khoản</string>
@@ -446,13 +448,13 @@
     <string name="analysis_processing_find_information_title">Tìm thông tin quan trọng</string>
     <string name="analysis_processing_find_information_description">Phát hiện thực thể và các mốc thời gian quan trọng</string>
     <string name="analysis_processing_check_risks_title">Kiểm tra rủi ro</string>
-    <string name="analysis_processing_check_risks_description">Sử dụng mô hình AI quét các điều khoản bất lợi</string>
+    <string name="analysis_processing_check_risks_description">Mô phỏng bước kiểm tra rủi ro; chưa gọi AI</string>
     <string name="analysis_processing_find_legal_basis_title">Tra cứu cơ sở pháp lý</string>
-    <string name="analysis_processing_find_legal_basis_description">Tìm kiếm các bộ luật liên quan</string>
+    <string name="analysis_processing_find_legal_basis_description">Chưa tìm kiếm căn cứ pháp lý thực tế</string>
     <string name="analysis_processing_create_summary_title">Tạo tóm tắt</string>
     <string name="analysis_processing_create_summary_description">Đang tổng hợp luật trong hợp đồng</string>
     <string name="analysis_processing_notice">VUI LÒNG KHÔNG ĐÓNG ỨNG DỤNG</string>
-    <string name="analysis_result_title">Kết quả phân tích</string>
+    <string name="analysis_result_title">Kết quả minh họa · DEMO</string>
     <string name="analysis_result_back_content_description">Quay lại</string>
     <string name="analysis_result_score_label">/100</string>
     <string name="analysis_result_risk_heading">Đánh giá rủi ro:</string>
@@ -481,7 +483,7 @@
     <string name="analysis_risk_overview_summary_title">Tổng hợp phát hiện (3 rủi ro)</string>
     <string name="analysis_risk_overview_high_risk">Rủi ro cao</string>
     <string name="analysis_risk_overview_low_risk">Rủi ro thấp</string>
-    <string name="analysis_risk_overview_disclaimer"><b>Khước từ trách nhiệm:</b> Kết quả phân tích được thực hiện bởi AI và chỉ mang tính chất tham khảo pháp lý, không thay thế cho tư vấn từ luật sư chuyên nghiệp.</string>
+    <string name="analysis_risk_overview_disclaimer"><b>DEMO:</b> Nội dung là dữ liệu minh họa, chưa do AI phân tích và không phải tư vấn pháp lý.</string>
     <string name="analysis_risk_overview_view_details">Xem chi tiết phát hiện rủi ro</string>
     <string name="analysis_risk_findings_title">Các phát hiện rủi ro</string>
     <string name="analysis_risk_findings_back_content_description">Quay lại</string>
@@ -497,9 +499,9 @@
     <string name="analysis_risk_findings_view_solution">Xem chi tiết giải pháp</string>
     <string name="analysis_risk_findings_solution_unavailable">Giải pháp chi tiết sẽ được bổ sung khi có thiết kế màn đích.</string>
     <string name="analysis_risk_findings_penalty_clause" translatable="false">Điều 8 · Khoản 2.1</string>
-    <string name="analysis_risk_findings_penalty_title" translatable="false">Phạt vi phạm vượt quá mức trần luật định</string>
-    <string name="analysis_risk_findings_penalty_description" translatable="false" formatted="false">Hợp đồng quy định mức phạt vi phạm là 15% giá trị phần nghĩa vụ bị vi phạm.</string>
-    <string name="analysis_risk_findings_penalty_consequence" translatable="false">Mức phạt tối đa theo Luật Thương mại Việt Nam là 8%. Điều khoản này có nguy cơ bị tòa án tuyên vô hiệu một phần.</string>
+    <string name="analysis_risk_findings_penalty_title" translatable="false">[DEMO] Điều khoản phạt cần được xem xét</string>
+    <string name="analysis_risk_findings_penalty_description" translatable="false" formatted="false">[DEMO] Ví dụ điều khoản phạt vi phạm, không lấy từ hợp đồng của bạn.</string>
+    <string name="analysis_risk_findings_penalty_consequence" translatable="false">[DEMO] Ví dụ minh họa, chưa có căn cứ pháp lý được xác minh cho hợp đồng này.</string>
     <string name="analysis_risk_findings_termination_clause" translatable="false">Điều 11 · Khoản 3</string>
     <string name="analysis_risk_findings_termination_title" translatable="false">Đơn phương chấm dứt hợp đồng không báo trước</string>
     <string name="analysis_risk_findings_termination_description" translatable="false">Bên Cho Thuê có quyền chấm dứt hợp đồng ngay lập tức nếu Bên Thuê chậm thanh toán 5 ngày.</string>
@@ -513,16 +515,21 @@
     <string name="analysis_risk_detail_more_content_description">Thêm tùy chọn</string>
     <string name="analysis_risk_detail_severity_high">Rủi ro Cao</string>
     <string name="analysis_risk_detail_attention_heading">VÌ SAO CẦN LƯU Ý</string>
-    <string name="analysis_risk_detail_attention_reason" translatable="false" formatted="false">Việt Nam quy định mức trần phạt vi phạm hợp đồng thương mại tối đa là 8%. Việc thỏa thuận 15% là vi phạm điều cấm của luật và có thể không được tòa án bảo vệ khi xảy ra tranh chấp.</string>
+    <string name="analysis_risk_detail_attention_reason" translatable="false" formatted="false">[DEMO] Đây là tình huống minh họa, chưa phải kết quả phân tích hay kết luận pháp lý cho hợp đồng của bạn.</string>
     <string name="analysis_risk_detail_clause_heading">ĐIỀU KHOẢN LIÊN QUAN</string>
     <string name="analysis_risk_detail_clause_reference" translatable="false">Trích dẫn Điều 8.2.1:</string>
     <string name="analysis_risk_detail_clause_excerpt" translatable="false" formatted="false">\"Trong trường hợp một trong hai bên đơn phương chấm dứt hợp đồng trái pháp luật, bên vi phạm sẽ chịu mức phạt vi phạm tương đương 15% tổng giá trị hợp đồng.\"</string>
     <string name="analysis_risk_detail_legal_explanation_heading">GIẢI THÍCH PHÁP LÝ</string>
-    <string name="analysis_risk_detail_legal_explanation" translatable="false" formatted="false">Theo Điều 301 Luật Thương mại 2005, mức phạt đối với vi phạm nghĩa vụ hợp đồng hoặc tổng mức phạt đối với nhiều vi phạm do các bên thỏa thuận trong hợp đồng nhưng không quá 8% giá trị phần nghĩa vụ hợp đồng bị vi phạm.</string>
-    <string name="analysis_risk_detail_legal_reference_title" translatable="false">Điều 301 · Luật Thương mại 2005</string>
-    <string name="analysis_risk_detail_legal_reference_subtitle" translatable="false">Xem văn bản luật đầy đủ</string>
+    <string name="analysis_risk_detail_legal_explanation" translatable="false" formatted="false">Chưa có giải thích và căn cứ pháp lý được xác minh cho hợp đồng lao động này.</string>
+    <string name="analysis_risk_detail_legal_reference_title" translatable="false">Chưa có căn cứ pháp lý được xác minh</string>
+    <string name="analysis_risk_detail_legal_reference_subtitle" translatable="false">Không có trích dẫn để xem</string>
     <string name="analysis_risk_detail_recommendation_heading">Đề xuất phương án đàm phán</string>
-    <string name="analysis_risk_detail_recommendation" translatable="false" formatted="false">Nên kiểm tra thêm và đàm phán giảm mức phạt xuống còn tối đa 8% tổng giá trị hợp đồng để đảm bảo tính an toàn pháp lý tuyệt đối và không bị vô hiệu điều khoản nếu có tranh chấp tại tòa án.</string>
+    <string name="analysis_risk_detail_recommendation" formatted="false">[DEMO] Hãy xem xét nội dung thực tế và tham khảo người có chuyên môn trước khi quyết định.</string>
+    <string name="analysis_citation_unavailable">Chưa có căn cứ pháp lý được xác minh cho hợp đồng này.</string>
+    <string name="analysis_result_unavailable">Kết quả phân tích hiện không khả dụng.</string>
+    <string name="analysis_storage_error">Không thể đọc dữ liệu phân tích. Vui lòng thử lại.</string>
+    <string name="analysis_snapshot_empty">Không có mục nào trong kết quả này.</string>
+    <string name="analysis_snapshot_english_unavailable">Bản dịch tiếng Anh chưa khả dụng; hãy chuyển sang tiếng Việt.</string>
     <string name="analysis_failure_title">Phân tích lỗi</string>
     <string name="analysis_failure_back_content_description">Quay lại</string>
     <string name="analysis_failure_more_content_description">Thêm tùy chọn</string>
@@ -603,6 +610,11 @@
     <string name="analysis_parties_address_value" translatable="false">Quận Đống Đa, Thành phố Hà Nội</string>
     <string name="analysis_parties_contact_label">Thông tin liên hệ khác</string>
     <string name="analysis_parties_contact_value" translatable="false">SĐT: ••• ••• ••• — Email: user@example.com</string>
+    <string name="analysis_obligations_working_conditions_excerpt">Nội dung minh họa: Bên A cung cấp trang thiết bị phù hợp cho công việc.</string>
+    <string name="analysis_obligations_salary_excerpt">Nội dung minh họa: Bên A thanh toán tiền lương đầy đủ theo thời hạn đã thỏa thuận.</string>
+    <string name="analysis_obligations_insurance_excerpt">Nội dung minh họa: Bên A thực hiện các khoản bảo hiểm theo thỏa thuận.</string>
+    <string name="analysis_obligations_professional_work_excerpt">Nội dung minh họa: Bên B thực hiện công việc chuyên môn đã thỏa thuận.</string>
+    <string name="analysis_obligations_confidentiality_excerpt">Nội dung minh họa: Bên B bảo mật thông tin công nghệ của Bên A.</string>
     <string name="analysis_obligations_title">Quyền và nghĩa vụ</string>
     <string name="analysis_obligations_rights_tab">Quyền lợi</string>
     <string name="analysis_obligations_duties_tab">Nghĩa vụ</string>
@@ -625,6 +637,15 @@
     <string name="analysis_obligations_confidentiality_clause" translatable="false">Khoản 2 · Điều 8</string>
     <string name="analysis_obligations_confidentiality_description" translatable="false">Tuyệt đối không tiết lộ mã nguồn, dữ liệu dự án hoặc bí mật thương mại của Bên A cho bất kỳ bên thứ ba nào.</string>
     <string name="analysis_legal_references_title">Cơ sở pháp lý</string>
+    <string name="analysis_legal_demo_notice">Nội dung minh họa · Chưa được xác minh cho hợp đồng này.</string>
+    <string name="analysis_legal_demo_heading">Cơ sở pháp lý mẫu</string>
+    <string name="analysis_legal_search_empty">Không tìm thấy trong nội dung được xem.</string>
+    <string name="analysis_legal_locked_notice">Các nội dung mẫu còn lại đã được làm mờ.</string>
+    <string name="analysis_legal_unlock">Mở khóa toàn bộ · %1$d Credit</string>
+    <string name="analysis_locked_count">Còn %1$d nội dung cần mở khóa</string>
+    <string name="analysis_locked_item_unavailable">Nội dung này cần mở khóa để xem.</string>
+    <string name="analysis_unlock_price_unavailable">Chưa tải được giá mở khóa</string>
+    <string name="analysis_obligation_source_unavailable">Chưa có đoạn trích điều khoản gốc.</string>
     <string name="analysis_legal_references_back_content_description">Quay lại kết quả phân tích</string>
     <string name="analysis_legal_references_more_content_description">Thêm tùy chọn</string>
     <string name="analysis_legal_references_section_title">Văn bản tham chiếu có hiệu lực</string>
@@ -677,7 +698,7 @@
     <string name="chatbot_back_content_description">Mở điều hướng hội thoại</string>
     <string name="chatbot_more_content_description">Tùy chọn hội thoại</string>
     <string name="chatbot_default_contract_name" translatable="false">HĐ Lao động mẫu</string>
-    <string name="chatbot_default_source_name" translatable="false">HĐ Thuê văn phòng tòa nhà Bitexco</string>
+    <string name="chatbot_default_source_name" translatable="false">Hợp đồng lao động mẫu · DEMO</string>
     <string name="chatbot_default_contract_type" translatable="false">Hợp đồng lao động</string>
     <string name="chatbot_attach_content_description">Đính kèm tệp</string>
     <string name="chatbot_send_content_description">Gửi tin nhắn</string>
@@ -703,29 +724,29 @@
     <string name="chatbot_new_chat_term_question">Thời hạn hợp đồng là bao lâu?</string>
     <string name="chatbot_new_chat_rights_question">Quyền và nghĩa vụ của tôi là gì?</string>
     <string name="chatbot_grounded_answer_notice">Câu trả lời sẽ dẫn chiếu tài liệu khi có căn cứ. Nếu thông tin chưa có, AI sẽ yêu cầu bổ sung.</string>
-    <string name="chatbot_draft_request">Tạo hợp đồng thuê văn phòng mới từ tài liệu này, thời hạn 24 tháng thay vì 36 tháng.</string>
+    <string name="chatbot_draft_request">Tạo hợp đồng lao động mới từ tài liệu này, thời hạn 24 tháng thay vì 36 tháng.</string>
     <string name="chatbot_draft_header_subtitle">Tạo hợp đồng mới</string>
     <string name="chatbot_draft_reference_badge">Tham chiếu: Hợp đồng gốc</string>
     <string name="chatbot_draft_preparing">Đang chuẩn bị yêu cầu</string>
     <string name="chatbot_draft_check_notice">Bản nháp cần được bạn kiểm tra; chưa đủ thông tin để ký.</string>
-    <string name="chatbot_draft_clarification">Bạn muốn tính 24 tháng từ ngày nào? Thông tin bên thuê, giá thuê, tiền đặt cọc và mặt bằng cho hợp đồng mới có thay đổi không?</string>
-    <string name="chatbot_draft_sample_details">Tính từ ngày bàn giao. Tôi chưa có thông tin các bên, địa chỉ cụ thể, giá thuê và tiền cọc; hãy để trong [ngoặc vuông] để bổ sung sau.</string>
-    <string name="chatbot_draft_acknowledgement">Tôi sẽ tạo bản nháp mới 24 tháng từ ngày bàn giao, ghi rõ các mục còn thiếu. Hợp đồng gốc 36 tháng được giữ nguyên.</string>
+    <string name="chatbot_draft_clarification">Bạn muốn tính 24 tháng từ ngày nào? Thông tin người lao động, vị trí công việc, mức lương và địa điểm làm việc cho hợp đồng mới có thay đổi không?</string>
+    <string name="chatbot_draft_sample_details">Tính từ ngày bắt đầu làm việc. Tôi chưa có thông tin các bên, vị trí công việc, mức lương và địa điểm làm việc; hãy để trong [ngoặc vuông] để bổ sung sau.</string>
+    <string name="chatbot_draft_acknowledgement">Tôi sẽ tạo bản nháp mới 24 tháng từ ngày bắt đầu làm việc, ghi rõ các mục còn thiếu. Hợp đồng gốc 36 tháng được giữ nguyên.</string>
     <string name="chatbot_draft_review_prompt">Vui lòng kiểm tra yêu cầu trước khi tạo bản nháp.</string>
     <string name="chatbot_draft_review_action">Xem lại yêu cầu</string>
     <string name="chatbot_draft_review_title">Yêu cầu tạo hợp đồng</string>
     <string name="chatbot_draft_contract_type_label">LOẠI HỢP ĐỒNG</string>
-    <string name="chatbot_draft_contract_type_value">Thuê văn phòng</string>
+    <string name="chatbot_draft_contract_type_value">Hợp đồng lao động</string>
     <string name="chatbot_draft_source_label">TÀI LIỆU THAM CHIẾU</string>
     <string name="chatbot_draft_source_status">Hợp đồng gốc · Chỉ đọc</string>
     <string name="chatbot_draft_changes_title">Thay đổi chính</string>
-    <string name="chatbot_draft_change_term">• Thời hạn đề xuất: 24 tháng từ bàn giao, thay cho 36 tháng của bản gốc.</string>
-    <string name="chatbot_draft_change_missing">• Các bên, mặt bằng, giá thuê và tiền cọc để [chưa cung cấp].</string>
+    <string name="chatbot_draft_change_term">• Thời hạn đề xuất: 24 tháng từ ngày bắt đầu làm việc, thay cho 36 tháng của bản gốc.</string>
+    <string name="chatbot_draft_change_missing">• Các bên, vị trí công việc, mức lương và địa điểm làm việc để [chưa cung cấp].</string>
     <string name="chatbot_draft_warning">Không sao chép thông tin chưa được xác nhận. Chưa sẵn sàng để ký.</string>
     <string name="chatbot_draft_create_action">Tạo bản nháp</string>
     <string name="chatbot_draft_edit_action">Chỉnh sửa yêu cầu</string>
     <string name="chatbot_draft_local_only">Đây là bản xem trước mẫu. Chưa có bản nháp nào được lưu.</string>
-    <string name="chatbot_generation_request">Tạo bản nháp thuê 24 tháng từ ngày bàn giao. Để thông tin chưa có trong [ngoặc vuông].</string>
+    <string name="chatbot_generation_request">Tạo bản nháp hợp đồng lao động 24 tháng từ ngày bắt đầu làm việc. Để thông tin chưa có trong [ngoặc vuông].</string>
     <string name="chatbot_generation_confirmed">YÊU CẦU MẪU ĐÃ XÁC NHẬN</string>
     <string name="chatbot_generation_source">Tham chiếu: %1$s · Hợp đồng gốc 36 tháng.</string>
     <string name="chatbot_generation_original_badge">Bản mới · Không ghi đè bản gốc</string>
@@ -737,7 +758,7 @@
     <string name="chatbot_generation_retry">Thử lại</string>
     <string name="chatbot_generation_error_note">Thử lại với cùng yêu cầu 24 tháng; chưa có bản nháp nào được tạo hoặc lưu.</string>
     <string name="chatbot_generation_success">Bản nháp mẫu D1 đã sẵn sàng. Hợp đồng gốc không thay đổi.</string>
-    <string name="chatbot_generation_result_name">HĐ Thuê văn phòng Bitexco · D1</string>
+    <string name="chatbot_generation_result_name">Hợp đồng lao động DEMO · D1</string>
     <string name="chatbot_generation_result_metadata">Mẫu minh họa · Thời hạn 24 tháng</string>
     <string name="chatbot_generation_result_badge">Bản nháp mẫu · Chưa lưu</string>
     <string name="chatbot_generation_result_warning">Còn thông tin cần bổ sung. Rà soát nội dung trước khi lưu hoặc xuất.</string>
@@ -844,7 +865,7 @@
     <string name="unlock_confirmation_heading">Mở khóa kết quả AI</string>
     <string name="unlock_confirmation_description">Bạn đã xem 40% miễn phí. Xác nhận để mở toàn bộ 100% kết quả phân tích rủi ro hợp đồng này.</string>
     <string name="unlock_confirmation_result_title">Kết quả phân tích rủi ro hợp đồng</string>
-    <string name="unlock_confirmation_result_meta" translatable="false">Mã %1$s · Đã xem 40%% miễn phí</string>
+    <string name="unlock_confirmation_result_meta">Mã %1$s · Đã xem 40%% miễn phí</string>
     <string name="unlock_confirmation_contract_label">Hợp đồng</string>
     <string name="unlock_confirmation_current_label">Hiện tại</string>
     <string name="unlock_confirmation_current_value" formatted="false">40% nội dung đã mở</string>
@@ -946,7 +967,7 @@
     <string name="credit_flow_pending_status">Chờ xác nhận</string>
     <string name="credit_flow_credit_pending">Credit chờ cộng</string>
     <string name="credit_flow_pending_note">Không thanh toán lại khi giao dịch đang xử lý để tránh tạo thêm giao dịch. Vui lòng chờ xác nhận.</string>
-    <string name="credit_flow_pending_footer" formatted="false">KQ-1042 vẫn ở trạng thái xem trước 40%. Mua Credit không tự mở khóa kết quả.</string>
+    <string name="credit_flow_pending_footer" formatted="false">Mua Credit không tự mở khóa kết quả.</string>
     <string name="credit_flow_pending_button">Đang chờ xác nhận…</string>
     <string name="credit_flow_pending_hint">Bạn không cần thanh toán lại.</string>
     <string name="credit_flow_success_title">Mua Credit thành công</string>
@@ -961,7 +982,7 @@
     <string name="credit_flow_result_status">Trạng thái</string>
     <string name="credit_flow_preview_status" formatted="false">Xem trước 40%</string>
     <string name="credit_flow_unlock_cost">Chi phí mở kết quả này</string>
-    <string name="credit_flow_success_note">Mua Credit không tự mở khóa kết quả. Quay về KQ-1042 và chủ động xác nhận riêng để mở toàn bộ; khi đó mới trừ 2 Credits.</string>
+    <string name="credit_flow_success_note">Mua Credit không tự mở khóa kết quả. Quay về kết quả phân tích và xác nhận riêng để mở khóa.</string>
     <string name="credit_flow_return_to_unlock">Về kết quả để xác nhận mở</string>
     <string name="credit_flow_view_credit_history">Xem lịch sử Credit</string>
 
@@ -987,4 +1008,8 @@
     <string name="credit_receipt_after">Số dư hiện tại</string>
     <string name="credit_sample_price">Giá minh họa</string>
     <string name="credit_time_submitted">Thời gian gửi</string>
+    <string name="analysis_existing_result_prompt">Hợp đồng này đã có kết quả phân tích gần nhất.</string>
+    <string name="analysis_open_existing">Xem kết quả</string>
+    <string name="analysis_start_new">Phân tích mới</string>
+    <string name="analysis_snapshot_demo_metadata">[DEMO] %1$s</string>
 </resources>

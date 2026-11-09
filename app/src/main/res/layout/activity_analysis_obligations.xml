@@ -6,6 +6,17 @@
     android:layout_height="match_parent"
     android:background="@color/legal_lens_background">
 
+    <ImageButton
+        android:id="@+id/analysis_obligations_back"
+        android:layout_width="@dimen/analysis_back_button_size"
+        android:layout_height="@dimen/analysis_back_button_size"
+        android:layout_marginStart="@dimen/analysis_content_side_padding"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/analysis_key_facts_back_content_description"
+        android:padding="@dimen/analysis_back_icon_padding"
+        android:src="@drawable/ic_upload_back"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
     <TextView
         android:id="@+id/analysis_obligations_title"
         android:layout_width="0dp"
@@ -18,7 +29,7 @@
         android:textSize="@dimen/analysis_header_title_text_size"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@id/analysis_obligations_back"
         app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
@@ -94,10 +105,13 @@
         app:layout_constraintTop_toBottomOf="@id/analysis_obligations_document">
 
         <TextView
+            android:id="@+id/analysis_obligations_tab_rights"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@drawable/bg_analysis_obligations_selected_tab"
+            android:clickable="true"
+            android:focusable="true"
             android:gravity="center"
             android:text="@string/analysis_obligations_rights_tab"
             android:textColor="@color/legal_lens_primary"
@@ -105,9 +119,12 @@
             android:textStyle="bold" />
 
         <TextView
+            android:id="@+id/analysis_obligations_tab_duties"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
             android:gravity="center"
             android:text="@string/analysis_obligations_duties_tab"
             android:textColor="@color/legal_lens_secondary_text"
@@ -130,4 +147,16 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/analysis_obligations_tabs" />
+    <TextView
+        android:id="@+id/analysis_content_empty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/analysis_snapshot_empty"
+        android:textColor="@color/legal_lens_secondary_text"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -7,4 +7,6 @@ sealed interface AnalysisObligationsUiEvent {
     ) : AnalysisObligationsUiEvent
 
     data object BackClicked : AnalysisObligationsUiEvent
+    data class TabSelected(val tab: com.example.lagallens.domain.model.analysis.AnalysisObligationTab) : AnalysisObligationsUiEvent
+    data class SourceClicked(val id: String) : AnalysisObligationsUiEvent
 }

@@ -4,21 +4,29 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
+import com.example.lagallens.presentation.feature.chatbot.draft.ui.DraftSessionActivity
+import com.example.lagallens.presentation.feature.chatbot.draft.ui.DraftSessionGuard
 import androidx.core.view.WindowCompat
 import com.example.lagallens.databinding.ActivitySavedDraftCopyDetailBinding
 import com.example.lagallens.presentation.common.utils.applySystemBarInsets
-import com.example.lagallens.presentation.feature.chatbot.draft.save.SavedDraftCopyStore
+import androidx.lifecycle.lifecycleScope
+import com.example.lagallens.LegalLensApplication
+import com.example.lagallens.R
+import com.example.lagallens.domain.model.DraftStage
+import com.example.lagallens.domain.repository.latestDraft
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.launch
 import com.example.lagallens.presentation.feature.chatbot.draft.save.pdf.DraftPdfExportBottomSheet
 import com.example.lagallens.presentation.feature.chatbot.draft.ui.AppliedDraftPreviewActivity
 import com.example.lagallens.presentation.feature.chatbot.draft.contract.ChatbotDraftUiState
 import com.example.lagallens.presentation.feature.chatbot.draft.ui.ChatbotDraftPreviewActivity
 
-class SavedDraftCopyDetailActivity : AppCompatActivity() {
+class SavedDraftCopyDetailActivity : DraftSessionActivity() {
     private lateinit var binding: ActivitySavedDraftCopyDetailBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (!guardDraftCreate()) return
         WindowCompat.setDecorFitsSystemWindows(window, false)
         window.statusBarColor = Color.TRANSPARENT
         binding = ActivitySavedDraftCopyDetailBinding.inflate(layoutInflater)
@@ -26,12 +34,30 @@ class SavedDraftCopyDetailActivity : AppCompatActivity() {
         binding.root.applySystemBarInsets()
         binding.savedDraftBack.setOnClickListener { finish() }
         val version = intent.getStringExtra(EXTRA_VERSION) ?: ChatbotDraftUiState.APPROVED_AI_VERSION
-        binding.savedDraftTitle.text = SavedDraftCopyStore.name(this, version).orEmpty()
+        val contractId = intent.getStringExtra(EXTRA_CONTRACT_ID)
+        var draftId = intent.getStringExtra(EXTRA_DRAFT_ID)
+        binding.savedDraftTitle.text = getString(R.string.chatbot_draft_document_name, version)
+        lifecycleScope.launch {
+            val app = application as LegalLensApplication
+            val draft = try {
+                val repository = app.draftRepository.forSession(app.currentSessionKey())
+                val stage = DraftStage.fromLegacyKey(version) ?: DraftStage.ORIGINAL
+                draftId?.let { repository.getDraft(it) } ?: repository.latestDraft(stage, contractId)
+            } catch (cancellation: CancellationException) {
+                throw cancellation
+            } catch (_: Exception) {
+                null
+            }
+            draft?.let {
+                draftId = it.draftId
+                binding.savedDraftTitle.text = it.title
+            }
+        }
         binding.savedDraftView.setOnClickListener {
             if (version == ChatbotDraftUiState.APPROVED_AI_VERSION) {
-                startActivity(AppliedDraftPreviewActivity.createIntent(this, isSaved = true, version = version))
+                startActivity(AppliedDraftPreviewActivity.createIntent(this, isSaved = true, version = version, draftId = draftId, contractId = contractId))
             } else {
-                startActivity(ChatbotDraftPreviewActivity.createIntent(this, version, savedContent = SavedDraftCopyStore.content(this, version)))
+                startActivity(ChatbotDraftPreviewActivity.createIntent(this, version, draftId = draftId, contractId = contractId))
             }
         }
         binding.savedDraftExport.setOnClickListener { showExportSheet() }
@@ -47,9 +73,14 @@ class SavedDraftCopyDetailActivity : AppCompatActivity() {
     companion object {
         private const val EXTRA_OPEN_EXPORT = "saved_draft_detail_open_export"
         private const val EXTRA_VERSION = "saved_draft_detail_version"
-        fun createIntent(context: Context, version: String = ChatbotDraftUiState.APPROVED_AI_VERSION, openExport: Boolean = false) =
+        private const val EXTRA_DRAFT_ID = "saved_draft_detail_draft_id"
+        private const val EXTRA_CONTRACT_ID = "saved_draft_detail_contract_id"
+        fun createIntent(context: Context, version: String = ChatbotDraftUiState.APPROVED_AI_VERSION, openExport: Boolean = false, draftId: String? = null, contractId: String? = null) =
             Intent(context, SavedDraftCopyDetailActivity::class.java)
                 .putExtra(EXTRA_OPEN_EXPORT, openExport)
                 .putExtra(EXTRA_VERSION, version)
+                .putExtra(EXTRA_DRAFT_ID, draftId)
+                .putExtra(EXTRA_CONTRACT_ID, contractId)
+            .also { DraftSessionGuard.stamp(context, it) }
     }
 }

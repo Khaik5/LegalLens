@@ -31,6 +31,7 @@ import org.hamcrest.Matchers.startsWith
 
 @RunWith(AndroidJUnit4::class)
 class DeviceInteractionTest {
+    @get:org.junit.Rule val demoSession = com.example.lagallens.DemoSessionRule()
     @Test fun mainTabsOpenAndReturnHome() {
         ActivityScenario.launch(MainActivity::class.java).use {
             onView(withId(R.id.navNotifications)).perform(click())
@@ -77,8 +78,8 @@ class DeviceInteractionTest {
     @Test fun contractDetailViewerAndSafeDialogs() {
         ActivityScenario.launch(MainActivity::class.java).use {
             onView(withId(R.id.navContracts)).perform(click())
-            onView(withText(R.string.contract_demo_labor_indefinite)).perform(click())
-            onView(withId(R.id.tvContractTitle)).check(matches(withText(R.string.contract_demo_labor_indefinite)))
+            onView(seededContractTitle(R.string.contract_demo_labor_indefinite)).perform(click())
+            onView(withId(R.id.tvContractTitle)).check(matches(seededContractTitle(R.string.contract_demo_labor_indefinite)))
             onView(withId(R.id.btnRename)).perform(click())
             onView(withId(R.id.renameCancel)).perform(click())
             onView(withId(R.id.btnDelete)).perform(click())
@@ -86,10 +87,10 @@ class DeviceInteractionTest {
             onView(withText(R.string.contract_detail_view_document)).perform(click())
             onView(withId(R.id.viewerRoot)).check(matches(isDisplayed()))
             pressBack()
-            onView(withId(R.id.tvContractTitle)).check(matches(withText(R.string.contract_demo_labor_indefinite)))
+            onView(withId(R.id.tvContractTitle)).check(matches(seededContractTitle(R.string.contract_demo_labor_indefinite)))
             pressBack()
-            onView(withText(R.string.contract_demo_labor_fixed_term)).perform(click())
-            onView(withId(R.id.tvContractTitle)).check(matches(withText(R.string.contract_demo_labor_fixed_term)))
+            onView(seededContractTitle(R.string.contract_demo_labor_fixed_term)).perform(click())
+            onView(withId(R.id.tvContractTitle)).check(matches(seededContractTitle(R.string.contract_demo_labor_fixed_term)))
         }
     }
 
@@ -147,19 +148,19 @@ class DeviceInteractionTest {
     @Test fun analysisFromContractReturnsToCorrectDetail() {
         ActivityScenario.launch(MainActivity::class.java).use {
             onView(withId(R.id.navContracts)).perform(click())
-            onView(withText(R.string.contract_demo_labor_indefinite)).perform(click())
+            onView(seededContractTitle(R.string.contract_demo_labor_indefinite)).perform(click())
             onView(withText(R.string.contract_detail_analyze)).perform(click())
             onView(withId(R.id.analysis_start_action)).perform(click())
             Thread.sleep(6000)
-            onView(withId(R.id.analysis_result_document_name)).check(matches(withText(R.string.contract_demo_labor_indefinite)))
+            onView(withId(R.id.analysis_result_document_name)).check(matches(seededContractTitle(R.string.contract_demo_labor_indefinite)))
             pressBack()
-            onView(withId(R.id.tvContractTitle)).check(matches(withText(R.string.contract_demo_labor_indefinite)))
+            onView(withId(R.id.tvContractTitle)).check(matches(seededContractTitle(R.string.contract_demo_labor_indefinite)))
         }
     }
 
     @Test fun analysisResultSectionsOpenAndReturn() {
         val context = ApplicationProvider.getApplicationContext<android.content.Context>()
-        val intent = AnalysisResultActivity.createIntent(context, "sample.pdf", "PDF")
+        val intent = com.example.lagallens.AnalysisTestFixture.scoped(AnalysisResultActivity.createIntent(context, "sample.pdf", "PDF"))
         val sections = listOf(
             R.string.analysis_result_summary_title to R.id.analysis_summary_root,
             R.string.analysis_result_important_information_title to R.id.analysis_key_facts_root,
@@ -184,7 +185,7 @@ class DeviceInteractionTest {
 
     @Test fun analysisResultContainsAllSixSections() {
         val context = ApplicationProvider.getApplicationContext<android.content.Context>()
-        val intent = AnalysisResultActivity.createIntent(context, "sample.pdf", "PDF")
+        val intent = com.example.lagallens.AnalysisTestFixture.scoped(AnalysisResultActivity.createIntent(context, "sample.pdf", "PDF"))
         ActivityScenario.launch<AnalysisResultActivity>(intent).use { scenario ->
             Thread.sleep(500)
             scenario.onActivity { activity ->

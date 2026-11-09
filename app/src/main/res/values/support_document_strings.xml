@@ -65,6 +65,6 @@
     <string name="contract_export_ready">PDF đã sẵn sàng (minh họa)</string>
     <string name="contract_export_ready_detail">Trạng thái mẫu; chưa tạo, lưu hoặc chia sẻ tệp thật.</string>
     <string name="contract_export_error">Xuất tài liệu thất bại</string>
-    <string name="contract_export_error_detail">Chưa có tệp PDF gốc để xuất. Vui lòng thử lại khi tài liệu sẵn sàng.</string>
+    <string name="contract_export_error_detail">Tính năng xuất tài liệu gốc chưa được hỗ trợ. Chưa có tệp nào được lưu hoặc chia sẻ.</string>
     <string name="contract_export_retry">Thử lại xuất PDF</string>
 </resources>

@@ -10,6 +10,8 @@ import com.example.lagallens.presentation.common.utils.bindPressFeedback
 import com.example.lagallens.R
 import com.example.lagallens.LegalLensApplication
 import com.example.lagallens.databinding.ActivityPurchaseSuccessBinding
+import com.example.lagallens.domain.model.credit.PurchaseBalance
+import com.example.lagallens.domain.model.credit.purchaseBalance
 import com.example.lagallens.presentation.feature.creditstore.flow.contract.CreditFlowUiEffect
 import com.example.lagallens.presentation.feature.creditstore.flow.contract.CreditFlowUiEvent
 import com.example.lagallens.presentation.feature.creditstore.hub.ui.CreditHubActivity
@@ -32,11 +34,21 @@ class PurchaseSuccessActivity : CreditFlowActivity() {
                 return@launch
             }
             val balance = app.creditRepository.balance.value
+            val transactions = runCatching { app.creditRepository.getTransactions() }
+                .onFailure { if (it is kotlinx.coroutines.CancellationException) throw it }
+                .getOrDefault(emptyList())
+            val receipt = transactions.purchaseBalance(selection.purchaseId, balance)
+                ?: PurchaseBalance(balance - payment.credits, balance)
             binding.successHeading.text = getString(R.string.credit_flow_success_heading, payment.credits)
             binding.successCredits.text = getString(R.string.credit_purchase_added, payment.credits)
             binding.successPrice.text = selection.priceText
-            binding.successBalanceBefore.text = getString(R.string.credit_store_balance_credits, balance - payment.credits)
-            binding.successBalanceAfter.text = getString(R.string.credit_store_balance_credits, balance)
+            binding.successTransaction.text = getString(
+                R.string.credit_success_transaction,
+                selection.transactionReference,
+                java.text.DateFormat.getDateTimeInstance(java.text.DateFormat.SHORT, java.text.DateFormat.SHORT).format(java.util.Date(payment.updatedAtEpochMillis))
+            )
+            binding.successBalanceBefore.text = getString(R.string.credit_store_balance_credits, receipt.before)
+            binding.successBalanceAfter.text = getString(R.string.credit_store_balance_credits, receipt.after)
         }
         binding.purchaseSuccessReturnToUnlock.bindPressFeedback()
         binding.purchaseSuccessBack.setOnClickListener {
@@ -53,7 +65,8 @@ class PurchaseSuccessActivity : CreditFlowActivity() {
     private fun handleEffect(effect: CreditFlowUiEffect) {
         when (effect) {
             CreditFlowUiEffect.NavigateBack -> {
-                startActivity(CreditHubActivity.createIntent(this).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP))
+                if (selection.returnsToUnlockOrigin) startActivity(InsufficientCreditsActivity.purchaseCompletedIntent(this))
+                else startActivity(CreditHubActivity.createIntent(this).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP))
                 finish()
             }
 

@@ -2,11 +2,9 @@ package com.example.lagallens.presentation.feature.chatbot.draft.ui
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.WindowCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -20,15 +18,15 @@ import com.example.lagallens.presentation.feature.chatbot.draft.contract.CopyDra
 import com.example.lagallens.presentation.feature.chatbot.draft.viewmodel.CopyDraftVersionViewModel
 import kotlinx.coroutines.launch
 
-class CopyDraftVersionActivity : AppCompatActivity() {
+class CopyDraftVersionActivity : DraftSessionActivity() {
     private lateinit var binding: ActivityCopyDraftVersionBinding
     private val viewModel by viewModels<CopyDraftVersionViewModel>()
     private var openingDraft = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        window.statusBarColor = Color.TRANSPARENT
+        if (!guardDraftCreate()) return
+        useEdgeToEdgeSystemBars()
         binding = ActivityCopyDraftVersionBinding.inflate(layoutInflater)
         setContentView(binding.root)
         binding.root.applySystemBarInsets()
@@ -43,13 +41,18 @@ class CopyDraftVersionActivity : AppCompatActivity() {
                 openingDraft = false
                 return@setOnClickListener
             }
-            startActivity(ChatbotDraftPreviewActivity.createIntent(this@CopyDraftVersionActivity, ChatbotDraftUiState.COPY_VERSION, draftId = draftId))
+            startActivity(ChatbotDraftPreviewActivity.createIntent(this@CopyDraftVersionActivity, ChatbotDraftUiState.COPY_VERSION, draftId = draftId, contractId = intent.getStringExtra(EXTRA_CONTRACT_ID)))
         }
-        binding.copyDraftManage.setOnClickListener { startActivity(ChatbotDraftVersionsActivity.createIntent(this, hasD3 = true)) }
-        viewModel.onEvent(CopyDraftVersionUiEvent.Opened(intent.getBooleanExtra(EXTRA_PREVIEW_FAILURE, false), null, null))
+        binding.copyDraftManage.setOnClickListener { startActivity(ChatbotDraftVersionsActivity.createIntent(this, hasD3 = true, contractId = intent.getStringExtra(EXTRA_CONTRACT_ID))) }
+        viewModel.onEvent(CopyDraftVersionUiEvent.Opened(intent.getBooleanExtra(EXTRA_PREVIEW_FAILURE, false), intent.getStringExtra(EXTRA_SOURCE_DRAFT_ID), intent.getStringExtra(EXTRA_CONTRACT_ID)))
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) { viewModel.uiState.collect(::render) }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        openingDraft = false
     }
 
     private fun render(state: com.example.lagallens.presentation.feature.chatbot.draft.contract.CopyDraftVersionUiState) = with(binding) {
@@ -68,7 +71,12 @@ class CopyDraftVersionActivity : AppCompatActivity() {
 
     companion object {
         private const val EXTRA_PREVIEW_FAILURE = "chatbot_copy_draft_preview_failure"
-        fun createIntent(context: Context, previewFailure: Boolean = false) =
+        private const val EXTRA_SOURCE_DRAFT_ID = "chatbot_copy_draft_source_id"
+        private const val EXTRA_CONTRACT_ID = "chatbot_copy_draft_contract_id"
+        fun createIntent(context: Context, previewFailure: Boolean = false, sourceDraftId: String? = null, contractId: String? = null) =
             Intent(context, CopyDraftVersionActivity::class.java).putExtra(EXTRA_PREVIEW_FAILURE, previewFailure)
+                .putExtra(EXTRA_SOURCE_DRAFT_ID, sourceDraftId)
+                .putExtra(EXTRA_CONTRACT_ID, contractId)
+            .also { DraftSessionGuard.stamp(context, it) }
     }
 }

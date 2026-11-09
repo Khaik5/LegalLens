@@ -14,6 +14,7 @@
         android:orientation="horizontal">
 
         <ImageView
+            android:id="@+id/ivRecentIcon"
             android:layout_width="@dimen/dp_36"
             android:layout_height="@dimen/dp_36"
             android:background="@drawable/bg_dashboard_status_red"
@@ -29,6 +30,7 @@
             android:orientation="vertical">
 
             <TextView
+                android:id="@+id/tvRecentTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
@@ -40,6 +42,7 @@
                 android:textStyle="bold" />
 
             <TextView
+                android:id="@+id/tvRecentSubtitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/dp_4"
@@ -50,6 +53,7 @@
         </LinearLayout>
 
         <TextView
+            android:id="@+id/tvRecentStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/bg_dashboard_status_red"
@@ -76,12 +80,14 @@
         android:orientation="horizontal">
 
         <ImageView
+            android:id="@+id/ivRecentRisk"
             android:layout_width="@dimen/dp_20"
             android:layout_height="@dimen/dp_20"
             android:contentDescription="@null"
             android:src="@drawable/ic_dashboard_risk_high" />
 
         <TextView
+            android:id="@+id/tvRecentRisk"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/dp_8"

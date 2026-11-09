@@ -79,29 +79,29 @@ class CreditHubActivity : AppCompatActivity() {
 
     private fun render(state: CreditHubUiState) {
         binding.creditHubBalance.text = if (state.isBackendUnavailable) getString(R.string.credit_backend_not_configured)
-        else getString(R.string.credit_hub_balance, state.balanceCredits)
+        else getString(R.string.credit_hub_balance, if (viewModel.isOwnerSession()) state.balanceCredits else 0)
     }
 
     private fun handleEffect(effect: CreditHubUiEffect) {
+        if (!viewModel.isOwnerSession()) return
         when (effect) {
             CreditHubUiEffect.ShowBackendUnavailable -> Toast.makeText(this, R.string.credit_backend_not_configured, Toast.LENGTH_SHORT).show()
             CreditHubUiEffect.NavigateBack -> finish()
             CreditHubUiEffect.NavigateToStore -> startActivity(CreditStoreActivity.createIntent(this))
             CreditHubUiEffect.NavigateToHistory -> startActivity(CreditHistoryActivity.createIntent(this))
             CreditHubUiEffect.NavigateToUnlockConfirmation -> {
-                startActivity(
-                    UnlockConfirmationActivity.createIntent(
-                        context = this,
-                        analysisResultId = "KQ-1042",
-                        availableCredits = viewModel.uiState.value.balanceCredits,
-                        unlockCost = 2
-                    )
-                )
+                val resultId = intent.getStringExtra(EXTRA_RESULT_ID).orEmpty()
+                val cost = intent.getIntExtra(EXTRA_UNLOCK_COST, 0)
+                if (resultId.isBlank() || cost <= 0) Toast.makeText(this, R.string.credit_hub_unlock_hint, Toast.LENGTH_LONG).show()
+                else startActivity(UnlockConfirmationActivity.createIntent(this, resultId, viewModel.uiState.value.balanceCredits, cost))
             }
         }
     }
 
     companion object {
-        fun createIntent(context: Context): Intent = Intent(context, CreditHubActivity::class.java)
+        private const val EXTRA_RESULT_ID = "credit_hub_result_id"
+        private const val EXTRA_UNLOCK_COST = "credit_hub_unlock_cost"
+        fun createIntent(context: Context, resultId: String? = null, unlockCost: Int = 0): Intent = Intent(context, CreditHubActivity::class.java)
+            .putExtra(EXTRA_RESULT_ID, resultId).putExtra(EXTRA_UNLOCK_COST, unlockCost)
     }
 }

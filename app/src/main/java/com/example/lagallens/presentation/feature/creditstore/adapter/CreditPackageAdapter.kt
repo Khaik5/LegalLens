@@ -45,8 +45,8 @@ class CreditPackageAdapter(
                 }
             )
             creditStorePackageCheck.isVisible = item.isSelected
-            creditStorePackageTitle.setText(item.titleRes)
-            creditStorePackageDescription.setText(item.descriptionRes)
+            creditStorePackageTitle.text = item.title
+            creditStorePackageDescription.text = item.description
             creditStorePackageCredits.text = item.credits.toString()
             root.isSelected = item.isSelected
             (root.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin = if (isLastItem) {

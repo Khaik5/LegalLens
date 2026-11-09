@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/analysis_parties_card_spacing"
+    android:background="@drawable/bg_analysis_summary_section"
+    android:orientation="vertical"
+    android:padding="@dimen/analysis_parties_card_padding">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:gravity="center_vertical" android:orientation="horizontal">
+        <TextView android:id="@+id/analysis_party_badge" android:layout_width="@dimen/analysis_parties_badge_size"
+            android:layout_height="@dimen/analysis_parties_badge_size" android:background="@drawable/bg_analysis_party_employer_badge"
+            android:gravity="center" android:textColor="@color/white" android:textSize="@dimen/analysis_parties_badge_text_size" android:textStyle="bold" />
+        <TextView android:id="@+id/analysis_party_title" android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/analysis_parties_title_margin_start" android:layout_weight="1"
+            android:textColor="@color/legal_lens_primary" android:textSize="@dimen/analysis_parties_party_title_text_size" android:textStyle="bold" />
+        <TextView android:id="@+id/analysis_party_role" android:layout_width="wrap_content" android:layout_height="@dimen/analysis_parties_chip_height"
+            android:background="@drawable/bg_analysis_party_employer_chip" android:gravity="center"
+            android:paddingStart="@dimen/analysis_parties_chip_horizontal_padding" android:paddingEnd="@dimen/analysis_parties_chip_horizontal_padding"
+            android:textColor="@color/legal_lens_auth_accent" android:textSize="@dimen/analysis_parties_chip_text_size" />
+    </LinearLayout>
+    <View android:layout_width="match_parent" android:layout_height="@dimen/dp_1"
+        android:layout_marginTop="@dimen/analysis_parties_divider_margin_top" android:background="@color/legal_lens_input_stroke" />
+    <LinearLayout android:id="@+id/analysis_party_fields" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:orientation="vertical" />
+</LinearLayout>

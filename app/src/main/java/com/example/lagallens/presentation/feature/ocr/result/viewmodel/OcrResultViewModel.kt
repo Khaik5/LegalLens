@@ -16,9 +16,9 @@ import com.example.lagallens.presentation.feature.ocr.result.contract.OcrResultU
 import com.example.lagallens.presentation.feature.ocr.result.contract.OcrResultUiEvent
 import com.example.lagallens.presentation.feature.ocr.result.contract.OcrResultUiState
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -27,20 +27,25 @@ import java.util.UUID
 class OcrResultViewModel(
     private val getOcrResult: GetOcrResultUseCase,
     private val documentRepository: DocumentRepository,
-    private val contractRepository: ContractRepository
+    private val contractRepository: ContractRepository,
+    private val isOwner: () -> Boolean = { true }
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(OcrResultUiState())
     val uiState = _uiState.asStateFlow()
-    private val _uiEffect = MutableSharedFlow<OcrResultUiEffect>()
-    val uiEffect = _uiEffect.asSharedFlow()
+    private val _uiEffect = Channel<OcrResultUiEffect>(Channel.BUFFERED)
+    val uiEffect = _uiEffect.receiveAsFlow()
 
     fun onEvent(event: OcrResultUiEvent) {
+        if (!isOwner()) { _uiState.value = OcrResultUiState(); return }
         when (event) {
             is OcrResultUiEvent.ScreenOpened -> loadResult(event)
             OcrResultUiEvent.BackClicked -> emitEffect(OcrResultUiEffect.NavigateBack)
             OcrResultUiEvent.EditClicked -> emitEffect(OcrResultUiEffect.NavigateToEdit(_uiState.value.documentText))
             OcrResultUiEvent.ReviewClicked -> emitEffect(OcrResultUiEffect.NavigateToReview)
-            is OcrResultUiEvent.DocumentUpdated -> _uiState.update { it.copy(documentText = event.documentText) }
+            is OcrResultUiEvent.DocumentUpdated -> {
+                _uiState.update { it.copy(documentText = event.documentText) }
+                persistEditedText(event.documentText)
+            }
             is OcrResultUiEvent.ReviewConfirmed -> {
                 val current = _uiState.value
                 if (event.documentId != null && event.documentId != current.documentId) {
@@ -59,25 +64,37 @@ class OcrResultViewModel(
         viewModelScope.launch {
             try {
                 val persisted = documentRepository.getDocument(documentId)
-                val ocrResult = if (persisted == null && event.initialContent.isBlank()) getOcrResult(event.documentName, event.documentDetails) else null
+                check(isOwner())
+                if (!event.contractId.isNullOrBlank()) {
+                    val contract = contractRepository.getContract(event.contractId)
+                    check(isOwner() && contract != null && contract.documentId == documentId && persisted?.contractId == event.contractId) { "Document unavailable" }
+                }
+                val ocrResult = if (persisted == null && event.initialContent.isBlank()) getOcrResult(documentId) else null
+                check(isOwner())
                 val text = persisted?.content?.takeIf(String::isNotBlank)
                     ?: event.initialContent.takeIf(String::isNotBlank)
                     ?: ocrResult?.documentText.orEmpty()
-                documentRepository.saveDocument(
+                val savedDocument = documentRepository.saveDocument(
                     EmploymentDocument(
                         id = documentId,
                         contractId = event.contractId ?: persisted?.contractId,
                         displayName = event.documentName,
                         uri = event.documentUri ?: persisted?.uri,
-                        mimeType = persisted?.mimeType.orEmpty(),
+                        mimeType = persisted?.mimeType?.takeIf(String::isNotBlank) ?: event.mimeType,
                         content = text,
                         updatedAtMillis = System.currentTimeMillis()
                     )
                 )
+                check(isOwner())
                 _uiState.update {
                     it.copy(
                         documentText = text,
-                        confidenceLabel = ocrResult?.confidenceLabel ?: "DEMO · Nội dung đã lưu",
+                        documentUri = savedDocument.uri,
+                        mimeType = savedDocument.mimeType,
+                        warnings = ocrResult?.warnings.orEmpty(),
+                        isSampleContent = ocrResult?.isSampleContent == true,
+                        confidenceLabel = ocrResult?.confidenceLabel.orEmpty(),
+                        confidenceLabelRes = R.string.ocr_result_saved_content_label.takeIf { ocrResult == null },
                         confidencePercentage = ocrResult?.confidencePercentage ?: "—",
                         errorMessageRes = null
                     )
@@ -85,7 +102,22 @@ class OcrResultViewModel(
             } catch (cancellationException: CancellationException) {
                 throw cancellationException
             } catch (_: Exception) {
-                _uiState.update { it.copy(confidenceLabel = "", confidencePercentage = "", documentText = "", errorMessageRes = R.string.auth_backend_not_configured) }
+                if (!isOwner()) { _uiState.value = OcrResultUiState(); return@launch }
+                _uiState.update { it.copy(confidenceLabel = "", confidenceLabelRes = null, confidencePercentage = "", documentText = "", errorMessageRes = R.string.auth_backend_not_configured) }
+            }
+        }
+    }
+
+    /** An edit survives leaving the screen or process death, before the review is confirmed. */
+    private fun persistEditedText(text: String) {
+        val current = _uiState.value
+        viewModelScope.launch {
+            try {
+                check(documentRepository.updateDocumentContent(current.documentId, current.contractId, text)) { "Document unavailable" }
+            } catch (cancellationException: CancellationException) {
+                throw cancellationException
+            } catch (_: Exception) {
+                if (isOwner()) _uiState.update { it.copy(errorMessageRes = R.string.ocr_edit_save_failed) }
             }
         }
     }
@@ -102,10 +134,15 @@ class OcrResultViewModel(
             try {
                 val timestamp = System.currentTimeMillis()
                 val contractId = current.contractId ?: UUID.randomUUID().toString()
-                val document = EmploymentDocument(current.documentId, contractId, current.documentName, current.documentUri, "", content, timestamp)
-                documentRepository.saveDocument(document)
+                val document = EmploymentDocument(current.documentId, contractId, current.documentName, current.documentUri, current.mimeType, content, timestamp)
                 val existing = if (current.contractId.isNullOrBlank()) null else contractRepository.getContract(current.contractId)
+                check(isOwner())
+                if (existing == null && !current.contractId.isNullOrBlank()) error("Contract unavailable")
+                if (existing != null) check(existing.documentId == current.documentId) { "Document unavailable" }
                 if (existing == null) {
+                    // A document can only point at an existing contract: save it unlinked, create the contract, then link it.
+                    val saved = documentRepository.saveDocument(document.copy(contractId = null))
+                    check(isOwner())
                     contractRepository.createContract(
                         EmploymentContract(
                             id = contractId,
@@ -114,39 +151,46 @@ class OcrResultViewModel(
                             content = content,
                             createdAtMillis = timestamp,
                             updatedAtMillis = timestamp,
-                            status = EmploymentContractStatus.COMPLETE,
+                            status = if (current.isSampleContent) EmploymentContractStatus.DRAFT else EmploymentContractStatus.COMPLETE,
                             risk = EmploymentContractRisk.NOT_ANALYZED,
                             fileName = current.documentName,
-                            fileUri = current.documentUri,
-                            mimeType = ""
+                            fileUri = saved.uri ?: current.documentUri,
+                            mimeType = current.mimeType
                         )
                     )
+                    check(isOwner())
+                    check(documentRepository.updateDocumentContent(current.documentId, contractId, content)) { "Document unavailable" }
                 } else {
+                    documentRepository.saveDocument(document)
+                    check(isOwner())
                     contractRepository.updateContract(existing.copy(content = content, updatedAtMillis = timestamp))
                 }
+                check(isOwner())
                 _uiState.update { it.copy(contractId = contractId, isReviewConfirmed = true) }
                 emitEffect(OcrResultUiEffect.NavigateToSaved(current.documentName, current.documentId, contractId))
             } catch (cancellationException: CancellationException) {
                 throw cancellationException
             } catch (_: Exception) {
+                if (!isOwner()) { _uiState.value = OcrResultUiState(); return@launch }
                 _uiState.update { it.copy(errorMessageRes = R.string.auth_backend_not_configured) }
             }
         }
     }
 
     private fun emitEffect(effect: OcrResultUiEffect) {
-        viewModelScope.launch { _uiEffect.emit(effect) }
+        viewModelScope.launch { if (isOwner()) _uiEffect.send(effect) }
     }
 
     class Factory(
         private val getOcrResult: GetOcrResultUseCase,
         private val documentRepository: DocumentRepository,
-        private val contractRepository: ContractRepository
+        private val contractRepository: ContractRepository,
+        private val isOwner: () -> Boolean = { true }
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             require(modelClass.isAssignableFrom(OcrResultViewModel::class.java))
-            return OcrResultViewModel(getOcrResult, documentRepository, contractRepository) as T
+            return OcrResultViewModel(getOcrResult, documentRepository, contractRepository, isOwner) as T
         }
     }
 }

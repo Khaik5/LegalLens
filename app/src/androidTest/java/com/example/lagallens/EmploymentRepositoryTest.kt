@@ -23,10 +23,9 @@ class EmploymentRepositoryTest {
     @Test
     fun employmentCrudDocumentsCompareAndPersistenceUseSelectedContent() = runBlocking {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val preferences = context.getSharedPreferences("contract_demo_data", Context.MODE_PRIVATE)
-        preferences.edit().clear().commit()
+        val name = "test_employment_${java.util.UUID.randomUUID()}"
         try {
-            val source = EmploymentDemoDataSource(context)
+            val source = EmploymentDemoDataSource(context, name)
             val contracts = FakeContractRepository(source)
             val documents = FakeDocumentRepository(source)
             val initial = contracts.observeContracts().first()
@@ -54,7 +53,7 @@ class EmploymentRepositoryTest {
             val editedText = "ĐIỀU 1. CÔNG VIỆC\n[Chức danh đã sửa]\nĐIỀU 2. THỜI HẠN\n[Theo nội dung đã chọn]"
             assertTrue(documents.updateDocumentContent(created.documentId, created.id, editedText))
 
-            val recreated = EmploymentDemoDataSource(context)
+            val recreated = EmploymentDemoDataSource(context, name)
             val reopenedContracts = FakeContractRepository(recreated)
             val reopenedDocuments = FakeDocumentRepository(recreated)
             val persisted = reopenedContracts.getContract(created.id)
@@ -71,8 +70,7 @@ class EmploymentRepositoryTest {
             assertFalse(reopenedContracts.observeContracts().first().any { it.id == created.id })
             assertEquals(null, reopenedDocuments.getDocument(created.documentId))
         } finally {
-            preferences.edit().clear().commit()
-            EmploymentDemoDataSource(context)
+            context.deleteSharedPreferences(name)
         }
     }
 }
