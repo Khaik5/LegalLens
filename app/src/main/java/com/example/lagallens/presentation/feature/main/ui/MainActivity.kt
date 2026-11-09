@@ -48,12 +48,13 @@ class MainActivity : AppCompatActivity() {
         }
         binding.mainNavHost.applySystemBarInsets(top = true, bottom = false)
         binding.bottomNavigationContainer.applySystemBarInsets(
-            top = false, bottom = true, expandHeightForBottomInset = true
+            top = false,
+            bottom = true,
+            expandHeightForBottomInset = true
         )
         bindPremiumSticker()
 
-        val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.mainNavHost) as NavHostFragment
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.mainNavHost) as NavHostFragment
         val navController = navHostFragment.navController
 
         bindBottomNavigation(navController)
@@ -153,14 +154,17 @@ class MainActivity : AppCompatActivity() {
             navController.popBackStack(destinationId, false)
         ) return
         navController.navigate(
-            destinationId, null, navOptions {
+            destinationId,
+            null,
+            navOptions {
                 launchSingleTop = true
                 restoreState = true
                 anim { enter = R.anim.anim_main_tab_enter }
                 popUpTo(navController.graph.findStartDestination().id) {
                     saveState = true
                 }
-            })
+            }
+        )
     }
 
     private companion object {

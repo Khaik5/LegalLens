@@ -199,12 +199,10 @@
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".presentation.feature.upload.progress.ui.UploadProgressActivity"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
+            android:exported="false" />
         <activity
             android:name=".presentation.feature.upload.error.ui.UploadErrorActivity"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
+            android:exported="false" />
         <activity android:name=".presentation.feature.onboarding.ui.OnboardingActivity" />
     </application>
 
