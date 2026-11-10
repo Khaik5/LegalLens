@@ -12,7 +12,9 @@ import androidx.core.view.doOnPreDraw
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.example.lagallens.LegalLensApplication
 import com.example.lagallens.databinding.ActivitySuccessBinding
+import com.example.lagallens.presentation.feature.login.ui.LoginActivity
 import com.example.lagallens.presentation.feature.main.ui.MainActivity
 import com.example.lagallens.presentation.feature.success.contract.SuccessUiEffect
 import com.example.lagallens.presentation.feature.success.contract.SuccessUiEvent
@@ -33,6 +35,9 @@ class SuccessActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(binding.root)
         playEntranceMotion()
+        if ((application as LegalLensApplication).currentSessionKey() == null) {
+            binding.startUsingButton.setText(com.example.lagallens.R.string.login)
+        }
         binding.startUsingButton.bindPressFeedback()
         binding.startUsingButton.setOnClickListener {
             viewModel.onEvent(SuccessUiEvent.StartUsingClicked)
@@ -62,8 +67,10 @@ class SuccessActivity : AppCompatActivity() {
                 viewModel.uiEffect.collect { effect ->
                     when (effect) {
                         SuccessUiEffect.NavigateToHome -> {
+                            val app = application as LegalLensApplication
+                            val destination = if (app.currentSessionKey() == null) LoginActivity::class.java else MainActivity::class.java
                             startActivity(
-                                Intent(this@SuccessActivity, MainActivity::class.java).apply {
+                                Intent(this@SuccessActivity, destination).apply {
                                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                                 }
                             )

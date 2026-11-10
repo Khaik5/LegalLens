@@ -1,5 +1,6 @@
 package com.example.lagallens.presentation.feature.profile.password.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,7 +16,10 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import com.example.lagallens.LegalLensApplication
 import com.example.lagallens.R
+import com.example.lagallens.presentation.feature.login.ui.LoginActivity
+import com.example.lagallens.presentation.feature.main.ui.MainActivity
 import com.example.lagallens.databinding.FragmentProfilePasswordBinding
 import com.example.lagallens.presentation.common.utils.bindPressFeedback
 import com.example.lagallens.databinding.ItemProfilePasswordRequirementBinding
@@ -29,7 +33,10 @@ class ProfilePasswordFragment : Fragment() {
     private var _binding: FragmentProfilePasswordBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: ProfilePasswordViewModel by viewModels()
+    private val viewModel: ProfilePasswordViewModel by viewModels {
+        val app = requireActivity().application as LegalLensApplication
+        ProfilePasswordViewModel.Factory(app.changePasswordUseCase)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -53,6 +60,7 @@ class ProfilePasswordFragment : Fragment() {
         }
         btnUpdatePassword.setOnClickListener {
             viewModel.onEvent(ProfilePasswordUiEvent.SubmitClicked)
+            (activity as? MainActivity)?.setPasswordChangePending(viewModel.uiState.value.isSubmitting)
         }
         etCurrentPassword.doAfterTextChanged {
             viewModel.onEvent(ProfilePasswordUiEvent.CurrentPasswordChanged(it.toString()))
@@ -88,6 +96,7 @@ class ProfilePasswordFragment : Fragment() {
         renderRequirement(requirementMinimumLength, state.hasMinimumLength)
         renderRequirement(requirementMixedCase, state.hasMixedCase)
         renderRequirement(requirementNumberOrSpecial, state.hasNumberOrSpecial)
+        (activity as? MainActivity)?.setPasswordChangePending(state.isSubmitting)
         btnUpdatePassword.isEnabled = !state.isSubmitting
     }
 
@@ -117,19 +126,21 @@ class ProfilePasswordFragment : Fragment() {
     private fun handleEffect(effect: ProfilePasswordUiEffect) {
         when (effect) {
             ProfilePasswordUiEffect.NavigateBack -> findNavController().navigateUp()
-            ProfilePasswordUiEffect.ShowBackendUnavailable -> {
-                Toast.makeText(
-                    requireContext(),
-                    R.string.profile_password_backend_unavailable,
-                    Toast.LENGTH_SHORT
-                ).show()
+            ProfilePasswordUiEffect.NavigateToLogin -> {
+                val host = requireActivity()
+                Toast.makeText(host.applicationContext, R.string.profile_password_sign_in_again, Toast.LENGTH_LONG).show()
+                host.startActivity(Intent(host, LoginActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                })
+                host.finish()
             }
+            is ProfilePasswordUiEffect.ShowError -> Toast.makeText(requireContext(), effect.messageRes, Toast.LENGTH_SHORT).show()
             ProfilePasswordUiEffect.PasswordUpdated -> Toast.makeText(requireContext(), R.string.profile_password_updated, Toast.LENGTH_SHORT).show()
-            ProfilePasswordUiEffect.CurrentPasswordIncorrect -> Unit
         }
     }
 
     override fun onDestroyView() {
+        (activity as? MainActivity)?.setPasswordChangePending(false)
         _binding = null
         super.onDestroyView()
     }

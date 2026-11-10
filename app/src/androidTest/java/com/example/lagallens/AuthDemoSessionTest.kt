@@ -3,7 +3,10 @@ package com.example.lagallens
 import androidx.test.platform.app.InstrumentationRegistry
 import com.example.lagallens.data.datasource.local.datastore.AuthLocalDataSource
 import com.example.lagallens.data.repository.LocalAuthRepository
+import com.example.lagallens.domain.model.auth.AuthFailure
 import com.example.lagallens.domain.model.auth.AuthResult
+import com.example.lagallens.domain.model.auth.ChangePasswordResult
+import com.example.lagallens.domain.model.auth.OtpVerification
 import com.example.lagallens.domain.model.auth.OtpPurpose
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -36,14 +39,15 @@ class AuthDemoSessionTest {
         val repository = LocalAuthRepository(AuthLocalDataSource(context, name)) { createdName = it }
         try {
             val email = "new.user@example.test"
-            assertEquals(AuthResult.SUCCESS, repository.register("New User", email, "Chosen-123"))
+            val registration = repository.register("New User", email, "Chosen-123") as AuthResult.Success
+            val challenge = checkNotNull(registration.value)
             assertNull(repository.currentSessionKey())
-            assertEquals(AuthResult.INVALID_CODE, repository.verifyOtp(email, "12a456", OtpPurpose.REGISTRATION))
+            assertEquals(AuthResult.Failed(AuthFailure.INVALID_CODE), repository.verifyOtp(challenge.challengeId, "12a456", OtpPurpose.REGISTRATION))
             assertNull(repository.currentSessionKey())
-            assertEquals(AuthResult.SUCCESS, repository.verifyOtp(email, "123456", OtpPurpose.REGISTRATION))
+            assertEquals(AuthResult.Success(OtpVerification.Verified), repository.verifyOtp(challenge.challengeId, "123456", OtpPurpose.REGISTRATION))
             assertEquals(email, repository.currentUserEmail())
             assertEquals("New User", createdName)
-            assertEquals(AuthResult.EMAIL_TAKEN, repository.register("Other", email, "Other-123"))
+            assertEquals(AuthResult.Failed(AuthFailure.EMAIL_TAKEN), repository.register("Other", email, "Other-123"))
             repository.logout()
             assertFalse(repository.authenticate(email, "Other-123"))
             assertTrue(repository.authenticate(email, "Chosen-123"))
@@ -60,11 +64,14 @@ class AuthDemoSessionTest {
             val email = "reset.user@example.test"
             assertTrue(repository.authenticate(email, "Old-demo-123"))
             repository.logout()
-            assertEquals(AuthResult.REJECTED, repository.confirmPasswordReset(email, "New-demo-456"))
-            assertEquals(AuthResult.SUCCESS, repository.verifyOtp(email, "123456", OtpPurpose.PASSWORD_RESET))
+            val challenge = (repository.requestPasswordReset(email) as AuthResult.Success).value
+            val challengeId = challenge.challengeId
+            assertEquals(AuthResult.Failed(AuthFailure.REJECTED), repository.confirmPasswordReset(challengeId, challengeId, "New-demo-456"))
+            val verification = repository.verifyOtp(challengeId, "123456", OtpPurpose.PASSWORD_RESET) as AuthResult.Success
+            val proof = (verification.value as OtpVerification.PasswordResetVerified).verificationToken
             assertNull(repository.currentSessionKey())
-            assertEquals(AuthResult.SUCCESS, repository.confirmPasswordReset(email, "New-demo-456"))
-            assertEquals(AuthResult.REJECTED, repository.confirmPasswordReset(email, "Again-demo-789"))
+            assertEquals(AuthResult.Success(Unit), repository.confirmPasswordReset(challengeId, proof, "New-demo-456"))
+            assertEquals(AuthResult.Failed(AuthFailure.REJECTED), repository.confirmPasswordReset(challengeId, proof, "Again-demo-789"))
             assertFalse(repository.authenticate(email, "Old-demo-123"))
             assertTrue(repository.authenticate(email, "New-demo-456"))
         } finally {
@@ -79,8 +86,8 @@ class AuthDemoSessionTest {
         val repository = LocalAuthRepository(AuthLocalDataSource(context, name))
         try {
             assertTrue(repository.authenticate("password.test@example.test", "Old-demo-123"))
-            assertFalse(repository.changePassword("wrong", "New-demo-456"))
-            assertTrue(repository.changePassword("Old-demo-123", "New-demo-456"))
+            assertEquals(ChangePasswordResult.IncorrectCurrentPassword, repository.changePassword("wrong", "New-demo-456"))
+            assertEquals(ChangePasswordResult.Updated, repository.changePassword("Old-demo-123", "New-demo-456"))
             repository.logout()
             assertFalse(repository.authenticate("password.test@example.test", "Old-demo-123"))
             assertTrue(repository.authenticate("password.test@example.test", "New-demo-456"))

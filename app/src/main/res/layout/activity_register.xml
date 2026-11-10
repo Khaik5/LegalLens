@@ -157,6 +157,17 @@
                 app:backgroundTint="@color/legal_lens_primary"
                 app:cornerRadius="@dimen/dp_14" />
 
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/resendVerificationButton"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_8"
+                android:minHeight="@dimen/dp_48"
+                android:text="@string/register_resend_verification"
+                android:textAllCaps="false"
+                android:visibility="gone" />
+
             <TextView
                 android:id="@+id/loginText"
                 android:layout_width="match_parent"

@@ -1,9 +1,12 @@
 package com.example.lagallens.presentation.feature.profile.password.viewmodel
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.lagallens.R
+import com.example.lagallens.domain.model.auth.ChangePasswordResult
+import com.example.lagallens.domain.usecase.ChangePasswordUseCase
+import kotlinx.coroutines.CancellationException
 import com.example.lagallens.presentation.feature.profile.password.contract.ProfilePasswordUiEffect
 import com.example.lagallens.presentation.feature.profile.password.contract.ProfilePasswordUiEvent
 import com.example.lagallens.presentation.feature.profile.password.contract.ProfilePasswordUiState
@@ -13,9 +16,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import com.example.lagallens.LegalLensApplication
 
-class ProfilePasswordViewModel(application: Application) : AndroidViewModel(application) {
+class ProfilePasswordViewModel(private val changePassword: ChangePasswordUseCase) : ViewModel() {
     private val _uiState = MutableStateFlow(ProfilePasswordUiState())
     val uiState = _uiState.asStateFlow()
 
@@ -73,23 +75,41 @@ class ProfilePasswordViewModel(application: Application) : AndroidViewModel(appl
         if (_uiState.value.isSubmitting) return
         _uiState.update { it.copy(isSubmitting = true) }
         viewModelScope.launch {
-            val app = getApplication<Application>() as LegalLensApplication
-            val result = runCatching { app.changeCurrentPassword(state.currentPassword, state.newPassword) }
-            when {
-                result.isFailure -> {
-                    _uiState.update { it.copy(isSubmitting = false) }
-                    emitEffect(ProfilePasswordUiEffect.ShowBackendUnavailable)
+            val result = try {
+                changePassword(state.currentPassword, state.newPassword)
+            } catch (error: CancellationException) {
+                throw error
+            } catch (_: Exception) {
+                ChangePasswordResult.Failed
+            }
+            when (result) {
+                ChangePasswordResult.UpdatedSignInRequired -> {
+                    _uiState.value = ProfilePasswordUiState(isSubmitting = true)
+                    _uiEffect.send(ProfilePasswordUiEffect.NavigateToLogin)
                 }
-                result.getOrDefault(false) -> {
+                ChangePasswordResult.Updated -> {
                     _uiState.value = ProfilePasswordUiState()
-                    emitEffect(ProfilePasswordUiEffect.PasswordUpdated)
+                    _uiEffect.send(ProfilePasswordUiEffect.PasswordUpdated)
                 }
-                else -> {
-                    _uiState.update { it.copy(isSubmitting = false, currentPasswordErrorRes = R.string.profile_password_current_incorrect) }
-                    emitEffect(ProfilePasswordUiEffect.CurrentPasswordIncorrect)
+                ChangePasswordResult.IncorrectCurrentPassword -> _uiState.update {
+                    it.copy(isSubmitting = false, currentPasswordErrorRes = R.string.profile_password_current_incorrect)
+                }
+                ChangePasswordResult.RateLimited, ChangePasswordResult.Failed -> {
+                    _uiState.update { it.copy(isSubmitting = false) }
+                    val message = if (result == ChangePasswordResult.RateLimited) {
+                        R.string.profile_password_rate_limited
+                    } else {
+                        R.string.profile_password_backend_unavailable
+                    }
+                    _uiEffect.send(ProfilePasswordUiEffect.ShowError(message))
                 }
             }
         }
+    }
+
+    class Factory(private val changePassword: ChangePasswordUseCase) : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T = ProfilePasswordViewModel(changePassword) as T
     }
 
     private fun emitEffect(effect: ProfilePasswordUiEffect) {

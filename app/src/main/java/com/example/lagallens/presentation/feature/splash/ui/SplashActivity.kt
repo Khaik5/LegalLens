@@ -5,7 +5,11 @@ import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.viewModels
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.doOnPreDraw
+import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -17,6 +21,7 @@ import com.example.lagallens.presentation.feature.main.ui.MainActivity
 import com.example.lagallens.presentation.feature.onboarding.ui.OnboardingActivity
 import com.example.lagallens.presentation.feature.splash.contract.SplashUiEffect
 import com.example.lagallens.presentation.feature.splash.contract.SplashUiEvent
+import com.example.lagallens.presentation.feature.splash.contract.SplashUiState
 import com.example.lagallens.presentation.feature.splash.viewmodel.SplashViewModel
 import com.example.lagallens.presentation.feature.splash.utils.SplashMotion
 import com.example.lagallens.presentation.feature.splash.utils.SplashMotion.SplashProgressAnimation
@@ -27,10 +32,8 @@ import kotlinx.coroutines.launch
 class SplashActivity : AppCompatActivity() {
     private val binding by lazy { ActivitySplashBinding.inflate(layoutInflater) }
     private val viewModel by viewModels<SplashViewModel> {
-        SplashViewModel.Factory(
-            (application as LegalLensApplication).isOnboardingCompletedUseCase,
-            (application as LegalLensApplication).authRepository
-        )
+        val app = application as LegalLensApplication
+        SplashViewModel.Factory(app.isOnboardingCompletedUseCase, app.restoreSessionUseCase)
     }
     private var splashProgressAnimation: SplashProgressAnimation? = null
 
@@ -41,13 +44,24 @@ class SplashActivity : AppCompatActivity() {
         window.statusBarColor = getColor(R.color.splash_background)
         window.navigationBarColor = getColor(R.color.splash_background)
 
+        binding.splashRetryButton.setOnClickListener { viewModel.onEvent(SplashUiEvent.RetryClicked) }
+        ViewCompat.setOnApplyWindowInsetsListener(binding.splash) { _, insets ->
+            binding.splashRetryPanel.updatePadding(
+                bottom = insets.getInsets(WindowInsetsCompat.Type.systemBars()).bottom
+            )
+            insets
+        }
         playEntranceMotion()
-        collectEffect()
+        collectSplash()
         viewModel.onEvent(SplashUiEvent.ScreenStarted)
     }
 
     override fun onResume() {
         super.onResume()
+        if (viewModel.uiState.value.isLoading) startProgress()
+    }
+
+    private fun startProgress() {
         if (splashProgressAnimation == null) {
             splashProgressAnimation = SplashMotion.startProgress(binding.splashProgressIndicator)
         }
@@ -74,11 +88,24 @@ class SplashActivity : AppCompatActivity() {
         super.onPause()
     }
 
-    private fun collectEffect() {
+    private fun collectSplash() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.uiEffect.collect(::handleEffect)
+                launch { viewModel.uiState.collect(::render) }
+                launch { viewModel.uiEffect.collect(::handleEffect) }
             }
+        }
+    }
+
+    private fun render(state: SplashUiState) {
+        binding.splashProgress.isVisible = state.isLoading
+        binding.splashStatus.isVisible = state.isLoading
+        binding.splashRetryPanel.isVisible = state.isRetryVisible
+        if (!state.isLoading) {
+            splashProgressAnimation?.cancel()
+            splashProgressAnimation = null
+        } else if (lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+            startProgress()
         }
     }
 

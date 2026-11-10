@@ -1,7 +1,11 @@
 package com.example.lagallens.domain.repository
 
 import com.example.lagallens.domain.model.auth.AuthResult
+import com.example.lagallens.domain.model.auth.ChangePasswordResult
+import com.example.lagallens.domain.model.auth.OtpChallenge
 import com.example.lagallens.domain.model.auth.OtpPurpose
+import com.example.lagallens.domain.model.auth.OtpVerification
+import com.example.lagallens.domain.model.auth.SessionRestoreResult
 import kotlinx.coroutines.flow.Flow
 
 interface AuthRepository {
@@ -11,12 +15,13 @@ interface AuthRepository {
     fun currentUserEmail(): String? = null
     fun currentUserId(): String? = null
 
+    suspend fun restoreSession(): SessionRestoreResult
     suspend fun authenticate(username: String, password: String): Boolean
-    suspend fun register(fullName: String, email: String, password: String): AuthResult
-    suspend fun resendOtp(email: String, purpose: OtpPurpose): AuthResult
-    suspend fun verifyOtp(email: String, code: String, purpose: OtpPurpose): AuthResult
-    suspend fun requestPasswordReset(email: String): AuthResult
-    suspend fun confirmPasswordReset(email: String, newPassword: String): AuthResult
+    suspend fun register(fullName: String, email: String, password: String): AuthResult<OtpChallenge?>
+    suspend fun resendOtp(email: String, purpose: OtpPurpose): AuthResult<OtpChallenge>
+    suspend fun verifyOtp(challengeId: String, code: String, purpose: OtpPurpose): AuthResult<OtpVerification>
+    suspend fun requestPasswordReset(email: String): AuthResult<OtpChallenge>
+    suspend fun confirmPasswordReset(challengeId: String, verificationToken: String, newPassword: String): AuthResult<Unit>
     suspend fun logout(): Boolean
-    suspend fun changePassword(currentPassword: String, newPassword: String): Boolean
+    suspend fun changePassword(currentPassword: String, newPassword: String): ChangePasswordResult
 }

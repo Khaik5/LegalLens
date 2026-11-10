@@ -6,6 +6,7 @@ import android.os.Build
 import android.os.LocaleList
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
+import com.example.lagallens.di.AppDataMode
 import com.example.lagallens.di.RepositoryModule
 import com.example.lagallens.di.DataModeConfig
 import com.example.lagallens.di.UseCaseModule
@@ -43,6 +44,7 @@ import kotlinx.coroutines.launch
 
 class LegalLensApplication : Application() {
     val dataMode get() = DataModeConfig.current
+    val usesBackendAuthentication get() = dataMode == AppDataMode.REAL
     val authRepository: AuthRepository by lazy {
         RepositoryModule.provideAuthRepository(applicationContext) { fullName ->
             val profile = userProfileRepository.getProfile()
@@ -106,6 +108,8 @@ class LegalLensApplication : Application() {
     }
     private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
 
+    val restoreSessionUseCase by lazy { UseCaseModule.provideRestoreSessionUseCase(authRepository) }
+
     val authenticateUserUseCase: AuthenticateUserUseCase by lazy {
         UseCaseModule.provideAuthenticateUserUseCase(authRepository)
     }
@@ -131,8 +135,7 @@ class LegalLensApplication : Application() {
     fun observeSessionKeys(): kotlinx.coroutines.flow.Flow<String?> =
         if (sandboxDraftRepository != null) sandboxSession else authRepository.observeSessionKeys()
 
-    suspend fun changeCurrentPassword(currentPassword: String, newPassword: String): Boolean =
-        authRepository.changePassword(currentPassword, newPassword)
+    val changePasswordUseCase by lazy { UseCaseModule.provideChangePasswordUseCase(authRepository) }
 
     /**
      * Every session change (start, logout, expiry, account switch) removes temporary scans and PDFs written before

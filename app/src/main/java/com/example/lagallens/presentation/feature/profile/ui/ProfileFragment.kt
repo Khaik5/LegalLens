@@ -19,6 +19,7 @@ import com.example.lagallens.databinding.FragmentProfileBinding
 import com.example.lagallens.presentation.common.utils.bindPressFeedback
 import com.example.lagallens.databinding.ItemProfileActionBinding
 import com.example.lagallens.presentation.feature.home.ui.HomeActivity
+import com.example.lagallens.presentation.feature.main.ui.MainActivity
 import com.example.lagallens.presentation.feature.profile.contract.ProfileUiEffect
 import com.example.lagallens.presentation.feature.profile.contract.ProfileUiEvent
 import com.example.lagallens.presentation.feature.profile.contract.ProfileUiState
@@ -175,8 +176,12 @@ class ProfileFragment : Fragment() {
     }
 
     private fun navigateToAuthentication() {
-        // MainActivity also reacts to the signed-out session; whichever runs first finishes it.
-        if (requireActivity().isFinishing) return
+        val host = requireActivity()
+        if (host is MainActivity) {
+            host.openAuthentication()
+            return
+        }
+        if (host.isFinishing) return
         startActivity(
             Intent(requireContext(), HomeActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK

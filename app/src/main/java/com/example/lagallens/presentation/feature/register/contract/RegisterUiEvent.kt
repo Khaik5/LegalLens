@@ -7,5 +7,6 @@ sealed interface RegisterUiEvent {
     data class PasswordChanged(val value: String) : RegisterUiEvent
     data class ConfirmPasswordChanged(val value: String) : RegisterUiEvent
     data object SubmitClicked : RegisterUiEvent
+    data object ResendVerificationClicked : RegisterUiEvent
     data object LoginClicked : RegisterUiEvent
 }
