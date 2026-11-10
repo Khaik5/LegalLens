@@ -18,6 +18,7 @@ import androidx.navigation.navOptions
 import androidx.lifecycle.lifecycleScope
 import com.example.lagallens.LegalLensApplication
 import com.example.lagallens.R
+import com.example.lagallens.presentation.feature.login.ui.LoginActivity
 import com.example.lagallens.presentation.feature.home.ui.HomeActivity
 import kotlinx.coroutines.launch
 import com.example.lagallens.databinding.ActivityMainBinding
@@ -33,6 +34,7 @@ class MainActivity : AppCompatActivity() {
     private val premiumSticker by lazy { FloatingPremiumSticker(this) }
     private var isResumed = false
     private var hasSelectedTab = false
+    private var passwordChangePending = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,7 +46,9 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(binding.root)
         lifecycleScope.launch {
-            app.observeSessionKeys().collect { session -> if (session == null) openAuthentication() }
+            app.observeSessionKeys().collect { session ->
+                if (session == null && !passwordChangePending) openAuthentication()
+            }
         }
         binding.mainNavHost.applySystemBarInsets(top = true, bottom = false)
         binding.bottomNavigationContainer.applySystemBarInsets(
@@ -64,10 +68,20 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun openAuthentication() {
+    internal fun setPasswordChangePending(pending: Boolean) {
+        if (passwordChangePending == pending) return
+        passwordChangePending = pending
+        if (!pending && !isChangingConfigurations && (application as LegalLensApplication).currentSessionKey() == null) {
+            openAuthentication()
+        }
+    }
+
+    internal fun openAuthentication() {
         if (isFinishing) return
+        val app = application as LegalLensApplication
+        val destination = if (app.usesBackendAuthentication) LoginActivity::class.java else HomeActivity::class.java
         startActivity(
-            Intent(this, HomeActivity::class.java).apply {
+            Intent(this, destination).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             }
         )

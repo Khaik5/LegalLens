@@ -14,6 +14,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.doOnPreDraw
+import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -32,7 +33,8 @@ import kotlinx.coroutines.launch
 class RegisterActivity : AppCompatActivity() {
     private val binding by lazy { ActivityRegisterBinding.inflate(layoutInflater) }
     private val viewModel by viewModels<RegisterViewModel> {
-        RegisterViewModel.Factory((application as com.example.lagallens.LegalLensApplication).registerAccountUseCase)
+        val app = application as com.example.lagallens.LegalLensApplication
+        RegisterViewModel.Factory(app.registerAccountUseCase, app.resendOtpUseCase)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,6 +74,9 @@ class RegisterActivity : AppCompatActivity() {
         binding.confirmPasswordInput.doAfterTextChanged { text ->
             viewModel.onEvent(RegisterUiEvent.ConfirmPasswordChanged(text?.toString().orEmpty()))
         }
+        binding.resendVerificationButton.setOnClickListener {
+            viewModel.onEvent(RegisterUiEvent.ResendVerificationClicked)
+        }
         binding.loginText.setOnClickListener {
             viewModel.onEvent(RegisterUiEvent.LoginClicked)
         }
@@ -102,6 +107,9 @@ class RegisterActivity : AppCompatActivity() {
                     }
                     updateText(binding.passwordInput, state.password)
                     updateText(binding.confirmPasswordInput, state.confirmPassword)
+                    binding.submitButton.isEnabled = !state.isLoading
+                    binding.resendVerificationButton.isVisible = state.canResendVerification
+                    binding.resendVerificationButton.isEnabled = !state.isLoading
                     binding.fullNameInput.error = state.fullNameErrorResId?.let(::getString)
                     binding.emailInput.error = state.emailErrorResId?.let(::getString)
                     binding.passwordInput.error = state.passwordErrorResId?.let(::getString)
@@ -129,7 +137,7 @@ class RegisterActivity : AppCompatActivity() {
                             finish()
                         }
                         is RegisterUiEffect.NavigateToOtp -> {
-                            startActivity(OtpVerificationActivity.createIntent(this@RegisterActivity, effect.email, com.example.lagallens.domain.model.auth.OtpPurpose.REGISTRATION))
+                            startActivity(OtpVerificationActivity.createIntent(this@RegisterActivity, effect.email, com.example.lagallens.domain.model.auth.OtpPurpose.REGISTRATION, effect.challenge))
                         }
                     }
                 }

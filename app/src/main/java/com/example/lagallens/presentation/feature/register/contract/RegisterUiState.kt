@@ -9,5 +9,6 @@ data class RegisterUiState(
     val emailErrorResId: Int? = null,
     val passwordErrorResId: Int? = null,
     val confirmPasswordErrorResId: Int? = null,
-    val isLoading: Boolean = false
+    val isLoading: Boolean = false,
+    val canResendVerification: Boolean = false
 )

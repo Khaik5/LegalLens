@@ -35,6 +35,10 @@ android {
             applicationIdSuffix = ".testsandbox"
             matchingFallbacks += listOf("debug")
         }
+        debug {
+            val debugApiBaseUrl = legalLensApiBaseUrl.ifBlank { "http://10.0.2.2:3000/" }
+            buildConfigField("String", "API_BASE_URL", "\"$debugApiBaseUrl\"")
+        }
         release {
             optimization {
                 enable = false

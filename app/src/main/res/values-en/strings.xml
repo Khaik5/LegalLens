@@ -13,7 +13,7 @@
     <string name="username">Username</string>
     <string name="login_username_required">Please enter your username.</string>
     <string name="login_password_required">Please enter your password.</string>
-    <string name="login_password_minimum_length">Password must be at least 6 characters.</string>
+    <string name="login_password_minimum_length">Password must be at least 8 characters.</string>
     <string name="login_invalid_credentials">Incorrect username or password.</string>
     <string name="login_welcome_back">Welcome back</string>
     <string name="login_subtitle">Sign in to continue accessing your secure data.</string>
@@ -31,7 +31,7 @@
     <string name="register_full_name_required">Please enter your full name.</string>
     <string name="register_email_invalid">Please enter a valid email address.</string>
     <string name="register_password_required">Please enter your password.</string>
-    <string name="register_password_minimum_length">Password must be at least 6 characters.</string>
+    <string name="register_password_minimum_length">Password must be at least 8 characters.</string>
     <string name="register_confirm_password_required">Please confirm your password.</string>
     <string name="register_password_mismatch">Password confirmation does not match.</string>
     <string name="email_address">Email address</string>
@@ -54,7 +54,12 @@
     <string name="otp_verification">Email verification</string>
     <string name="otp_title">Enter verification code</string>
     <string name="otp_subtitle">A 6-digit verification code was sent to your email</string>
-    <string name="otp_invalid">Invalid code. Please try again.</string>
+    <string name="otp_invalid">The code is incorrect or has expired.</string>
+    <string name="otp_rate_limited">Please try again in a few minutes.</string>
+    <string name="auth_rate_limited">Too many requests. Please try again later.</string>
+    <string name="auth_phase_disabled">Email verification is not enabled.</string>
+    <string name="auth_request_failed">Could not complete the request. Please try again.</string>
+    <string name="register_resend_verification">Resend verification code</string>
     <string name="otp_not_received">Didn’t receive a code?</string>
     <string name="otp_resend_after">Resend code in %1$s</string>
     <string name="otp_resend">Resend code</string>
@@ -161,7 +166,9 @@
     <string name="profile_password_submit">Update password</string>
     <string name="profile_password_current_required">Please enter your current password.</string>
     <string name="profile_password_confirmation_mismatch">Password confirmation does not match.</string>
-    <string name="profile_password_backend_unavailable">Password updates will be connected when the backend is ready.</string>
+    <string name="profile_password_backend_unavailable">Could not change your password. Please try again.</string>
+    <string name="profile_password_sign_in_again">Password changed. Please sign in again.</string>
+    <string name="profile_password_rate_limited">Too many requests. Please try again later.</string>
     <string name="profile_password_requirements_not_met">The new password does not meet the security requirements.</string>
     <string name="profile_password_current_incorrect">The current password is incorrect.</string>
     <string name="profile_password_updated">DEMO password updated.</string>
@@ -547,6 +554,8 @@
     <string name="credit_hub_unlock_description">View analysis results that have not been unlocked</string>
     <string name="credit_hub_info">You can preview 40%% of AI analysis results for free. Use Credits to unlock 100%% of the content. Unlocked results can be reviewed without paying more Credits.</string>
     <string name="splash_initializing_security">INITIALISING SECURITY</string>
+    <string name="splash_connection_error">Could not connect to restore your session.</string>
+    <string name="splash_retry">Try again</string>
     <string name="onboarding_skip">Skip</string>
     <string name="onboarding_title_search">EASY LEGAL RESEARCH</string>
     <string name="onboarding_description_search">Find and access the legal information you need quickly, clearly and conveniently.</string>

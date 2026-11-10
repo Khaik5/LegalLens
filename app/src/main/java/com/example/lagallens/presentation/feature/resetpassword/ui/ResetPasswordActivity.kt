@@ -35,7 +35,12 @@ class ResetPasswordActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(binding.root)
-        viewModel.onEvent(ResetPasswordUiEvent.Initialized(intent.getStringExtra(EXTRA_EMAIL).orEmpty()))
+        viewModel.onEvent(
+            ResetPasswordUiEvent.Initialized(
+                intent.getStringExtra(EXTRA_CHALLENGE_ID).orEmpty(),
+                intent.getStringExtra(EXTRA_VERIFICATION_TOKEN).orEmpty()
+            )
+        )
         bindView()
         collectState()
         collectEffect()
@@ -96,9 +101,12 @@ class ResetPasswordActivity : AppCompatActivity() {
     }
 
     companion object {
-        private const val EXTRA_EMAIL = "extra_email"
+        private const val EXTRA_CHALLENGE_ID = "extra_challenge_id"
+        private const val EXTRA_VERIFICATION_TOKEN = "extra_verification_token"
 
-        fun createIntent(context: Context, email: String): Intent =
-            Intent(context, ResetPasswordActivity::class.java).putExtra(EXTRA_EMAIL, email)
+        fun createIntent(context: Context, challengeId: String, verificationToken: String): Intent =
+            Intent(context, ResetPasswordActivity::class.java)
+                .putExtra(EXTRA_CHALLENGE_ID, challengeId)
+                .putExtra(EXTRA_VERIFICATION_TOKEN, verificationToken)
     }
 }

@@ -17,6 +17,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.lagallens.R
+import com.example.lagallens.domain.model.auth.OtpChallenge
 import com.example.lagallens.domain.model.auth.OtpPurpose
 import com.example.lagallens.presentation.feature.resetpassword.ui.ResetPasswordActivity
 import com.example.lagallens.databinding.ActivityOtpVerificationBinding
@@ -55,7 +56,12 @@ class OtpVerificationActivity : AppCompatActivity() {
         bindView()
         viewModel.onEvent(OtpVerificationUiEvent.Initialized(
             intent.getStringExtra(EXTRA_EMAIL).orEmpty(),
-            OtpPurpose.valueOf(intent.getStringExtra(EXTRA_PURPOSE) ?: OtpPurpose.REGISTRATION.name)
+            OtpPurpose.valueOf(intent.getStringExtra(EXTRA_PURPOSE) ?: OtpPurpose.REGISTRATION.name),
+            OtpChallenge(
+                intent.getStringExtra(EXTRA_CHALLENGE_ID).orEmpty(),
+                intent.getIntExtra(EXTRA_EXPIRES_IN, 0),
+                intent.getIntExtra(EXTRA_RESEND_AFTER, 0)
+            )
         ))
         collectState()
         collectEffect()
@@ -126,17 +132,20 @@ class OtpVerificationActivity : AppCompatActivity() {
                 viewModel.uiState.collect { state ->
                     binding.emailText.text = state.email.ifBlank { getString(R.string.email_hint) }
                     renderOtpInputs(state)
-                    val shouldAnimateError = state.hasError && !binding.errorMessage.isVisible
-                    binding.errorMessage.isVisible = state.hasError
+                    val shouldAnimateError = state.errorResId != null && !binding.errorMessage.isVisible
+                    state.errorResId?.let(binding.otpErrorText::setText)
+                    binding.errorMessage.isVisible = state.errorResId != null
+                    binding.submitButton.isEnabled = !state.isVerifying && !state.isResending && !state.isVerified
                     if (shouldAnimateError) {
                         binding.errorMessage.doOnPreDraw {
                             binding.errorMessage.animateContentEntrance(resources.getDimension(R.dimen.dp_8))
                         }
                     }
-                    binding.resendText.text = getString(
-                        if (state.isResendAvailable) R.string.otp_resend else R.string.otp_resend_after,
-                        formatSeconds(state.remainingSeconds)
-                    )
+                    binding.resendText.text = if (state.remainingSeconds > 0) {
+                        getString(R.string.otp_resend_after, formatSeconds(state.remainingSeconds))
+                    } else {
+                        getString(R.string.otp_resend)
+                    }
                     binding.resendBlock.isEnabled = state.isResendAvailable
                     binding.resendBlock.alpha = if (state.isResendAvailable) 1f else 0.8f
                 }
@@ -163,7 +172,7 @@ class OtpVerificationActivity : AppCompatActivity() {
     }
 
     private fun formatSeconds(seconds: Int): String {
-        return String.format("00:%02d", seconds)
+        return String.format(java.util.Locale.getDefault(), "%02d:%02d", seconds / 60, seconds % 60)
     }
 
     private fun collectEffect() {
@@ -174,13 +183,11 @@ class OtpVerificationActivity : AppCompatActivity() {
                         OtpVerificationUiEffect.CloseScreen -> finish()
                         OtpVerificationUiEffect.NavigateToSuccess -> {
                             startActivity(Intent(this@OtpVerificationActivity, SuccessActivity::class.java))
+                            finish()
                         }
                         is OtpVerificationUiEffect.NavigateToResetPassword -> startActivity(
-                            ResetPasswordActivity.createIntent(this@OtpVerificationActivity, effect.email)
+                            ResetPasswordActivity.createIntent(this@OtpVerificationActivity, effect.challengeId, effect.verificationToken)
                         )
-                        is OtpVerificationUiEffect.ShowMessage -> android.widget.Toast.makeText(
-                            this@OtpVerificationActivity, effect.messageRes, android.widget.Toast.LENGTH_LONG
-                        ).show()
                     }
                 }
             }
@@ -190,11 +197,17 @@ class OtpVerificationActivity : AppCompatActivity() {
     companion object {
         private const val EXTRA_EMAIL = "extra_email"
         private const val EXTRA_PURPOSE = "extra_otp_purpose"
+        private const val EXTRA_CHALLENGE_ID = "extra_challenge_id"
+        private const val EXTRA_EXPIRES_IN = "extra_expires_in"
+        private const val EXTRA_RESEND_AFTER = "extra_resend_after"
 
-        fun createIntent(context: Context, email: String, purpose: OtpPurpose): Intent {
+        fun createIntent(context: Context, email: String, purpose: OtpPurpose, challenge: OtpChallenge): Intent {
             return Intent(context, OtpVerificationActivity::class.java)
                 .putExtra(EXTRA_EMAIL, email)
                 .putExtra(EXTRA_PURPOSE, purpose.name)
+                .putExtra(EXTRA_CHALLENGE_ID, challenge.challengeId)
+                .putExtra(EXTRA_EXPIRES_IN, challenge.expiresInSeconds)
+                .putExtra(EXTRA_RESEND_AFTER, challenge.resendAfterSeconds)
         }
     }
 }

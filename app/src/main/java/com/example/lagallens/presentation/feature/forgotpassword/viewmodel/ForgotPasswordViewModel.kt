@@ -4,7 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.lagallens.R
+import com.example.lagallens.domain.model.auth.AuthFailure
 import com.example.lagallens.domain.model.auth.AuthResult
+import com.example.lagallens.presentation.common.utils.toAuthMessage
 import com.example.lagallens.domain.usecase.RequestPasswordResetUseCase
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.Channel
@@ -54,12 +56,13 @@ class ForgotPasswordViewModel(private val requestPasswordReset: RequestPasswordR
             } catch (cancellation: CancellationException) {
                 throw cancellation
             } catch (_: Exception) {
-                AuthResult.REJECTED
+                AuthResult.Failed(AuthFailure.REJECTED)
             }
             _uiState.update {
-                it.copy(isLoading = false, emailErrorResId = R.string.auth_backend_not_configured.takeIf { result != AuthResult.SUCCESS })
+                val failure = (result as? AuthResult.Failed)?.reason
+                it.copy(isLoading = false, emailErrorResId = failure?.toAuthMessage())
             }
-            if (result == AuthResult.SUCCESS) sendEffect(ForgotPasswordUiEffect.NavigateToOtp(email))
+            if (result is AuthResult.Success) _uiEffect.send(ForgotPasswordUiEffect.NavigateToOtp(email, result.value))
         }
     }
 

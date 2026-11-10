@@ -4,7 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.lagallens.R
+import com.example.lagallens.domain.model.auth.AuthFailure
 import com.example.lagallens.domain.model.auth.AuthResult
+import com.example.lagallens.presentation.common.utils.toAuthMessage
 import com.example.lagallens.domain.usecase.ConfirmPasswordResetUseCase
 import com.example.lagallens.presentation.feature.resetpassword.contract.ResetPasswordUiEffect
 import com.example.lagallens.presentation.feature.resetpassword.contract.ResetPasswordUiEvent
@@ -23,10 +25,15 @@ class ResetPasswordViewModel(private val confirmPasswordReset: ConfirmPasswordRe
 
     private val _uiEffect = Channel<ResetPasswordUiEffect>(Channel.BUFFERED)
     val uiEffect = _uiEffect.receiveAsFlow()
+    private var challengeId = ""
+    private var verificationToken = ""
 
     fun onEvent(event: ResetPasswordUiEvent) {
         when (event) {
-            is ResetPasswordUiEvent.Initialized -> _uiState.update { it.copy(email = event.email) }
+            is ResetPasswordUiEvent.Initialized -> {
+                challengeId = event.challengeId
+                verificationToken = event.verificationToken
+            }
             is ResetPasswordUiEvent.PasswordChanged -> _uiState.update { it.copy(password = event.value, passwordErrorResId = null) }
             is ResetPasswordUiEvent.ConfirmPasswordChanged -> _uiState.update {
                 it.copy(confirmPassword = event.value, confirmPasswordErrorResId = null)
@@ -40,6 +47,7 @@ class ResetPasswordViewModel(private val confirmPasswordReset: ConfirmPasswordRe
         val state = _uiState.value
         if (state.isLoading) return
         val passwordError = when {
+            challengeId.isBlank() || verificationToken.isBlank() -> R.string.otp_invalid
             state.password.isEmpty() -> R.string.register_password_required
             state.password.length < MINIMUM_PASSWORD_LENGTH -> R.string.register_password_minimum_length
             else -> null
@@ -56,16 +64,18 @@ class ResetPasswordViewModel(private val confirmPasswordReset: ConfirmPasswordRe
         _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
             val result = try {
-                confirmPasswordReset(state.email, state.password)
+                confirmPasswordReset(challengeId, verificationToken, state.password)
             } catch (cancellation: CancellationException) {
                 throw cancellation
             } catch (_: Exception) {
-                AuthResult.REJECTED
+                AuthResult.Failed(AuthFailure.REJECTED)
             }
             _uiState.update {
-                it.copy(isLoading = false, passwordErrorResId = R.string.reset_password_failed.takeIf { result != AuthResult.SUCCESS })
+                val error = (result as? AuthResult.Failed)?.reason
+                val message = if (error == AuthFailure.REJECTED) R.string.reset_password_failed else error?.toAuthMessage()
+                it.copy(isLoading = false, passwordErrorResId = message)
             }
-            if (result == AuthResult.SUCCESS) _uiEffect.send(ResetPasswordUiEffect.NavigateToLogin)
+            if (result is AuthResult.Success) _uiEffect.send(ResetPasswordUiEffect.NavigateToLogin)
         }
     }
 
@@ -75,6 +85,6 @@ class ResetPasswordViewModel(private val confirmPasswordReset: ConfirmPasswordRe
     }
 
     private companion object {
-        const val MINIMUM_PASSWORD_LENGTH = 6
+        const val MINIMUM_PASSWORD_LENGTH = 8
     }
 }

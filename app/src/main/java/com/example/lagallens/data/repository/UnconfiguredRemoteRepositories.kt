@@ -8,7 +8,6 @@ import com.example.lagallens.domain.repository.AnalysisRepository
 import com.example.lagallens.domain.repository.AnalysisUnlockOutcome
 import com.example.lagallens.domain.repository.AnalysisUnlockRepository
 import com.example.lagallens.domain.repository.AnalysisUnlockStatus
-import com.example.lagallens.domain.repository.AuthRepository
 import com.example.lagallens.domain.repository.ChatbotRepository
 import com.example.lagallens.domain.repository.OcrRepository
 import com.example.lagallens.domain.model.NotificationRecord
@@ -33,31 +32,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import com.example.lagallens.domain.model.processing.AnalysisJobState
 import com.example.lagallens.domain.model.processing.ProcessingState
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
-import com.example.lagallens.data.datasource.local.datastore.EncryptedTokenStore
-import com.example.lagallens.domain.model.auth.AuthResult
-import com.example.lagallens.domain.model.auth.OtpPurpose
-import java.security.MessageDigest
-
-/** Opaque session identity for one access token; the token itself is never exposed. */
-internal fun tokenSessionKey(tokens: EncryptedTokenStore): String? = tokens.accessToken()?.let { token ->
-    MessageDigest.getInstance("SHA-256").digest(token.toByteArray(Charsets.UTF_8)).joinToString("") { "%02x".format(it.toInt() and 0xff) }
-}
-
-class UnconfiguredRemoteAuthRepository(private val tokens: EncryptedTokenStore) : AuthRepository {
-    private fun unavailable(): Nothing = throw BackendNotConfiguredException("Auth")
-    override fun currentSessionKey(): String? = tokenSessionKey(tokens)
-    override fun observeSessionKeys(): Flow<String?> = tokens.observeTokenChanges().map { tokenSessionKey(tokens) }.distinctUntilChanged()
-    override suspend fun authenticate(username: String, password: String): Boolean = unavailable()
-    override suspend fun register(fullName: String, email: String, password: String): AuthResult = unavailable()
-    override suspend fun resendOtp(email: String, purpose: OtpPurpose): AuthResult = unavailable()
-    override suspend fun verifyOtp(email: String, code: String, purpose: OtpPurpose): AuthResult = unavailable()
-    override suspend fun requestPasswordReset(email: String): AuthResult = unavailable()
-    override suspend fun confirmPasswordReset(email: String, newPassword: String): AuthResult = unavailable()
-    override suspend fun logout(): Boolean { tokens.clear(); return true }
-    override suspend fun changePassword(currentPassword: String, newPassword: String): Boolean = unavailable()
-}
 
 class UnconfiguredRemoteChatbotRepository(private val sessionKey: () -> String? = { null }) : ChatbotRepository {
     override fun currentSessionKey(): String? = sessionKey()

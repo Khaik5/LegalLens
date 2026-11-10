@@ -13,7 +13,12 @@ import com.example.lagallens.data.repository.OnboardingPreferencesRepository
 import com.example.lagallens.data.repository.ProfileSettingsRepositoryImpl
 import com.example.lagallens.data.repository.ProfileRepositoryImpl
 import com.example.lagallens.data.repository.UnconfiguredRemoteAnalysisRepository
-import com.example.lagallens.data.repository.UnconfiguredRemoteAuthRepository
+import com.example.lagallens.core.network.NetworkModule
+import com.example.lagallens.data.datasource.local.datastore.EncryptedTokenStore
+import com.example.lagallens.data.datasource.remote.AuthRemoteDataSource
+import com.example.lagallens.data.datasource.remote.api.AuthApi
+import com.example.lagallens.data.datasource.remote.api.AuthSessionApi
+import com.example.lagallens.data.repository.RemoteAuthRepository
 import com.example.lagallens.data.repository.UnconfiguredRemoteChatbotRepository
 import com.example.lagallens.data.repository.UnconfiguredRemoteOcrRepository
 import com.example.lagallens.domain.repository.AuthRepository
@@ -46,7 +51,7 @@ import com.example.lagallens.data.repository.UnconfiguredRemoteProfileRepository
 import com.example.lagallens.data.repository.SessionScopedDraftRepository
 import com.example.lagallens.data.datasource.local.datastore.AccountStorageName
 import com.example.lagallens.data.repository.SessionScopedEmploymentRepositories
-import com.example.lagallens.data.repository.tokenSessionKey
+import com.example.lagallens.data.datasource.remote.rotateTokens
 
 object RepositoryModule {
     fun provideAnalysisUnlockRepository(context: Context): com.example.lagallens.domain.repository.AnalysisUnlockRepository =
@@ -129,16 +134,25 @@ object RepositoryModule {
     fun provideAuthRepository(context: Context, onAccountCreated: suspend (String) -> Unit = {}): AuthRepository {
         return when (DataModeConfig.current) {
             AppDataMode.DEMO -> LocalAuthRepository(AuthLocalDataSource(context), onAccountCreated)
-            AppDataMode.REAL -> UnconfiguredRemoteAuthRepository(
-                com.example.lagallens.data.datasource.local.datastore.EncryptedTokenStore(context)
-            )
+            AppDataMode.REAL -> {
+                val tokens = EncryptedTokenStore(context)
+                val publicApi = lazy { NetworkModule.provideRetrofit().create(AuthApi::class.java) }
+                val remote = AuthRemoteDataSource(
+                    api = publicApi,
+                    sessionApi = lazy {
+                        NetworkModule.provideAuthenticatedRetrofit(tokens) { publicApi.value.rotateTokens(it) }
+                            .create(AuthSessionApi::class.java)
+                    }
+                )
+                RemoteAuthRepository(tokens, remote)
+            }
         }
     }
 
-    /** REAL session identity shared by remote repositories; derived from the stored token without exposing it. */
+    /** REAL session identity shared by remote repositories across token rotation. */
     private fun remoteSessionKey(context: Context): () -> String? {
-        val tokens = com.example.lagallens.data.datasource.local.datastore.EncryptedTokenStore(context)
-        return { tokenSessionKey(tokens) }
+        val tokens = EncryptedTokenStore(context)
+        return { tokens.accessSession()?.key }
     }
 
     fun provideChatbotRepository(context: Context): ChatbotRepository = when (DataModeConfig.current) {

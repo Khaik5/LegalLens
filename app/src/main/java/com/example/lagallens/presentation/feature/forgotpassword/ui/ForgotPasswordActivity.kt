@@ -102,7 +102,7 @@ class ForgotPasswordActivity : AppCompatActivity() {
                             finish()
                         }
                         is ForgotPasswordUiEffect.NavigateToOtp -> {
-                            startActivity(OtpVerificationActivity.createIntent(this@ForgotPasswordActivity, effect.email, com.example.lagallens.domain.model.auth.OtpPurpose.PASSWORD_RESET))
+                            startActivity(OtpVerificationActivity.createIntent(this@ForgotPasswordActivity, effect.email, com.example.lagallens.domain.model.auth.OtpPurpose.PASSWORD_RESET, effect.challenge))
                         }
                     }
                 }

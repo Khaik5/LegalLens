@@ -171,9 +171,11 @@
                     android:src="@drawable/ic_alert_triangle" />
 
                 <TextView
+                    android:id="@+id/otpErrorText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/dp_8"
+                    android:accessibilityLiveRegion="polite"
                     android:includeFontPadding="false"
                     android:text="@string/otp_invalid"
                     android:textColor="@color/legal_lens_error"

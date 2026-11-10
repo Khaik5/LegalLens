@@ -1,5 +1,6 @@
 package com.example.lagallens.presentation.feature.login.viewmodel
 
+import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.lagallens.presentation.common.utils.toFailureMessage
@@ -50,7 +51,11 @@ class LoginViewModel(
         val state = _uiState.value
         val username = state.email.trim()
         val password = state.password
-        val usernameErrorResId = if (username.isEmpty()) R.string.login_username_required else null
+        val usernameErrorResId = when {
+            username.isEmpty() -> R.string.login_username_required
+            !Patterns.EMAIL_ADDRESS.matcher(username).matches() -> R.string.register_email_invalid
+            else -> null
+        }
         val passwordErrorResId = when {
             password.isEmpty() -> R.string.login_password_required
             password.length < MINIMUM_PASSWORD_LENGTH -> R.string.login_password_minimum_length
@@ -91,6 +96,6 @@ class LoginViewModel(
     }
 
     private companion object {
-        const val MINIMUM_PASSWORD_LENGTH = 6
+        const val MINIMUM_PASSWORD_LENGTH = 8
     }
 }

@@ -75,5 +75,46 @@
         android:translationY="@dimen/splash_label_top" />
 
 
+    <LinearLayout
+        android:id="@+id/splashRetryPanel"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dp_24"
+        android:layout_marginEnd="@dimen/dp_24"
+        android:layout_marginBottom="@dimen/dp_24"
+        android:orientation="vertical"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:accessibilityLiveRegion="polite"
+            android:gravity="center"
+            android:text="@string/splash_connection_error"
+            android:textColor="@color/splash_text"
+            android:textSize="@dimen/sp_16" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/splashRetryButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_12"
+            android:fontFamily="sans-serif"
+            android:insetLeft="@dimen/dp_0"
+            android:insetTop="@dimen/dp_0"
+            android:insetRight="@dimen/dp_0"
+            android:insetBottom="@dimen/dp_0"
+            android:minHeight="@dimen/dp_54"
+            android:text="@string/splash_retry"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="@dimen/sp_16"
+            android:textStyle="bold"
+            app:backgroundTint="@color/legal_lens_primary"
+            app:cornerRadius="@dimen/dp_14" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

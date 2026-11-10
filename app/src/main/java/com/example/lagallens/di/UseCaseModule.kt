@@ -8,6 +8,8 @@ import com.example.lagallens.domain.repository.OnboardingRepository
 import com.example.lagallens.domain.repository.ProfileRepository
 import com.example.lagallens.domain.repository.ProfileSettingsRepository
 import com.example.lagallens.domain.usecase.AuthenticateUserUseCase
+import com.example.lagallens.domain.usecase.ChangePasswordUseCase
+import com.example.lagallens.domain.usecase.RestoreSessionUseCase
 import com.example.lagallens.domain.usecase.LogoutUseCase
 import com.example.lagallens.domain.usecase.OpenChatbotConversationUseCase
 import com.example.lagallens.domain.usecase.RetryChatbotMessageUseCase
@@ -24,6 +26,10 @@ object UseCaseModule {
     fun provideAuthenticateUserUseCase(repository: AuthRepository): AuthenticateUserUseCase {
         return AuthenticateUserUseCase(repository)
     }
+
+    fun provideRestoreSessionUseCase(repository: AuthRepository) = RestoreSessionUseCase(repository)
+
+    fun provideChangePasswordUseCase(repository: AuthRepository) = ChangePasswordUseCase(repository)
 
     fun provideLogoutUseCase(
         authRepository: AuthRepository,
