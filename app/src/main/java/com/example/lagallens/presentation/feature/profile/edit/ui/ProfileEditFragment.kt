@@ -67,8 +67,8 @@ class ProfileEditFragment : Fragment() {
                             Toast.makeText(requireContext(), R.string.profile_edit_save_success, Toast.LENGTH_SHORT).show()
                             findNavController().navigateUp()
                         }
-                        ProfileUiEffect.ProfileSaveFailed ->
-                            Toast.makeText(requireContext(), R.string.profile_backend_not_configured, Toast.LENGTH_SHORT).show()
+                        is ProfileUiEffect.ProfileSaveFailed ->
+                            Toast.makeText(requireContext(), effect.messageRes, Toast.LENGTH_SHORT).show()
                         else -> Unit
                     }
                 }
@@ -99,7 +99,8 @@ class ProfileEditFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 profileViewModel.uiState.collect { profile ->
-                    if (profile.isLoading) return@collect
+                    // A failed load has no real values; filling the form with blanks would lock them in.
+                    if (profile.isLoading || profile.isBackendUnavailable) return@collect
                     viewModel.onEvent(
                         ProfileEditUiEvent.Initialize(profile.name, profile.email, profile.phone, profile.photoUri)
                     )

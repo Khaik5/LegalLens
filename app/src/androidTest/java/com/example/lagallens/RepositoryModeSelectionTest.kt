@@ -2,7 +2,7 @@ package com.example.lagallens
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.example.lagallens.data.repository.UnconfiguredRemoteContractRepository
+import com.example.lagallens.data.repository.RemoteContractRepository
 import com.example.lagallens.data.repository.UnconfiguredRemoteDocumentRepository
 import com.example.lagallens.di.AppDataMode
 import com.example.lagallens.di.DataModeConfig
@@ -22,11 +22,11 @@ class RepositoryModeSelectionTest {
 
         when (DataModeConfig.current) {
             AppDataMode.DEMO -> {
-                assertFalse(contracts is UnconfiguredRemoteContractRepository)
+                assertFalse(contracts is RemoteContractRepository)
                 assertFalse(documents is UnconfiguredRemoteDocumentRepository)
             }
             AppDataMode.REAL -> {
-                assertTrue(contracts is UnconfiguredRemoteContractRepository)
+                assertTrue(contracts is RemoteContractRepository)
                 assertTrue(documents is UnconfiguredRemoteDocumentRepository)
             }
         }

@@ -1,5 +1,6 @@
 package com.example.lagallens.data.datasource.local.datastore
 
+import com.example.lagallens.core.network.AuthSessionScope
 import kotlinx.coroutines.flow.Flow
 
 class AccessSession(val key: String, val token: String)
@@ -16,4 +17,13 @@ interface AuthSessionStore {
     fun clearIfSessionMatches(sessionKey: String): Boolean
     fun clearIfRefreshMatches(expectedRefresh: String): Boolean
     fun clearAccessTokenIfMatches(sessionKey: String, expectedToken: String): Boolean
+}
+
+internal fun AuthSessionStore.currentSessionScope(): AuthSessionScope? =
+    accessSession()?.let { AuthSessionScope(it.key) }
+
+internal fun AuthSessionStore.requireUserId(scope: AuthSessionScope): String {
+    val userId = userId()
+    check(userId != null && currentSessionScope()?.key == scope.key) { "Session changed" }
+    return userId
 }

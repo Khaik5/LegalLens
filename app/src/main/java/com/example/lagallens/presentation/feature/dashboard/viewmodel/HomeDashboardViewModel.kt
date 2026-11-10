@@ -32,6 +32,7 @@ class HomeDashboardViewModel(
     private val _uiEffect = Channel<HomeDashboardUiEffect>(Channel.BUFFERED)
     val uiEffect = _uiEffect.receiveAsFlow()
     private var contractsJob: Job? = null
+    private var profileJob: Job? = null
 
     init {
         observeContracts()
@@ -85,15 +86,16 @@ class HomeDashboardViewModel(
     }
 
     private fun loadProfile() {
-        viewModelScope.launch {
-            val name = try {
-                profiles.getProfile().name
+        profileJob?.cancel()
+        profileJob = viewModelScope.launch {
+            val profile = try {
+                profiles.getProfile()
             } catch (cancellation: CancellationException) {
                 throw cancellation
             } catch (_: Exception) {
-                ""
+                null
             }
-            _uiState.update { it.copy(userName = name) }
+            _uiState.update { it.copy(userName = profile?.name.orEmpty(), photoUri = profile?.photoUri) }
         }
     }
 
