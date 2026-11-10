@@ -147,6 +147,8 @@ class HomeDashboardFragment : Fragment() {
     }
 
     private fun bindView() {
+        // The XML attribute only takes effect from API 31; minSdk is 28.
+        binding.ivDashboardAvatar.clipToOutline = true
         listOf(
             binding.shortcutUpload.root, binding.shortcutCamera.root,
             binding.shortcutAnalyze.root, binding.shortcutCompare.root, binding.tvViewAllContracts,

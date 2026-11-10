@@ -11,6 +11,9 @@ class SessionCacheCleanerTest {
         val cache = Files.createTempDirectory("session-cache").toFile()
         val scans = File(cache, "scan-session").apply { mkdirs() }
         val pdfs = File(cache, "draft-pdfs/fixture").apply { mkdirs() }
+        val documents = File(cache, DocumentSessionCache.DIRECTORY).apply { mkdirs() }
+        val oldPreview = File(documents, "old.tmp").apply { writeText("previous user"); setLastModified(1_000) }
+        val newPreview = File(documents, "new.tmp").apply { writeText("next user"); setLastModified(5_000) }
         val oldScan = File(scans, "old.jpg").apply { writeText("previous user"); setLastModified(1_000) }
         val oldPdf = File(pdfs, "old.pdf").apply { writeText("previous user"); setLastModified(1_000) }
         val newScan = File(scans, "new.jpg").apply { writeText("next user"); setLastModified(5_000) }
@@ -18,6 +21,8 @@ class SessionCacheCleanerTest {
 
         SessionCacheCleaner(cache).clear(createdBefore = 2_000)
 
+        assertFalse(oldPreview.exists())
+        assertTrue(newPreview.exists())
         assertFalse(oldScan.exists())
         assertFalse(oldPdf.exists())
         assertFalse(pdfs.exists())

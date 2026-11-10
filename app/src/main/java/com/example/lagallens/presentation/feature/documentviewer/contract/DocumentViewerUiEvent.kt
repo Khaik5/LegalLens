@@ -5,7 +5,9 @@ sealed interface DocumentViewerUiEvent {
     data object PdfLoading : DocumentViewerUiEvent
     data class PdfLoaded(val title: String, val metadata: String, val pageCount: Int) : DocumentViewerUiEvent
     data object PdfLoadFailed : DocumentViewerUiEvent
+    data class OpenRemote(val contractId: String, val sessionKey: String) : DocumentViewerUiEvent
     data object RetryClicked : DocumentViewerUiEvent
+    data object DownloadClicked : DocumentViewerUiEvent
     data object PreviousClicked : DocumentViewerUiEvent
     data object NextClicked : DocumentViewerUiEvent
     data object ZoomInClicked : DocumentViewerUiEvent

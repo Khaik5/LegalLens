@@ -18,14 +18,18 @@ class UploadErrorViewModel : ViewModel() {
 
     private val _effects = Channel<UploadErrorEffect>(Channel.BUFFERED)
     val effects = _effects.receiveAsFlow()
+    private var canRetryUpload = false
 
     fun onEvent(event: UploadErrorEvent) {
         when (event) {
-            is UploadErrorEvent.ScreenOpened -> _uiState.update {
-                it.copy(errorCode = event.errorCode, errorMessage = event.errorMessage)
+            is UploadErrorEvent.ScreenOpened -> {
+                canRetryUpload = event.canRetryUpload
+                _uiState.update { it.copy(errorCode = event.errorCode, errorMessage = event.errorMessage) }
             }
 
-            UploadErrorEvent.RetryClicked,
+            UploadErrorEvent.RetryClicked -> emitEffect(
+                if (canRetryUpload) UploadErrorEffect.RetryUpload else UploadErrorEffect.OpenUploadSource
+            )
             UploadErrorEvent.BackClicked -> emitEffect(UploadErrorEffect.OpenUploadSource)
 
             UploadErrorEvent.BackToListClicked -> emitEffect(UploadErrorEffect.ReturnToCaller)

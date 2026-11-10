@@ -1,6 +1,8 @@
 package com.example.lagallens.presentation.feature.main.ui
 
+import android.content.Context
 import android.content.Intent
+import com.example.lagallens.presentation.feature.contracts.detail.ui.ContractDetailFragment
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
@@ -66,6 +68,25 @@ class MainActivity : AppCompatActivity() {
         binding.btnAddContract.setOnClickListener {
             startActivity(Intent(this, UploadSourceActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP))
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+    }
+
+    override fun onResumeFragments() {
+        super.onResumeFragments()
+        val contractId = intent.getStringExtra(EXTRA_UPLOADED_CONTRACT) ?: return
+        val session = intent.getStringExtra(EXTRA_UPLOAD_SESSION)
+        intent.removeExtra(EXTRA_UPLOADED_CONTRACT)
+        intent.removeExtra(EXTRA_UPLOAD_SESSION)
+        if (session == null || (application as LegalLensApplication).currentSessionKey() != session) return
+        val host = supportFragmentManager.findFragmentById(R.id.mainNavHost) as? NavHostFragment ?: return
+        host.navController.navigate(
+            R.id.contractDetailFragment,
+            Bundle().apply { putString(ContractDetailFragment.ARG_CONTRACT_ID, contractId) }
+        )
     }
 
     internal fun setPasswordChangePending(pending: Boolean) {
@@ -181,8 +202,17 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    private companion object {
-        val stickerDestinationIds = setOf(
+    companion object {
+        private const val EXTRA_UPLOADED_CONTRACT = "uploaded_contract"
+        private const val EXTRA_UPLOAD_SESSION = "upload_owner_session"
+
+        fun contractDetailIntent(context: Context, contractId: String, session: String): Intent =
+            Intent(context, MainActivity::class.java)
+                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                .putExtra(EXTRA_UPLOADED_CONTRACT, contractId)
+                .putExtra(EXTRA_UPLOAD_SESSION, session)
+
+        private val stickerDestinationIds = setOf(
             R.id.contractListFragment,
             R.id.notificationFragment
         )

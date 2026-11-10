@@ -4,8 +4,9 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.net.Uri
+import androidx.activity.addCallback
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.WindowCompat
@@ -16,6 +17,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.lagallens.databinding.ActivityUploadProgressBinding
 import com.example.lagallens.R
+import com.example.lagallens.core.network.DocumentFiles
+import com.example.lagallens.domain.model.processing.UploadFailure
+import com.example.lagallens.presentation.feature.main.ui.MainActivity
+import com.example.lagallens.presentation.feature.upload.error.ui.UploadErrorActivity
+import java.io.File
 import com.example.lagallens.presentation.common.utils.animateContentEntrance
 import com.example.lagallens.presentation.common.utils.bindPressFeedback
 import com.example.lagallens.presentation.feature.camera.ocr.ui.OcrProcessingActivity
@@ -60,12 +66,15 @@ class UploadProgressActivity : com.example.lagallens.presentation.feature.ocr.Oc
                 fileDetails = intent.getStringExtra(EXTRA_FILE_DETAILS).orEmpty(),
                 documentUri = intent.getStringExtra(EXTRA_DOCUMENT_URI),
                 documentId = intent.getStringExtra(EXTRA_DOCUMENT_ID).orEmpty(),
-                mimeType = intent.getStringExtra(EXTRA_MIME_TYPE).orEmpty()
+                mimeType = intent.getStringExtra(EXTRA_MIME_TYPE).orEmpty(),
+                scanPageUris = intent.getStringArrayListExtra(EXTRA_SCAN_PAGES).orEmpty(),
+                sessionKey = ownerSession
             )
         )
     }
 
     private fun bindEvents() {
+        onBackPressedDispatcher.addCallback(this) { viewModel.onEvent(UploadProgressEvent.CancelClicked) }
         binding.uploadProgressBack.setOnClickListener {
             viewModel.onEvent(UploadProgressEvent.CancelClicked)
         }
@@ -94,8 +103,21 @@ class UploadProgressActivity : com.example.lagallens.presentation.feature.ocr.Oc
         if (!isOcrSessionValid()) return
         when (effect) {
             UploadProgressEffect.NavigateBack -> finish()
-            UploadProgressEffect.NavigateToUploadError -> {
-                startActivity(com.example.lagallens.presentation.feature.upload.error.ui.UploadErrorActivity.newIntent(this))
+            is UploadProgressEffect.NavigateToContract -> {
+                startActivity(MainActivity.contractDetailIntent(this, effect.contractId, ownerSession))
+                finish()
+            }
+            is UploadProgressEffect.NavigateToUploadError -> {
+                val errorIntent = when (effect.reason) {
+                    UploadFailure.TOO_LARGE -> UploadErrorActivity.newIntent(this, "413", getString(R.string.upload_real_file_too_large))
+                    UploadFailure.UNSUPPORTED_FORMAT -> UploadErrorActivity.newIntent(this, "400", getString(R.string.upload_real_unsupported_format))
+                    UploadFailure.NETWORK -> UploadErrorActivity.newIntent(
+                        this, "NETWORK", getString(R.string.upload_error_retry), retryIntent = Intent(intent)
+                    )
+                    UploadFailure.UNREADABLE -> UploadErrorActivity.newIntent(this, "FILE", getString(R.string.upload_source_file_unreadable))
+                    UploadFailure.UNKNOWN -> UploadErrorActivity.newIntent(this, "UPLOAD_FAILED", getString(R.string.upload_real_failed))
+                }
+                startActivity(errorIntent)
                 finish()
             }
             is UploadProgressEffect.NavigateToOcrProcessing -> {
@@ -120,6 +142,11 @@ class UploadProgressActivity : com.example.lagallens.presentation.feature.ocr.Oc
         private const val EXTRA_DOCUMENT_URI = "extra_document_uri"
         private const val EXTRA_DOCUMENT_ID = "extra_document_id"
         private const val EXTRA_MIME_TYPE = "extra_mime_type"
+        private const val EXTRA_SCAN_PAGES = "extra_scan_pages"
+
+        fun scanIntent(context: Context, fileName: String, fileDetails: String, pagePaths: List<String>): Intent =
+            newIntent(context, fileName, fileDetails, mimeType = DocumentFiles.PDF)
+                .putStringArrayListExtra(EXTRA_SCAN_PAGES, ArrayList(pagePaths.map { Uri.fromFile(File(it)).toString() }))
 
         fun newIntent(context: Context, fileName: String, fileDetails: String, documentUri: String? = null, documentId: String = java.util.UUID.randomUUID().toString(), mimeType: String = ""): Intent {
             return com.example.lagallens.presentation.feature.ocr.OcrSession.stamp(context, Intent(context, UploadProgressActivity::class.java)
