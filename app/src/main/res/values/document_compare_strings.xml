@@ -86,4 +86,10 @@
     <string name="compare_demo_risk_termination" translatable="false">Điều khoản Đơn Phương Chấm Dứt · Cao\n\nKhông quy định thời gian báo trước đủ dài cho bên bị chấm dứt.\n\nHĐ A: Mắc rủi ro    HĐ B: An toàn</string>
     <string name="compare_demo_risk_penalty" translatable="false">Mức Phạt Vi Phạm Vượt Quá Trần · Cao\n\nCần đối chiếu điều khoản phạt với văn bản pháp luật liên quan.\n\nHĐ A: Mắc rủi ro    HĐ B: Mắc rủi ro</string>
     <string name="compare_demo_risk_force" translatable="false">Định nghĩa Sự Kiện Bất Khả Kháng · Trung bình\n\nCần làm rõ thời gian khắc phục và nghĩa vụ giảm thiểu thiệt hại.\n\nHĐ A: An toàn    HĐ B: Mắc rủi ro</string>
+    <string name="viewer_remote_title">Xem tài liệu</string>
+    <string name="viewer_remote_preview">Bản xem trước</string>
+    <string name="viewer_remote_error">Không thể tải bản xem trước của tài liệu này.</string>
+    <string name="viewer_word_download">Tải file Word về để mở bằng ứng dụng hỗ trợ.</string>
+    <string name="viewer_download">Tải tài liệu về</string>
+    <string name="viewer_download_error">Không thể tải tài liệu. Thử lại.</string>
 </resources>

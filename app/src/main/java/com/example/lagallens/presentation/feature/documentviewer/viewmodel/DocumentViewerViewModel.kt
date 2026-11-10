@@ -1,7 +1,12 @@
 package com.example.lagallens.presentation.feature.documentviewer.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.lagallens.core.network.DocumentFiles
+import com.example.lagallens.domain.usecase.GetDocumentFileUseCase
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
 import com.example.lagallens.presentation.feature.documentviewer.contract.DocumentViewerStatus
 import com.example.lagallens.presentation.feature.documentviewer.contract.DocumentViewerUiEffect
 import com.example.lagallens.presentation.feature.documentviewer.contract.DocumentViewerUiEvent
@@ -13,11 +18,70 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class DocumentViewerViewModel : ViewModel() {
+class DocumentViewerViewModel(private val getDocumentFile: GetDocumentFileUseCase) : ViewModel() {
+    private var remoteRequest: DocumentViewerUiEvent.OpenRemote? = null
+    private var previewJob: Job? = null
     private val state = MutableStateFlow(DocumentViewerUiState())
     val uiState = state.asStateFlow()
     private val effects = Channel<DocumentViewerUiEffect>(Channel.BUFFERED)
     val uiEffect = effects.receiveAsFlow()
+
+    private fun loadPreview(request: DocumentViewerUiEvent.OpenRemote) {
+        previewJob?.cancel()
+        releasePreview()
+        previewJob = viewModelScope.launch {
+            state.update { it.copy(status = DocumentViewerStatus.LOADING, remoteDocument = null, previewUri = null) }
+            try {
+                val document = getDocumentFile.findForContract(request.contractId, request.sessionKey)
+                state.update { it.copy(remoteDocument = document, title = document?.displayName ?: it.title) }
+                if (document == null || (document.mimeType != DocumentFiles.PDF && !document.mimeType.startsWith("image/"))) {
+                    state.update { it.copy(status = DocumentViewerStatus.ERROR) }
+                    return@launch
+                }
+                val uri = getDocumentFile(document.id, request.sessionKey)
+                state.update { it.copy(previewUri = uri) }
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (_: Exception) {
+                state.update { it.copy(status = DocumentViewerStatus.ERROR) }
+            }
+        }
+    }
+
+    private fun download() {
+        val session = remoteRequest?.sessionKey ?: return
+        val document = state.value.remoteDocument ?: return
+        if (state.value.isDownloading) return
+        state.update { it.copy(isDownloading = true) }
+        viewModelScope.launch {
+            try {
+                val uri = getDocumentFile(document.id, session, forDownload = true)
+                effects.send(DocumentViewerUiEffect.SaveDownload(uri, document.displayName, document.mimeType))
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (_: Exception) {
+                effects.send(DocumentViewerUiEffect.DownloadFailed)
+            } finally {
+                state.update { it.copy(isDownloading = false) }
+            }
+        }
+    }
+
+    /** Each preview is a fresh cache file, so drop the previous one once it is no longer shown. */
+    private fun releasePreview() {
+        state.value.previewUri?.let(getDocumentFile::release)
+    }
+
+    override fun onCleared() {
+        previewJob?.cancel()
+        releasePreview()
+        super.onCleared()
+    }
+
+    class Factory(private val getDocumentFile: GetDocumentFileUseCase) : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T = DocumentViewerViewModel(getDocumentFile) as T
+    }
 
     fun onEvent(event: DocumentViewerUiEvent) {
         when (event) {
@@ -29,7 +93,12 @@ class DocumentViewerViewModel : ViewModel() {
             }
             DocumentViewerUiEvent.PdfLoading -> state.update { it.copy(status = DocumentViewerStatus.LOADING) }
             DocumentViewerUiEvent.PdfLoadFailed -> state.update { it.copy(status = DocumentViewerStatus.ERROR) }
-            DocumentViewerUiEvent.RetryClicked -> Unit
+            is DocumentViewerUiEvent.OpenRemote -> if (remoteRequest != event) {
+                remoteRequest = event
+                loadPreview(event)
+            }
+            DocumentViewerUiEvent.RetryClicked -> remoteRequest?.let(::loadPreview) ?: Unit
+            DocumentViewerUiEvent.DownloadClicked -> download()
             DocumentViewerUiEvent.PreviousClicked -> state.update { it.copy(currentPage = (it.currentPage - 1).coerceAtLeast(1)) }
             DocumentViewerUiEvent.NextClicked -> state.update { it.copy(currentPage = (it.currentPage + 1).coerceAtMost(it.pageCount)) }
             DocumentViewerUiEvent.ZoomOutClicked -> state.update { it.copy(zoomPercent = (it.zoomPercent - 25).coerceAtLeast(75)) }

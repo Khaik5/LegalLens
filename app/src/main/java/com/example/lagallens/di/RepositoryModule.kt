@@ -40,7 +40,12 @@ import com.example.lagallens.data.datasource.local.datastore.EmploymentDemoDataS
 import com.example.lagallens.data.repository.FakeContractRepository
 import com.example.lagallens.data.repository.FakeDocumentRepository
 import com.example.lagallens.data.repository.RemoteContractRepository
-import com.example.lagallens.data.repository.UnconfiguredRemoteDocumentRepository
+import com.example.lagallens.data.repository.RemoteDocumentRepository
+import com.example.lagallens.data.repository.RemoteDocumentUploadRepository
+import com.example.lagallens.data.repository.FakeDocumentUploadRepository
+import com.example.lagallens.data.datasource.remote.DocumentRemoteDataSource
+import com.example.lagallens.data.datasource.remote.api.DocumentApi
+import com.example.lagallens.domain.repository.DocumentUploadRepository
 import com.example.lagallens.data.repository.FakeDraftRepository
 import com.example.lagallens.data.repository.UnconfiguredRemoteDraftRepository
 import com.example.lagallens.domain.repository.ContractRepository
@@ -120,13 +125,14 @@ object RepositoryModule {
         AppDataMode.DEMO -> employmentRepositories(context).contracts
         AppDataMode.REAL -> RemoteContractRepository(
             EncryptedTokenStore(context),
-            ContractRemoteDataSource(lazy { authenticatedRetrofit(context).create(ContractApi::class.java) })
+            ContractRemoteDataSource(lazy { authenticatedRetrofit(context).create(ContractApi::class.java) }),
+            documentRemote(context)
         )
     }
 
     fun provideDocumentRepository(context: Context): DocumentRepository = when (DataModeConfig.current) {
         AppDataMode.DEMO -> employmentRepositories(context).documents
-        AppDataMode.REAL -> UnconfiguredRemoteDocumentRepository()
+        AppDataMode.REAL -> RemoteDocumentRepository(context.applicationContext, EncryptedTokenStore(context), documentRemote(context))
     }
 
     fun provideDraftRepository(context: Context): DraftRepository = when (DataModeConfig.current) {
@@ -176,10 +182,16 @@ object RepositoryModule {
         AppDataMode.REAL -> UnconfiguredRemoteChatbotRepository(remoteSessionKey(context))
     }
 
-    fun provideDocumentUploadRepository(): com.example.lagallens.domain.repository.DocumentUploadRepository = when (DataModeConfig.current) {
-        AppDataMode.DEMO -> com.example.lagallens.data.repository.FakeDocumentUploadRepository()
-        AppDataMode.REAL -> com.example.lagallens.data.repository.UnconfiguredRemoteDocumentUploadRepository()
-    }
+    private fun documentRemote(context: Context) =
+        DocumentRemoteDataSource(lazy { authenticatedRetrofit(context).create(DocumentApi::class.java) })
+
+    fun provideDocumentUploadRepository(context: Context, contracts: ContractRepository): DocumentUploadRepository =
+        when (DataModeConfig.current) {
+            AppDataMode.DEMO -> FakeDocumentUploadRepository()
+            AppDataMode.REAL -> RemoteDocumentUploadRepository(
+                context.applicationContext, EncryptedTokenStore(context), contracts, documentRemote(context)
+            )
+        }
 
     fun provideOcrRepository(): OcrRepository = when (DataModeConfig.current) {
         AppDataMode.DEMO -> FakeOcrRepository()

@@ -22,6 +22,19 @@ class CameraCaptureViewModelTest {
     private fun CameraCaptureViewModel.showReadyFrames(count: Int = 12) =
         repeat(count) { onEvent(CameraCaptureUiEvent.DetectionUpdated(ready)) }
 
+    @Test fun framingHintsMarkThePageWithoutAskingTheUser() {
+        val vm = CameraCaptureViewModel()
+        val hint = DocumentQualityResult(
+            QualityDecision.ACCEPTED,
+            listOf(com.example.lagallens.domain.model.camera.QualityIssue.DOCUMENT_SMALL)
+        )
+
+        vm.onEvent(CameraCaptureUiEvent.PhotoQualityChecked(ScanPage("page"), hint))
+
+        assertEquals(listOf(ScanPage("page", hasQualityWarning = true)), vm.uiState.value.pages)
+        assertTrue(vm.uiState.value.pendingQualityChecks.isEmpty())
+    }
+
     @Test fun autoCaptureTakesOnePageUntilTheDocumentLeavesTheFrame() {
         val vm = CameraCaptureViewModel()
         vm.showReadyFrames()

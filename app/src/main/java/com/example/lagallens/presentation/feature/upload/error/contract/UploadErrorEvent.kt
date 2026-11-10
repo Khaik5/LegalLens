@@ -3,7 +3,8 @@ package com.example.lagallens.presentation.feature.upload.error.contract
 sealed interface UploadErrorEvent {
     data class ScreenOpened(
         val errorCode: String,
-        val errorMessage: String
+        val errorMessage: String,
+        val canRetryUpload: Boolean = false
     ) : UploadErrorEvent
 
     data object RetryClicked : UploadErrorEvent

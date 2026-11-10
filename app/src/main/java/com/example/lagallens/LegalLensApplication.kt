@@ -58,7 +58,7 @@ class LegalLensApplication : Application() {
     }
     val chatbotRepository: ChatbotRepository by lazy { RepositoryModule.provideChatbotRepository(applicationContext) }
     val ocrRepository: OcrRepository by lazy { RepositoryModule.provideOcrRepository() }
-    val documentUploadRepository by lazy { RepositoryModule.provideDocumentUploadRepository() }
+    val documentUploadRepository by lazy { RepositoryModule.provideDocumentUploadRepository(applicationContext, contractRepository) }
     val analysisRepository: AnalysisRepository by lazy { RepositoryModule.provideAnalysisRepository(applicationContext) }
     private val onboardingRepository: OnboardingRepository by lazy {
         RepositoryModule.provideOnboardingRepository(applicationContext)
@@ -73,6 +73,7 @@ class LegalLensApplication : Application() {
     val analysisUnlockRepository by lazy { RepositoryModule.provideAnalysisUnlockRepository(applicationContext) }
     val contractRepository: ContractRepository by lazy { RepositoryModule.provideContractRepository(applicationContext) }
     val documentRepository: DocumentRepository by lazy { RepositoryModule.provideDocumentRepository(applicationContext) }
+    val getDocumentFileUseCase by lazy { com.example.lagallens.domain.usecase.GetDocumentFileUseCase(documentRepository) }
     private val defaultDraftRepository: DraftRepository by lazy { RepositoryModule.provideDraftRepository(applicationContext) }
     @Volatile private var sandboxDraftRepository: DraftRepository? = null
     @Volatile internal var sandboxDraftPreferences: String? = null

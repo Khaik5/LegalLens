@@ -14,6 +14,13 @@ import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
+import androidx.camera.core.UseCaseGroup
+import androidx.camera.view.PreviewView
+import androidx.core.view.doOnLayout
+import com.example.lagallens.core.camera.DetectionStabilizer
+import androidx.camera.core.resolutionselector.AspectRatioStrategy
+import androidx.camera.core.resolutionselector.ResolutionSelector
+import androidx.camera.core.resolutionselector.ResolutionStrategy
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
@@ -51,8 +58,8 @@ class CameraCaptureActivity : com.example.lagallens.presentation.feature.ocr.Ocr
     private var qualityDialog: AlertDialog? = null
     private var shownQualityPath: String? = null
     private var openCvAvailable = false
-    private var previousReadyDetection: DocumentDetection.Ready? = null
-    private var shakeRisk = false
+    private val detectionStabilizer = DetectionStabilizer()
+    @Volatile private var shakeRisk = false
     private val galleryPicker = registerForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris ->
         if (uris.isNotEmpty()) importGalleryPages(uris.map { it.toString() })
     }
@@ -125,41 +132,54 @@ class CameraCaptureActivity : com.example.lagallens.presentation.feature.ocr.Ocr
             val preview = androidx.camera.core.Preview.Builder().build().also {
                 it.surfaceProvider = binding.cameraCapturePreview.surfaceProvider
             }
+            // Documents need legible small text: full sensor resolution and the camera's quality pipeline.
             val capture = ImageCapture.Builder()
-                .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
+                .setCaptureMode(ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY)
+                .setResolutionSelector(
+                    ResolutionSelector.Builder()
+                        .setAspectRatioStrategy(AspectRatioStrategy.RATIO_4_3_FALLBACK_AUTO_STRATEGY)
+                        .setResolutionStrategy(ResolutionStrategy.HIGHEST_AVAILABLE_STRATEGY)
+                        .build()
+                )
+                .setJpegQuality(95)
                 .build()
             imageCapture = capture
             val analysis = ImageAnalysis.Builder()
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                .setResolutionSelector(
+                    ResolutionSelector.Builder()
+                        .setAspectRatioStrategy(AspectRatioStrategy.RATIO_4_3_FALLBACK_AUTO_STRATEGY)
+                        .build()
+                )
                 .build()
             analysis.setAnalyzer(cameraExecutor) { image ->
                 val detection = if (openCvAvailable) DocumentVisionAnalyzer.detect(image) else DocumentDetection.Unavailable
                 image.close()
                 updateDetection(detection)
             }
-            camera = runCatching {
-                provider.unbindAll()
-                provider.bindToLifecycle(this, CameraSelector.DEFAULT_BACK_CAMERA, preview, capture, analysis)
-            }.getOrNull()
-            if (camera == null) viewModel.onEvent(CameraCaptureUiEvent.DetectionUpdated(DocumentDetection.Unavailable))
+            // The preview crops the sensor image to fill the screen. Sharing its ViewPort makes the saved photo and
+            // the analysed frames cover exactly what the user framed, so "page too small" matches the screen.
+            binding.cameraCapturePreview.doOnLayout { previewView ->
+                if (isDestroyed) return@doOnLayout
+                val useCases = UseCaseGroup.Builder()
+                    .addUseCase(preview)
+                    .addUseCase(capture)
+                    .addUseCase(analysis)
+                    .apply { (previewView as PreviewView).viewPort?.let(::setViewPort) }
+                    .build()
+                camera = runCatching {
+                    provider.unbindAll()
+                    provider.bindToLifecycle(this, CameraSelector.DEFAULT_BACK_CAMERA, useCases)
+                }.getOrNull()
+                if (camera == null) viewModel.onEvent(CameraCaptureUiEvent.DetectionUpdated(DocumentDetection.Unavailable))
+            }
         }, ContextCompat.getMainExecutor(this))
     }
 
+    /** Runs on [cameraExecutor], the only thread that touches [detectionStabilizer]. */
     private fun updateDetection(detection: DocumentDetection) {
-        if (detection is DocumentDetection.Ready && previousReadyDetection != null) {
-            val previous = previousReadyDetection ?: return
-            shakeRisk = kotlin.math.abs(previous.centerX - detection.centerX) > 0.04 ||
-                kotlin.math.abs(previous.centerY - detection.centerY) > 0.04 ||
-                kotlin.math.abs(previous.areaRatio - detection.areaRatio) > 0.08
-        } else if (detection !is DocumentDetection.Ready) {
-            shakeRisk = false
-        }
-        previousReadyDetection = detection as? DocumentDetection.Ready
-        val visibleDetection = if (detection is DocumentDetection.Ready && shakeRisk) {
-            DocumentDetection.Unstable
-        } else {
-            detection
-        }
+        val visibleDetection = detectionStabilizer.update(detection)
+        shakeRisk = detectionStabilizer.isShaking
         runOnUiThread { viewModel.onEvent(CameraCaptureUiEvent.DetectionUpdated(visibleDetection)) }
     }
 
@@ -211,9 +231,12 @@ class CameraCaptureActivity : com.example.lagallens.presentation.feature.ocr.Ocr
         val capture = imageCapture ?: return viewModel.onEvent(CameraCaptureUiEvent.CaptureFailed)
         val outputFile = createSessionFile()
         val options = ImageCapture.OutputFileOptions.Builder(outputFile).build()
+        // Read on the main thread at the shutter moment: a stable green frame already confirmed the framing.
+        val framedByPreview = viewModel.uiState.value.detection is DocumentDetection.Ready
+        val shakenAtShutter = shakeRisk
         capture.takePicture(options, cameraExecutor, object : ImageCapture.OnImageSavedCallback {
             override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                val quality = DocumentVisionAnalyzer.checkQuality(outputFile, shakeRisk)
+                val quality = DocumentVisionAnalyzer.checkQuality(outputFile, shakenAtShutter, framedByPreview)
                 runOnUiThread {
                     viewModel.onEvent(CameraCaptureUiEvent.PhotoQualityChecked(ScanPage(outputFile.path), quality))
                 }

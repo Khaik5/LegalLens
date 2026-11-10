@@ -1,5 +1,7 @@
 package com.example.lagallens.presentation.feature.documentviewer.contract
 
+import com.example.lagallens.domain.model.EmploymentDocument
+
 enum class DocumentViewerStatus { LOADING, READY, ERROR }
 
 data class DocumentViewerUiState(
@@ -9,5 +11,8 @@ data class DocumentViewerUiState(
     val currentPage: Int = 1,
     val zoomPercent: Int = 100,
     val status: DocumentViewerStatus = DocumentViewerStatus.LOADING,
-    val isInitialized: Boolean = false
+    val isInitialized: Boolean = false,
+    val remoteDocument: EmploymentDocument? = null,
+    val previewUri: String? = null,
+    val isDownloading: Boolean = false
 )
