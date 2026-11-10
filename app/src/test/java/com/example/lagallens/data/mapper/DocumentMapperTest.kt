@@ -28,6 +28,13 @@ class DocumentMapperTest {
         assertEquals(DocumentFiles.JPEG, response("a.jpg", "IMAGE").toDocument().mimeType)
     }
 
+    @Test fun backendMimeTypeIsUsedWhenSupported() {
+        assertEquals(DocumentFiles.DOC, response("hop-dong", "WORD").copy(mimeType = DocumentFiles.DOC).toDocument().mimeType)
+        assertEquals(DocumentFiles.PNG, response("scan", "IMAGE").copy(mimeType = DocumentFiles.PNG).toDocument().mimeType)
+        // An unexpected value falls back to the file type.
+        assertEquals(DocumentFiles.PDF, response("a.pdf", "PDF").copy(mimeType = "text/plain").toDocument().mimeType)
+    }
+
     @Test fun unknownTypeFallsBackToFileExtension() {
         assertEquals(DocumentFiles.PDF, response("a.pdf", "OTHER").toDocument().mimeType)
         assertEquals("application/octet-stream", response("a.bin", "OTHER").toDocument().mimeType)
