@@ -9,7 +9,6 @@ data class ProfileEdits(val phone: String, val photoUri: String?)
 internal interface ProfileLocalEdits {
     fun readEdits(userId: String): ProfileEdits
     fun saveEdits(userId: String, phone: String, photoUri: String?): ProfileEdits
-    fun clearEdits(userId: String): Boolean
 }
 
 class ProfileLocalDataSource(context: Context, private val sessionUserId: () -> String? = { null }, private val sessionEmail: () -> String? = { null }) : ProfileLocalEdits {
@@ -55,8 +54,6 @@ class ProfileLocalDataSource(context: Context, private val sessionUserId: () -> 
             .commit())
         return ProfileEdits(phone, photoUri)
     }
-
-    override fun clearEdits(userId: String): Boolean = remotePreferences(userId).edit().clear().commit()
 
     private fun remotePreferences(userId: String): android.content.SharedPreferences {
         val id = requireNotNull(userId.toLongOrNull()?.takeIf { it > 0 })

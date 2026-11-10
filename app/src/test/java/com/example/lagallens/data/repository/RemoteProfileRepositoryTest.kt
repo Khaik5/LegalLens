@@ -14,7 +14,6 @@ import com.example.lagallens.domain.repository.ProfileNameUpdateException
 import kotlinx.coroutines.test.runTest
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -74,14 +73,18 @@ class RemoteProfileRepositoryTest {
         assertEquals(expected, repository.getProfile())
     }
 
-    @Test fun clearsOnlyCurrentUsersLocalFields() = runTest {
-        local.saveEdits("42", "111111111", null)
+    @Test fun signOutKeepsTheAccountsPhoneAndAvatar() = runTest {
+        val mine = local.saveEdits("42", "111111111", "content://photos/avatar")
         val other = local.saveEdits("43", "222222222", null)
 
         assertTrue(repository.clearSessionData())
-        assertNull(local.values["42"])
+        assertEquals(mine, local.values["42"])
         assertEquals(other, local.values["43"])
         assertEquals(0, api.reads)
+
+        val profile = repository.getProfile()
+        assertEquals("content://photos/avatar", profile.photoUri)
+        assertEquals("111111111", profile.phone)
     }
 
     private inner class UserFixture : UserApi {
@@ -110,10 +113,5 @@ class RemoteProfileRepositoryTest {
         override fun readEdits(userId: String) = values[userId] ?: ProfileEdits("", null)
         override fun saveEdits(userId: String, phone: String, photoUri: String?) =
             ProfileEdits(phone, photoUri).also { values[userId] = it }
-
-        override fun clearEdits(userId: String): Boolean {
-            values.remove(userId)
-            return true
-        }
     }
 }

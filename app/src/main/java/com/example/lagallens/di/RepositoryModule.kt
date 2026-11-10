@@ -35,7 +35,10 @@ import com.example.lagallens.domain.repository.ProfileSettingsRepository
 import com.example.lagallens.domain.repository.ProfileRepository
 import com.example.lagallens.domain.repository.NotificationRepository
 import com.example.lagallens.data.repository.FakeNotificationRepository
-import com.example.lagallens.data.repository.UnconfiguredRemoteNotificationRepository
+import com.example.lagallens.R
+import com.example.lagallens.data.repository.RemoteNotificationRepository
+import com.example.lagallens.data.datasource.remote.NotificationRemoteDataSource
+import com.example.lagallens.data.datasource.remote.api.NotificationApi
 import com.example.lagallens.data.datasource.local.datastore.EmploymentDemoDataSource
 import com.example.lagallens.data.repository.FakeContractRepository
 import com.example.lagallens.data.repository.FakeDocumentRepository
@@ -210,7 +213,23 @@ object RepositoryModule {
 
     fun provideNotificationRepository(context: Context): NotificationRepository = when (DataModeConfig.current) {
         AppDataMode.DEMO -> FakeNotificationRepository(context)
-        AppDataMode.REAL -> UnconfiguredRemoteNotificationRepository()
+        AppDataMode.REAL -> {
+            val appContext = context.applicationContext
+            RemoteNotificationRepository(
+                EncryptedTokenStore(context),
+                NotificationRemoteDataSource(lazy { authenticatedRetrofit(context).create(NotificationApi::class.java) })
+            ) { type ->
+                // Resolved on each load so a language change applies to the next refresh.
+                appContext.getString(
+                    when (type) {
+                        "ANALYSIS_DONE" -> R.string.notification_type_analysis_done_title
+                        "HIGH_RISK_FOUND" -> R.string.notification_type_high_risk_title
+                        "CONTRACT_EXPIRING" -> R.string.notification_type_contract_expiring_title
+                        else -> R.string.notification_type_system_title
+                    }
+                )
+            }
+        }
     }
 
     fun provideOnboardingRepository(context: Context): OnboardingRepository {
