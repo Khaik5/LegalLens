@@ -1,6 +1,7 @@
 package com.example.lagallens.presentation.feature.dashboard.ui
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -78,6 +79,9 @@ class HomeDashboardFragment : Fragment() {
         tvDashboardUserName.text = state.userName
         tvDashboardAvatar.text = state.userName.trim().split(" ").filter(String::isNotBlank).takeLast(2).joinToString("") { it.first().toString() }
         tvDashboardAvatar.contentDescription = state.userName
+        ivDashboardAvatar.setImageURI(state.photoUri?.let(Uri::parse))
+        ivDashboardAvatar.isVisible = ivDashboardAvatar.drawable != null
+        tvDashboardAvatar.isVisible = !ivDashboardAvatar.isVisible
         val hasError = state.errorMessageRes != null
         fun count(value: Int) = when { state.isLoading -> "\u2026"; hasError -> "\u2014"; else -> value.toString() }
         statTotalContracts.tvStatValue.text = count(state.totalContracts)

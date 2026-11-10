@@ -46,10 +46,12 @@ class LegalLensApplication : Application() {
     val dataMode get() = DataModeConfig.current
     val usesBackendAuthentication get() = dataMode == AppDataMode.REAL
     val authRepository: AuthRepository by lazy {
-        RepositoryModule.provideAuthRepository(applicationContext) { fullName ->
-            val profile = userProfileRepository.getProfile()
-            userProfileRepository.saveProfile(fullName, profile.phone, profile.photoUri)
-        }
+        RepositoryModule.provideAuthRepository(applicationContext, onDemoAccountCreated = ::saveDemoAccountName)
+    }
+
+    private suspend fun saveDemoAccountName(fullName: String) {
+        val profile = userProfileRepository.getProfile()
+        userProfileRepository.saveProfile(fullName, profile.phone, profile.photoUri)
     }
     val notificationRepository: com.example.lagallens.domain.repository.NotificationRepository by lazy {
         RepositoryModule.provideNotificationRepository(applicationContext)
@@ -151,7 +153,9 @@ class LegalLensApplication : Application() {
     }
 
     val syncContractRelatedDataUseCase by lazy {
-        com.example.lagallens.domain.usecase.SyncContractRelatedDataUseCase(chatbotRepository) { session -> draftRepository.forSession(session) }
+        if (dataMode == AppDataMode.DEMO) {
+            com.example.lagallens.domain.usecase.SyncContractRelatedDataUseCase(chatbotRepository) { session -> draftRepository.forSession(session) }
+        } else null
     }
     val logoutUseCase by lazy { UseCaseModule.provideLogoutUseCase(authRepository, chatbotRepository, userProfileRepository) }
     val registerAccountUseCase by lazy { com.example.lagallens.domain.usecase.RegisterAccountUseCase(authRepository) }

@@ -79,9 +79,18 @@ class HomeDashboardViewModelTest {
         assertEquals(1, vm.uiState.value.totalContracts)
     }
 
-    @Test fun userNameComesFromTheProfile() = runTest {
-        val vm = HomeDashboardViewModel(Contracts { MutableStateFlow(emptyList()) }, Profiles)
+    @Test fun userNameAndPhotoRefreshFromTheProfileWhenHomeResumes() = runTest {
+        var profile = Profiles.getProfile()
+        val profiles = object : ProfileRepository by Profiles {
+            override suspend fun getProfile() = profile
+        }
+        val vm = HomeDashboardViewModel(Contracts { MutableStateFlow(emptyList()) }, profiles)
         vm.onEvent(HomeDashboardUiEvent.ScreenResumed)
         assertEquals("Trần B", vm.uiState.value.userName)
+        assertNull(vm.uiState.value.photoUri)
+
+        profile = profile.copy(photoUri = "content://profile/new-photo")
+        vm.onEvent(HomeDashboardUiEvent.ScreenResumed)
+        assertEquals(profile.photoUri, vm.uiState.value.photoUri)
     }
 }

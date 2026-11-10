@@ -7,3 +7,6 @@ interface ProfileRepository {
     suspend fun saveProfile(name: String, phone: String, photoUri: String?): UserProfile
     suspend fun clearSessionData(): Boolean = true
 }
+
+class ProfileNameUpdateException(val savedProfile: UserProfile, cause: Exception) :
+    Exception("Could not update the profile name", cause)

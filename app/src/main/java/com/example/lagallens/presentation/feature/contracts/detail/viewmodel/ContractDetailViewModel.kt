@@ -4,13 +4,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.lagallens.R
+import com.example.lagallens.core.network.ApiFailureKind
+import com.example.lagallens.core.network.ApiFailureMapper
 import com.example.lagallens.domain.model.EmploymentContract
-import com.example.lagallens.presentation.feature.contracts.contract.ContractListItem
 import com.example.lagallens.presentation.feature.contracts.detail.contract.ContractAssistantAction
 import com.example.lagallens.presentation.feature.contracts.detail.contract.ContractDetailUiEffect
 import com.example.lagallens.presentation.feature.contracts.detail.contract.ContractDetailUiEvent
 import com.example.lagallens.presentation.feature.contracts.detail.contract.ContractDetailUiState
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,6 +29,7 @@ class ContractDetailViewModel(
     private var activeSession = repository.activeSessionKey()
     private var currentContractId: String? = null
     private var currentContract: EmploymentContract? = null
+    private var loadJob: Job? = null
     private val _uiState = MutableStateFlow(ContractDetailUiState())
     val uiState = _uiState.asStateFlow()
     private val _uiEffect = Channel<ContractDetailUiEffect>(Channel.BUFFERED)
@@ -37,9 +40,7 @@ class ContractDetailViewModel(
             repository.observeSessionKeys().collect { session ->
                 if (session != activeSession) {
                     activeSession = session
-                    currentContractId = null
-                    currentContract = null
-                    _uiState.value = ContractDetailUiState()
+                    clearContract()
                 }
             }
         }
@@ -48,18 +49,19 @@ class ContractDetailViewModel(
     fun loadContract(contractId: String?) {
         if (activeSession != repository.activeSessionKey()) {
             activeSession = repository.activeSessionKey()
-            currentContractId = null
-            currentContract = null
-            _uiState.value = ContractDetailUiState()
+            clearContract()
         }
-        if (contractId.isNullOrBlank() || currentContractId == contractId) return
+        if (contractId.isNullOrBlank()) return
+        if (currentContractId == contractId && (currentContract != null || loadJob?.isActive == true)) return
+        if (currentContractId != contractId) clearContract()
         currentContractId = contractId
         val session = activeSession
-        viewModelScope.launch {
+        loadJob = viewModelScope.launch {
             try {
                 val contract = repository.getContract(contractId)
                 if (session != repository.activeSessionKey() || currentContractId != contractId) return@launch
                 if (contract == null) {
+                    clearContract()
                     emitEffect(ContractDetailUiEffect.NavigateBack)
                     return@launch
                 }
@@ -67,9 +69,8 @@ class ContractDetailViewModel(
                 _uiState.value = ContractDetailUiState.from(contract.toContractListItem(""), contract)
             } catch (cancellationException: CancellationException) {
                 throw cancellationException
-            } catch (_: Exception) {
-                if (session != repository.activeSessionKey() || currentContractId != contractId) return@launch
-                emitEffect(ContractDetailUiEffect.ShowMessage(R.string.auth_backend_not_configured))
+            } catch (failure: Exception) {
+                handleFailure(session, contractId, failure)
             }
         }
     }
@@ -77,9 +78,7 @@ class ContractDetailViewModel(
     fun onEvent(event: ContractDetailUiEvent) {
         if (activeSession != repository.activeSessionKey()) {
             activeSession = repository.activeSessionKey()
-            currentContractId = null
-            currentContract = null
-            _uiState.value = ContractDetailUiState()
+            clearContract()
             return
         }
         when (event) {
@@ -112,8 +111,8 @@ class ContractDetailViewModel(
                         repository.renameContract(id, event.name)
                     } catch (cancellationException: CancellationException) {
                         throw cancellationException
-                    } catch (_: Exception) {
-                        emitEffect(ContractDetailUiEffect.ShowMessage(R.string.contract_action_failed))
+                    } catch (failure: Exception) {
+                        handleFailure(session, id, failure)
                         return@launch
                     }
                     if (session != repository.activeSessionKey() || currentContractId != id) return@launch
@@ -133,8 +132,8 @@ class ContractDetailViewModel(
                         repository.deleteContract(id)
                     } catch (cancellationException: CancellationException) {
                         throw cancellationException
-                    } catch (_: Exception) {
-                        emitEffect(ContractDetailUiEffect.ShowMessage(R.string.contract_action_failed))
+                    } catch (failure: Exception) {
+                        handleFailure(session, id, failure)
                         return@launch
                     }
                     if (session != repository.activeSessionKey() || currentContractId != id) return@launch
@@ -146,6 +145,25 @@ class ContractDetailViewModel(
                 }
             }
         }
+    }
+
+    private fun handleFailure(session: String?, contractId: String, failure: Exception) {
+        if (session != repository.activeSessionKey() || currentContractId != contractId) return
+        when (ApiFailureMapper.map(failure).kind) {
+            ApiFailureKind.NOT_FOUND, ApiFailureKind.FORBIDDEN -> {
+                clearContract()
+                emitEffect(ContractDetailUiEffect.NavigateBack)
+            }
+            else -> emitEffect(ContractDetailUiEffect.ShowMessage(R.string.contract_action_failed))
+        }
+    }
+
+    private fun clearContract() {
+        loadJob?.cancel()
+        loadJob = null
+        currentContractId = null
+        currentContract = null
+        _uiState.value = ContractDetailUiState()
     }
 
     /** The contract change already succeeded, so a failure here is reported without undoing it. */
@@ -166,7 +184,7 @@ class ContractDetailViewModel(
 
     class Factory(
         private val repository: com.example.lagallens.domain.repository.ContractRepository,
-        private val relatedData: com.example.lagallens.domain.usecase.SyncContractRelatedDataUseCase
+        private val relatedData: com.example.lagallens.domain.usecase.SyncContractRelatedDataUseCase?
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {

@@ -133,7 +133,7 @@ class ProfileFragment : Fragment() {
                         ProfileUiEffect.ShowLogoutConfirmation -> showLogoutConfirmation()
                         ProfileUiEffect.NavigateToAuthentication -> navigateToAuthentication()
                         ProfileUiEffect.ShowLogoutFailed -> Toast.makeText(requireContext(), R.string.profile_logout_failed, Toast.LENGTH_LONG).show()
-                        ProfileUiEffect.ProfileSaveSucceeded, ProfileUiEffect.ProfileSaveFailed -> Unit
+                        ProfileUiEffect.ProfileSaveSucceeded, is ProfileUiEffect.ProfileSaveFailed -> Unit
                     }
                 }
             }

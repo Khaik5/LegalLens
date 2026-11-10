@@ -151,7 +151,7 @@ class ContractListFragment : Fragment() {
                 }
             }
         }
-        binding.tvContractsEmpty.isVisible = state.contracts.isEmpty()
+        binding.tvContractsEmpty.isVisible = !state.isLoading && !state.hasError && state.contracts.isEmpty()
         updateFilterStyle(binding.tvFilterAll, state.selectedFilter == ContractFilter.ALL)
         updateFilterStyle(binding.tvFilterAnalyzed, state.selectedFilter == ContractFilter.ANALYZED)
         updateFilterStyle(binding.tvFilterProcessing, state.selectedFilter == ContractFilter.PROCESSING)

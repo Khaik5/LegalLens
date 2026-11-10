@@ -9,7 +9,9 @@ data class ContractListUiState(
     val query: String = "",
     val selectedFilter: ContractFilter = ContractFilter.ALL,
     val filterSelection: ContractFilterSelection = ContractFilterSelection(),
-    val contracts: List<ContractListItem> = emptyList()
+    val contracts: List<ContractListItem> = emptyList(),
+    val isLoading: Boolean = true,
+    val hasError: Boolean = false
 )
 
 data class ContractFilterSelection(

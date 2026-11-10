@@ -4,7 +4,7 @@
     <string name="credit_history_backend_not_configured">Lịch sử Credit chưa thể tải vì Backend chưa được cấu hình.</string>
     <string name="credit_history_loading">Đang tải lịch sử Credit…</string>
     <string name="credit_history_error">Không thể tải lịch sử Credit. Vui lòng thử lại.</string>
-    <string name="profile_backend_not_configured">Hồ sơ chưa thể tải hoặc lưu vì Backend chưa được cấu hình.</string>
+    <string name="profile_backend_not_configured">Không thể tải hoặc lưu hồ sơ. Vui lòng thử lại.</string>
     <string name="profile_demo_default_name">Người dùng DEMO</string>
     <string name="app_name">LegalLens</string>
     <string name="legal_lens_logo_description">LegalLens</string>
@@ -163,9 +163,12 @@
     <string name="profile_edit_back_description">Quay lại hồ sơ</string>
     <string name="profile_edit_photo_unavailable">Thay đổi ảnh sẽ được kết nối khi nguồn ảnh sẵn sàng.</string>
     <string name="profile_edit_name_required">Vui lòng nhập họ và tên.</string>
+    <string name="profile_edit_name_too_long">Họ và tên không được vượt quá 100 ký tự.</string>
     <string name="profile_edit_phone_required">Vui lòng nhập số điện thoại.</string>
     <string name="profile_edit_phone_invalid">Số điện thoại chưa hợp lệ.</string>
     <string name="profile_edit_save_success">Đã lưu thay đổi hồ sơ.</string>
+    <string name="profile_edit_name_update_failed">Không cập nhật được tên</string>
+    <string name="profile_edit_no_connection">Không có kết nối</string>
     <string name="profile_settings_title">Cài đặt</string>
     <string name="profile_settings_back_description">Quay lại hồ sơ</string>
     <string name="profile_settings_system_notifications">THÔNG BÁO HỆ THỐNG</string>
