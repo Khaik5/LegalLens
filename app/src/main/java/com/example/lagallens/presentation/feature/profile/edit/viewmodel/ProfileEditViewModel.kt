@@ -55,7 +55,11 @@ class ProfileEditViewModel : ViewModel() {
         val state = _uiState.value
         val name = state.name.trim()
         val phone = state.phone.trim()
-        val nameErrorRes = if (name.isBlank()) R.string.profile_edit_name_required else null
+        val nameErrorRes = when {
+            name.isBlank() -> R.string.profile_edit_name_required
+            name.codePointCount(0, name.length) > MAX_NAME_LENGTH -> R.string.profile_edit_name_too_long
+            else -> null
+        }
         val phoneErrorRes = when {
             phone.isBlank() -> R.string.profile_edit_phone_required
             phone.filter(Char::isDigit).length < MIN_PHONE_DIGITS -> R.string.profile_edit_phone_invalid
@@ -80,5 +84,6 @@ class ProfileEditViewModel : ViewModel() {
 
     private companion object {
         const val MIN_PHONE_DIGITS = 9
+        const val MAX_NAME_LENGTH = 100
     }
 }

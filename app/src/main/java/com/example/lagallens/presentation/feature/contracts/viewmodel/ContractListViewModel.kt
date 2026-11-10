@@ -4,9 +4,8 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.lagallens.LegalLensApplication
+import com.example.lagallens.R
 import com.example.lagallens.domain.model.EmploymentContract
-import com.example.lagallens.domain.model.EmploymentContractRisk
-import com.example.lagallens.domain.model.EmploymentContractStatus
 import com.example.lagallens.presentation.feature.contracts.contract.ContractFilter
 import com.example.lagallens.presentation.feature.contracts.contract.ContractFilterSelection
 import com.example.lagallens.presentation.feature.contracts.contract.ContractListItem
@@ -23,6 +22,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
 
 import com.example.lagallens.presentation.feature.contracts.contract.toContractListItem
 
@@ -33,19 +33,27 @@ class ContractListViewModel(application: Application) : AndroidViewModel(applica
     private val _uiEffect = Channel<ContractListUiEffect>(Channel.BUFFERED)
     val uiEffect = _uiEffect.receiveAsFlow()
     private var sourceContracts: List<ContractListItem> = emptyList()
+    private var contractsJob: Job? = null
 
     init {
-        viewModelScope.launch {
+        observeContracts()
+    }
+
+    private fun observeContracts() {
+        contractsJob?.cancel()
+        _uiState.update { it.copy(isLoading = true, hasError = false) }
+        contractsJob = viewModelScope.launch {
             try {
-                (application as LegalLensApplication).contractRepository.observeContracts().collect { contracts ->
+                getApplication<LegalLensApplication>().contractRepository.observeContracts().collect { contracts ->
                     sourceContracts = contracts.map(::toListItem)
-                    updateContracts()
+                    updateContracts(isLoading = false, hasError = false)
                 }
             } catch (cancellationException: CancellationException) {
                 throw cancellationException
             } catch (_: Exception) {
                 sourceContracts = emptyList()
-                updateContracts()
+                updateContracts(isLoading = false, hasError = true)
+                _uiEffect.send(ContractListUiEffect.ShowMessage(R.string.dashboard_load_failed))
             }
         }
     }
@@ -58,6 +66,7 @@ class ContractListViewModel(application: Application) : AndroidViewModel(applica
             is ContractListUiEvent.QueryChanged -> updateContracts(query = event.query)
             is ContractListUiEvent.FilterSelected -> updateContracts(filter = event.filter)
             ContractListUiEvent.FilterClicked -> showFilterBottomSheet()
+            ContractListUiEvent.RetryClicked -> if (_uiState.value.hasError) observeContracts()
             is ContractListUiEvent.FiltersApplied -> updateContracts(filterSelection = event.filterSelection)
             is ContractListUiEvent.ContractClicked -> navigateToDetail(event.contract.id)
         }
@@ -66,13 +75,17 @@ class ContractListViewModel(application: Application) : AndroidViewModel(applica
     private fun updateContracts(
         query: String = _uiState.value.query,
         filter: ContractFilter = _uiState.value.selectedFilter,
-        filterSelection: ContractFilterSelection = _uiState.value.filterSelection
+        filterSelection: ContractFilterSelection = _uiState.value.filterSelection,
+        isLoading: Boolean = _uiState.value.isLoading,
+        hasError: Boolean = _uiState.value.hasError
     ) {
         _uiState.update {
             it.copy(
                 query = query,
                 selectedFilter = filter,
                 filterSelection = filterSelection,
+                isLoading = isLoading,
+                hasError = hasError,
                 contracts = sourceContracts.filter { item ->
                     item.matches(filter) && item.matches(filterSelection) && item.matches(query)
                 }

@@ -20,24 +20,82 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
+import okhttp3.ResponseBody.Companion.toResponseBody
+import retrofit2.HttpException
+import retrofit2.Response
+import java.io.IOException
 
 class ContractDetailViewModelTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
-    @Test fun failedDeleteReportsAnErrorInsteadOfCrashing() = runTest {
+    @Test fun failedDeleteReportsAnErrorAndKeepsTheIdForRetry() = runTest {
         val base = repository()
+        var attempts = 0
         val failing = object : ContractRepository by base {
-            override suspend fun deleteContract(contractId: String): Boolean = error("offline")
-            override suspend fun renameContract(contractId: String, title: String): Boolean = error("offline")
+            override suspend fun deleteContract(contractId: String): Boolean {
+                if (++attempts == 1) throw IOException("offline")
+                return base.deleteContract(contractId)
+            }
         }
         val vm = ContractDetailViewModel(failing)
         vm.loadContract("collaborator")
-        vm.onEvent(com.example.lagallens.presentation.feature.contracts.detail.contract.ContractDetailUiEvent.DeleteConfirmed)
-        assertEquals(
-            com.example.lagallens.presentation.feature.contracts.detail.contract.ContractDetailUiEffect.ShowMessage(R.string.contract_action_failed),
-            vm.uiEffect.first()
-        )
+        vm.onEvent(ContractDetailUiEvent.DeleteConfirmed)
+        assertEquals(ContractDetailUiEffect.ShowMessage(R.string.contract_action_failed), vm.uiEffect.first())
+
+        vm.onEvent(ContractDetailUiEvent.DeleteConfirmed)
+        assertEquals(ContractDetailUiEffect.NavigateBack, vm.uiEffect.first())
+        assertEquals(2, attempts)
+    }
+
+    @Test fun failedRenameKeepsTheIdForRetry() = runTest {
+        val base = repository()
+        var attempts = 0
+        val vm = ContractDetailViewModel(object : ContractRepository by base {
+            override suspend fun renameContract(contractId: String, title: String): Boolean {
+                if (++attempts == 1) throw IOException("offline")
+                return base.renameContract(contractId, title)
+            }
+        })
+        vm.loadContract("collaborator")
+        vm.onEvent(ContractDetailUiEvent.RenameConfirmed("New title"))
+        assertEquals(ContractDetailUiEffect.ShowMessage(R.string.contract_action_failed), vm.uiEffect.first())
+
+        vm.onEvent(ContractDetailUiEvent.RenameConfirmed("New title"))
+        testScheduler.runCurrent()
+        assertEquals("New title", vm.uiState.value.renamedTitle)
+        assertEquals(2, attempts)
+    }
+
+    @Test fun transientLoadFailureAllowsReloadingTheSameId() = runTest {
+        val base = repository()
+        var attempts = 0
+        val vm = ContractDetailViewModel(object : ContractRepository by base {
+            override suspend fun getContract(contractId: String): EmploymentContract? {
+                if (++attempts == 1) throw IOException("offline")
+                return base.getContract(contractId)
+            }
+        })
+        vm.loadContract("collaborator")
+        assertEquals(ContractDetailUiEffect.ShowMessage(R.string.contract_action_failed), vm.uiEffect.first())
+
+        vm.loadContract("collaborator")
+        testScheduler.runCurrent()
+        assertEquals("collaborator", vm.uiState.value.contractId)
+        assertEquals(2, attempts)
+    }
+
+    @Test fun forbiddenRenameClearsTheContractAndNavigatesBack() = runTest {
+        val base = repository()
+        val vm = ContractDetailViewModel(object : ContractRepository by base {
+            override suspend fun renameContract(contractId: String, title: String): Boolean =
+                throw HttpException(Response.error<Unit>(403, "".toResponseBody()))
+        })
+        vm.loadContract("collaborator")
+        vm.onEvent(ContractDetailUiEvent.RenameConfirmed("New title"))
+
+        assertEquals(ContractDetailUiEffect.NavigateBack, vm.uiEffect.first())
+        assertTrue(vm.uiState.value.contractId.isBlank())
     }
 
     @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)

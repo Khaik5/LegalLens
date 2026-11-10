@@ -6,6 +6,7 @@ import com.example.lagallens.presentation.feature.contracts.contract.ContractLis
 data class HomeDashboardUiState(
     val isLoading: Boolean = true,
     val userName: String = "",
+    val photoUri: String? = null,
     val totalContracts: Int = 0,
     val analyzedContracts: Int = 0,
     val reviewContracts: Int = 0,

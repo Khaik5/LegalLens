@@ -4,7 +4,11 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.lagallens.LegalLensApplication
+import com.example.lagallens.R
+import com.example.lagallens.core.network.ApiFailureKind
+import com.example.lagallens.core.network.ApiFailureMapper
 import com.example.lagallens.domain.model.EmploymentContractRisk
+import com.example.lagallens.domain.repository.ProfileNameUpdateException
 import com.example.lagallens.presentation.feature.profile.contract.ProfileUiEffect
 import com.example.lagallens.presentation.feature.profile.contract.ProfileUiEvent
 import com.example.lagallens.presentation.feature.profile.contract.ProfileUiState
@@ -104,9 +108,25 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
                 _uiEffect.send(ProfileUiEffect.ProfileSaveSucceeded)
             } catch (cancellation: CancellationException) {
                 throw cancellation
-            } catch (_: Exception) {
-                _uiState.update { it.copy(isSaving = false, isBackendUnavailable = true) }
-                _uiEffect.send(ProfileUiEffect.ProfileSaveFailed)
+            } catch (failure: Exception) {
+                val nameFailure = failure as? ProfileNameUpdateException
+                val apiFailure = ApiFailureMapper.map(nameFailure?.cause ?: failure)
+                val message = when {
+                    apiFailure.kind == ApiFailureKind.NETWORK ||
+                        (apiFailure.kind == ApiFailureKind.TIMEOUT && apiFailure.statusCode == null) ->
+                        R.string.profile_edit_no_connection
+                    nameFailure != null -> R.string.profile_edit_name_update_failed
+                    else -> R.string.profile_backend_not_configured
+                }
+                _uiState.update { state ->
+                    val saved = nameFailure?.savedProfile
+                    if (saved == null) {
+                        state.copy(isSaving = false)
+                    } else {
+                        state.copy(name = saved.name, email = saved.email, phone = saved.phone, photoUri = saved.photoUri, isSaving = false)
+                    }
+                }
+                _uiEffect.send(ProfileUiEffect.ProfileSaveFailed(message))
             }
         }
     }

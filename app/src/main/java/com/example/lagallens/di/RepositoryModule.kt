@@ -15,9 +15,14 @@ import com.example.lagallens.data.repository.ProfileRepositoryImpl
 import com.example.lagallens.data.repository.UnconfiguredRemoteAnalysisRepository
 import com.example.lagallens.core.network.NetworkModule
 import com.example.lagallens.data.datasource.local.datastore.EncryptedTokenStore
+import com.example.lagallens.data.datasource.local.datastore.currentSessionScope
 import com.example.lagallens.data.datasource.remote.AuthRemoteDataSource
+import com.example.lagallens.data.datasource.remote.ContractRemoteDataSource
+import com.example.lagallens.data.datasource.remote.UserRemoteDataSource
 import com.example.lagallens.data.datasource.remote.api.AuthApi
 import com.example.lagallens.data.datasource.remote.api.AuthSessionApi
+import com.example.lagallens.data.datasource.remote.api.ContractApi
+import com.example.lagallens.data.datasource.remote.api.UserApi
 import com.example.lagallens.data.repository.RemoteAuthRepository
 import com.example.lagallens.data.repository.UnconfiguredRemoteChatbotRepository
 import com.example.lagallens.data.repository.UnconfiguredRemoteOcrRepository
@@ -34,7 +39,7 @@ import com.example.lagallens.data.repository.UnconfiguredRemoteNotificationRepos
 import com.example.lagallens.data.datasource.local.datastore.EmploymentDemoDataSource
 import com.example.lagallens.data.repository.FakeContractRepository
 import com.example.lagallens.data.repository.FakeDocumentRepository
-import com.example.lagallens.data.repository.UnconfiguredRemoteContractRepository
+import com.example.lagallens.data.repository.RemoteContractRepository
 import com.example.lagallens.data.repository.UnconfiguredRemoteDocumentRepository
 import com.example.lagallens.data.repository.FakeDraftRepository
 import com.example.lagallens.data.repository.UnconfiguredRemoteDraftRepository
@@ -47,13 +52,23 @@ import com.example.lagallens.data.repository.UnconfiguredRemotePaymentRepository
 import com.example.lagallens.data.repository.UnconfiguredRemoteCreditRepository
 import com.example.lagallens.data.repository.FakePaymentRepository
 import com.example.lagallens.data.repository.FakeCreditRepository
-import com.example.lagallens.data.repository.UnconfiguredRemoteProfileRepository
+import com.example.lagallens.data.repository.RemoteProfileRepository
 import com.example.lagallens.data.repository.SessionScopedDraftRepository
 import com.example.lagallens.data.datasource.local.datastore.AccountStorageName
 import com.example.lagallens.data.repository.SessionScopedEmploymentRepositories
 import com.example.lagallens.data.datasource.remote.rotateTokens
+import retrofit2.Retrofit
 
 object RepositoryModule {
+    private val publicAuthApi = lazy { NetworkModule.provideRetrofit().create(AuthApi::class.java) }
+    private var authenticatedRetrofitInstance: Retrofit? = null
+
+    @Synchronized
+    private fun authenticatedRetrofit(context: Context): Retrofit =
+        authenticatedRetrofitInstance ?: NetworkModule.provideAuthenticatedRetrofit(
+            EncryptedTokenStore(context.applicationContext)
+        ) { publicAuthApi.value.rotateTokens(it) }.also { authenticatedRetrofitInstance = it }
+
     fun provideAnalysisUnlockRepository(context: Context): com.example.lagallens.domain.repository.AnalysisUnlockRepository =
         when (DataModeConfig.current) {
             AppDataMode.DEMO -> com.example.lagallens.data.repository.DemoAnalysisUnlockRepository(
@@ -103,7 +118,10 @@ object RepositoryModule {
 
     fun provideContractRepository(context: Context): ContractRepository = when (DataModeConfig.current) {
         AppDataMode.DEMO -> employmentRepositories(context).contracts
-        AppDataMode.REAL -> UnconfiguredRemoteContractRepository(remoteSessionKey(context))
+        AppDataMode.REAL -> RemoteContractRepository(
+            EncryptedTokenStore(context),
+            ContractRemoteDataSource(lazy { authenticatedRetrofit(context).create(ContractApi::class.java) })
+        )
     }
 
     fun provideDocumentRepository(context: Context): DocumentRepository = when (DataModeConfig.current) {
@@ -131,17 +149,15 @@ object RepositoryModule {
             AppDataMode.REAL -> com.example.lagallens.data.repository.UnconfiguredRemoteDraftAiRepository()
         }
 
-    fun provideAuthRepository(context: Context, onAccountCreated: suspend (String) -> Unit = {}): AuthRepository {
+    fun provideAuthRepository(context: Context, onDemoAccountCreated: suspend (String) -> Unit = {}): AuthRepository {
         return when (DataModeConfig.current) {
-            AppDataMode.DEMO -> LocalAuthRepository(AuthLocalDataSource(context), onAccountCreated)
+            AppDataMode.DEMO -> LocalAuthRepository(AuthLocalDataSource(context), onDemoAccountCreated)
             AppDataMode.REAL -> {
                 val tokens = EncryptedTokenStore(context)
-                val publicApi = lazy { NetworkModule.provideRetrofit().create(AuthApi::class.java) }
                 val remote = AuthRemoteDataSource(
-                    api = publicApi,
+                    api = publicAuthApi,
                     sessionApi = lazy {
-                        NetworkModule.provideAuthenticatedRetrofit(tokens) { publicApi.value.rotateTokens(it) }
-                            .create(AuthSessionApi::class.java)
+                        authenticatedRetrofit(context).create(AuthSessionApi::class.java)
                     }
                 )
                 RemoteAuthRepository(tokens, remote)
@@ -152,7 +168,7 @@ object RepositoryModule {
     /** REAL session identity shared by remote repositories across token rotation. */
     private fun remoteSessionKey(context: Context): () -> String? {
         val tokens = EncryptedTokenStore(context)
-        return { tokens.accessSession()?.key }
+        return { tokens.currentSessionScope()?.key }
     }
 
     fun provideChatbotRepository(context: Context): ChatbotRepository = when (DataModeConfig.current) {
@@ -200,7 +216,11 @@ object RepositoryModule {
         sessionUserId: () -> String? = { null }
     ): ProfileRepository = when (mode) {
         AppDataMode.DEMO -> ProfileRepositoryImpl(ProfileLocalDataSource(context, sessionUserId, sessionEmail))
-        AppDataMode.REAL -> UnconfiguredRemoteProfileRepository()
+        AppDataMode.REAL -> RemoteProfileRepository(
+            EncryptedTokenStore(context),
+            UserRemoteDataSource(lazy { authenticatedRetrofit(context).create(UserApi::class.java) }),
+            ProfileLocalDataSource(context)
+        )
     }
 
     fun provideCreditRepository(context: Context): CreditRepository = when (DataModeConfig.current) {

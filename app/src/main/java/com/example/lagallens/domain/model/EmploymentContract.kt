@@ -20,7 +20,8 @@ data class EmploymentContract(
     val mimeType: String = "",
     val type: EmploymentContractType = EmploymentContractType.EMPLOYMENT,
     val pageCount: Int? = null,
-    val generatedTitleKey: String? = null
+    val generatedTitleKey: String? = null,
+    val description: String? = null
 )
 
 data class EmploymentContractComparison(

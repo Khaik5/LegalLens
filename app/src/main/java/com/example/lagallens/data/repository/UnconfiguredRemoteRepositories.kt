@@ -12,17 +12,12 @@ import com.example.lagallens.domain.repository.ChatbotRepository
 import com.example.lagallens.domain.repository.OcrRepository
 import com.example.lagallens.domain.model.NotificationRecord
 import com.example.lagallens.domain.repository.NotificationRepository
-import com.example.lagallens.domain.model.EmploymentContract
-import com.example.lagallens.domain.model.EmploymentContractComparison
 import com.example.lagallens.domain.model.EmploymentDocument
-import com.example.lagallens.domain.repository.ContractRepository
 import com.example.lagallens.domain.repository.DocumentRepository
 import com.example.lagallens.domain.repository.DraftRepository
 import com.example.lagallens.domain.model.Draft
 import com.example.lagallens.domain.model.DraftStage
 import com.example.lagallens.domain.repository.CreditRepository
-import com.example.lagallens.domain.model.UserProfile
-import com.example.lagallens.domain.repository.ProfileRepository
 import com.example.lagallens.domain.model.credit.CreditReceipt
 import com.example.lagallens.domain.model.credit.CreditTransaction
 import com.example.lagallens.core.network.BackendNotConfiguredException
@@ -75,18 +70,6 @@ class UnconfiguredRemoteNotificationRepository : NotificationRepository {
     override suspend fun markAllRead() = throw BackendNotConfiguredException("Notification")
 }
 
-class UnconfiguredRemoteContractRepository(private val sessionKeyProvider: () -> String? = { null }) : ContractRepository {
-    override fun forSession(sessionKey: String): ContractRepository = this
-    override fun activeSessionKey(): String? = sessionKeyProvider()
-    override fun observeContracts(): Flow<List<EmploymentContract>> = throw BackendNotConfiguredException("Contract")
-    override suspend fun getContract(contractId: String): EmploymentContract? = throw BackendNotConfiguredException("Contract")
-    override suspend fun createContract(contract: EmploymentContract): EmploymentContract = throw BackendNotConfiguredException("Contract")
-    override suspend fun updateContract(contract: EmploymentContract): Boolean = throw BackendNotConfiguredException("Contract")
-    override suspend fun renameContract(contractId: String, title: String): Boolean = throw BackendNotConfiguredException("Contract")
-    override suspend fun deleteContract(contractId: String): Boolean = throw BackendNotConfiguredException("Contract")
-    override suspend fun compareContracts(firstId: String, secondId: String): EmploymentContractComparison? = throw BackendNotConfiguredException("Contract")
-}
-
 class UnconfiguredRemoteDocumentRepository : DocumentRepository {
     override fun forSession(sessionKey: String): DocumentRepository = this
     override suspend fun getDocument(documentId: String): EmploymentDocument? = throw BackendNotConfiguredException("Document")
@@ -118,12 +101,4 @@ class UnconfiguredRemoteCreditRepository(private val sessionKey: () -> String? =
     private fun unavailable(): Nothing = throw BackendNotConfiguredException("Credit")
     override suspend fun getTransactions(): List<CreditTransaction> = unavailable()
     override suspend fun spend(transactionId: String, credits: Int): CreditReceipt = unavailable()
-}
-
-/** REAL profile calls stay disabled until the Backend confirms its profile contract. */
-class UnconfiguredRemoteProfileRepository : ProfileRepository {
-    private fun unavailable(): Nothing = throw BackendNotConfiguredException("Profile")
-    override suspend fun getProfile(): UserProfile = unavailable()
-    override suspend fun saveProfile(name: String, phone: String, photoUri: String?): UserProfile = unavailable()
-    override suspend fun clearSessionData(): Boolean = true
 }

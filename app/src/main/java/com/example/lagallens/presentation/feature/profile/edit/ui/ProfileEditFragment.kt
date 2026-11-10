@@ -67,8 +67,8 @@ class ProfileEditFragment : Fragment() {
                             Toast.makeText(requireContext(), R.string.profile_edit_save_success, Toast.LENGTH_SHORT).show()
                             findNavController().navigateUp()
                         }
-                        ProfileUiEffect.ProfileSaveFailed ->
-                            Toast.makeText(requireContext(), R.string.profile_backend_not_configured, Toast.LENGTH_SHORT).show()
+                        is ProfileUiEffect.ProfileSaveFailed ->
+                            Toast.makeText(requireContext(), effect.messageRes, Toast.LENGTH_SHORT).show()
                         else -> Unit
                     }
                 }
