@@ -5,8 +5,14 @@ sealed interface ProcessingState {
     /** [progressPercent] and [stage] are optional because not every job reports both. */
     data class Running(val progressPercent: Int? = null, val stage: Int? = null) : ProcessingState
     data object Completed : ProcessingState
-    data class Failed(val isRetryable: Boolean = true) : ProcessingState
+    data class Uploaded(val contractId: String, val documentId: String) : ProcessingState
+    data class Failed(
+        val isRetryable: Boolean = true,
+        val reason: UploadFailure = UploadFailure.UNKNOWN
+    ) : ProcessingState
 }
+
+enum class UploadFailure { TOO_LARGE, UNSUPPORTED_FORMAT, NETWORK, UNREADABLE, UNKNOWN }
 
 sealed interface AnalysisJobState {
     data class Running(val stage: Int) : AnalysisJobState
@@ -19,5 +25,7 @@ data class DocumentUploadRequest(
     val documentId: String,
     val displayName: String,
     val mimeType: String,
-    val sourceUris: List<String>
+    val sourceUris: List<String>,
+    val isScan: Boolean = false,
+    val sessionKey: String? = null
 )

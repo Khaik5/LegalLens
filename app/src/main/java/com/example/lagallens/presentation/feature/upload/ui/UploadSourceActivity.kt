@@ -15,7 +15,9 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.example.lagallens.LegalLensApplication
 import com.example.lagallens.R
+import com.example.lagallens.core.network.DocumentFiles
 import com.example.lagallens.databinding.ActivityUploadSourceBinding
 import com.example.lagallens.presentation.common.utils.bindPressFeedback
 import com.example.lagallens.presentation.feature.camera.permission.ui.CameraPermissionActivity
@@ -31,6 +33,7 @@ import kotlinx.coroutines.withContext
 
 class UploadSourceActivity : com.example.lagallens.presentation.feature.ocr.OcrSessionActivity() {
     private val binding by lazy { ActivityUploadSourceBinding.inflate(layoutInflater) }
+    private val isReal get() = (application as LegalLensApplication).usesBackendAuthentication
     private val viewModel by viewModels<UploadSourceViewModel>()
     private val documentPicker = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         uri?.let(::openUploadProgress)
@@ -107,8 +110,13 @@ class UploadSourceActivity : com.example.lagallens.presentation.feature.ocr.OcrS
             UploadSourceUiEffect.NavigateToCameraPermission -> startActivity(
                 CameraPermissionActivity.createIntent(this)
             )
-            is UploadSourceUiEffect.OpenDocumentPicker -> documentPicker.launch(effect.mimeTypes)
-            UploadSourceUiEffect.OpenImagePicker -> imagePicker.launch(arrayOf("image/*"))
+            is UploadSourceUiEffect.OpenDocumentPicker -> documentPicker.launch(
+                if (isReal && DocumentFiles.DOCX in effect.mimeTypes) arrayOf(DocumentFiles.DOC, DocumentFiles.DOCX)
+                else effect.mimeTypes
+            )
+            UploadSourceUiEffect.OpenImagePicker -> imagePicker.launch(
+                if (isReal) arrayOf(DocumentFiles.JPEG, DocumentFiles.PNG) else arrayOf("image/*")
+            )
             UploadSourceUiEffect.ShowFileSelected -> showMessage(R.string.upload_source_selected)
         }
     }
@@ -135,22 +143,29 @@ class UploadSourceActivity : com.example.lagallens.presentation.feature.ocr.OcrS
         } } catch (_: Exception) { showMessage(R.string.upload_source_file_unreadable); return }
         val fileName = fileMetadata?.first ?: getString(R.string.upload_source_selected_file)
         val byteCount = fileMetadata?.second
-        val mimeType = try { contentResolver.getType(uri).orEmpty() }
+        val reportedType = try { contentResolver.getType(uri).orEmpty() }
             catch (_: Exception) { showMessage(R.string.upload_source_file_unreadable); return }
-        if (!UploadFileValidator.isSupported(mimeType)) {
-            showMessage(R.string.upload_source_unsupported_file)
+        val mimeType = if (isReal && !DocumentFiles.isSupported(reportedType)) {
+            DocumentFiles.mimeType(fileName) ?: reportedType
+        } else reportedType
+        val supported = if (isReal) DocumentFiles.isSupported(mimeType) else UploadFileValidator.isSupported(mimeType)
+        if (!supported) {
+            showMessage(if (isReal) R.string.upload_real_unsupported_format else R.string.upload_source_unsupported_file)
             return
         }
+        val maxBytes = if (isReal) DocumentFiles.MAX_UPLOAD_BYTES else UploadFileValidator.MAX_BYTES
         lifecycleScope.launch {
             // Some providers report no size, so the limit is enforced on the stream itself.
             val measuredBytes = withContext(Dispatchers.IO) {
-                try { contentResolver.openInputStream(uri)?.use { byteCount ?: UploadFileValidator.countBytes(it) } }
+                try { contentResolver.openInputStream(uri)?.use { byteCount?.takeIf { size -> size >= 0 } ?: UploadFileValidator.countBytes(it, maxBytes) } }
                 catch (_: Exception) { null }
             }
             if (!isOcrSessionValid()) return@launch
             when {
                 measuredBytes == null -> showMessage(R.string.upload_source_file_unreadable)
-                measuredBytes > UploadFileValidator.MAX_BYTES -> showMessage(R.string.upload_source_file_too_large)
+                measuredBytes > maxBytes -> showMessage(
+                    if (isReal) R.string.upload_real_file_too_large else R.string.upload_source_file_too_large
+                )
                 measuredBytes == 0L -> showMessage(R.string.upload_source_file_empty)
                 else -> {
                     val fileSize = Formatter.formatShortFileSize(this@UploadSourceActivity, measuredBytes)

@@ -23,6 +23,6 @@ class SessionCacheCleaner(private val cacheDir: File) {
     }
 
     private companion object {
-        val SESSION_DIRECTORIES = listOf("scan-session", "draft-pdfs")
+        val SESSION_DIRECTORIES = listOf("scan-session", "draft-pdfs", DocumentSessionCache.DIRECTORY)
     }
 }

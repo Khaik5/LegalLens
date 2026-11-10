@@ -49,16 +49,20 @@ object DocumentVisionAnalyzer {
     }
 
     /**
-     * Only an unreadable image is rejected. A page where no document or a cut-off edge was found is a warning,
-     * so the user can still keep it: detection misses real documents on busy backgrounds or in dim light.
+     * Only an unreadable image is rejected. Blur, bad exposure or a missing document need the user's decision
+     * ([QualityDecision.WARNING]); framing hints such as a small or cut-off page, or a shaky preview, are kept on
+     * an accepted page so the user is not interrupted for a readable photo.
+     *
+     * [framedByPreview] is true when the live preview showed a stable document at the moment of capture; the
+     * framing was then already confirmed, so only the photo's sharpness and exposure are checked.
      */
-    fun checkQuality(file: File, shakeRisk: Boolean): DocumentQualityResult = runCatching {
-        evaluateQuality(file, shakeRisk)
+    fun checkQuality(file: File, shakeRisk: Boolean, framedByPreview: Boolean = false): DocumentQualityResult = runCatching {
+        evaluateQuality(file, shakeRisk, framedByPreview)
     }.getOrElse {
         DocumentQualityResult(QualityDecision.WARNING, listOf(QualityIssue.DOCUMENT_NOT_FOUND))
     }
 
-    private fun evaluateQuality(file: File, shakeRisk: Boolean): DocumentQualityResult {
+    private fun evaluateQuality(file: File, shakeRisk: Boolean, framedByPreview: Boolean): DocumentQualityResult {
         val bitmap = loadQualityBitmap(file) ?: return DocumentQualityResult(
             QualityDecision.REJECTED,
             listOf(QualityIssue.DOCUMENT_NOT_FOUND)
@@ -69,24 +73,23 @@ object DocumentVisionAnalyzer {
             Utils.bitmapToMat(bitmap, rgba)
             Imgproc.cvtColor(rgba, gray, Imgproc.COLOR_RGBA2GRAY)
             val issues = mutableListOf<QualityIssue>()
-            val detection = detect(gray)
-            if (blurScore(gray) < 90.0) issues += QualityIssue.BLUR
+            if (blurScore(gray) < BLUR_THRESHOLD) issues += QualityIssue.BLUR
             if (isPoorlyExposed(gray)) issues += QualityIssue.EXPOSURE
             if (shakeRisk) issues += QualityIssue.SHAKE
-            when (detection) {
-                is DocumentDetection.Ready -> {
-                    if (detection.areaRatio < 0.28) issues += QualityIssue.DOCUMENT_SMALL
-                    if (isCropRisk(gray) || isTextCutOff(bitmap)) issues += QualityIssue.CROP_RISK
+            if (!framedByPreview) {
+                when (val detection = detect(gray)) {
+                    // A quadrilateral clear of the image border is already fully inside the photo.
+                    is DocumentDetection.Ready -> if (detection.areaRatio < MIN_DOCUMENT_RATIO) issues += QualityIssue.DOCUMENT_SMALL
+                    is DocumentDetection.Partial -> {
+                        if (detection.areaRatio < MIN_DOCUMENT_RATIO) issues += QualityIssue.DOCUMENT_SMALL
+                        if (isCropRisk(gray) || isTextCutOff(bitmap)) issues += QualityIssue.CROP_RISK
+                    }
+                    DocumentDetection.Unstable -> issues += QualityIssue.SHAKE
+                    DocumentDetection.NotFound,
+                    DocumentDetection.Unavailable -> issues += QualityIssue.DOCUMENT_NOT_FOUND
                 }
-                is DocumentDetection.Partial -> {
-                    issues += QualityIssue.DOCUMENT_SMALL
-                    issues += QualityIssue.CROP_RISK
-                }
-                DocumentDetection.Unstable -> issues += QualityIssue.SHAKE
-                DocumentDetection.NotFound,
-                DocumentDetection.Unavailable -> issues += QualityIssue.DOCUMENT_NOT_FOUND
             }
-            val decision = if (issues.isEmpty()) QualityDecision.ACCEPTED else QualityDecision.WARNING
+            val decision = if (issues.any { it in BLOCKING_ISSUES }) QualityDecision.WARNING else QualityDecision.ACCEPTED
             DocumentQualityResult(decision, issues.distinct())
         } finally {
             gray.release()
@@ -187,8 +190,11 @@ object DocumentVisionAnalyzer {
             Imgproc.convexHull(contour, hullIndices)
             val all = contour.toArray()
             curve.fromArray(*hullIndices.toArray().map { all[it] }.toTypedArray())
-            Imgproc.approxPolyDP(curve, approximation, Imgproc.arcLength(curve, true) * 0.02, true)
-            approximation.toArray().takeIf { it.size == 4 }
+            val perimeter = Imgproc.arcLength(curve, true)
+            QUAD_EPSILONS.firstNotNullOfOrNull { epsilon ->
+                Imgproc.approxPolyDP(curve, approximation, perimeter * epsilon, true)
+                approximation.toArray().takeIf { it.size == 4 }
+            }
         } finally {
             approximation.release()
             curve.release()
@@ -215,6 +221,14 @@ object DocumentVisionAnalyzer {
     private const val MIN_AREA_RATIO = 0.08
     private const val BORDER_MARGIN = 0.01
     private const val CANDIDATES = 5
+    private const val BLUR_THRESHOLD = 90.0
+    private const val MIN_DOCUMENT_RATIO = 0.20
+
+    /** Simplification tolerances tried in order; a bent page or a covered corner needs a looser one. */
+    private val QUAD_EPSILONS = listOf(0.02, 0.03, 0.04, 0.05)
+
+    /** Issues that make the photo hard to read; the rest are framing hints that do not interrupt the user. */
+    private val BLOCKING_ISSUES = setOf(QualityIssue.BLUR, QualityIssue.EXPOSURE, QualityIssue.DOCUMENT_NOT_FOUND)
 
     private fun blurScore(gray: Mat): Double {
         val laplacian = Mat()
@@ -242,7 +256,8 @@ object DocumentVisionAnalyzer {
             val pixels = gray.rows().toDouble() * gray.cols().toDouble()
             val darkRatio = Core.countNonZero(dark) / pixels
             val brightRatio = Core.countNonZero(bright) / pixels
-            mean < 55.0 || mean > 210.0 || max(darkRatio, brightRatio) > 0.72
+            // A white page filling the frame is legitimately bright; only a dark or washed-out photo is flagged.
+            mean < 50.0 || darkRatio > 0.72 || brightRatio > 0.92
         } finally {
             bright.release()
             dark.release()
@@ -306,14 +321,22 @@ object DocumentVisionAnalyzer {
         )
     }
 
+    /** The luminance plane limited to [ImageProxy.getCropRect], which matches the preview when a ViewPort is set. */
     private fun ImageProxy.toGrayMat(): Mat {
         val plane = planes.first()
-        val data = ByteArray(width * height)
-        val buffer = plane.buffer.duplicate()
-        for (row in 0 until height) {
-            buffer.position(row * plane.rowStride)
-            buffer.get(data, row * width, width)
+        val crop = android.graphics.Rect(cropRect).apply {
+            if (!intersect(0, 0, this@toGrayMat.width, this@toGrayMat.height) || isEmpty) {
+                set(0, 0, this@toGrayMat.width, this@toGrayMat.height)
+            }
         }
-        return Mat(height, width, CvType.CV_8UC1).apply { put(0, 0, data) }
+        val cropWidth = crop.width()
+        val cropHeight = crop.height()
+        val data = ByteArray(cropWidth * cropHeight)
+        val buffer = plane.buffer.duplicate()
+        for (row in 0 until cropHeight) {
+            buffer.position((crop.top + row) * plane.rowStride + crop.left * plane.pixelStride)
+            buffer.get(data, row * cropWidth, cropWidth)
+        }
+        return Mat(cropHeight, cropWidth, CvType.CV_8UC1).apply { put(0, 0, data) }
     }
 }

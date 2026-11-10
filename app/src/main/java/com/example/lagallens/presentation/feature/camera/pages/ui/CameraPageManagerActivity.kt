@@ -6,7 +6,9 @@ import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.addCallback
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
+import com.example.lagallens.LegalLensApplication
+import com.example.lagallens.R
+import com.example.lagallens.presentation.feature.upload.progress.ui.UploadProgressActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -120,7 +122,16 @@ class CameraPageManagerActivity : com.example.lagallens.presentation.feature.ocr
                 finish()
             }
             is CameraPageManagerUiEffect.NavigateToOcrProcessing -> {
-                startActivity(OcrProcessingActivity.createIntent(this, effect.pages))
+                if ((application as LegalLensApplication).usesBackendAuthentication) {
+                    startActivity(UploadProgressActivity.scanIntent(
+                        this,
+                        getString(R.string.upload_scan_file_name),
+                        getString(R.string.upload_scan_file_details, effect.pages.size),
+                        effect.pages.map(ScanPage::path)
+                    ))
+                } else {
+                    startActivity(OcrProcessingActivity.createIntent(this, effect.pages))
+                }
             }
         }
     }

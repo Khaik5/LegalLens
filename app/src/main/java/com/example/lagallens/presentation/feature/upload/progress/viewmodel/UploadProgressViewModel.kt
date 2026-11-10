@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.lagallens.domain.model.processing.DocumentUploadRequest
 import com.example.lagallens.domain.model.processing.ProcessingState
+import com.example.lagallens.domain.model.processing.UploadFailure
 import com.example.lagallens.domain.repository.DocumentUploadRepository
 import com.example.lagallens.presentation.feature.upload.progress.contract.UploadProgressEffect
 import com.example.lagallens.presentation.feature.upload.progress.contract.UploadProgressEvent
@@ -36,7 +37,7 @@ class UploadProgressViewModel(private val uploadRepository: DocumentUploadReposi
                 if (uploadJob?.isActive == true && current.fileName == event.fileName &&
                     current.fileDetails == event.fileDetails && current.documentUri == event.documentUri && current.documentId == event.documentId) return
                 _uiState.update {
-                    it.copy(fileName = event.fileName, fileDetails = event.fileDetails, documentUri = event.documentUri, documentId = event.documentId)
+                    it.copy(progress = 0, fileName = event.fileName, fileDetails = event.fileDetails, documentUri = event.documentUri, documentId = event.documentId)
                 }
                 startUpload(event)
             }
@@ -51,26 +52,31 @@ class UploadProgressViewModel(private val uploadRepository: DocumentUploadReposi
     private fun startUpload(event: UploadProgressEvent.ScreenOpened) {
         uploadJob?.cancel()
         uploadJob = viewModelScope.launch {
-            val request = DocumentUploadRequest(event.documentId, event.fileName, event.mimeType, listOfNotNull(event.documentUri))
-            var completed = false
+            val request = DocumentUploadRequest(
+                event.documentId, event.fileName, event.mimeType,
+                event.scanPageUris.ifEmpty { listOfNotNull(event.documentUri) },
+                isScan = event.scanPageUris.isNotEmpty(),
+                sessionKey = event.sessionKey
+            )
+            var destination: UploadProgressEffect = UploadProgressEffect.NavigateToUploadError(UploadFailure.UNKNOWN)
             try {
                 uploadRepository.upload(request).collect { state ->
                     when (state) {
                         is ProcessingState.Running -> state.progressPercent?.let { percent -> _uiState.update { it.copy(progress = percent) } }
-                        ProcessingState.Completed -> completed = true
-                        is ProcessingState.Failed -> completed = false
+                        ProcessingState.Completed -> destination = UploadProgressEffect.NavigateToOcrProcessing(
+                            event.fileName, event.fileDetails, event.documentUri, event.documentId, event.mimeType
+                        )
+                        is ProcessingState.Uploaded -> destination = UploadProgressEffect.NavigateToContract(state.contractId)
+                        is ProcessingState.Failed -> destination = UploadProgressEffect.NavigateToUploadError(state.reason)
                     }
                 }
             } catch (cancellation: CancellationException) {
                 throw cancellation
             } catch (_: Exception) {
-                completed = false
+                destination = UploadProgressEffect.NavigateToUploadError(UploadFailure.UNKNOWN)
             }
             finishedDocumentId = event.documentId
-            _effects.send(
-                if (completed) UploadProgressEffect.NavigateToOcrProcessing(event.fileName, event.fileDetails, event.documentUri, event.documentId, event.mimeType)
-                else UploadProgressEffect.NavigateToUploadError
-            )
+            _effects.send(destination)
         }
     }
 

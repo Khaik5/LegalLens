@@ -86,8 +86,10 @@ class CameraCaptureViewModel : ViewModel() {
     }
 
     private fun handleQualityResult(page: ScanPage, qualityResult: DocumentQualityResult) {
-        if (qualityResult.decision == QualityDecision.ACCEPTED) addPage(page)
-        else _uiState.update { it.copy(pendingQualityChecks = it.pendingQualityChecks + PendingQualityCheck(page, qualityResult)) }
+        // Framing hints on a readable photo only mark the page; the user is asked only about unreadable photos.
+        if (qualityResult.decision == QualityDecision.ACCEPTED) {
+            addPage(if (qualityResult.issues.isEmpty()) page else page.copy(hasQualityWarning = true))
+        } else _uiState.update { it.copy(pendingQualityChecks = it.pendingQualityChecks + PendingQualityCheck(page, qualityResult)) }
     }
 
     private fun removePending(path: String) {

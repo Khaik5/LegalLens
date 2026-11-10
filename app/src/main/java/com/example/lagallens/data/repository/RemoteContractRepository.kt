@@ -6,11 +6,14 @@ import com.example.lagallens.data.datasource.local.datastore.AuthSessionStore
 import com.example.lagallens.data.datasource.local.datastore.currentSessionScope
 import com.example.lagallens.data.datasource.local.datastore.requireUserId
 import com.example.lagallens.data.datasource.remote.ContractRemoteDataSource
+import com.example.lagallens.data.datasource.remote.DocumentRemoteDataSource
 import com.example.lagallens.data.mapper.toContract
+import com.example.lagallens.data.mapper.toDocument
 import com.example.lagallens.data.model.response.ContractResponse
 import com.example.lagallens.domain.model.EmploymentContract
 import com.example.lagallens.domain.model.EmploymentContractComparison
 import com.example.lagallens.domain.repository.ContractRepository
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -24,19 +27,25 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.withContext
+import retrofit2.HttpException
+import java.io.IOException
 
 class RemoteContractRepository private constructor(
     private val tokens: AuthSessionStore,
     private val remote: ContractRemoteDataSource,
+    private val documents: DocumentRemoteDataSource?,
     private val listState: MutableStateFlow<ContractListState>,
     private val boundSession: String?
 ) : ContractRepository {
-    constructor(tokens: AuthSessionStore, remote: ContractRemoteDataSource) :
-        this(tokens, remote, MutableStateFlow(ContractListState()), null)
+    constructor(
+        tokens: AuthSessionStore,
+        remote: ContractRemoteDataSource,
+        documents: DocumentRemoteDataSource? = null
+    ) : this(tokens, remote, documents, MutableStateFlow(ContractListState()), null)
 
     override fun forSession(sessionKey: String): ContractRepository {
         check(boundSession == null || boundSession == sessionKey) { "Session changed" }
-        return RemoteContractRepository(tokens, remote, listState, sessionKey)
+        return RemoteContractRepository(tokens, remote, documents, listState, sessionKey)
     }
 
     override fun activeSessionKey(): String? = tokens.currentSessionScope()?.key
@@ -75,7 +84,31 @@ class RemoteContractRepository private constructor(
         detail.copy(
             latestRiskLevel = detail.latestRiskLevel ?: summary?.latestRiskLevel,
             latestAnalysisStatus = detail.latestAnalysisStatus ?: summary?.latestAnalysisStatus
-        ).toContract()
+        ).toContract().withLatestDocument(scope)
+    }
+
+    /**
+     * The contract endpoint carries no file details; the latest uploaded document supplies the file name and format.
+     * The detail screen stays usable when the document list cannot be read.
+     */
+    private suspend fun EmploymentContract.withLatestDocument(scope: AuthSessionScope): EmploymentContract {
+        val source = documents ?: return this
+        val document = try {
+            source.list(scope, id).maxByOrNull { it.uploadedAt }?.toDocument()
+        } catch (cancelled: CancellationException) {
+            throw cancelled
+        } catch (error: HttpException) {
+            error.response()?.errorBody()?.close()
+            null
+        } catch (_: IOException) {
+            null
+        } ?: return this
+        return copy(
+            documentId = document.id,
+            fileName = document.displayName,
+            mimeType = document.mimeType,
+            pageCount = pageCount ?: 1.takeIf { document.mimeType.startsWith("image/") }
+        )
     }
 
     override suspend fun createContract(contract: EmploymentContract): EmploymentContract = inSession { scope ->
