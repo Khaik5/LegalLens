@@ -10,8 +10,6 @@ import com.example.lagallens.domain.repository.AnalysisUnlockRepository
 import com.example.lagallens.domain.repository.AnalysisUnlockStatus
 import com.example.lagallens.domain.repository.ChatbotRepository
 import com.example.lagallens.domain.repository.OcrRepository
-import com.example.lagallens.domain.model.NotificationRecord
-import com.example.lagallens.domain.repository.NotificationRepository
 import com.example.lagallens.domain.repository.DraftRepository
 import com.example.lagallens.domain.model.Draft
 import com.example.lagallens.domain.model.DraftStage
@@ -62,11 +60,6 @@ class UnconfiguredRemoteAnalysisRepository : AnalysisRepository {
         flow { throw BackendNotConfiguredException("Analysis") }
 }
 
-class UnconfiguredRemoteNotificationRepository : NotificationRepository {
-    override suspend fun getAll(): List<NotificationRecord> = throw BackendNotConfiguredException("Notification")
-    override suspend fun markRead(notificationId: String) = throw BackendNotConfiguredException("Notification")
-    override suspend fun markAllRead() = throw BackendNotConfiguredException("Notification")
-}
 
 class UnconfiguredRemoteAnalysisUnlockRepository : AnalysisUnlockRepository {
     override suspend fun status(sessionKey: String, resultId: String): AnalysisUnlockStatus = throw BackendNotConfiguredException("Analysis unlock")
