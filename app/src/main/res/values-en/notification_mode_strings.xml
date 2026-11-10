@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="notification_load_error_title">Notifications are unavailable</string>
+    <string name="notification_type_analysis_done_title">Analysis complete</string>
+    <string name="notification_type_high_risk_title">High risk found</string>
+    <string name="notification_type_contract_expiring_title">Contract expiring soon</string>
+    <string name="notification_type_system_title">System notice</string>
     <string name="notification_analysis_complete_title">Analysis ready: Sample employment contract</string>
     <string name="notification_analysis_complete_description">The DEMO analysis for the employment contract is ready to view.</string>
     <string name="notification_ocr_review_title">Review OCR: Fixed-term employment contract</string>
