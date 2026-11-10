@@ -10,7 +10,7 @@ internal fun DocumentResponse.toDocument() = EmploymentDocument(
     contractId = contractId.toString(),
     displayName = fileName,
     uri = null,
-    mimeType = when (fileType) {
+    mimeType = mimeType?.takeIf(DocumentFiles::isSupported) ?: when (fileType) {
         "PDF" -> DocumentFiles.PDF
         "WORD" -> if (fileName.endsWith(".doc", ignoreCase = true)) DocumentFiles.DOC else DocumentFiles.DOCX
         "IMAGE" -> if (fileName.endsWith(".png", ignoreCase = true)) DocumentFiles.PNG else DocumentFiles.JPEG
