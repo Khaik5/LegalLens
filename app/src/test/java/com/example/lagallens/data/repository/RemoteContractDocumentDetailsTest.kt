@@ -50,6 +50,29 @@ class RemoteContractDocumentDetailsTest {
         assertEquals("1", documentsApi.requestedContractId)
     }
 
+    @Test fun pdfShowsThePageCountFromTheBackend() = runTest {
+        documentsApi.documents = listOf(
+            document(4, "Hợp đồng đã quét.pdf", "PDF", "2026-11-10T00:00:00.000Z")
+                .copy(mimeType = DocumentFiles.PDF, pageCount = 5)
+        )
+
+        val detail = checkNotNull(repository.getContract("1"))
+
+        assertEquals(5, detail.pageCount)
+        assertEquals("Hợp đồng đã quét.pdf", detail.fileName)
+    }
+
+    @Test fun wordWithoutPageCountStaysUnknown() = runTest {
+        documentsApi.documents = listOf(
+            document(5, "Hợp đồng.doc", "WORD", "2026-11-10T00:00:00.000Z").copy(mimeType = DocumentFiles.DOC)
+        )
+
+        val detail = checkNotNull(repository.getContract("1"))
+
+        assertEquals(DocumentFiles.DOC, detail.mimeType)
+        assertNull(detail.pageCount)
+    }
+
     @Test fun imageCountsAsOnePage() = runTest {
         documentsApi.documents = listOf(document(3, "scan.jpg", "IMAGE", "2026-11-10T00:00:00.000Z"))
 
