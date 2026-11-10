@@ -6,7 +6,9 @@ sealed interface UploadProgressEvent {
         val fileDetails: String,
         val documentUri: String? = null,
         val documentId: String = "",
-        val mimeType: String = ""
+        val mimeType: String = "",
+        val scanPageUris: List<String> = emptyList(),
+        val sessionKey: String? = null
     ) : UploadProgressEvent
 
     data object CancelClicked : UploadProgressEvent

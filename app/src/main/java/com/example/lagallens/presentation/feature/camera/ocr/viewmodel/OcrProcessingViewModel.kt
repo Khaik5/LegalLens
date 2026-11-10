@@ -78,7 +78,7 @@ class OcrProcessingViewModel(
             when (state) {
                 is ProcessingState.Running -> state.stage?.let { stage -> _uiState.update { it.withActiveStep(stage) } }
                 ProcessingState.Completed -> succeeded = true
-                is ProcessingState.Failed -> succeeded = false
+                is ProcessingState.Failed, is ProcessingState.Uploaded -> succeeded = false
             }
         }
         return succeeded

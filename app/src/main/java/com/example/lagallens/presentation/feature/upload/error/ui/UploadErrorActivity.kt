@@ -3,6 +3,7 @@ package com.example.lagallens.presentation.feature.upload.error.ui
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -52,7 +53,8 @@ class UploadErrorActivity : AppCompatActivity() {
                 },
                 errorMessage = intent.getStringExtra(EXTRA_ERROR_MESSAGE).orEmpty().ifBlank {
                     UploadErrorUiState.DEFAULT_ERROR_MESSAGE
-                }
+                },
+                canRetryUpload = intent.hasExtra(EXTRA_RETRY_INTENT) && retryIntent() != null
             )
         )
     }
@@ -93,22 +95,37 @@ class UploadErrorActivity : AppCompatActivity() {
                 )
             }
 
+            UploadErrorEffect.RetryUpload -> retryIntent()?.let { retry ->
+                startActivity(retry.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP))
+                finish()
+            }
+
             UploadErrorEffect.ReturnToCaller -> finishAffinity()
         }
     }
 
+    @Suppress("DEPRECATION")
+    private fun retryIntent(): Intent? = if (Build.VERSION.SDK_INT >= 33) {
+        intent.getParcelableExtra(EXTRA_RETRY_INTENT, Intent::class.java)
+    } else {
+        intent.getParcelableExtra(EXTRA_RETRY_INTENT)
+    }
+
     companion object {
+        private const val EXTRA_RETRY_INTENT = "extra_retry_intent"
         private const val EXTRA_ERROR_CODE = "extra_error_code"
         private const val EXTRA_ERROR_MESSAGE = "extra_error_message"
 
         fun newIntent(
             context: Context,
             errorCode: String = UploadErrorUiState.DEFAULT_ERROR_CODE,
-            errorMessage: String = UploadErrorUiState.DEFAULT_ERROR_MESSAGE
+            errorMessage: String = UploadErrorUiState.DEFAULT_ERROR_MESSAGE,
+            retryIntent: Intent? = null
         ): Intent {
             return Intent(context, UploadErrorActivity::class.java)
                 .putExtra(EXTRA_ERROR_CODE, errorCode)
                 .putExtra(EXTRA_ERROR_MESSAGE, errorMessage)
+                .putExtra(EXTRA_RETRY_INTENT, retryIntent)
         }
     }
 }

@@ -195,4 +195,40 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/filterScrollView" />
+
+    <LinearLayout
+        android:id="@+id/layoutContractsError"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/dp_24"
+        android:layout_marginTop="@dimen/dp_40"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/filterScrollView">
+
+        <TextView
+            android:id="@+id/tvContractsError"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/dashboard_load_failed"
+            android:textColor="@color/legal_lens_secondary_text"
+            android:textSize="@dimen/sp_14" />
+
+        <TextView
+            android:id="@+id/btnContractsRetry"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_16"
+            android:background="@drawable/bg_contract_filter_active"
+            android:gravity="center"
+            android:paddingHorizontal="@dimen/dp_24"
+            android:paddingVertical="@dimen/dp_8"
+            android:text="@string/upload_error_retry"
+            android:textColor="@color/white"
+            android:textSize="@dimen/sp_14" />
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

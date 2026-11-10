@@ -12,8 +12,6 @@ import com.example.lagallens.domain.repository.ChatbotRepository
 import com.example.lagallens.domain.repository.OcrRepository
 import com.example.lagallens.domain.model.NotificationRecord
 import com.example.lagallens.domain.repository.NotificationRepository
-import com.example.lagallens.domain.model.EmploymentDocument
-import com.example.lagallens.domain.repository.DocumentRepository
 import com.example.lagallens.domain.repository.DraftRepository
 import com.example.lagallens.domain.model.Draft
 import com.example.lagallens.domain.model.DraftStage
@@ -68,14 +66,6 @@ class UnconfiguredRemoteNotificationRepository : NotificationRepository {
     override suspend fun getAll(): List<NotificationRecord> = throw BackendNotConfiguredException("Notification")
     override suspend fun markRead(notificationId: String) = throw BackendNotConfiguredException("Notification")
     override suspend fun markAllRead() = throw BackendNotConfiguredException("Notification")
-}
-
-class UnconfiguredRemoteDocumentRepository : DocumentRepository {
-    override fun forSession(sessionKey: String): DocumentRepository = this
-    override suspend fun getDocument(documentId: String): EmploymentDocument? = throw BackendNotConfiguredException("Document")
-    override suspend fun saveDocument(document: EmploymentDocument): EmploymentDocument = throw BackendNotConfiguredException("Document")
-    override suspend fun updateDocumentContent(documentId: String, contractId: String?, content: String): Boolean = throw BackendNotConfiguredException("Document")
-    override suspend fun deleteDocument(documentId: String): Boolean = throw BackendNotConfiguredException("Document")
 }
 
 class UnconfiguredRemoteAnalysisUnlockRepository : AnalysisUnlockRepository {

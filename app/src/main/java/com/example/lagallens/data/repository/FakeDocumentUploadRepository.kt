@@ -1,6 +1,5 @@
 package com.example.lagallens.data.repository
 
-import com.example.lagallens.core.network.BackendNotConfiguredException
 import com.example.lagallens.domain.model.processing.DocumentUploadRequest
 import com.example.lagallens.domain.model.processing.ProcessingState
 import com.example.lagallens.domain.repository.DocumentUploadRepository
@@ -16,11 +15,5 @@ class FakeDocumentUploadRepository : DocumentUploadRepository {
         emit(ProcessingState.Running(progressPercent = 100))
         delay(300)
         emit(ProcessingState.Completed)
-    }
-}
-
-class UnconfiguredRemoteDocumentUploadRepository : DocumentUploadRepository {
-    override fun upload(request: DocumentUploadRequest): Flow<ProcessingState> = flow {
-        throw BackendNotConfiguredException("Upload")
     }
 }

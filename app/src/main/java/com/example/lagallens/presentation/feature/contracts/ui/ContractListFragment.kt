@@ -79,6 +79,7 @@ class ContractListFragment : Fragment() {
         binding.tvFilterAnalyzed.setOnClickListener { selectFilter(ContractFilter.ANALYZED) }
         binding.tvFilterProcessing.setOnClickListener { selectFilter(ContractFilter.PROCESSING) }
         binding.tvFilterHighRisk.setOnClickListener { selectFilter(ContractFilter.HIGH_RISK) }
+        binding.btnContractsRetry.setOnClickListener { viewModel.onEvent(ContractListUiEvent.RetryClicked) }
     }
 
     private fun bindFilterResult() {
@@ -152,6 +153,7 @@ class ContractListFragment : Fragment() {
             }
         }
         binding.tvContractsEmpty.isVisible = !state.isLoading && !state.hasError && state.contracts.isEmpty()
+        binding.layoutContractsError.isVisible = !state.isLoading && state.hasError && state.contracts.isEmpty()
         updateFilterStyle(binding.tvFilterAll, state.selectedFilter == ContractFilter.ALL)
         updateFilterStyle(binding.tvFilterAnalyzed, state.selectedFilter == ContractFilter.ANALYZED)
         updateFilterStyle(binding.tvFilterProcessing, state.selectedFilter == ContractFilter.PROCESSING)
