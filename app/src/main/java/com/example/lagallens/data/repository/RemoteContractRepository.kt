@@ -93,8 +93,8 @@ class RemoteContractRepository private constructor(
      */
     private suspend fun EmploymentContract.withLatestDocument(scope: AuthSessionScope): EmploymentContract {
         val source = documents ?: return this
-        val document = try {
-            source.list(scope, id).maxByOrNull { it.uploadedAt }?.toDocument()
+        val latest = try {
+            source.list(scope, id).maxByOrNull { it.uploadedAt }
         } catch (cancelled: CancellationException) {
             throw cancelled
         } catch (error: HttpException) {
@@ -103,11 +103,15 @@ class RemoteContractRepository private constructor(
         } catch (_: IOException) {
             null
         } ?: return this
+        val document = latest.toDocument()
         return copy(
             documentId = document.id,
             fileName = document.displayName,
             mimeType = document.mimeType,
-            pageCount = pageCount ?: 1.takeIf { document.mimeType.startsWith("image/") }
+            // The backend counts PDF pages at upload; an image is always one page even on older backends.
+            pageCount = latest.pageCount?.takeIf { it > 0 }
+                ?: pageCount
+                ?: 1.takeIf { document.mimeType.startsWith("image/") }
         )
     }
 
