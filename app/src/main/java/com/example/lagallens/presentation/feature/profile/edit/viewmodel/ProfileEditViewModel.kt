@@ -60,8 +60,9 @@ class ProfileEditViewModel : ViewModel() {
             name.codePointCount(0, name.length) > MAX_NAME_LENGTH -> R.string.profile_edit_name_too_long
             else -> null
         }
+        // The backend account has no phone number, so it stays optional; an entered number must still be valid.
         val phoneErrorRes = when {
-            phone.isBlank() -> R.string.profile_edit_phone_required
+            phone.isBlank() -> null
             phone.filter(Char::isDigit).length < MIN_PHONE_DIGITS -> R.string.profile_edit_phone_invalid
             else -> null
         }
