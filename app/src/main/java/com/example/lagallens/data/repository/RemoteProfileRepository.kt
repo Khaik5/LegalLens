@@ -60,14 +60,17 @@ class RemoteProfileRepository internal constructor(
         }
     }
 
+    /**
+     * Forgets the cached profile of the signed-out session. The phone number and avatar stay on the device:
+     * the backend does not store them, and they are kept per account, so another account never sees them.
+     */
     override suspend fun clearSessionData(): Boolean = withContext(Dispatchers.IO) {
         val scope = tokens.currentSessionScope() ?: return@withContext true
-        val userId = tokens.requireUserId(scope)
         edits.withLock {
             if (tokens.currentSessionScope()?.key != scope.key) return@withLock false
             lastProfile = null
             clearedSession = scope.key
-            local.clearEdits(userId)
+            true
         }
     }
 }

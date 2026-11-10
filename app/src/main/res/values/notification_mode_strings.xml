@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="notification_load_error_title">Không tải được thông báo</string>
+    <string name="notification_type_analysis_done_title">Phân tích hoàn tất</string>
+    <string name="notification_type_high_risk_title">Phát hiện rủi ro cao</string>
+    <string name="notification_type_contract_expiring_title">Hợp đồng sắp hết hạn</string>
+    <string name="notification_type_system_title">Thông báo hệ thống</string>
 </resources>
