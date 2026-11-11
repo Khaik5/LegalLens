@@ -14,6 +14,9 @@
     <string name="freeze_severity_low">Thấp</string>
     <string name="credit_history_analysis_unlock">Mở khóa kết quả phân tích</string>
     <string name="credit_history_credit_adjustment">Cộng Credit</string>
+    <string name="credit_history_purchase">Nạp Credit</string>
+    <string name="credit_history_refund">Hoàn Credit</string>
+    <string name="credit_history_bonus">Credit tặng</string>
     <string name="credit_history_completed">Hoàn tất</string>
     <string name="credit_history_pending">Đang xử lý</string>
     <string name="credit_history_failed">Thất bại</string>

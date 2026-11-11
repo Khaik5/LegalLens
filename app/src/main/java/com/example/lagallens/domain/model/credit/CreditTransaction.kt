@@ -7,8 +7,12 @@ data class CreditTransaction(
     val amountVnd: Long,
     val creditDelta: Int,
     val status: String,
-    val createdAtEpochMillis: Long
+    val createdAtEpochMillis: Long,
+    /** Null for DEMO ledger entries, which are described by their amount and sign instead. */
+    val kind: CreditTransactionKind? = null
 )
+
+enum class CreditTransactionKind { PURCHASE, USAGE, REFUND, BONUS }
 
 data class CreditReceipt(val balance: Int, val applied: Boolean)
 
