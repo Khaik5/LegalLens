@@ -16,7 +16,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.lagallens.R
 import com.example.lagallens.presentation.common.utils.bindPressFeedback
 import com.example.lagallens.databinding.ActivityCompareSelectBinding
-import com.example.lagallens.presentation.common.utils.applySystemBarInsets
 import com.example.lagallens.presentation.feature.compare.result.ui.CompareResultActivity
 import com.example.lagallens.presentation.feature.compare.select.adapter.CompareContractAdapter
 import com.example.lagallens.presentation.feature.compare.select.contract.CompareContract
@@ -25,6 +24,7 @@ import com.example.lagallens.presentation.feature.compare.select.contract.Compar
 import com.example.lagallens.presentation.feature.compare.select.contract.CompareSelectUiState
 import com.example.lagallens.presentation.feature.compare.select.viewmodel.CompareSelectViewModel
 import kotlinx.coroutines.launch
+import com.example.lagallens.presentation.common.utils.applySystemBarAndKeyboardInsets
 
 class CompareSelectActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCompareSelectBinding
@@ -42,7 +42,7 @@ class CompareSelectActivity : AppCompatActivity() {
         }
         binding = ActivityCompareSelectBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        binding.root.applySystemBarInsets()
+        binding.root.applySystemBarAndKeyboardInsets()
         binding.compareSelectList.layoutManager = LinearLayoutManager(this)
         binding.compareSelectList.adapter = adapter
         binding.compareSelectSubmit.bindPressFeedback()
