@@ -3,4 +3,7 @@
     <cache-path
         name="draft_pdfs"
         path="draft-pdfs/" />
+    <cache-path
+        name="document_exports"
+        path="document-session/" />
 </paths>
