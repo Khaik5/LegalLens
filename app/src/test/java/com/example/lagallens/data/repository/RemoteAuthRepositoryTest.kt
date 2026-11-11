@@ -28,7 +28,9 @@ import okhttp3.Request
 import okhttp3.Response
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.json.JSONObject
+import com.example.lagallens.domain.repository.AccountNotVerifiedException
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -52,6 +54,24 @@ class RemoteAuthRepositoryTest {
         assertEquals("current@example.test", repository.currentUserEmail())
         assertEquals("test-access", store.accessSession()?.token)
         assertEquals("test-refresh", store.refreshToken())
+    }
+
+    @Test fun loginOfAnUnverifiedAccountIsReportedSeparately() = runTest {
+        val repository = loginRepository(TestSessionStore()) {
+            response(it, 401, """{"success":false,"code":"ACCOUNT_NOT_VERIFIED","message":"Account email verification is required","data":null}""")
+        }
+
+        val failure = runCatching { repository.authenticate("pending@example.test", "Correct-123") }.exceptionOrNull()
+
+        assertTrue(failure is AccountNotVerifiedException)
+    }
+
+    @Test fun wrongCredentialsStillReturnFalse() = runTest {
+        val repository = loginRepository(TestSessionStore()) {
+            response(it, 401, """{"success":false,"code":"INVALID_CREDENTIALS","message":"Invalid credentials","data":null}""")
+        }
+
+        assertFalse(repository.authenticate("user@example.test", "Wrong-123"))
     }
 
     @Test fun unauthorizedWithNoRefreshClearsLegacySession() = runTest {
@@ -255,6 +275,14 @@ class RemoteAuthRepositoryTest {
         return RemoteAuthRepository(store, AuthRemoteDataSource(
             api = lazy { error("Unexpected public API call") },
             sessionApi = lazy { retrofit("http://10.0.2.2:3000/", client).create(AuthSessionApi::class.java) }
+        ))
+    }
+
+    private fun loginRepository(store: TestSessionStore, respond: (Request) -> Response): RemoteAuthRepository {
+        val client = OkHttpClient.Builder().addInterceptor { respond(it.request()) }.build()
+        return RemoteAuthRepository(store, AuthRemoteDataSource(
+            api = lazy { retrofit("http://10.0.2.2:3000/", client).create(AuthApi::class.java) },
+            sessionApi = lazy { error("Unexpected session API call") }
         ))
     }
 
