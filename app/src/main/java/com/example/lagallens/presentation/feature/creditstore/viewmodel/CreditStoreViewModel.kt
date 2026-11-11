@@ -35,6 +35,15 @@ class CreditStoreViewModel(
     init {
         viewModelScope.launch {
             try {
+                creditRepository.refresh()
+            } catch (cancellation: CancellationException) {
+                throw cancellation
+            } catch (_: Exception) {
+                if (isOwnerSession()) _uiState.update { it.copy(isBalanceUnavailable = true) }
+            }
+        }
+        viewModelScope.launch {
+            try {
                 val offers = paymentRepository.getPackages()
                 if (isOwnerSession()) _uiState.update { state ->
                     state.copy(isLoading = false, packages = offers.map { offer ->
@@ -57,6 +66,8 @@ class CreditStoreViewModel(
             CreditStoreUiEvent.BackClicked -> emitEffect(CreditStoreUiEffect.NavigateBack)
             CreditStoreUiEvent.TopUpClicked -> if (!creditRepository.isConfigured) {
                 emitEffect(CreditStoreUiEffect.ShowBackendUnavailable)
+            } else if (!paymentRepository.isConfigured) {
+                emitEffect(CreditStoreUiEffect.ShowPaymentUnavailable)
             } else _uiState.value.let { state ->
                 state.packages.firstOrNull { it.isSelected }?.let { selected ->
                     emitEffect(CreditStoreUiEffect.NavigateToPurchaseConfirmation(selected, state.balanceCredits))

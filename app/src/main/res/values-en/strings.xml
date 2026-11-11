@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="credit_backend_not_configured">The Credit wallet cannot be loaded or changed because the Backend is not configured.</string>
+    <string name="credit_balance_load_failed">Could not load your Credit balance. Please try again.</string>
+    <string name="credit_payment_not_connected">Credit top-up is not connected yet. Please try again later.</string>
     <string name="credit_history_backend_not_configured">Credit history cannot be loaded because the Backend is not configured.</string>
     <string name="credit_history_loading">Loading credit history…</string>
     <string name="credit_history_error">Unable to load credit history. Please try again.</string>

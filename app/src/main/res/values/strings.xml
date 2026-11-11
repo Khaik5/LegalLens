@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="credit_backend_not_configured">Ví Credit chưa thể tải hoặc thay đổi vì Backend chưa được cấu hình.</string>
+    <string name="credit_balance_load_failed">Không tải được số dư Credit. Vui lòng thử lại.</string>
+    <string name="credit_payment_not_connected">Nạp Credit chưa được kết nối. Vui lòng thử lại sau.</string>
     <string name="credit_history_backend_not_configured">Lịch sử Credit chưa thể tải vì Backend chưa được cấu hình.</string>
     <string name="credit_history_loading">Đang tải lịch sử Credit…</string>
     <string name="credit_history_error">Không thể tải lịch sử Credit. Vui lòng thử lại.</string>

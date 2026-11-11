@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import com.example.lagallens.R
+import com.example.lagallens.domain.model.credit.CreditTransactionKind
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import android.widget.LinearLayout
@@ -48,7 +49,10 @@ class CreditHistoryActivity : CreditFlowActivity() {
                 repository.balance.collect { if (isOwner()) binding.creditHistoryBalance.text = getString(R.string.credit_store_balance_credits, it) else { window.decorView.alpha = 0f; finish() } }
             }
             lifecycleScope.launch {
-                val transactions = runCatching { repository.getTransactions() }.getOrNull()
+                val transactions = runCatching {
+                    repository.refresh()
+                    repository.getTransactions()
+                }.getOrNull()
                 if (!isOwner() || isFinishing || isDestroyed) return@launch
                 if (transactions == null) renderTransactions(emptyList(), failed = true)
                 else renderTransactions(transactions)
@@ -105,7 +109,14 @@ class CreditHistoryActivity : CreditFlowActivity() {
         }
         rows.forEach { transaction ->
             val sign = if (transaction.creditDelta > 0) "+" else "−"
-            val detail = if (transaction.amountVnd > 0) getString(
+            val detail = transaction.kind?.let { kind ->
+                getString(when (kind) {
+                    CreditTransactionKind.PURCHASE -> R.string.credit_history_purchase
+                    CreditTransactionKind.USAGE -> R.string.credit_history_analysis_unlock
+                    CreditTransactionKind.REFUND -> R.string.credit_history_refund
+                    CreditTransactionKind.BONUS -> R.string.credit_history_bonus
+                })
+            } ?: if (transaction.amountVnd > 0) getString(
                 R.string.credit_history_purchase_detail, transaction.packageId.orEmpty(), transaction.amountVnd
             ) else getString(if (transaction.creditDelta < 0) R.string.credit_history_analysis_unlock else R.string.credit_history_credit_adjustment)
             val date = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(Date(transaction.createdAtEpochMillis))
