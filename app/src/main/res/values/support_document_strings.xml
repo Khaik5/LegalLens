@@ -56,15 +56,15 @@
     <string name="contract_rename_save">Lưu</string>
     <string name="contract_rename_loading">Đang lưu…</string>
     <string name="contract_export_title">Xuất tài liệu</string>
-    <string name="contract_export_description">Xuất bản PDF của tài liệu gốc, không phải báo cáo phân tích AI.</string>
-    <string name="contract_export_demo_notice">Giao diện minh họa: chưa có tệp PDF gốc để lưu hoặc chia sẻ.</string>
-    <string name="contract_export_save">Lưu PDF về thiết bị</string>
+    <string name="contract_export_description">Lưu hoặc chia sẻ file gốc của hợp đồng (PDF, Word hoặc ảnh). Đây không phải báo cáo phân tích AI.</string>
+    <string name="contract_export_save">Lưu về thiết bị</string>
     <string name="contract_export_share">Chia sẻ tài liệu</string>
     <string name="contract_export_loading">Đang xuất tài liệu</string>
-    <string name="contract_export_loading_detail">Đang chuẩn bị tài liệu…</string>
-    <string name="contract_export_ready">PDF đã sẵn sàng (minh họa)</string>
-    <string name="contract_export_ready_detail">Trạng thái mẫu; chưa tạo, lưu hoặc chia sẻ tệp thật.</string>
+    <string name="contract_export_loading_detail">Đang tải tài liệu gốc…</string>
     <string name="contract_export_error">Xuất tài liệu thất bại</string>
-    <string name="contract_export_error_detail">Tính năng xuất tài liệu gốc chưa được hỗ trợ. Chưa có tệp nào được lưu hoặc chia sẻ.</string>
-    <string name="contract_export_retry">Thử lại xuất PDF</string>
+    <string name="contract_export_error_detail">Không tải được tài liệu gốc. Kiểm tra kết nối rồi thử lại.</string>
+    <string name="contract_export_retry">Thử lại</string>
+    <string name="contract_export_saved">Đã lưu tài liệu</string>
+    <string name="contract_export_save_failed">Không lưu được tài liệu</string>
+    <string name="contract_export_share_unavailable">Không có ứng dụng nào để chia sẻ tài liệu</string>
 </resources>
