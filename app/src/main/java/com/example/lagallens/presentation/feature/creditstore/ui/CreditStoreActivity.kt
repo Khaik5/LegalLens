@@ -75,6 +75,7 @@ class CreditStoreActivity : AppCompatActivity() {
 
     private fun render(state: CreditStoreUiState) = with(binding) {
         creditStoreBalance.text = if (state.isBackendUnavailable) getString(R.string.credit_backend_not_configured)
+        else if (state.isBalanceUnavailable) getString(R.string.credit_balance_load_failed)
         else getString(R.string.credit_store_balance_credits, if (viewModel.isOwnerSession()) state.balanceCredits else 0)
         creditPackageAdapter.submitList(if (viewModel.isOwnerSession()) state.packages else CreditStoreUiState(balanceCredits = 0).packages)
     }
@@ -83,6 +84,7 @@ class CreditStoreActivity : AppCompatActivity() {
         if (!viewModel.isOwnerSession()) return
         when (effect) {
             CreditStoreUiEffect.ShowBackendUnavailable -> Toast.makeText(this, R.string.credit_backend_not_configured, Toast.LENGTH_SHORT).show()
+            CreditStoreUiEffect.ShowPaymentUnavailable -> Toast.makeText(this, R.string.credit_payment_not_connected, Toast.LENGTH_SHORT).show()
             CreditStoreUiEffect.NavigateBack -> finish()
             is CreditStoreUiEffect.NavigateToPurchaseConfirmation -> {
                 startActivity(PurchaseConfirmationActivity.createIntent(this, effect.creditPackage, effect.balanceCredits, intent.getBooleanExtra(EXTRA_FROM_ANALYSIS, false)).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP))

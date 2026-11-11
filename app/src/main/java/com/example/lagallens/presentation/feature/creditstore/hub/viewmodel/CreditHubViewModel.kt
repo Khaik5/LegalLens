@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.ViewModelProvider
 import com.example.lagallens.domain.repository.CreditRepository
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
@@ -26,6 +27,17 @@ class CreditHubViewModel(private val creditRepository: CreditRepository) : ViewM
     private val _uiEffect = Channel<CreditHubUiEffect>(Channel.BUFFERED)
     val uiEffect = _uiEffect.receiveAsFlow()
 
+    init {
+        viewModelScope.launch {
+            try {
+                creditRepository.refresh()
+            } catch (cancellation: CancellationException) {
+                throw cancellation
+            } catch (_: Exception) {
+                if (isOwnerSession()) _uiState.update { it.copy(isBalanceUnavailable = true) }
+            }
+        }
+    }
     init { viewModelScope.launch { creditRepository.balance.collect { balance -> _uiState.update { it.copy(balanceCredits = if (isOwnerSession()) balance else 0, isBackendUnavailable = !creditRepository.isConfigured) } } } }
     init { viewModelScope.launch { creditRepository.observeSessionKeys().collect { if (it != ownerSession) _uiState.value = CreditHubUiState(balanceCredits = 0, isBackendUnavailable = !creditRepository.isConfigured) } } }
 

@@ -79,6 +79,7 @@ class CreditHubActivity : AppCompatActivity() {
 
     private fun render(state: CreditHubUiState) {
         binding.creditHubBalance.text = if (state.isBackendUnavailable) getString(R.string.credit_backend_not_configured)
+        else if (state.isBalanceUnavailable) getString(R.string.credit_balance_load_failed)
         else getString(R.string.credit_hub_balance, if (viewModel.isOwnerSession()) state.balanceCredits else 0)
     }
 
