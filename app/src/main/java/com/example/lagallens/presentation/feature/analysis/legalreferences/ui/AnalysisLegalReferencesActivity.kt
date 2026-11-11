@@ -7,9 +7,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.Lifecycle
@@ -25,6 +23,7 @@ import com.example.lagallens.presentation.feature.analysis.legalreferences.contr
 import com.example.lagallens.presentation.feature.analysis.legalreferences.detail.ui.AnalysisLegalReferenceDetailActivity
 import com.example.lagallens.presentation.feature.analysis.legalreferences.viewmodel.AnalysisLegalReferencesViewModel
 import kotlinx.coroutines.launch
+import com.example.lagallens.presentation.common.utils.applySystemBarAndKeyboardInsets
 
 class AnalysisLegalReferencesActivity : com.example.lagallens.presentation.feature.analysis.AnalysisScopedActivity() {
     override val requiresUnlock = false
@@ -46,11 +45,7 @@ class AnalysisLegalReferencesActivity : com.example.lagallens.presentation.featu
         }
         binding = ActivityAnalysisLegalReferencesBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(binding.analysisLegalReferencesRoot) { view, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
+        binding.analysisLegalReferencesRoot.applySystemBarAndKeyboardInsets()
         bindViews()
         observeViewModel()
         viewModel.onEvent(

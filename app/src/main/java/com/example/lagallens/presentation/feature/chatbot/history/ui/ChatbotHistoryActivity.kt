@@ -7,11 +7,9 @@ import android.os.Bundle
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -30,6 +28,7 @@ import com.example.lagallens.LegalLensApplication
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.launch
+import com.example.lagallens.presentation.common.utils.applySystemBarAndKeyboardInsets
 
 class ChatbotHistoryActivity : AppCompatActivity() {
     private val ownerSession by lazy { (application as LegalLensApplication).currentSessionKey() }
@@ -63,12 +62,7 @@ class ChatbotHistoryActivity : AppCompatActivity() {
         }
         binding = ActivityChatbotHistoryBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(binding.chatbotHistoryRoot) { view, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
-        ViewCompat.requestApplyInsets(binding.chatbotHistoryRoot)
+        binding.chatbotHistoryRoot.applySystemBarAndKeyboardInsets()
         bindViews()
         observeViewModel()
         viewModel.onEvent(ChatbotHistoryUiEvent.ScreenOpened())

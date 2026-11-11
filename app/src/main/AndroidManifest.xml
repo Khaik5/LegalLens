@@ -21,7 +21,7 @@
         <activity android:name=".presentation.feature.chatbot.help.ui.ChatbotHelpActivity" android:exported="false" />
         <activity android:name=".presentation.feature.chatbot.draft.ui.ChatbotDraftPreviewActivity" android:exported="false" />
         <activity android:name=".presentation.feature.chatbot.draft.ui.ChatbotDraftRegenerationActivity" android:exported="false" />
-        <activity android:name=".presentation.feature.chatbot.draft.ui.ChatbotDraftManualEditActivity" android:exported="false" />
+        <activity android:name=".presentation.feature.chatbot.draft.ui.ChatbotDraftManualEditActivity" android:exported="false" android:windowSoftInputMode="adjustResize" />
         <activity android:name=".presentation.feature.chatbot.draft.ui.ChatbotDraftManualSavedActivity" android:exported="false" />
         <activity android:name=".presentation.feature.chatbot.draft.ui.ChatbotDraftAiEditingActivity" android:exported="false" />
         <activity android:name=".presentation.feature.chatbot.draft.ui.ChatbotDraftAiReviewActivity" android:exported="false" />
@@ -58,7 +58,8 @@
             android:exported="false" />
         <activity
             android:name=".presentation.feature.chatbot.history.ui.ChatbotHistoryActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".presentation.feature.chatbot.ui.ChatbotActivity"
             android:exported="false"
