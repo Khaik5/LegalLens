@@ -7,8 +7,6 @@ import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -17,6 +15,7 @@ import com.example.lagallens.LegalLensApplication
 import com.example.lagallens.R
 import com.example.lagallens.databinding.ActivityResetPasswordBinding
 import com.example.lagallens.presentation.common.utils.animateLoadingFeedback
+import com.example.lagallens.presentation.common.utils.applySystemBarAndKeyboardInsets
 import com.example.lagallens.presentation.common.utils.bindPressFeedback
 import com.example.lagallens.presentation.feature.login.ui.LoginActivity
 import com.example.lagallens.presentation.feature.resetpassword.contract.ResetPasswordUiEffect
@@ -44,11 +43,7 @@ class ResetPasswordActivity : AppCompatActivity() {
         bindView()
         collectState()
         collectEffect()
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
+        binding.root.applySystemBarAndKeyboardInsets()
     }
 
     private fun bindView() {

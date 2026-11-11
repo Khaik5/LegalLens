@@ -17,6 +17,7 @@
     <string name="login_password_required">Vui lòng nhập mật khẩu</string>
     <string name="login_password_minimum_length">Mật khẩu cần ít nhất 8 ký tự</string>
     <string name="login_invalid_credentials">Tên đăng nhập hoặc mật khẩu không đúng</string>
+    <string name="login_account_not_verified">Tài khoản chưa xác thực email. Mã OTP mới đã được gửi tới email của bạn.</string>
     <string name="login_username_hint">Admin</string>
     <string name="login_welcome_back">Chào mừng trở lại</string>
     <string name="login_subtitle">Vui lòng đăng nhập để tiếp tục truy cập dữ liệu bảo mật.</string>

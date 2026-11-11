@@ -10,12 +10,11 @@ import android.text.method.PasswordTransformationMethod
 import android.text.method.SingleLineTransformationMethod
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.doOnPreDraw
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.Lifecycle
@@ -25,7 +24,9 @@ import com.example.lagallens.R
 import com.example.lagallens.LegalLensApplication
 import com.example.lagallens.di.AppDataMode
 import com.example.lagallens.databinding.ActivityLoginBinding
+import com.example.lagallens.domain.model.auth.OtpPurpose
 import com.example.lagallens.presentation.feature.forgotpassword.ui.ForgotPasswordActivity
+import com.example.lagallens.presentation.feature.otp.ui.OtpVerificationActivity
 import com.example.lagallens.presentation.feature.register.ui.RegisterActivity
 import com.example.lagallens.presentation.feature.main.ui.MainActivity
 import com.example.lagallens.presentation.feature.login.contract.LoginUiEffect
@@ -34,6 +35,7 @@ import com.example.lagallens.presentation.feature.login.contract.LoginUiState
 import com.example.lagallens.presentation.feature.login.viewmodel.LoginViewModel
 import com.example.lagallens.presentation.feature.login.viewmodel.LoginViewModelFactory
 import com.example.lagallens.presentation.common.utils.animateContentEntrance
+import com.example.lagallens.presentation.common.utils.applySystemBarAndKeyboardInsets
 import com.example.lagallens.presentation.common.utils.animateLoadingFeedback
 import com.example.lagallens.presentation.common.utils.bindPressFeedback
 import kotlinx.coroutines.launch
@@ -41,9 +43,8 @@ import kotlinx.coroutines.launch
 class LoginActivity : AppCompatActivity() {
     private val binding by lazy { ActivityLoginBinding.inflate(layoutInflater) }
     private val viewModel by viewModels<LoginViewModel> {
-        LoginViewModelFactory(
-            (application as LegalLensApplication).authenticateUserUseCase
-        )
+        val app = application as LegalLensApplication
+        LoginViewModelFactory(app.authenticateUserUseCase, app.resendOtpUseCase)
     }
     private var wasLoading = false
 
@@ -59,11 +60,7 @@ class LoginActivity : AppCompatActivity() {
         bindText()
         collectState()
         collectEffect()
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
+        binding.root.applySystemBarAndKeyboardInsets()
     }
 
     private fun bindView() {
@@ -93,8 +90,11 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun playEntranceMotion() {
-        binding.loginScroll.doOnPreDraw {
-            binding.loginScroll.animateContentEntrance(resources.getDimension(R.dimen.dp_16))
+        binding.root.doOnPreDraw {
+            val distance = resources.getDimension(R.dimen.dp_16)
+            listOf(binding.loginHeader, binding.loginScroll, binding.loginBottomBar).forEach {
+                it.animateContentEntrance(distance)
+            }
         }
     }
 
@@ -165,6 +165,14 @@ class LoginActivity : AppCompatActivity() {
                 viewModel.uiEffect.collect { effect ->
                     when (effect) {
                         LoginUiEffect.CloseScreen -> finish()
+                        is LoginUiEffect.NavigateToAccountVerification -> {
+                            Toast.makeText(this@LoginActivity, R.string.login_account_not_verified, Toast.LENGTH_LONG).show()
+                            startActivity(
+                                OtpVerificationActivity.createIntent(
+                                    this@LoginActivity, effect.email, OtpPurpose.REGISTRATION, effect.challenge
+                                )
+                            )
+                        }
                         LoginUiEffect.NavigateToForgotPassword -> {
                             startActivity(Intent(this@LoginActivity, ForgotPasswordActivity::class.java))
                         }
