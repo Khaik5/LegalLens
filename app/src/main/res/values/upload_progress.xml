@@ -36,10 +36,10 @@
     <dimen name="upload_progress_cancel_corner_radius">8dp</dimen>
     <dimen name="upload_progress_cancel_text_size">14sp</dimen>
     <dimen name="upload_progress_ring_size">105dp</dimen>
-    <string name="upload_progress_title">Mô phỏng tải tệp · DEMO</string>
+    <string name="upload_progress_title">Đang tải tệp lên</string>
     <string name="upload_progress_back_content_description">Hủy tải lên</string>
     <string name="upload_progress_percentage">%1$d%%</string>
     <string name="upload_progress_status">Đang xử lý</string>
-    <string name="upload_progress_description">Tiến trình minh họa; tệp chưa được gửi tới máy chủ và chưa được AI phân tích.</string>
+    <string name="upload_progress_description">Tệp đang được tải lên an toàn. Vui lòng không đóng ứng dụng.</string>
     <string name="upload_progress_cancel">Hủy tải lên</string>
 </resources>

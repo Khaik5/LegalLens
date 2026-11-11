@@ -4,8 +4,8 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.lagallens.LegalLensApplication
-import com.example.lagallens.R
 import com.example.lagallens.domain.model.EmploymentContract
+import com.example.lagallens.presentation.feature.contracts.contract.labelRes
 import com.example.lagallens.presentation.feature.compare.select.contract.CompareContract
 import com.example.lagallens.presentation.feature.compare.select.contract.CompareSelectUiEffect
 import com.example.lagallens.presentation.feature.compare.select.contract.CompareSelectUiEvent
@@ -80,16 +80,8 @@ class CompareSelectViewModel(application: Application) : AndroidViewModel(applic
         }
     }
 
-    private fun toCompareContract(contract: EmploymentContract): CompareContract {
-        val context = getApplication<Application>()
-        val title = if (contract.id in SAMPLE_IDS) {
-            val template = com.example.lagallens.presentation.feature.contracts.contract.ContractListItem.allSamples.firstOrNull { it.id == contract.id }
-            if (contract.title == template?.titleOverride) contract.title else contract.title
-        } else contract.title
-        return CompareContract(contract.id, title, context.getString(R.string.contract_demo_labor_subtitle))
-    }
+    private fun toCompareContract(contract: EmploymentContract): CompareContract =
+        CompareContract(contract.id, contract.title, getApplication<Application>().getString(contract.type.labelRes()))
 
     private fun emit(effect: CompareSelectUiEffect) { viewModelScope.launch { effects.send(effect) } }
-
-    private companion object { val SAMPLE_IDS = setOf("office-lease", "collaborator", "equipment-purchase", "vehicle-lease") }
 }

@@ -35,6 +35,9 @@ class ProfileInformationActivity : AppCompatActivity() {
         bindCard(binding.aboutAssistant, R.string.about_assistant_title, R.string.about_assistant_description)
         bindCard(binding.aboutTeam, R.string.about_team_title, R.string.about_team_placeholder)
         bindCard(binding.aboutContact, R.string.about_contact_title, R.string.about_contact_placeholder)
+        // Hidden until the team name and contact email are provided; the strings are still placeholders.
+        binding.aboutTeam.root.isVisible = false
+        binding.aboutContact.root.isVisible = false
         bindCard(binding.privacyOcr, R.string.privacy_ocr_title, R.string.privacy_ocr_body)
         bindCard(binding.privacyStorage, R.string.privacy_storage_title, R.string.privacy_storage_body)
         bindCard(binding.privacySecurity, R.string.privacy_security_title, R.string.privacy_security_body)

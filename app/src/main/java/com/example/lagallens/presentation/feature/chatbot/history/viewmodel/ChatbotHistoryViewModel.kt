@@ -18,6 +18,7 @@ import com.example.lagallens.domain.repository.ChatbotRepository
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import com.example.lagallens.presentation.common.utils.toFailureMessage
 
 class ChatbotHistoryViewModel(private val repository: ChatbotRepository? = null) : ViewModel() {
     private val ownerSession = repository?.currentSessionKey()
@@ -76,7 +77,7 @@ class ChatbotHistoryViewModel(private val repository: ChatbotRepository? = null)
                         filter(_uiState.value.query)
                     }.onFailure {
                         if (it is CancellationException) throw it
-                        if (isCurrent()) emitEffect(ChatbotHistoryUiEffect.ShowMessage(com.example.lagallens.R.string.auth_backend_not_configured))
+                        if (isCurrent()) emitEffect(ChatbotHistoryUiEffect.ShowMessage(it.toFailureMessage()))
                     }
                 }
             }

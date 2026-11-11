@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
+import com.example.lagallens.presentation.common.utils.toFailureMessage
 
 class OcrResultViewModel(
     private val getOcrResult: GetOcrResultUseCase,
@@ -101,9 +102,9 @@ class OcrResultViewModel(
                 }
             } catch (cancellationException: CancellationException) {
                 throw cancellationException
-            } catch (_: Exception) {
+            } catch (failure: Exception) {
                 if (!isOwner()) { _uiState.value = OcrResultUiState(); return@launch }
-                _uiState.update { it.copy(confidenceLabel = "", confidenceLabelRes = null, confidencePercentage = "", documentText = "", errorMessageRes = R.string.auth_backend_not_configured) }
+                _uiState.update { it.copy(confidenceLabel = "", confidenceLabelRes = null, confidencePercentage = "", documentText = "", errorMessageRes = failure.toFailureMessage()) }
             }
         }
     }
@@ -170,9 +171,9 @@ class OcrResultViewModel(
                 emitEffect(OcrResultUiEffect.NavigateToSaved(current.documentName, current.documentId, contractId))
             } catch (cancellationException: CancellationException) {
                 throw cancellationException
-            } catch (_: Exception) {
+            } catch (failure: Exception) {
                 if (!isOwner()) { _uiState.value = OcrResultUiState(); return@launch }
-                _uiState.update { it.copy(errorMessageRes = R.string.auth_backend_not_configured) }
+                _uiState.update { it.copy(errorMessageRes = failure.toFailureMessage()) }
             }
         }
     }

@@ -18,6 +18,7 @@ internal data class CreditPurchaseSelection(val creditPackage: CreditPackage, va
         .putExtra(EXTRA_PRICE, creditPackage.priceVnd)
         .putExtra(EXTRA_TITLE, creditPackage.title)
         .putExtra(EXTRA_DESCRIPTION, creditPackage.description)
+        .putExtra(EXTRA_RECOMMENDED, creditPackage.isRecommended)
         .putExtra(EXTRA_BALANCE, balanceCredits)
         .putExtra(EXTRA_PURCHASE_ID, purchaseId)
         .putExtra(EXTRA_RETURN_TO_ORIGIN, returnsToUnlockOrigin)
@@ -28,6 +29,7 @@ internal data class CreditPurchaseSelection(val creditPackage: CreditPackage, va
         private const val EXTRA_PRICE = "credit_purchase_price"
         private const val EXTRA_TITLE = "credit_purchase_title"
         private const val EXTRA_DESCRIPTION = "credit_purchase_description"
+        private const val EXTRA_RECOMMENDED = "credit_purchase_recommended"
         private const val EXTRA_BALANCE = "credit_purchase_balance"
         private const val EXTRA_PURCHASE_ID = "credit_purchase_id"
         private const val EXTRA_RETURN_TO_ORIGIN = "credit_purchase_return_to_origin"
@@ -37,7 +39,8 @@ internal data class CreditPurchaseSelection(val creditPackage: CreditPackage, va
             if (!intent.hasExtra(EXTRA_BALANCE) || !intent.hasExtra(EXTRA_CREDITS)) return null
             val selected = CreditPackage(
                 id, intent.getIntExtra(EXTRA_CREDITS, 0), intent.getLongExtra(EXTRA_PRICE, 0),
-                intent.getStringExtra(EXTRA_TITLE).orEmpty(), intent.getStringExtra(EXTRA_DESCRIPTION).orEmpty()
+                intent.getStringExtra(EXTRA_TITLE).orEmpty(), intent.getStringExtra(EXTRA_DESCRIPTION).orEmpty(),
+                isRecommended = intent.getBooleanExtra(EXTRA_RECOMMENDED, false)
             )
             return CreditPurchaseSelection(selected, intent.getIntExtra(EXTRA_BALANCE, 0), intent.getStringExtra(EXTRA_PURCHASE_ID) ?: UUID.randomUUID().toString(), intent.getBooleanExtra(EXTRA_RETURN_TO_ORIGIN, false))
         }

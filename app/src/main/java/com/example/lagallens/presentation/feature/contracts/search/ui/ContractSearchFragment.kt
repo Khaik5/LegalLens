@@ -63,22 +63,6 @@ class ContractSearchFragment : Fragment() {
         binding.etSearch.doAfterTextChanged {
             viewModel.onEvent(ContractSearchUiEvent.QueryChanged(it?.toString().orEmpty()))
         }
-        binding.tvRecentBitexco.setOnClickListener {
-            selectRecentSearch(R.string.contract_search_recent_bitexco)
-        }
-        binding.tvRecentNda.setOnClickListener {
-            selectRecentSearch(R.string.contract_search_recent_nda)
-        }
-        binding.tvRecentLabor.setOnClickListener {
-            selectRecentSearch(R.string.contract_search_recent_labor)
-        }
-        binding.tvRecentEquipment.setOnClickListener {
-            selectRecentSearch(R.string.contract_search_recent_equipment)
-        }
-    }
-
-    private fun selectRecentSearch(queryRes: Int) {
-        viewModel.onEvent(ContractSearchUiEvent.RecentSearchClicked(getString(queryRes)))
     }
 
     private fun collectUiState() {

@@ -28,7 +28,7 @@ class PurchaseConfirmationActivity : CreditFlowActivity() {
         val price = selection.priceText
         binding.purchasePackageTitle.text = creditPackage.title
         binding.purchaseSummaryPackage.text = creditPackage.title
-        binding.purchasePackageDescription.setText(if (creditPackage.credits == 15) R.string.credit_flow_package_description else R.string.credit_purchase_no_expiry)
+        binding.purchasePackageDescription.setText(if (creditPackage.isRecommended) R.string.credit_flow_package_description else R.string.credit_purchase_no_expiry)
         binding.purchasePackagePrice.text = price
         binding.purchaseSummaryPrice.text = price
         val creditRepository = (application as LegalLensApplication).creditRepository

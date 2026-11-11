@@ -151,7 +151,7 @@ class ContractDetailFragment : Fragment() {
         val repository = app.analysisIdentityRepository
         val session = repository.sessionKey()
         if (session.isNullOrBlank()) {
-            Toast.makeText(requireContext(), R.string.auth_backend_not_configured, Toast.LENGTH_LONG).show()
+            Toast.makeText(requireContext(), R.string.operation_session_error, Toast.LENGTH_LONG).show()
             return
         }
         viewLifecycleOwner.lifecycleScope.launch {
