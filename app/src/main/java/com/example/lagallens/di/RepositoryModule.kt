@@ -57,8 +57,10 @@ import com.example.lagallens.domain.repository.DocumentRepository
 import com.example.lagallens.domain.repository.DraftRepository
 import com.example.lagallens.domain.repository.CreditRepository
 import com.example.lagallens.domain.repository.PaymentRepository
-import com.example.lagallens.data.repository.UnconfiguredRemotePaymentRepository
-import com.example.lagallens.data.repository.UnconfiguredRemoteCreditRepository
+import com.example.lagallens.data.repository.RemotePaymentRepository
+import com.example.lagallens.data.repository.RemoteCreditRepository
+import com.example.lagallens.data.datasource.remote.CreditRemoteDataSource
+import com.example.lagallens.data.datasource.remote.api.CreditApi
 import com.example.lagallens.data.repository.FakePaymentRepository
 import com.example.lagallens.data.repository.FakeCreditRepository
 import com.example.lagallens.data.repository.RemoteProfileRepository
@@ -258,11 +260,14 @@ object RepositoryModule {
 
     fun provideCreditRepository(context: Context): CreditRepository = when (DataModeConfig.current) {
         AppDataMode.DEMO -> com.example.lagallens.data.repository.IoFinanceRepository(finance(context))
-        AppDataMode.REAL -> UnconfiguredRemoteCreditRepository(remoteSessionKey(context))
+        AppDataMode.REAL -> RemoteCreditRepository(EncryptedTokenStore(context), creditRemoteDataSource(context))
     }
 
     fun providePaymentRepository(context: Context, creditRepository: CreditRepository): PaymentRepository = when (DataModeConfig.current) {
         AppDataMode.DEMO -> com.example.lagallens.data.repository.IoFinanceRepository(finance(context))
-        AppDataMode.REAL -> UnconfiguredRemotePaymentRepository(remoteSessionKey(context))
+        AppDataMode.REAL -> RemotePaymentRepository(EncryptedTokenStore(context), creditRemoteDataSource(context))
     }
+
+    private fun creditRemoteDataSource(context: Context) =
+        CreditRemoteDataSource(lazy { authenticatedRetrofit(context).create(CreditApi::class.java) })
 }

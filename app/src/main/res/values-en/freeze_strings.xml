@@ -14,6 +14,9 @@
     <string name="freeze_severity_low">Low</string>
     <string name="credit_history_analysis_unlock">Analysis result unlock</string>
     <string name="credit_history_credit_adjustment">Credit added</string>
+    <string name="credit_history_purchase">Credit top-up</string>
+    <string name="credit_history_refund">Credit refund</string>
+    <string name="credit_history_bonus">Bonus Credit</string>
     <string name="credit_history_completed">Completed</string>
     <string name="credit_history_pending">Pending</string>
     <string name="credit_history_failed">Failed</string>
