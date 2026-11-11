@@ -131,7 +131,12 @@ class ContractDetailFragment : Fragment() {
                         }
                         ContractDetailUiEffect.ShowExportSheet -> {
                             if (parentFragmentManager.findFragmentByTag(ContractExportBottomSheet.TAG) == null) {
-                                ContractExportBottomSheet.newInstance(binding.tvContractTitle.text.toString(), getString(R.string.viewer_metadata, binding.tvFileFormat.text, binding.tvPageCount.text)).show(parentFragmentManager, ContractExportBottomSheet.TAG)
+                                ContractExportBottomSheet.newInstance(
+                                    binding.tvContractTitle.text.toString(),
+                                    getString(R.string.viewer_metadata, binding.tvFileFormat.text, binding.tvPageCount.text),
+                                    viewModel.uiState.value.contractId,
+                                    (requireActivity().application as LegalLensApplication).currentSessionKey().orEmpty()
+                                ).show(parentFragmentManager, ContractExportBottomSheet.TAG)
                             }
                         }
                         is ContractDetailUiEffect.ShowMessage -> Toast.makeText(requireContext(), effect.messageRes, Toast.LENGTH_SHORT).show()
