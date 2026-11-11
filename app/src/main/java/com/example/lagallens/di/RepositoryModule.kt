@@ -4,6 +4,7 @@ import android.content.Context
 import com.example.lagallens.data.datasource.local.datastore.AuthLocalDataSource
 import com.example.lagallens.data.datasource.local.datastore.OnboardingPreferencesDataSource
 import com.example.lagallens.data.datasource.local.datastore.ProfileSettingsLocalDataSource
+import com.example.lagallens.data.datasource.local.ProfileAvatarFiles
 import com.example.lagallens.data.datasource.local.datastore.ProfileLocalDataSource
 import com.example.lagallens.data.repository.LocalAuthRepository
 import com.example.lagallens.data.repository.FakeChatbotRepository
@@ -250,6 +251,7 @@ object RepositoryModule {
         AppDataMode.REAL -> RemoteProfileRepository(
             EncryptedTokenStore(context),
             UserRemoteDataSource(lazy { authenticatedRetrofit(context).create(UserApi::class.java) }),
+            ProfileAvatarFiles(context),
             ProfileLocalDataSource(context)
         )
     }

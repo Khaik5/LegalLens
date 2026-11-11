@@ -6,9 +6,10 @@ import com.example.lagallens.domain.model.UserProfile
 
 data class ProfileEdits(val phone: String, val photoUri: String?)
 
+/** Phone and avatar that older REAL builds kept on the device; read once to move them to the backend. */
 internal interface ProfileLocalEdits {
     fun readEdits(userId: String): ProfileEdits
-    fun saveEdits(userId: String, phone: String, photoUri: String?): ProfileEdits
+    fun clearEdits(userId: String)
 }
 
 class ProfileLocalDataSource(context: Context, private val sessionUserId: () -> String? = { null }, private val sessionEmail: () -> String? = { null }) : ProfileLocalEdits {
@@ -47,12 +48,8 @@ class ProfileLocalDataSource(context: Context, private val sessionUserId: () -> 
         return ProfileEdits(store.getString(KEY_PHONE, "").orEmpty(), store.getString(KEY_PHOTO_URI, null))
     }
 
-    override fun saveEdits(userId: String, phone: String, photoUri: String?): ProfileEdits {
-        check(remotePreferences(userId).edit()
-            .putString(KEY_PHONE, phone)
-            .putString(KEY_PHOTO_URI, photoUri)
-            .commit())
-        return ProfileEdits(phone, photoUri)
+    override fun clearEdits(userId: String) {
+        check(remotePreferences(userId).edit().clear().commit())
     }
 
     private fun remotePreferences(userId: String): android.content.SharedPreferences {
