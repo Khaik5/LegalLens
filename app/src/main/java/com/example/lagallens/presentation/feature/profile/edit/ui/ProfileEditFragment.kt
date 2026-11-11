@@ -27,6 +27,7 @@ import com.example.lagallens.presentation.feature.profile.edit.contract.ProfileE
 import com.example.lagallens.presentation.feature.profile.edit.viewmodel.ProfileEditViewModel
 import com.example.lagallens.presentation.feature.profile.viewmodel.ProfileViewModel
 import kotlinx.coroutines.launch
+import com.example.lagallens.presentation.common.utils.applySystemBarAndKeyboardInsets
 
 class ProfileEditFragment : Fragment() {
     private val photoPicker = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
@@ -51,6 +52,8 @@ class ProfileEditFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        // The nav host already pads for the status bar; this keeps the Save button above the keyboard.
+        binding.root.applySystemBarAndKeyboardInsets(top = false)
         bindView()
         collectProfileState()
         collectUiState()

@@ -11,8 +11,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
@@ -27,6 +25,7 @@ import com.example.lagallens.presentation.feature.register.contract.RegisterUiEf
 import com.example.lagallens.presentation.feature.register.contract.RegisterUiEvent
 import com.example.lagallens.presentation.feature.register.viewmodel.RegisterViewModel
 import com.example.lagallens.presentation.common.utils.animateContentEntrance
+import com.example.lagallens.presentation.common.utils.applySystemBarAndKeyboardInsets
 import com.example.lagallens.presentation.common.utils.bindPressFeedback
 import kotlinx.coroutines.launch
 
@@ -46,11 +45,7 @@ class RegisterActivity : AppCompatActivity() {
         bindText()
         collectState()
         collectEffect()
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
+        binding.root.applySystemBarAndKeyboardInsets()
     }
 
     private fun bindView() {
