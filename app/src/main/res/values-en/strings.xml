@@ -134,7 +134,7 @@
     <string name="profile_edit_phone_required">Please enter your phone number.</string>
     <string name="profile_edit_phone_invalid">The phone number is invalid.</string>
     <string name="profile_edit_save_success">Profile changes saved.</string>
-    <string name="profile_edit_name_update_failed">Could not update the name</string>
+    <string name="profile_edit_avatar_update_failed">Your details were saved, but the profile photo was not updated. Please try again.</string>
     <string name="profile_edit_no_connection">No connection</string>
     <string name="profile_settings_title">Settings</string>
     <string name="profile_settings_back_description">Back to profile</string>

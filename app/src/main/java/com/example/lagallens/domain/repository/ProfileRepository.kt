@@ -8,5 +8,9 @@ interface ProfileRepository {
     suspend fun clearSessionData(): Boolean = true
 }
 
-class ProfileNameUpdateException(val savedProfile: UserProfile, cause: Exception) :
-    Exception("Could not update the profile name", cause)
+/** The backend rejected the phone number; nothing was saved. */
+class ProfilePhoneRejectedException(cause: Exception) : Exception("The phone number was rejected", cause)
+
+/** The name and phone were saved, but the new avatar was not; [savedProfile] is what the backend now holds. */
+class ProfileAvatarUpdateException(val savedProfile: UserProfile, cause: Exception) :
+    Exception("Could not update the profile avatar", cause)

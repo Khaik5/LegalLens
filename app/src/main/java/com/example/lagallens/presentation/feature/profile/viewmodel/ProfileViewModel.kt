@@ -8,7 +8,8 @@ import com.example.lagallens.R
 import com.example.lagallens.core.network.ApiFailureKind
 import com.example.lagallens.core.network.ApiFailureMapper
 import com.example.lagallens.domain.model.EmploymentContractRisk
-import com.example.lagallens.domain.repository.ProfileNameUpdateException
+import com.example.lagallens.domain.repository.ProfileAvatarUpdateException
+import com.example.lagallens.domain.repository.ProfilePhoneRejectedException
 import com.example.lagallens.presentation.feature.profile.contract.ProfileUiEffect
 import com.example.lagallens.presentation.feature.profile.contract.ProfileUiEvent
 import com.example.lagallens.presentation.feature.profile.contract.ProfileUiState
@@ -109,17 +110,18 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
             } catch (cancellation: CancellationException) {
                 throw cancellation
             } catch (failure: Exception) {
-                val nameFailure = failure as? ProfileNameUpdateException
-                val apiFailure = ApiFailureMapper.map(nameFailure?.cause ?: failure)
+                val avatarFailure = failure as? ProfileAvatarUpdateException
+                val apiFailure = ApiFailureMapper.map(avatarFailure?.cause ?: failure)
                 val message = when {
+                    failure is ProfilePhoneRejectedException -> R.string.profile_edit_phone_invalid
                     apiFailure.kind == ApiFailureKind.NETWORK ||
                         (apiFailure.kind == ApiFailureKind.TIMEOUT && apiFailure.statusCode == null) ->
                         R.string.profile_edit_no_connection
-                    nameFailure != null -> R.string.profile_edit_name_update_failed
+                    avatarFailure != null -> R.string.profile_edit_avatar_update_failed
                     else -> R.string.profile_backend_not_configured
                 }
                 _uiState.update { state ->
-                    val saved = nameFailure?.savedProfile
+                    val saved = avatarFailure?.savedProfile
                     if (saved == null) {
                         state.copy(isSaving = false)
                     } else {
