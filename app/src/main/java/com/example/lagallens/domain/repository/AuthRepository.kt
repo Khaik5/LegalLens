@@ -16,6 +16,11 @@ interface AuthRepository {
     fun currentUserId(): String? = null
 
     suspend fun restoreSession(): SessionRestoreResult
+
+    /**
+     * Returns false for wrong credentials. Throws [AccountNotVerifiedException] when the password is right
+     * but the account's email has not been verified yet.
+     */
     suspend fun authenticate(username: String, password: String): Boolean
     suspend fun register(fullName: String, email: String, password: String): AuthResult<OtpChallenge?>
     suspend fun resendOtp(email: String, purpose: OtpPurpose): AuthResult<OtpChallenge>
@@ -25,3 +30,6 @@ interface AuthRepository {
     suspend fun logout(): Boolean
     suspend fun changePassword(currentPassword: String, newPassword: String): ChangePasswordResult
 }
+
+/** The account exists and the password is right, but its email must be verified before signing in. */
+class AccountNotVerifiedException : Exception("Account email verification is required")
