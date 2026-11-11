@@ -20,7 +20,6 @@
         android:id="@+id/camera_capture_preview_overlay"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="@color/camera_preview_overlay"
         android:importantForAccessibility="no"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
