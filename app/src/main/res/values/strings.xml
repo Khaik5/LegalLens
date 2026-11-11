@@ -167,7 +167,7 @@
     <string name="profile_edit_phone_required">Vui lòng nhập số điện thoại.</string>
     <string name="profile_edit_phone_invalid">Số điện thoại chưa hợp lệ.</string>
     <string name="profile_edit_save_success">Đã lưu thay đổi hồ sơ.</string>
-    <string name="profile_edit_name_update_failed">Không cập nhật được tên</string>
+    <string name="profile_edit_avatar_update_failed">Đã lưu thông tin nhưng chưa cập nhật được ảnh đại diện. Vui lòng thử lại.</string>
     <string name="profile_edit_no_connection">Không có kết nối</string>
     <string name="profile_settings_title">Cài đặt</string>
     <string name="profile_settings_back_description">Quay lại hồ sơ</string>
