@@ -10,6 +10,7 @@ import android.text.method.PasswordTransformationMethod
 import android.text.method.SingleLineTransformationMethod
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -25,7 +26,9 @@ import com.example.lagallens.R
 import com.example.lagallens.LegalLensApplication
 import com.example.lagallens.di.AppDataMode
 import com.example.lagallens.databinding.ActivityLoginBinding
+import com.example.lagallens.domain.model.auth.OtpPurpose
 import com.example.lagallens.presentation.feature.forgotpassword.ui.ForgotPasswordActivity
+import com.example.lagallens.presentation.feature.otp.ui.OtpVerificationActivity
 import com.example.lagallens.presentation.feature.register.ui.RegisterActivity
 import com.example.lagallens.presentation.feature.main.ui.MainActivity
 import com.example.lagallens.presentation.feature.login.contract.LoginUiEffect
@@ -41,9 +44,8 @@ import kotlinx.coroutines.launch
 class LoginActivity : AppCompatActivity() {
     private val binding by lazy { ActivityLoginBinding.inflate(layoutInflater) }
     private val viewModel by viewModels<LoginViewModel> {
-        LoginViewModelFactory(
-            (application as LegalLensApplication).authenticateUserUseCase
-        )
+        val app = application as LegalLensApplication
+        LoginViewModelFactory(app.authenticateUserUseCase, app.resendOtpUseCase)
     }
     private var wasLoading = false
 
@@ -165,6 +167,14 @@ class LoginActivity : AppCompatActivity() {
                 viewModel.uiEffect.collect { effect ->
                     when (effect) {
                         LoginUiEffect.CloseScreen -> finish()
+                        is LoginUiEffect.NavigateToAccountVerification -> {
+                            Toast.makeText(this@LoginActivity, R.string.login_account_not_verified, Toast.LENGTH_LONG).show()
+                            startActivity(
+                                OtpVerificationActivity.createIntent(
+                                    this@LoginActivity, effect.email, OtpPurpose.REGISTRATION, effect.challenge
+                                )
+                            )
+                        }
                         LoginUiEffect.NavigateToForgotPassword -> {
                             startActivity(Intent(this@LoginActivity, ForgotPasswordActivity::class.java))
                         }
