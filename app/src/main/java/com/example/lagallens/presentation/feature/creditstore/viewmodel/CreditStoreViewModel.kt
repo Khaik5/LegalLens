@@ -47,7 +47,12 @@ class CreditStoreViewModel(
                 val offers = paymentRepository.getPackages()
                 if (isOwnerSession()) _uiState.update { state ->
                     state.copy(isLoading = false, packages = offers.map { offer ->
-                        CreditPackage(offer.id, offer.credits, offer.priceVnd, offer.title, offer.description, offer.isRecommended)
+                        CreditPackage(
+                            offer.id, offer.credits, offer.priceVnd, offer.title, offer.description,
+                            // The recommended package starts selected, so Top up works without an extra tap.
+                            isSelected = offer.isRecommended,
+                            isRecommended = offer.isRecommended
+                        )
                     })
                 }
             } catch (cancellation: CancellationException) {

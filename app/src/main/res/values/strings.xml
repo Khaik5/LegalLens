@@ -149,7 +149,7 @@
     <string name="profile_change_password">Đổi mật khẩu</string>
     <string name="profile_notification_settings">Cài đặt thông báo</string>
     <string name="profile_privacy">Bảo mật &amp; Quyền riêng tư</string>
-    <string name="profile_appearance">Giao diện &amp; Ngôn ngữ</string>
+    <string name="profile_appearance">Ngôn ngữ</string>
     <string name="profile_about">Về LegalLens</string>
     <string name="profile_sign_out">Đăng xuất tài khoản</string>
     <string name="profile_sign_out_title">Đăng xuất?</string>
@@ -218,7 +218,7 @@
     <string name="profile_password_rate_limited">Bạn đã gửi quá nhiều yêu cầu. Vui lòng thử lại sau.</string>
     <string name="profile_password_requirements_not_met">Mật khẩu mới chưa đáp ứng yêu cầu bảo mật.</string>
     <string name="profile_password_current_incorrect">Mật khẩu hiện tại không đúng.</string>
-    <string name="profile_password_updated">Đã cập nhật mật khẩu DEMO.</string>
+    <string name="profile_password_updated">Đã cập nhật mật khẩu.</string>
     <string name="profile_password_same_as_current">Mật khẩu mới phải khác mật khẩu hiện tại.</string>
     <string name="add_contract">Thêm hợp đồng</string>
     <string name="unavailable_feature_title">%1$s</string>
@@ -365,13 +365,7 @@
     <string name="onboarding_next">Tiếp theo</string>
     <string name="contract_search_back_description">Quay lại danh sách hợp đồng</string>
     <string name="contract_search_clear_description">Xóa nội dung tìm kiếm</string>
-    <string name="contract_search_recent_title">TÌM KIẾM GẦN ĐÂY</string>
-    <string name="contract_search_recent_bitexco" translatable="false">Hợp đồng thuê Bitexco</string>
-    <string name="contract_search_recent_nda" translatable="false">Rủi ro NDA</string>
-    <string name="contract_search_recent_labor" translatable="false">Hợp đồng lao động mẫu</string>
-    <string name="contract_search_recent_equipment" translatable="false">Thiết bị văn phòng</string>
     <string name="contract_search_results">KẾT QUẢ TÌM KIẾM (%1$d)</string>
-    <string name="contract_search_default_query" translatable="false">Hợp đồng lao động</string>
     <string name="contract_vehicle_lease" translatable="false">HĐ Thuê xe đưa đón nhân viên</string>
     <string name="contract_office_lease_search_subtitle" translatable="false">Dịch vụ · 24/10/2026</string>
     <string name="contract_vehicle_lease_search_subtitle" translatable="false">Dịch vụ · 10/10/2026</string>
@@ -412,7 +406,7 @@
     <string name="contract_detail_delete_dialog_title">Xóa hợp đồng?</string>
     <string name="contract_detail_delete_dialog_message">Hành động này sẽ xóa vĩnh viễn tệp hợp đồng và toàn bộ dữ liệu phân tích AI liên quan. Bạn không thể hoàn tác hành động này.</string>
     <string name="contract_detail_delete_forever">Xóa vĩnh viễn</string>
-    <string name="contract_detail_type_service">Hợp đồng dịch vụ thuê tài sản</string>
+    <string name="contract_detail_type_service">Hợp đồng dịch vụ</string>
     <string name="contract_detail_type_employment">Hợp đồng lao động</string>
     <string name="contract_detail_type_commercial">Hợp đồng thương mại</string>
     <string name="contract_detail_office_created_at" translatable="false">20/10/2026</string>
@@ -867,12 +861,6 @@
     <string name="credit_store_package_100_description">Minh họa: 449.000đ</string>
     <string name="credit_store_history_title">Lịch sử giao dịch</string>
     <string name="credit_store_view_all">Xem tất cả</string>
-    <string name="credit_store_history_purchase_title">Mua Credit</string>
-    <string name="credit_store_history_purchase_description">15 Credits · Minh họa: 79.000đ</string>
-    <string name="credit_store_history_purchase_amount" translatable="false">+15</string>
-    <string name="credit_store_history_unlock_title">Mở khóa kết quả</string>
-    <string name="credit_store_history_unlock_description">Phân tích hợp đồng · 2 Credits</string>
-    <string name="credit_store_history_unlock_amount" translatable="false">−2</string>
     <string name="unlock_confirmation_title">Xác nhận mở khóa</string>
     <string name="unlock_confirmation_back_description">Quay lại</string>
     <string name="unlock_confirmation_shield_description">Mở khóa kết quả AI</string>
@@ -926,17 +914,15 @@
     <string name="credit_flow_view_analysis_history">Về lịch sử phân tích</string>
     <string name="credit_flow_insufficient_title">Mở kết quả AI</string>
     <string name="credit_flow_insufficient_heading">Không đủ Credit để mở khóa</string>
-    <string name="credit_flow_insufficient_description" translatable="false">Bạn cần 2 Credit để mở 100% kết quả AI. Hiện tại bạn có 1 Credit, còn thiếu 1 Credit.</string>
+    <string name="credit_flow_insufficient_description">Bạn cần %1$d Credits để mở toàn bộ kết quả AI. Hiện tại bạn có %2$d Credits, còn thiếu %3$d Credits.</string>
     <string name="credit_flow_viewing_result">Kết quả AI đang xem</string>
-    <string name="credit_flow_result_reference" translatable="false">HĐ Thuê văn phòng tòa nhà Bitexco · KQ-1042</string>
     <string name="credit_flow_required_credits">Credit cần để mở</string>
     <string name="credit_flow_available_credits">Credit hiện có</string>
     <string name="credit_flow_need_top_up">Cần nạp thêm</string>
     <string name="credit_flow_one_credit" translatable="false">1 Credit</string>
-    <string name="credit_flow_two_credits" translatable="false">2 Credit</string>
     <string name="credit_flow_insufficient_note">Chưa trừ Credit nào. Credit chỉ trừ sau khi bạn xác nhận mở kết quả.</string>
     <string name="credit_flow_risk_warning_title">Cảnh báo rủi ro quan trọng</string>
-    <string name="credit_flow_risk_warning_body" translatable="false">Điều khoản chấm dứt hợp đồng có thể thiếu báo trước, ảnh hưởng đến quyền lợi của bên thuê.</string>
+    <string name="credit_flow_risk_warning_body">Các mục phân tích đang bị khóa có thể chứa rủi ro quan trọng với quyền lợi của bạn. Hãy mở khóa hoặc đọc kỹ hợp đồng gốc.</string>
     <string name="credit_flow_preview_note" formatted="false">Bạn vẫn dùng tất cả chức năng và xem trước 40% kết quả mới khi hết Credit.</string>
     <string name="credit_flow_go_to_store">Đến Cửa hàng Credit</string>
     <string name="credit_flow_continue_free">Tiếp tục xem miễn phí</string>
