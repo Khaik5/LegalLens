@@ -32,10 +32,10 @@
     <string name="chatbot_help_attachment_title">Đính kèm tài liệu</string>
     <string name="chatbot_help_attachment_body">1. Nhấn biểu tượng kẹp giấy cạnh ô nhập trong cuộc trò chuyện.\n\n2. Chọn tài liệu bạn có quyền sử dụng và kiểm tra tên tệp.\n\n3. Nhập câu hỏi rồi nhấn gửi khi chức năng gửi tệp được kết nối.\n\nHiện tại tệp chỉ được chọn để xem trước, chưa gửi tới AI.</string>
     <string name="chatbot_help_questions">Bạn có thể hỏi</string>
-    <string name="chatbot_help_question_term" translatable="false">Thời hạn hợp đồng thuê là bao lâu?</string>
-    <string name="chatbot_help_question_payment" translatable="false">Tiền thuê và ngày thanh toán được quy định thế nào?</string>
-    <string name="chatbot_help_question_obligations" translatable="false">Nghĩa vụ của bên thuê gồm những gì?</string>
-    <string name="chatbot_help_question_termination" translatable="false">Điều khoản chấm dứt nào cần lưu ý?</string>
+    <string name="chatbot_help_question_term">Thời hạn hợp đồng lao động là bao lâu?</string>
+    <string name="chatbot_help_question_payment">Lương và ngày trả lương được quy định thế nào?</string>
+    <string name="chatbot_help_question_obligations">Nghĩa vụ của người lao động gồm những gì?</string>
+    <string name="chatbot_help_question_termination">Điều khoản chấm dứt nào cần lưu ý?</string>
     <string name="chatbot_help_faq">Câu hỏi thường gặp</string>
     <string name="chatbot_help_faq_evidence">Làm gì khi AI trả lời thiếu căn cứ?</string>
     <string name="chatbot_help_faq_evidence_answer">Yêu cầu AI nêu điều khoản hoặc phần văn bản liên quan. Mở tài liệu gốc để đối chiếu. Nếu không tìm thấy căn cứ hoặc câu trả lời chưa rõ, không dùng kết quả đó để kết luận; hãy hỏi chuyên gia pháp lý.</string>

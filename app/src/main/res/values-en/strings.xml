@@ -106,7 +106,7 @@
     <string name="profile_settings_language_picker_title">Choose language</string>
     <string name="profile_settings_language_vietnamese">Vietnamese (VN)</string>
     <string name="profile_settings_language_english">English (US)</string>
-    <string name="profile_appearance">Appearance</string>
+    <string name="profile_appearance">Language</string>
     <string name="profile_settings_system">System</string>
     <string name="profile_settings_light">Light</string>
     <string name="profile_camera_description">Update profile picture</string>
@@ -177,7 +177,7 @@
     <string name="profile_password_rate_limited">Too many requests. Please try again later.</string>
     <string name="profile_password_requirements_not_met">The new password does not meet the security requirements.</string>
     <string name="profile_password_current_incorrect">The current password is incorrect.</string>
-    <string name="profile_password_updated">DEMO password updated.</string>
+    <string name="profile_password_updated">Password updated.</string>
     <string name="profile_password_same_as_current">New password must be different from the current password.</string>
     <string name="add_contract">Add contract</string>
     <string name="unavailable_feature_message">This screen will be connected when its corresponding feature is complete.</string>
@@ -189,7 +189,6 @@
     <string name="contract_demo_labor_part_time">Part-time employment contract · DEMO</string>
     <string name="contract_demo_labor_subtitle">Employment contract · Sample data</string>
     <string name="contract_search_hint">Search contracts...</string>
-    <string name="contract_search_default_query">Employment contract</string>
     <string name="contract_search_description">Search contracts</string>
     <string name="contract_filter_description">Filter contracts</string>
     <string name="contract_filter_all">All</string>
@@ -283,7 +282,6 @@
     <string name="camera_page_warning_description">Page has a quality warning</string>
     <string name="contract_search_back_description">Back to contract list</string>
     <string name="contract_search_clear_description">Clear search text</string>
-    <string name="contract_search_recent_title">RECENT SEARCHES</string>
     <string name="contract_search_results">SEARCH RESULTS (%1$d)</string>
     <string name="ocr_processing_title">OCR processing</string>
     <string name="ocr_processing_scanned_document_name">Scanned document</string>
@@ -492,8 +490,6 @@
     <string name="credit_store_select_package">Choose a top-up package</string>
     <string name="credit_store_history_title">Transaction history</string>
     <string name="credit_store_view_all">View all</string>
-    <string name="credit_store_history_purchase_title">Purchase Credits</string>
-    <string name="credit_store_history_unlock_title">Unlock result</string>
     <string name="credit_flow_back">Back</string>
     <string name="credit_flow_unlocked_title">Risk analysis</string>
     <string name="credit_flow_risk_summary">Risk summary</string>
@@ -502,12 +498,14 @@
     <string name="credit_flow_view_analysis_history">Go to analysis history</string>
     <string name="credit_flow_insufficient_title">Unlock AI result</string>
     <string name="credit_flow_insufficient_heading">Not enough Credits to unlock</string>
+    <string name="credit_flow_insufficient_description">You need %1$d Credits to unlock the full AI result. You have %2$d Credits, so %3$d more are needed.</string>
     <string name="credit_flow_viewing_result">AI result being viewed</string>
     <string name="credit_flow_required_credits">Credits required to unlock</string>
     <string name="credit_flow_available_credits">Available Credits</string>
     <string name="credit_flow_need_top_up">Need to top up</string>
     <string name="credit_flow_insufficient_note">No Credits have been deducted. Credits are deducted only after you confirm the unlock.</string>
     <string name="credit_flow_risk_warning_title">Important risk warning</string>
+    <string name="credit_flow_risk_warning_body">Locked analysis sections may contain risks that matter for your rights. Unlock them or read the original contract carefully.</string>
     <string name="credit_flow_go_to_store">Go to Credit store</string>
     <string name="credit_flow_continue_free">Continue viewing for free</string>
     <string name="credit_flow_purchase_title">Confirm Credit purchase</string>
@@ -722,11 +720,11 @@
     <string name="ocr_result_back_content_description">Back</string>
     <string name="ocr_result_edit">Edit</string>
     <string name="ocr_result_review">Needs review</string>
-    <string name="upload_progress_title">Simulated upload · DEMO</string>
+    <string name="upload_progress_title">Uploading file</string>
     <string name="upload_progress_back_content_description">Cancel upload</string>
     <string name="upload_progress_percentage">%1$d%%</string>
     <string name="upload_progress_status">Processing</string>
-    <string name="upload_progress_description">This progress is simulated; the file has not been sent to a server or analyzed by AI.</string>
+    <string name="upload_progress_description">Your file is being uploaded securely. Please keep the app open.</string>
     <string name="upload_progress_cancel">Cancel upload</string>
     <string name="upload_error_title">Upload error</string>
     <string name="upload_error_back_content_description">Back to file selection</string>
@@ -754,8 +752,6 @@
     <string name="credit_store_package_30_description">Sample price: 149.000đ</string>
     <string name="credit_store_package_100_description">Sample price: 449.000đ</string>
     <string name="credit_flow_package_description">Most popular · Never expires</string>
-    <string name="credit_store_history_purchase_description">15 Credits · Sample: 79.000đ</string>
-    <string name="credit_store_history_unlock_description">Contract analysis · 2 Credits</string>
     <string name="credit_flow_history_count">%1$d transactions</string>
     <string name="credit_history_empty">No transactions yet.</string>
     <string name="credit_history_row">%1$s%2$d Credits · %3$s\n%4$s</string>
@@ -776,7 +772,7 @@
     <string name="dashboard_employment_contract">Employment contract · 23/10/2026</string>
     <string name="dashboard_probation_end">Probation ends</string>
     <string name="dashboard_probation_date">Collaborator contract · 12 days remaining</string>
-    <string name="contract_detail_type_service">Property lease service contract</string>
+    <string name="contract_detail_type_service">Service contract</string>
     <string name="contract_detail_type_employment">Employment contract</string>
     <string name="contract_detail_type_commercial">Commercial contract</string>
     <string name="credit_flow_unlocked_status">KQ-1042 · UNLOCKED</string>

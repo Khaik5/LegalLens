@@ -142,7 +142,16 @@ class UnlockConfirmationActivity : AppCompatActivity() {
             UnlockConfirmationUiEffect.ShowBackendUnavailable -> Toast.makeText(this, R.string.credit_backend_not_configured, Toast.LENGTH_SHORT).show()
             UnlockConfirmationUiEffect.NavigateBack -> finish()
             UnlockConfirmationUiEffect.NavigateToInsufficientCredits -> {
-                startActivity(InsufficientCreditsActivity.createIntent(this, intent.getBooleanExtra(EXTRA_FROM_ANALYSIS, false)))
+                val state = viewModel.uiState.value
+                startActivity(
+                    InsufficientCreditsActivity.createIntent(
+                        this,
+                        fromAnalysis = intent.getBooleanExtra(EXTRA_FROM_ANALYSIS, false),
+                        contractName = intent.getStringExtra(EXTRA_CONTRACT_NAME),
+                        requiredCredits = state.unlockCost,
+                        availableCredits = state.availableCredits
+                    )
+                )
                 finish()
             }
             is UnlockConfirmationUiEffect.UnlockRequested -> {

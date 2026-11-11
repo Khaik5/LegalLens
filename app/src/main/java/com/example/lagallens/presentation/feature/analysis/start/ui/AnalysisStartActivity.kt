@@ -106,7 +106,7 @@ class AnalysisStartActivity : AppCompatActivity() {
                 val session = ownerSession
                 if (navigated) return
                 if (session.isNullOrBlank() || session != (application as com.example.lagallens.LegalLensApplication).currentSessionKey()) {
-                    android.widget.Toast.makeText(this, R.string.auth_backend_not_configured, android.widget.Toast.LENGTH_LONG).show()
+                    android.widget.Toast.makeText(this, R.string.operation_session_error, android.widget.Toast.LENGTH_LONG).show()
                     return
                 }
                 navigated = true
