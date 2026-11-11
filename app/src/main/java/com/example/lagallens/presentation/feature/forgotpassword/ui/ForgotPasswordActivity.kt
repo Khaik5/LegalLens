@@ -6,8 +6,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doAfterTextChanged
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.doOnPreDraw
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -19,6 +17,7 @@ import com.example.lagallens.presentation.feature.forgotpassword.contract.Forgot
 import com.example.lagallens.presentation.feature.forgotpassword.contract.ForgotPasswordUiEvent
 import com.example.lagallens.presentation.feature.forgotpassword.viewmodel.ForgotPasswordViewModel
 import com.example.lagallens.presentation.common.utils.animateContentEntrance
+import com.example.lagallens.presentation.common.utils.applySystemBarAndKeyboardInsets
 import com.example.lagallens.presentation.common.utils.animateLoadingFeedback
 import com.example.lagallens.presentation.common.utils.bindPressFeedback
 import kotlinx.coroutines.launch
@@ -38,11 +37,7 @@ class ForgotPasswordActivity : AppCompatActivity() {
         bindView()
         collectState()
         collectEffect()
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
+        binding.root.applySystemBarAndKeyboardInsets()
     }
 
     private fun bindView() {
@@ -63,8 +58,11 @@ class ForgotPasswordActivity : AppCompatActivity() {
     }
 
     private fun playEntranceMotion() {
-        binding.forgotPasswordScroll.doOnPreDraw {
-            binding.forgotPasswordScroll.animateContentEntrance(resources.getDimension(com.example.lagallens.R.dimen.dp_16))
+        binding.root.doOnPreDraw {
+            val distance = resources.getDimension(com.example.lagallens.R.dimen.dp_16)
+            listOf(binding.forgotPasswordHeader, binding.forgotPasswordScroll, binding.forgotPasswordBottomBar).forEach {
+                it.animateContentEntrance(distance)
+            }
         }
     }
 

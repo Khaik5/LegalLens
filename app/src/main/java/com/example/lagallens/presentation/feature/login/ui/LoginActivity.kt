@@ -15,8 +15,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.doOnPreDraw
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.Lifecycle
@@ -37,6 +35,7 @@ import com.example.lagallens.presentation.feature.login.contract.LoginUiState
 import com.example.lagallens.presentation.feature.login.viewmodel.LoginViewModel
 import com.example.lagallens.presentation.feature.login.viewmodel.LoginViewModelFactory
 import com.example.lagallens.presentation.common.utils.animateContentEntrance
+import com.example.lagallens.presentation.common.utils.applySystemBarAndKeyboardInsets
 import com.example.lagallens.presentation.common.utils.animateLoadingFeedback
 import com.example.lagallens.presentation.common.utils.bindPressFeedback
 import kotlinx.coroutines.launch
@@ -61,11 +60,7 @@ class LoginActivity : AppCompatActivity() {
         bindText()
         collectState()
         collectEffect()
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
+        binding.root.applySystemBarAndKeyboardInsets()
     }
 
     private fun bindView() {
@@ -95,8 +90,11 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun playEntranceMotion() {
-        binding.loginScroll.doOnPreDraw {
-            binding.loginScroll.animateContentEntrance(resources.getDimension(R.dimen.dp_16))
+        binding.root.doOnPreDraw {
+            val distance = resources.getDimension(R.dimen.dp_16)
+            listOf(binding.loginHeader, binding.loginScroll, binding.loginBottomBar).forEach {
+                it.animateContentEntrance(distance)
+            }
         }
     }
 

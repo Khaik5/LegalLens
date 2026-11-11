@@ -28,6 +28,7 @@ import com.example.lagallens.presentation.feature.profile.password.contract.Prof
 import com.example.lagallens.presentation.feature.profile.password.contract.ProfilePasswordUiState
 import com.example.lagallens.presentation.feature.profile.password.viewmodel.ProfilePasswordViewModel
 import kotlinx.coroutines.launch
+import com.example.lagallens.presentation.common.utils.applySystemBarAndKeyboardInsets
 
 class ProfilePasswordFragment : Fragment() {
     private var _binding: FragmentProfilePasswordBinding? = null
@@ -49,6 +50,8 @@ class ProfilePasswordFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        // The nav host already pads for the status bar; this keeps the Save button above the keyboard.
+        binding.root.applySystemBarAndKeyboardInsets(top = false)
         bindViews()
         observeViewModel()
     }
