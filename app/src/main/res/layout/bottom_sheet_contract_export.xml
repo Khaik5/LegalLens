@@ -11,7 +11,6 @@
     </LinearLayout>
     <View android:layout_width="match_parent" android:layout_height="@dimen/dp_1" android:layout_marginTop="@dimen/dp_16" android:background="@color/legal_lens_input_stroke" />
     <TextView android:id="@+id/exportDescription" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/dp_16" android:text="@string/contract_export_description" android:textColor="@color/legal_lens_secondary_text" android:textSize="@dimen/sp_13" />
-    <TextView android:id="@+id/exportDemoNotice" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/dp_8" android:text="@string/contract_export_demo_notice" android:textColor="@color/legal_lens_secondary_text" android:textSize="@dimen/sp_12" />
     <LinearLayout android:id="@+id/exportStatus" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/dp_16" android:background="@drawable/bg_compare_notice" android:gravity="center_vertical" android:orientation="horizontal" android:padding="@dimen/dp_12" android:visibility="gone">
         <ProgressBar android:id="@+id/exportProgress" android:layout_width="@dimen/dp_24" android:layout_height="@dimen/dp_24" android:indeterminateTint="@color/legal_lens_auth_accent" android:visibility="gone" />
         <ImageView android:id="@+id/exportStatusIcon" android:layout_width="@dimen/dp_24" android:layout_height="@dimen/dp_24" android:contentDescription="@null" />
