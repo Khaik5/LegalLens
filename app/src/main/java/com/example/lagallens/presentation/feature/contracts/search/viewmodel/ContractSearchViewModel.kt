@@ -3,9 +3,9 @@ package com.example.lagallens.presentation.feature.contracts.search.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.lagallens.R
 import com.example.lagallens.LegalLensApplication
 import com.example.lagallens.domain.model.EmploymentContract
+import com.example.lagallens.presentation.feature.contracts.contract.labelRes
 import com.example.lagallens.presentation.feature.contracts.search.contract.ContractSearchResult
 import com.example.lagallens.presentation.feature.contracts.search.contract.ContractSearchUiEffect
 import com.example.lagallens.presentation.feature.contracts.search.contract.ContractSearchUiEvent
@@ -24,13 +24,18 @@ internal fun ContractSearchResult.matchesQuery(query: String): Boolean {
         searchKeywords.any { it.lowercase().contains(normalizedQuery) }
 }
 
+/** Matches only what belongs to this contract: its title, text, file name and type. */
+internal fun EmploymentContract.toSearchResult(typeLabel: String) = ContractSearchResult(
+    contractId = id,
+    titleRes = type.labelRes(),
+    subtitleRes = type.labelRes(),
+    searchKeywords = listOf(title, content, fileName, typeLabel).filter(String::isNotBlank),
+    titleOverride = title,
+    subtitleOverride = typeLabel
+)
+
 class ContractSearchViewModel(application: Application) : AndroidViewModel(application) {
-    private val initialQuery = application.getString(R.string.contract_search_default_query)
-    private val _uiState = MutableStateFlow(
-        ContractSearchUiState(
-            query = initialQuery
-        )
-    )
+    private val _uiState = MutableStateFlow(ContractSearchUiState(query = ""))
     val uiState = _uiState.asStateFlow()
 
     private val _uiEffect = Channel<ContractSearchUiEffect>(Channel.BUFFERED)
@@ -57,7 +62,6 @@ class ContractSearchViewModel(application: Application) : AndroidViewModel(appli
     fun onEvent(event: ContractSearchUiEvent) {
         when (event) {
             is ContractSearchUiEvent.QueryChanged -> updateQuery(event.query)
-            is ContractSearchUiEvent.RecentSearchClicked -> updateQuery(event.query)
             ContractSearchUiEvent.ClearClicked -> updateQuery("")
             ContractSearchUiEvent.BackClicked -> navigateBack()
             is ContractSearchUiEvent.ResultClicked -> navigateToDetail(event.result.contractId)
@@ -75,16 +79,7 @@ class ContractSearchViewModel(application: Application) : AndroidViewModel(appli
 
     private fun activeResults(): List<ContractSearchResult> {
         val context = getApplication<Application>()
-        return contracts.map { contract ->
-            val template = ContractSearchResult.samples.firstOrNull { it.contractId == contract.id }
-                ?: ContractSearchResult.samples.first()
-            template.copy(
-                contractId = contract.id,
-                titleOverride = contract.title,
-                subtitleOverride = context.getString(R.string.contract_demo_labor_subtitle),
-                searchKeywords = listOf(contract.title, contract.content, "hợp đồng lao động", "người lao động")
-            )
-        }
+        return contracts.map { contract -> contract.toSearchResult(context.getString(contract.type.labelRes())) }
     }
 
     private fun navigateBack() {

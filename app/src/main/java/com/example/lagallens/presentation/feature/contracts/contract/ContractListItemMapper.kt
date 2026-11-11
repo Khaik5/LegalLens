@@ -1,10 +1,19 @@
 package com.example.lagallens.presentation.feature.contracts.contract
 
+import androidx.annotation.StringRes
 import com.example.lagallens.R
 import com.example.lagallens.domain.model.EmploymentContract
 import com.example.lagallens.domain.model.EmploymentContractRisk
 import com.example.lagallens.domain.model.EmploymentContractStatus
 import com.example.lagallens.domain.model.EmploymentContractType
+
+/** Display name of the contract type, used as the subtitle wherever a contract is listed. */
+@StringRes
+fun EmploymentContractType.labelRes(): Int = when (this) {
+    EmploymentContractType.EMPLOYMENT -> R.string.contract_detail_type_employment
+    EmploymentContractType.SERVICE -> R.string.contract_detail_type_service
+    EmploymentContractType.COMMERCIAL -> R.string.contract_detail_type_commercial
+}
 
 /** Every displayed value comes from the contract, so any stored or backend contract renders the same way. */
 fun EmploymentContract.toContractListItem(subtitle: String): ContractListItem {
@@ -47,11 +56,12 @@ fun EmploymentContract.toContractListItem(subtitle: String): ContractListItem {
         riskLevel == ContractRiskLevel.NOT_ANALYZED -> R.color.legal_lens_secondary_text
         else -> R.color.contract_complete
     }
-    val (contractType, detailTypeRes) = when (type) {
-        EmploymentContractType.EMPLOYMENT -> ContractType.EMPLOYMENT to R.string.contract_detail_type_employment
-        EmploymentContractType.SERVICE -> ContractType.SERVICE to R.string.contract_detail_type_service
-        EmploymentContractType.COMMERCIAL -> ContractType.COMMERCIAL to R.string.contract_detail_type_commercial
+    val contractType = when (type) {
+        EmploymentContractType.EMPLOYMENT -> ContractType.EMPLOYMENT
+        EmploymentContractType.SERVICE -> ContractType.SERVICE
+        EmploymentContractType.COMMERCIAL -> ContractType.COMMERCIAL
     }
+    val detailTypeRes = type.labelRes()
     return ContractListItem(
         id = id,
         statusRes = statusRes,

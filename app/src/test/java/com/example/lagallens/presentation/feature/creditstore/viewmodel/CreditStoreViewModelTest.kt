@@ -33,6 +33,17 @@ class CreditStoreViewModelTest {
         }
     }
 
+    @Test fun recommendedFlagComesFromThePackageAndStartsSelected() = runTest {
+        val model = CreditStoreViewModel(CreditDemoLedger(initialBalance = 5), com.example.lagallens.TestPaymentRepository())
+
+        val packages = model.uiState.value.packages
+
+        assertEquals(listOf("credits_15"), packages.filter { it.isRecommended }.map { it.id })
+        assertEquals(listOf("credits_15"), packages.filter { it.isSelected }.map { it.id })
+        model.onEvent(CreditStoreUiEvent.PackageClicked("credits_30"))
+        assertEquals(listOf("credits_15"), model.uiState.value.packages.filter { it.isRecommended }.map { it.id })
+    }
+
     @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
     @Test fun queuedNavigationFromOldGenerationIsDiscarded() = runTest {
         kotlinx.coroutines.Dispatchers.setMain(kotlinx.coroutines.test.StandardTestDispatcher(testScheduler))

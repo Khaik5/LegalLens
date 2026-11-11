@@ -14,5 +14,7 @@ data class CreditPackage(
     val priceVnd: Long,
     val title: String,
     val description: String,
-    val isSelected: Boolean = false
+    val isSelected: Boolean = false,
+    /** Set by the package data source; drives the "most popular" label. */
+    val isRecommended: Boolean = false
 )
