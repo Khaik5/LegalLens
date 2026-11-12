@@ -17,7 +17,12 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.navOptions
+import androidx.activity.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import com.example.lagallens.presentation.feature.main.contract.MainNavigationUiEvent
+import com.example.lagallens.presentation.feature.main.viewmodel.MainNavigationViewModel
 import com.example.lagallens.LegalLensApplication
 import com.example.lagallens.R
 import com.example.lagallens.presentation.feature.login.ui.LoginActivity
@@ -34,6 +39,10 @@ import com.example.lagallens.presentation.feature.upload.ui.UploadSourceActivity
 class MainActivity : AppCompatActivity() {
     private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
     private val premiumSticker by lazy { FloatingPremiumSticker(this) }
+    private val navigationViewModel by viewModels<MainNavigationViewModel> {
+        val app = application as LegalLensApplication
+        MainNavigationViewModel.Factory(app.notificationRepository, app.observeSessionKeys(), app::currentSessionKey)
+    }
     private var isResumed = false
     private var hasSelectedTab = false
     private var passwordChangePending = false
@@ -59,6 +68,7 @@ class MainActivity : AppCompatActivity() {
             expandHeightForBottomInset = true
         )
         bindPremiumSticker()
+        collectNavigationState()
 
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.mainNavHost) as NavHostFragment
         val navController = navHostFragment.navController
@@ -109,8 +119,23 @@ class MainActivity : AppCompatActivity() {
         finish()
     }
 
+    private fun collectNavigationState() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                navigationViewModel.uiState.collect { state ->
+                    val badge = state.badgeText
+                    binding.navNotificationsBadge.isVisible = badge != null
+                    binding.navNotificationsBadge.text = badge
+                    binding.navNotifications.contentDescription = if (badge == null) getString(R.string.menu_notifications)
+                    else getString(R.string.notification_badge_description, state.unreadNotifications)
+                }
+            }
+        }
+    }
+
     override fun onResume() {
         super.onResume()
+        navigationViewModel.onEvent(MainNavigationUiEvent.ScreenResumed)
         isResumed = true
         premiumSticker.setMotionActive(binding.premiumStickerLayer.isVisible)
     }

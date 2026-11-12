@@ -113,6 +113,10 @@
     <string name="menu_calendar">Lịch</string>
     <string name="menu_notifications">Thông báo</string>
     <string name="notification_mark_all_read">Đọc tất cả</string>
+    <string name="notification_deleted">Đã xóa thông báo</string>
+    <string name="notification_undo">Hoàn tác</string>
+    <string name="notification_delete_failed">Không xóa được thông báo. Vui lòng thử lại.</string>
+    <string name="notification_badge_description">Thông báo, %1$d chưa đọc</string>
     <string name="notification_empty_title">Chưa có thông báo</string>
     <string name="notification_empty_description">Chúng tôi sẽ cập nhật ngay khi có thông báo mới nhất liên quan đến các hợp đồng của bạn.</string>
     <string name="notification_filter_analysis">Phân tích</string>

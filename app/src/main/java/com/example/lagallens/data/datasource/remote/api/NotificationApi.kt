@@ -3,7 +3,9 @@ package com.example.lagallens.data.datasource.remote.api
 import com.example.lagallens.core.network.AuthSessionScope
 import com.example.lagallens.data.model.response.ApiEnvelope
 import com.example.lagallens.data.model.response.NotificationPageResponse
+import com.example.lagallens.data.model.response.UnreadCountResponse
 import retrofit2.Response
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.PATCH
 import retrofit2.http.Path
@@ -25,6 +27,13 @@ interface NotificationApi {
     /** 204 without a body. */
     @PATCH("notifications/read-all")
     suspend fun markAllRead(@Tag scope: AuthSessionScope): Response<Unit>
+
+    @GET("notifications/unread-count")
+    suspend fun unreadCount(@Tag scope: AuthSessionScope): ApiEnvelope<UnreadCountResponse>
+
+    /** 204 without a body. */
+    @DELETE("notifications/{id}")
+    suspend fun delete(@Tag scope: AuthSessionScope, @Path("id") id: String): Response<Unit>
 
     companion object {
         const val PAGE_SIZE = 100

@@ -94,6 +94,10 @@
     <string name="dashboard_view_all">View all</string>
     <string name="dashboard_upcoming_dates">Upcoming important dates</string>
     <string name="notification_mark_all_read">Mark all read</string>
+    <string name="notification_deleted">Notification deleted</string>
+    <string name="notification_undo">Undo</string>
+    <string name="notification_delete_failed">Could not delete the notification. Please try again.</string>
+    <string name="notification_badge_description">Notifications, %1$d unread</string>
     <string name="notification_empty_title">No notifications yet</string>
     <string name="notification_empty_description">We’ll update you when there are new notifications about your contracts.</string>
     <string name="notification_filter_analysis">Analysis</string>

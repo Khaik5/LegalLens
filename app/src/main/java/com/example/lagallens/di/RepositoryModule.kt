@@ -64,6 +64,9 @@ import com.example.lagallens.data.datasource.remote.api.CreditApi
 import com.example.lagallens.data.repository.FakePaymentRepository
 import com.example.lagallens.data.repository.FakeCreditRepository
 import com.example.lagallens.data.repository.RemoteProfileRepository
+import com.example.lagallens.data.repository.RemoteProfileSettingsRepository
+import com.example.lagallens.data.datasource.remote.ProfilePreferencesRemoteDataSource
+import com.example.lagallens.data.datasource.remote.api.ProfilePreferencesApi
 import com.example.lagallens.data.repository.SessionScopedDraftRepository
 import com.example.lagallens.data.datasource.local.datastore.AccountStorageName
 import com.example.lagallens.data.repository.SessionScopedEmploymentRepositories
@@ -239,8 +242,13 @@ object RepositoryModule {
         return OnboardingPreferencesRepository(OnboardingPreferencesDataSource(context))
     }
 
-    fun provideProfileSettingsRepository(context: Context): ProfileSettingsRepository {
-        return ProfileSettingsRepositoryImpl(ProfileSettingsLocalDataSource(context))
+    fun provideProfileSettingsRepository(context: Context): ProfileSettingsRepository = when (DataModeConfig.current) {
+        AppDataMode.DEMO -> ProfileSettingsRepositoryImpl(ProfileSettingsLocalDataSource(context))
+        AppDataMode.REAL -> RemoteProfileSettingsRepository(
+            ProfileSettingsLocalDataSource(context),
+            EncryptedTokenStore(context),
+            ProfilePreferencesRemoteDataSource(lazy { authenticatedRetrofit(context).create(ProfilePreferencesApi::class.java) })
+        )
     }
 
     fun provideProfileRepository(
