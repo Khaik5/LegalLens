@@ -6,7 +6,9 @@ import com.example.lagallens.data.datasource.remote.api.NotificationApi
 import com.example.lagallens.data.model.response.ApiEnvelope
 import com.example.lagallens.data.model.response.NotificationPageResponse
 import com.example.lagallens.data.model.response.NotificationResponse
+import com.example.lagallens.data.model.response.UnreadCountResponse
 import com.example.lagallens.domain.model.NotificationKind
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
@@ -88,6 +90,42 @@ class RemoteNotificationRepositoryTest {
         }
     }
 
+    @Test fun unreadCountFollowsListingReadingAndDeleting() = runTest {
+        api.items = listOf(notification(1, "SYSTEM"), notification(2, "SYSTEM"), notification(3, "SYSTEM", isRead = true))
+
+        repository.getAllForSession("session")
+        assertEquals(2, repository.observeUnreadCount().first())
+
+        api.items = api.items.map { if (it.id == 1L) it.copy(isRead = true) else it }
+        repository.markReadForSession("session", "1")
+        assertEquals(1, repository.observeUnreadCount().first())
+
+        repository.deleteForSession("session", "2")
+        assertEquals(listOf("2"), api.deletedIds)
+        assertEquals(0, repository.observeUnreadCount().first())
+    }
+
+    @Test fun markAllReadClearsTheCount() = runTest {
+        api.items = listOf(notification(1, "SYSTEM"))
+        repository.refreshUnreadCount("session")
+        assertEquals(1, repository.observeUnreadCount().first())
+
+        repository.markAllReadForSession("session")
+
+        assertEquals(0, repository.observeUnreadCount().first())
+    }
+
+    @Test fun failedDeleteIsReportedAndKeepsTheCount() = runTest {
+        api.items = listOf(notification(1, "SYSTEM"))
+        repository.refreshUnreadCount("session")
+        api.deleteCode = 500
+
+        val failure = runCatching { repository.deleteForSession("session", "1") }.exceptionOrNull()
+
+        assertTrue(failure is HttpException)
+        assertEquals(1, repository.observeUnreadCount().first())
+    }
+
     @Test fun requestForAnotherSessionIsRejectedBeforeCallingTheBackend() = runTest {
         val failure = runCatching { repository.getAllForSession("old-session") }.exceptionOrNull()
 
@@ -101,6 +139,8 @@ class RemoteNotificationRepositoryTest {
         val readIds = mutableListOf<String>()
         var readAllCalls = 0
         var markReadCode = 204
+        var deleteCode = 204
+        val deletedIds = mutableListOf<String>()
 
         override suspend fun list(scope: AuthSessionScope, page: Int, limit: Int): ApiEnvelope<NotificationPageResponse> {
             pages += page
@@ -116,6 +156,16 @@ class RemoteNotificationRepositoryTest {
 
         override suspend fun markAllRead(scope: AuthSessionScope): Response<Unit> {
             readAllCalls++
+            return Response.success(204, Unit)
+        }
+
+        override suspend fun unreadCount(scope: AuthSessionScope): ApiEnvelope<UnreadCountResponse> =
+            ApiEnvelope(true, UnreadCountResponse(items.count { !it.isRead }))
+
+        override suspend fun delete(scope: AuthSessionScope, id: String): Response<Unit> {
+            if (deleteCode != 204) return Response.error(deleteCode, "".toResponseBody())
+            deletedIds += id
+            items = items.filterNot { it.id.toString() == id }
             return Response.success(204, Unit)
         }
     }
