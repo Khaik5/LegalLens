@@ -4,6 +4,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
 import com.example.lagallens.R
+import com.example.lagallens.core.network.DocumentFiles
 import com.example.lagallens.domain.model.EmploymentContract
 import com.example.lagallens.presentation.feature.contracts.contract.ContractListItem
 import com.example.lagallens.presentation.feature.contracts.contract.ContractRiskLevel
@@ -45,8 +46,15 @@ data class ContractDetailUiState(
                 ContractRiskLevel.HIGH, ContractRiskLevel.CRITICAL -> R.drawable.bg_contract_detail_risk_high
                 else -> R.drawable.bg_contract_detail_risk
             },
-            riskTextColorRes = item.riskTextColorRes
+            riskTextColorRes = item.riskTextColorRes,
+            // Word files cannot be recognized yet, so without saved text there is nothing to show.
+            assistantActions = if (contract.isWordFile() && contract.content.isBlank()) {
+                ContractAssistantAction.entries - ContractAssistantAction.OCR_TEXT
+            } else ContractAssistantAction.entries
         )
+
+        private fun EmploymentContract.isWordFile(): Boolean =
+            mimeType == DocumentFiles.DOC || mimeType == DocumentFiles.DOCX
 
         private fun EmploymentContract.displayFileFormat(): String = when {
             mimeType.contains("pdf", ignoreCase = true) -> "PDF"

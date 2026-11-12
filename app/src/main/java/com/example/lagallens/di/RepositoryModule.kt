@@ -26,7 +26,9 @@ import com.example.lagallens.data.datasource.remote.api.ContractApi
 import com.example.lagallens.data.datasource.remote.api.UserApi
 import com.example.lagallens.data.repository.RemoteAuthRepository
 import com.example.lagallens.data.repository.UnconfiguredRemoteChatbotRepository
-import com.example.lagallens.data.repository.UnconfiguredRemoteOcrRepository
+import com.example.lagallens.data.repository.RemoteOcrRepository
+import com.example.lagallens.data.datasource.remote.OcrRemoteDataSource
+import com.example.lagallens.data.datasource.remote.api.OcrApi
 import com.example.lagallens.domain.repository.AuthRepository
 import com.example.lagallens.domain.repository.ChatbotRepository
 import com.example.lagallens.domain.repository.AnalysisRepository
@@ -141,7 +143,7 @@ object RepositoryModule {
 
     fun provideDocumentRepository(context: Context): DocumentRepository = when (DataModeConfig.current) {
         AppDataMode.DEMO -> employmentRepositories(context).documents
-        AppDataMode.REAL -> RemoteDocumentRepository(context.applicationContext, EncryptedTokenStore(context), documentRemote(context))
+        AppDataMode.REAL -> RemoteDocumentRepository(context.applicationContext, EncryptedTokenStore(context), documentRemote(context), ocrRemote(context))
     }
 
     fun provideDraftRepository(context: Context): DraftRepository = when (DataModeConfig.current) {
@@ -202,9 +204,12 @@ object RepositoryModule {
             )
         }
 
-    fun provideOcrRepository(): OcrRepository = when (DataModeConfig.current) {
+    private fun ocrRemote(context: Context) =
+        OcrRemoteDataSource(lazy { authenticatedRetrofit(context).create(OcrApi::class.java) })
+
+    fun provideOcrRepository(context: Context): OcrRepository = when (DataModeConfig.current) {
         AppDataMode.DEMO -> FakeOcrRepository()
-        AppDataMode.REAL -> UnconfiguredRemoteOcrRepository()
+        AppDataMode.REAL -> RemoteOcrRepository(EncryptedTokenStore(context), ocrRemote(context))
     }
 
     fun provideAnalysisRepository(context: Context): AnalysisRepository = when (DataModeConfig.current) {

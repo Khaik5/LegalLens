@@ -3,6 +3,7 @@ package com.example.lagallens.presentation.feature.upload.progress.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.lagallens.core.network.DocumentFiles
 import com.example.lagallens.domain.model.processing.DocumentUploadRequest
 import com.example.lagallens.domain.model.processing.ProcessingState
 import com.example.lagallens.domain.model.processing.UploadFailure
@@ -66,7 +67,7 @@ class UploadProgressViewModel(private val uploadRepository: DocumentUploadReposi
                         ProcessingState.Completed -> destination = UploadProgressEffect.NavigateToOcrProcessing(
                             event.fileName, event.fileDetails, event.documentUri, event.documentId, event.mimeType
                         )
-                        is ProcessingState.Uploaded -> destination = UploadProgressEffect.NavigateToContract(state.contractId)
+                        is ProcessingState.Uploaded -> destination = uploadedDestination(event, state)
                         is ProcessingState.Failed -> destination = UploadProgressEffect.NavigateToUploadError(state.reason)
                     }
                 }
@@ -78,6 +79,21 @@ class UploadProgressViewModel(private val uploadRepository: DocumentUploadReposi
             finishedDocumentId = event.documentId
             _effects.send(destination)
         }
+    }
+
+    /** Scans and PDF or image files continue to text recognition; Word files open their contract directly. */
+    private fun uploadedDestination(event: UploadProgressEvent.ScreenOpened, state: ProcessingState.Uploaded): UploadProgressEffect {
+        val isScan = event.scanPageUris.isNotEmpty()
+        if (!isScan && !DocumentFiles.supportsOcr(event.mimeType)) return UploadProgressEffect.NavigateToContract(state.contractId)
+        return UploadProgressEffect.NavigateToOcrProcessing(
+            fileName = event.fileName,
+            fileDetails = event.fileDetails,
+            documentUri = event.documentUri,
+            documentId = state.documentId,
+            // Scanned pages are uploaded as a single PDF, and HEIC or WebP photos as JPEG.
+            mimeType = if (isScan) DocumentFiles.PDF else DocumentFiles.uploadMimeType(event.mimeType),
+            contractId = state.contractId
+        )
     }
 
     class Factory(private val uploadRepository: DocumentUploadRepository) : ViewModelProvider.Factory {

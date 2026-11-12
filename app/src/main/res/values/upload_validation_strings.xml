@@ -4,7 +4,7 @@
     <string name="upload_source_file_too_large">Tệp vượt quá giới hạn demo 20 MB.</string>
     <string name="upload_source_file_empty">Tệp đang rỗng.</string>
     <string name="upload_source_file_unreadable">Không thể đọc tệp. Vui lòng chọn lại tệp còn truy cập được.</string>
-    <string name="upload_real_file_too_large">File vượt quá 10 MB</string>
+    <string name="upload_real_file_too_large">File vượt quá 20 MB</string>
     <string name="upload_real_unsupported_format">Định dạng không hỗ trợ</string>
     <string name="upload_scan_file_name">Hợp đồng đã quét.pdf</string>
     <string name="upload_scan_file_details">PDF · %1$d trang</string>
