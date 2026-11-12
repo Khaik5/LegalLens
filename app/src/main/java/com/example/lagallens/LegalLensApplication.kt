@@ -39,6 +39,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
@@ -153,6 +154,25 @@ class LegalLensApplication : Application() {
         }
     }
 
+    private val syncProfileSettingsUseCase by lazy {
+        com.example.lagallens.domain.usecase.SyncProfileSettingsUseCase(profileSettingsRepository)
+    }
+
+    /** Each new session takes the account's settings, so language follows the user to another device. */
+    private fun syncSettingsOnSignIn() {
+        applicationScope.launch(Dispatchers.IO) {
+            authRepository.observeSessionKeys().distinctUntilChanged().filterNotNull().collect {
+                try {
+                    syncProfileSettingsUseCase()
+                } catch (cancellation: kotlinx.coroutines.CancellationException) {
+                    throw cancellation
+                } catch (_: Exception) {
+                    // Offline or signed out meanwhile: the device copy stays and the next session retries.
+                }
+            }
+        }
+    }
+
     val syncContractRelatedDataUseCase by lazy {
         if (dataMode == AppDataMode.DEMO) {
             com.example.lagallens.domain.usecase.SyncContractRelatedDataUseCase(chatbotRepository) { session -> draftRepository.forSession(session) }
@@ -205,6 +225,7 @@ class LegalLensApplication : Application() {
         // The dark palette is incomplete and has no approved design, so the app stays light until it does.
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         clearSessionCachesOnSessionChange()
+        syncSettingsOnSignIn()
         applicationScope.launch {
             observeProfileSettingsUseCase().collectLatest { settings ->
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
