@@ -5,10 +5,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.lagallens.R
+import com.example.lagallens.core.network.ApiFailureKind
+import com.example.lagallens.core.network.ApiFailureMapper
 import com.example.lagallens.domain.model.EmploymentContract
 import com.example.lagallens.domain.model.EmploymentContractRisk
 import com.example.lagallens.domain.model.EmploymentContractStatus
 import com.example.lagallens.domain.model.EmploymentDocument
+import com.example.lagallens.domain.model.ocr.OcrResultNotReadyException
 import com.example.lagallens.domain.usecase.GetOcrResultUseCase
 import com.example.lagallens.domain.repository.ContractRepository
 import com.example.lagallens.domain.repository.DocumentRepository
@@ -70,7 +73,8 @@ class OcrResultViewModel(
                     val contract = contractRepository.getContract(event.contractId)
                     check(isOwner() && contract != null && contract.documentId == documentId && persisted?.contractId == event.contractId) { "Document unavailable" }
                 }
-                val ocrResult = if (persisted == null && event.initialContent.isBlank()) getOcrResult(documentId) else null
+                // An uploaded document without saved text still needs its recognized text.
+                val ocrResult = if (persisted?.content.isNullOrBlank() && event.initialContent.isBlank()) getOcrResult(documentId) else null
                 check(isOwner())
                 val text = persisted?.content?.takeIf(String::isNotBlank)
                     ?: event.initialContent.takeIf(String::isNotBlank)
@@ -95,13 +99,18 @@ class OcrResultViewModel(
                         warnings = ocrResult?.warnings.orEmpty(),
                         isSampleContent = ocrResult?.isSampleContent == true,
                         confidenceLabel = ocrResult?.confidenceLabel.orEmpty(),
-                        confidenceLabelRes = R.string.ocr_result_saved_content_label.takeIf { ocrResult == null },
+                        confidenceLabelRes = if (ocrResult == null) R.string.ocr_result_saved_content_label
+                            else ocrResult.confidence?.let(::confidenceLabelRes),
                         confidencePercentage = ocrResult?.confidencePercentage ?: "—",
                         errorMessageRes = null
                     )
                 }
             } catch (cancellationException: CancellationException) {
                 throw cancellationException
+            } catch (_: OcrResultNotReadyException) {
+                // The document has no text yet: recognize it first, then this screen opens again.
+                if (!isOwner()) { _uiState.value = OcrResultUiState(); return@launch }
+                emitEffect(OcrResultUiEffect.NavigateToOcrProcessing(event.documentName, event.documentDetails, documentId, event.contractId, event.mimeType))
             } catch (failure: Exception) {
                 if (!isOwner()) { _uiState.value = OcrResultUiState(); return@launch }
                 _uiState.update { it.copy(confidenceLabel = "", confidenceLabelRes = null, confidencePercentage = "", documentText = "", errorMessageRes = failure.toFailureMessage()) }
@@ -117,8 +126,10 @@ class OcrResultViewModel(
                 check(documentRepository.updateDocumentContent(current.documentId, current.contractId, text)) { "Document unavailable" }
             } catch (cancellationException: CancellationException) {
                 throw cancellationException
-            } catch (_: Exception) {
-                if (isOwner()) _uiState.update { it.copy(errorMessageRes = R.string.ocr_edit_save_failed) }
+            } catch (failure: Exception) {
+                if (isOwner()) _uiState.update {
+                    it.copy(errorMessageRes = if (failure.isEditConflict()) R.string.ocr_edit_conflict else R.string.ocr_edit_save_failed)
+                }
             }
         }
     }
@@ -173,9 +184,20 @@ class OcrResultViewModel(
                 throw cancellationException
             } catch (failure: Exception) {
                 if (!isOwner()) { _uiState.value = OcrResultUiState(); return@launch }
-                _uiState.update { it.copy(errorMessageRes = failure.toFailureMessage()) }
+                _uiState.update {
+                    it.copy(errorMessageRes = if (failure.isEditConflict()) R.string.ocr_edit_conflict else failure.toFailureMessage())
+                }
             }
         }
+    }
+
+    /** The text was saved from another screen or device after this one loaded it. */
+    private fun Exception.isEditConflict(): Boolean = ApiFailureMapper.map(this).kind == ApiFailureKind.CONFLICT
+
+    private fun confidenceLabelRes(confidence: Double): Int = when {
+        confidence >= HIGH_CONFIDENCE -> R.string.ocr_result_confidence_high
+        confidence >= MEDIUM_CONFIDENCE -> R.string.ocr_result_confidence_medium
+        else -> R.string.ocr_result_confidence_low
     }
 
     private fun emitEffect(effect: OcrResultUiEffect) {
@@ -193,5 +215,10 @@ class OcrResultViewModel(
             require(modelClass.isAssignableFrom(OcrResultViewModel::class.java))
             return OcrResultViewModel(getOcrResult, documentRepository, contractRepository, isOwner) as T
         }
+    }
+
+    private companion object {
+        const val HIGH_CONFIDENCE = 0.9
+        const val MEDIUM_CONFIDENCE = 0.7
     }
 }

@@ -4,7 +4,7 @@
     <string name="upload_source_file_too_large">The file exceeds the 20 MB demo limit.</string>
     <string name="upload_source_file_empty">The file is empty.</string>
     <string name="upload_source_file_unreadable">Cannot read the file. Choose a file you can still access.</string>
-    <string name="upload_real_file_too_large">File exceeds 10 MB</string>
+    <string name="upload_real_file_too_large">File exceeds 20 MB</string>
     <string name="upload_real_unsupported_format">Unsupported file format</string>
     <string name="upload_scan_file_name">Scanned contract.pdf</string>
     <string name="upload_scan_file_details">PDF · %1$d pages</string>

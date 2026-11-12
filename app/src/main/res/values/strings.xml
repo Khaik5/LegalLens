@@ -331,7 +331,7 @@
     <string name="ocr_processing_scanned_document_name">Tài liệu quét</string>
     <string name="ocr_processing_scanned_document_details">%1$d trang quét</string>
     <string name="ocr_processing_upload_title">Tải lên tài liệu</string>
-    <string name="ocr_processing_upload_body" translatable="false">Hoàn thành · 09:41:02</string>
+    <string name="ocr_processing_upload_body">Hoàn thành</string>
     <string name="ocr_processing_analyzing_title">Đang xử lý phân tích hình ảnh</string>
     <string name="ocr_processing_analyzing_body">Tự động phân tích chất lượng hình ảnh</string>
     <string name="ocr_processing_pending_title">OCR văn bản &amp; Số hóa</string>
@@ -342,6 +342,9 @@
     <string name="ocr_processing_text_step_number" translatable="false">3</string>
     <string name="ocr_processing_review_step_number" translatable="false">4</string>
     <string name="ocr_processing_notice">VUI LÒNG KHÔNG ĐÓNG ỨNG DỤNG</string>
+    <string name="ocr_result_confidence_high">Độ tin cậy OCR cao</string>
+    <string name="ocr_result_confidence_medium">Độ tin cậy OCR trung bình, nên xem lại</string>
+    <string name="ocr_result_confidence_low">Độ tin cậy OCR thấp, cần xem lại kỹ</string>
     <string name="ocr_failure_title">Lỗi xử lý OCR</string>
     <string name="ocr_failure_back_content_description">Quay lại</string>
     <string name="ocr_failure_heading">OCR thất bại</string>

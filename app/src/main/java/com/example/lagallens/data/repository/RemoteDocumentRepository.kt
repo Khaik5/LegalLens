@@ -3,11 +3,11 @@ package com.example.lagallens.data.repository
 import android.content.Context
 import android.net.Uri
 import com.example.lagallens.core.network.AuthSessionScope
-import com.example.lagallens.core.network.BackendNotConfiguredException
 import com.example.lagallens.data.datasource.local.DocumentSessionCache
 import com.example.lagallens.data.datasource.local.datastore.AuthSessionStore
 import com.example.lagallens.data.datasource.local.datastore.currentSessionScope
 import com.example.lagallens.data.datasource.remote.DocumentRemoteDataSource
+import com.example.lagallens.data.datasource.remote.OcrRemoteDataSource
 import com.example.lagallens.data.mapper.toDocument
 import com.example.lagallens.domain.model.EmploymentDocument
 import com.example.lagallens.domain.repository.DocumentRepository
@@ -21,11 +21,12 @@ class RemoteDocumentRepository(
     private val context: Context,
     private val tokens: AuthSessionStore,
     private val remote: DocumentRemoteDataSource,
+    private val ocr: OcrRemoteDataSource,
     private val boundSession: String? = null
 ) : DocumentRepository {
     override fun forSession(sessionKey: String): DocumentRepository {
         check(boundSession == null || boundSession == sessionKey) { "Session changed" }
-        return RemoteDocumentRepository(context, tokens, remote, sessionKey)
+        return RemoteDocumentRepository(context, tokens, remote, ocr, sessionKey)
     }
 
     override suspend fun getDocument(documentId: String): EmploymentDocument? = inSession { scope ->
@@ -78,11 +79,32 @@ class RemoteDocumentRepository(
         uri.path?.let { DocumentSessionCache(context).delete(java.io.File(it)) }
     }
 
-    override suspend fun saveDocument(document: EmploymentDocument): EmploymentDocument =
-        throw BackendNotConfiguredException("Document content")
+    /**
+     * The file itself is uploaded separately, so saving only stores the reviewed text as a new OCR revision.
+     * A document that has not been uploaded cannot be saved.
+     */
+    override suspend fun saveDocument(document: EmploymentDocument): EmploymentDocument = inSession { scope ->
+        val existing = checkNotNull(remote.get(scope, document.id)) { "Document unavailable" }.toDocument()
+        check(document.contractId == null || document.contractId == existing.contractId) { "Document unavailable" }
+        if (document.content.isNotBlank()) check(saveRecognizedText(scope, document.id, document.content)) { "OCR result unavailable" }
+        existing.copy(content = document.content, uri = document.uri)
+    }
 
-    override suspend fun updateDocumentContent(documentId: String, contractId: String?, content: String): Boolean =
-        throw BackendNotConfiguredException("OCR document content")
+    override suspend fun updateDocumentContent(documentId: String, contractId: String?, content: String): Boolean = inSession { scope ->
+        val existing = remote.get(scope, documentId) ?: return@inSession false
+        if (contractId != null && existing.contractId.toString() != contractId) return@inSession false
+        saveRecognizedText(scope, documentId, content)
+    }
+
+    /** False when the document has no finished OCR result to correct. Unchanged text adds no revision. */
+    private suspend fun saveRecognizedText(scope: AuthSessionScope, documentId: String, text: String): Boolean {
+        val latest = ocr.latest(scope, documentId)
+        val revision = latest?.revision
+        if (latest?.status != OCR_COMPLETED || revision == null) return false
+        if (latest.text == text) return true
+        ocr.correct(scope, documentId, revision, text)
+        return true
+    }
 
     private suspend fun <T> inSession(action: suspend (AuthSessionScope) -> T): T = withContext(Dispatchers.IO) {
         val scope = checkNotNull(tokens.currentSessionScope()) { "No active session" }
@@ -90,5 +112,9 @@ class RemoteDocumentRepository(
         val result = action(scope)
         check(tokens.currentSessionScope()?.key == scope.key) { "Session changed" }
         result
+    }
+
+    private companion object {
+        const val OCR_COMPLETED = "COMPLETED"
     }
 }

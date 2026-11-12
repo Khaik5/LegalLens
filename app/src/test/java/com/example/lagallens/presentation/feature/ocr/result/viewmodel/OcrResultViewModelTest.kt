@@ -9,7 +9,9 @@ import com.example.lagallens.domain.usecase.GetOcrResultUseCase
 import com.example.lagallens.domain.repository.ContractRepository
 import com.example.lagallens.domain.repository.DocumentRepository
 import com.example.lagallens.presentation.feature.ocr.result.contract.OcrResultUiEvent
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -78,6 +80,24 @@ class OcrResultViewModelTest {
         assertNotNull(vm.uiState.value.errorMessageRes)
         assertEquals(null, kotlinx.coroutines.runBlocking { documents.getDocument("doc-a") })
         assertEquals(0, contracts.records.size)
+    }
+
+    @Test fun documentWithoutRecognizedTextOpensOcrProcessing() = kotlinx.coroutines.test.runTest {
+        val notReady = object : com.example.lagallens.domain.repository.OcrRepository {
+            override fun process(documentId: String) = kotlinx.coroutines.flow.emptyFlow<com.example.lagallens.domain.model.processing.ProcessingState>()
+            override suspend fun getResult(documentId: String) =
+                throw com.example.lagallens.domain.model.ocr.OcrResultNotReadyException()
+        }
+        val vm = OcrResultViewModel(GetOcrResultUseCase(notReady), MemoryDocumentRepository(), MemoryContractRepository())
+        val effect = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { vm.uiEffect.first() }
+
+        vm.onEvent(OcrResultUiEvent.ScreenOpened("Scan", "PDF", "15", mimeType = "application/pdf"))
+
+        assertEquals(
+            com.example.lagallens.presentation.feature.ocr.result.contract.OcrResultUiEffect.NavigateToOcrProcessing("Scan", "PDF", "15", null, "application/pdf"),
+            effect.await()
+        )
+        assertEquals(null, vm.uiState.value.errorMessageRes)
     }
 
     private fun viewModel(

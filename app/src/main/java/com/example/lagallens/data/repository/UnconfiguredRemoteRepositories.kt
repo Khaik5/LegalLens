@@ -3,13 +3,11 @@ package com.example.lagallens.data.repository
 import com.example.lagallens.domain.model.analysis.AnalysisOverview
 import com.example.lagallens.domain.model.chatbot.ChatbotConversation
 import com.example.lagallens.domain.model.chatbot.ChatbotReply
-import com.example.lagallens.domain.model.ocr.OcrResult
 import com.example.lagallens.domain.repository.AnalysisRepository
 import com.example.lagallens.domain.repository.AnalysisUnlockOutcome
 import com.example.lagallens.domain.repository.AnalysisUnlockRepository
 import com.example.lagallens.domain.repository.AnalysisUnlockStatus
 import com.example.lagallens.domain.repository.ChatbotRepository
-import com.example.lagallens.domain.repository.OcrRepository
 import com.example.lagallens.domain.repository.DraftRepository
 import com.example.lagallens.domain.model.Draft
 import com.example.lagallens.domain.model.DraftStage
@@ -22,7 +20,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import com.example.lagallens.domain.model.processing.AnalysisJobState
-import com.example.lagallens.domain.model.processing.ProcessingState
 
 class UnconfiguredRemoteChatbotRepository(private val sessionKey: () -> String? = { null }) : ChatbotRepository {
     override fun currentSessionKey(): String? = sessionKey()
@@ -43,12 +40,6 @@ class UnconfiguredRemoteChatbotRepository(private val sessionKey: () -> String? 
         contractType: String,
         messages: List<com.example.lagallens.domain.model.chatbot.ChatbotTranscriptMessage>
     ) = throw BackendNotConfiguredException("Chatbot")
-}
-
-class UnconfiguredRemoteOcrRepository : OcrRepository {
-    override fun process(documentId: String): Flow<ProcessingState> = flow { throw BackendNotConfiguredException("OCR") }
-    override suspend fun getResult(documentId: String): OcrResult =
-        throw BackendNotConfiguredException("OCR")
 }
 
 class UnconfiguredRemoteAnalysisRepository : AnalysisRepository {

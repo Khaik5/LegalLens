@@ -31,7 +31,11 @@ class OcrSavedViewModel : ViewModel() {
                 )
             }
 
-            OcrSavedUiEvent.ReturnToContractClicked -> emitEffect(OcrSavedUiEffect.NavigateBack)
+            OcrSavedUiEvent.ReturnToContractClicked -> emitEffect(
+                _uiState.value.contractId.takeIf(String::isNotBlank)
+                    ?.let(OcrSavedUiEffect::NavigateToContract)
+                    ?: OcrSavedUiEffect.NavigateBack
+            )
             OcrSavedUiEvent.AnalyzeClicked -> {
                 emitEffect(OcrSavedUiEffect.NavigateToAnalysis(_uiState.value.documentName, _uiState.value.documentId, _uiState.value.contractId))
             }

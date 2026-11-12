@@ -98,6 +98,10 @@ class OcrSavedActivity : com.example.lagallens.presentation.feature.ocr.OcrSessi
                 startActivity(Intent(this, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP))
                 finish()
             }
+            is OcrSavedUiEffect.NavigateToContract -> {
+                startActivity(MainActivity.contractDetailIntent(this, effect.contractId, ownerSession))
+                finish()
+            }
             is OcrSavedUiEffect.NavigateToAnalysis -> {
                 startActivity(AnalysisStartActivity.createIntent(this, effect.documentName, contractId = effect.contractId, documentId = effect.documentId).putExtra("analysis_return_home", true))
             }

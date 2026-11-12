@@ -12,6 +12,8 @@ sealed interface UploadProgressEffect {
         val fileDetails: String,
         val documentUri: String? = null,
         val documentId: String = "",
-        val mimeType: String = ""
+        val mimeType: String = "",
+        /** Set when the document is already stored in a backend contract. */
+        val contractId: String? = null
     ) : UploadProgressEffect
 }

@@ -8,6 +8,7 @@ import com.example.lagallens.core.network.DocumentFiles
 import com.example.lagallens.data.datasource.local.DocumentSessionCache
 import com.example.lagallens.data.datasource.local.datastore.AuthSessionStore
 import com.example.lagallens.data.datasource.local.datastore.currentSessionScope
+import com.example.lagallens.data.datasource.local.writeJpeg
 import com.example.lagallens.data.datasource.local.writeScanPdf
 import com.example.lagallens.data.datasource.remote.DocumentRemoteDataSource
 import com.example.lagallens.data.datasource.remote.UploadProgressRequestBody
@@ -50,16 +51,27 @@ class RemoteDocumentUploadRepository(
         var contactingBackend = false
         try {
             send(ProcessingState.Running(progressPercent = 0))
-            val mimeType = if (request.isScan) DocumentFiles.PDF else request.mimeType
+            val mimeType = if (request.isScan) DocumentFiles.PDF else DocumentFiles.uploadMimeType(request.mimeType)
             if (!DocumentFiles.isSupported(mimeType)) throw RejectedFile(UploadFailure.UNSUPPORTED_FORMAT)
+            val isConverted = !request.isScan && DocumentFiles.isConvertedToJpeg(request.mimeType)
             val file = DocumentSessionCache(context).newFile()
             stagingFile = file
-            if (request.isScan) {
-                require(request.sourceUris.isNotEmpty())
-                writeScanPdf(context.contentResolver, request.sourceUris, file, DocumentFiles.MAX_UPLOAD_BYTES)
-            } else {
-                stageFile(Uri.parse(request.sourceUris.single()), file)
+            when {
+                request.isScan -> {
+                    require(request.sourceUris.isNotEmpty())
+                    writeScanPdf(context.contentResolver, request.sourceUris, file, DocumentFiles.MAX_UPLOAD_BYTES)
+                }
+                isConverted -> try {
+                    writeJpeg(context.contentResolver, Uri.parse(request.sourceUris.single()), file)
+                } catch (cancelled: CancellationException) {
+                    throw cancelled
+                } catch (_: Exception) {
+                    throw RejectedFile(UploadFailure.UNREADABLE)
+                }
+                else -> stageFile(Uri.parse(request.sourceUris.single()), file)
             }
+            // The backend checks that the file extension matches its type.
+            val fileName = if (isConverted) request.displayName.substringBeforeLast('.') + ".jpg" else request.displayName
             if (file.length() > DocumentFiles.MAX_UPLOAD_BYTES) throw RejectedFile(UploadFailure.TOO_LARGE)
             if (file.length() == 0L) throw RejectedFile(UploadFailure.UNREADABLE)
 
@@ -79,7 +91,7 @@ class RemoteDocumentUploadRepository(
             val body = UploadProgressRequestBody(file, mimeType.toMediaType()) { percent ->
                 trySend(ProcessingState.Running(progressPercent = percent))
             }
-            val document = documents.upload(AuthSessionScope(scope.key), contractId, request.displayName, body)
+            val document = documents.upload(AuthSessionScope(scope.key), contractId, fileName, body)
             uploaded = true
             // The file is safely stored; a session switch only means this screen no longer belongs to that user.
             if (tokens.currentSessionScope()?.key != scope.key) return@channelFlow
