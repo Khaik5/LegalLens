@@ -80,7 +80,8 @@ class OcrFailureActivity : com.example.lagallens.presentation.feature.ocr.OcrSes
                         documentId = intent.getStringExtra(EXTRA_DOCUMENT_ID).orEmpty(),
                         documentUri = intent.getStringExtra(EXTRA_DOCUMENT_URI),
                         pagePaths = intent.getStringArrayListExtra(EXTRA_PAGE_PATHS).orEmpty(),
-                        mimeType = intent.getStringExtra(EXTRA_MIME_TYPE).orEmpty()
+                        mimeType = intent.getStringExtra(EXTRA_MIME_TYPE).orEmpty(),
+                        contractId = intent.getStringExtra(EXTRA_CONTRACT_ID)
                     )
                 )
                 finish()
@@ -95,6 +96,7 @@ class OcrFailureActivity : com.example.lagallens.presentation.feature.ocr.OcrSes
         private const val EXTRA_DOCUMENT_URI = "ocr_failure_document_uri"
         private const val EXTRA_PAGE_PATHS = "ocr_failure_page_paths"
         private const val EXTRA_MIME_TYPE = "ocr_failure_mime_type"
+        private const val EXTRA_CONTRACT_ID = "ocr_failure_contract_id"
 
         fun createIntent(
             context: Context,
@@ -103,9 +105,11 @@ class OcrFailureActivity : com.example.lagallens.presentation.feature.ocr.OcrSes
             documentId: String,
             documentUri: String?,
             pagePaths: List<String> = emptyList(),
-            mimeType: String = ""
+            mimeType: String = "",
+            contractId: String? = null
         ): Intent = com.example.lagallens.presentation.feature.ocr.OcrSession.stamp(context, Intent(context, OcrFailureActivity::class.java)
             .putExtra(EXTRA_DOCUMENT_NAME, documentName)
+            .putExtra(EXTRA_CONTRACT_ID, contractId)
             .putExtra(EXTRA_DOCUMENT_DETAILS, documentDetails)
             .putExtra(EXTRA_DOCUMENT_ID, documentId)
             .putExtra(EXTRA_DOCUMENT_URI, documentUri)

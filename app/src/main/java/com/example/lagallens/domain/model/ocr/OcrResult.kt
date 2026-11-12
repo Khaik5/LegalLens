@@ -6,7 +6,9 @@ data class OcrResult(
     val documentText: String,
     val warnings: List<OcrWarning> = emptyList(),
     /** True when the text did not come from the user's file. */
-    val isSampleContent: Boolean = false
+    val isSampleContent: Boolean = false,
+    /** Average recognition confidence from 0 to 1, when the recognizer reports one. */
+    val confidence: Double? = null
 )
 
 data class OcrWarning(

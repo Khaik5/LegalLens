@@ -298,7 +298,11 @@
     <string name="ocr_processing_text_description">Recognising text and digitising content</string>
     <string name="ocr_processing_review_title">Ready to review the results</string>
     <string name="ocr_processing_review_description">Preparing the results for your review</string>
+    <string name="ocr_processing_upload_body">Completed</string>
     <string name="ocr_processing_notice">PLEASE DO NOT CLOSE THE APP</string>
+    <string name="ocr_result_confidence_high">High OCR confidence</string>
+    <string name="ocr_result_confidence_medium">Medium OCR confidence, review recommended</string>
+    <string name="ocr_result_confidence_low">Low OCR confidence, review carefully</string>
     <string name="ocr_failure_title">OCR processing error</string>
     <string name="ocr_failure_back_content_description">Back</string>
     <string name="ocr_failure_heading">OCR failed</string>

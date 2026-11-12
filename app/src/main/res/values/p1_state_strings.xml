@@ -7,5 +7,6 @@
     <string name="chatbot_draft_load_failed">Không thể tải bản nháp.</string>
     <string name="chatbot_draft_version_row">%1$s · %2$s</string>
     <string name="ocr_edit_save_failed">Không thể lưu nội dung đã sửa.</string>
+    <string name="ocr_edit_conflict">Văn bản đã được sửa ở nơi khác. Hãy mở lại để xem bản mới nhất.</string>
     <string name="credit_success_transaction">%1$s · %2$s</string>
 </resources>

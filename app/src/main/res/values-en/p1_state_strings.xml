@@ -7,5 +7,6 @@
     <string name="chatbot_draft_load_failed">The draft could not be loaded.</string>
     <string name="chatbot_draft_version_row">%1$s · %2$s</string>
     <string name="ocr_edit_save_failed">The edited text could not be saved.</string>
+    <string name="ocr_edit_conflict">The text was changed elsewhere. Reopen it to see the latest version.</string>
     <string name="credit_success_transaction">%1$s · %2$s</string>
 </resources>
