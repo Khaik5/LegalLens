@@ -21,12 +21,12 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.example.lagallens.R
 import com.example.lagallens.databinding.ActivityChatbotDraftManualEditBinding
 import com.example.lagallens.databinding.DialogChatbotDraftDiscardEditBinding
-import com.example.lagallens.presentation.common.utils.applySystemBarInsets
 import com.example.lagallens.presentation.feature.chatbot.draft.contract.ChatbotDraftManualEditUiEvent
 import com.example.lagallens.presentation.feature.chatbot.draft.contract.ChatbotDraftManualEditUiEffect
 import com.example.lagallens.presentation.feature.chatbot.draft.contract.ChatbotDraftUiState
 import com.example.lagallens.presentation.feature.chatbot.draft.viewmodel.ChatbotDraftManualEditViewModel
 import kotlinx.coroutines.launch
+import com.example.lagallens.presentation.common.utils.applySystemBarAndKeyboardInsets
 
 class ChatbotDraftManualEditActivity : DraftSessionActivity() {
     override fun onStart() { super.onStart(); if (!DraftSessionGuard.valid(application as com.example.lagallens.LegalLensApplication, intent)) finish() }
@@ -48,7 +48,7 @@ class ChatbotDraftManualEditActivity : DraftSessionActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         binding = ActivityChatbotDraftManualEditBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        binding.root.applySystemBarInsets()
+        binding.root.applySystemBarAndKeyboardInsets()
         bindActions()
         viewModel.onEvent(ChatbotDraftManualEditUiEvent.Opened(initialBody, initialAddition))
         lifecycleScope.launch {
