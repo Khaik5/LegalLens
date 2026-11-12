@@ -21,4 +21,20 @@ class OcrSavedIdentityTest {
         vm.onEvent(OcrSavedUiEvent.AnalyzeClicked)
         assertEquals(OcrSavedUiEffect.NavigateToAnalysis("same name", "doc-1", "contract-1"), effect.await())
     }
+
+    @Test fun returnToContractOpensTheSavedContract() = runTest {
+        val vm = OcrSavedViewModel()
+        vm.onEvent(OcrSavedUiEvent.ScreenOpened("name", "", "", "doc-1", "contract-1"))
+        val effect = async(start = CoroutineStart.UNDISPATCHED) { vm.uiEffect.first() }
+        vm.onEvent(OcrSavedUiEvent.ReturnToContractClicked)
+        assertEquals(OcrSavedUiEffect.NavigateToContract("contract-1"), effect.await())
+    }
+
+    @Test fun returnWithoutAContractGoesBack() = runTest {
+        val vm = OcrSavedViewModel()
+        vm.onEvent(OcrSavedUiEvent.ScreenOpened("name", "", "", "doc-1", ""))
+        val effect = async(start = CoroutineStart.UNDISPATCHED) { vm.uiEffect.first() }
+        vm.onEvent(OcrSavedUiEvent.ReturnToContractClicked)
+        assertEquals(OcrSavedUiEffect.NavigateBack, effect.await())
+    }
 }

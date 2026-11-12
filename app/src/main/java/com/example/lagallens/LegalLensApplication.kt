@@ -58,7 +58,7 @@ class LegalLensApplication : Application() {
         RepositoryModule.provideNotificationRepository(applicationContext)
     }
     val chatbotRepository: ChatbotRepository by lazy { RepositoryModule.provideChatbotRepository(applicationContext) }
-    val ocrRepository: OcrRepository by lazy { RepositoryModule.provideOcrRepository() }
+    val ocrRepository: OcrRepository by lazy { RepositoryModule.provideOcrRepository(applicationContext) }
     val documentUploadRepository by lazy { RepositoryModule.provideDocumentUploadRepository(applicationContext, contractRepository) }
     val analysisRepository: AnalysisRepository by lazy { RepositoryModule.provideAnalysisRepository(applicationContext) }
     private val onboardingRepository: OnboardingRepository by lazy {

@@ -151,6 +151,20 @@ class OcrResultActivity : com.example.lagallens.presentation.feature.ocr.OcrSess
                 )
                 finish()
             }
+            is OcrResultUiEffect.NavigateToOcrProcessing -> {
+                startActivity(
+                    com.example.lagallens.presentation.feature.camera.ocr.ui.OcrProcessingActivity.createIntent(
+                        context = this,
+                        documentName = effect.documentName,
+                        documentDetails = effect.documentDetails,
+                        documentUri = intent.getStringExtra(EXTRA_DOCUMENT_URI),
+                        documentId = effect.documentId,
+                        mimeType = effect.mimeType,
+                        contractId = effect.contractId
+                    )
+                )
+                finish()
+            }
         }
     }
 

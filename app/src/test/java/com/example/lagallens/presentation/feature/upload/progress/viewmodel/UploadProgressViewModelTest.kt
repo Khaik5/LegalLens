@@ -46,7 +46,29 @@ class UploadProgressViewModelTest {
         assertEquals(1, effects.count { it is UploadProgressEffect.NavigateToOcrProcessing })
     }
 
-    @Test fun realScanOpensCreatedContractAfterUpload() = runTest {
+    @Test fun realWordFileContinuesToOcrWithTheBackendIds() = runTest {
+        val repository = object : DocumentUploadRepository {
+            override fun upload(request: DocumentUploadRequest) = flowOf(ProcessingState.Uploaded("15", "20"))
+        }
+        val vm = UploadProgressViewModel(repository)
+        val effects = mutableListOf<UploadProgressEffect>()
+        backgroundScope.launch { vm.effects.collect { effects.add(it) } }
+        vm.onEvent(UploadProgressEvent.ScreenOpened(
+            "contract.docx", "DOCX", documentUri = "content://contract", documentId = "local-id",
+            mimeType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document", sessionKey = "session"
+        ))
+        runCurrent()
+
+        assertEquals(
+            listOf(UploadProgressEffect.NavigateToOcrProcessing(
+                "contract.docx", "DOCX", "content://contract", documentId = "20",
+                mimeType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document", contractId = "15"
+            )),
+            effects
+        )
+    }
+
+    @Test fun realScanContinuesToOcrWithTheBackendIds() = runTest {
         val requests = mutableListOf<DocumentUploadRequest>()
         val repository = object : DocumentUploadRepository {
             override fun upload(request: DocumentUploadRequest) = flowOf(
@@ -65,7 +87,10 @@ class UploadProgressViewModelTest {
         runCurrent()
 
         assertEquals(listOf(DocumentUploadRequest("local-id", "scan.pdf", "application/pdf", pages, true, "session")), requests)
-        assertEquals(listOf(UploadProgressEffect.NavigateToContract("15")), effects)
+        assertEquals(
+            listOf(UploadProgressEffect.NavigateToOcrProcessing("scan.pdf", "PDF", null, documentId = "20", mimeType = "application/pdf", contractId = "15")),
+            effects
+        )
         assertEquals(100, vm.uiState.value.progress)
     }
 

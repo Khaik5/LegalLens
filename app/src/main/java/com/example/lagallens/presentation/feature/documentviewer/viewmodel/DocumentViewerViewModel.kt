@@ -34,7 +34,8 @@ class DocumentViewerViewModel(private val getDocumentFile: GetDocumentFileUseCas
             try {
                 val document = getDocumentFile.findForContract(request.contractId, request.sessionKey)
                 state.update { it.copy(remoteDocument = document, title = document?.displayName ?: it.title) }
-                if (document == null || (document.mimeType != DocumentFiles.PDF && !document.mimeType.startsWith("image/"))) {
+                // Word files are previewed as the PDF the backend converts them to.
+                if (document == null || !DocumentFiles.supportsOcr(document.mimeType)) {
                     state.update { it.copy(status = DocumentViewerStatus.ERROR) }
                     return@launch
                 }

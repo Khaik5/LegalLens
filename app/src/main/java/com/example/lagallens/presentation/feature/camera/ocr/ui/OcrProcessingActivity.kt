@@ -112,6 +112,7 @@ class OcrProcessingActivity : com.example.lagallens.presentation.feature.ocr.Ocr
                         documentDetails = effect.documentDetails,
                         documentUri = intent.getStringExtra(EXTRA_DOCUMENT_URI),
                         documentId = intent.getStringExtra(EXTRA_DOCUMENT_ID).orEmpty(),
+                        contractId = intent.getStringExtra(EXTRA_CONTRACT_ID),
                         mimeType = intent.getStringExtra(EXTRA_MIME_TYPE).orEmpty()
                     )
                 )
@@ -126,7 +127,8 @@ class OcrProcessingActivity : com.example.lagallens.presentation.feature.ocr.Ocr
                         documentId = intent.getStringExtra(EXTRA_DOCUMENT_ID).orEmpty(),
                         documentUri = intent.getStringExtra(EXTRA_DOCUMENT_URI),
                         pagePaths = intent.getStringArrayListExtra(EXTRA_PAGE_PATHS).orEmpty(),
-                        mimeType = intent.getStringExtra(EXTRA_MIME_TYPE).orEmpty()
+                        mimeType = intent.getStringExtra(EXTRA_MIME_TYPE).orEmpty(),
+                        contractId = intent.getStringExtra(EXTRA_CONTRACT_ID)
                     )
                 )
                 finish()
@@ -141,6 +143,7 @@ class OcrProcessingActivity : com.example.lagallens.presentation.feature.ocr.Ocr
         private const val EXTRA_DOCUMENT_URI = "ocr_document_uri"
         private const val EXTRA_DOCUMENT_ID = "ocr_document_id"
         private const val EXTRA_MIME_TYPE = "ocr_mime_type"
+        private const val EXTRA_CONTRACT_ID = "ocr_contract_id"
 
         fun createIntent(
             context: Context,
@@ -160,11 +163,13 @@ class OcrProcessingActivity : com.example.lagallens.presentation.feature.ocr.Ocr
             documentUri: String? = null,
             documentId: String = java.util.UUID.randomUUID().toString(),
             pagePaths: List<String> = emptyList(),
-            mimeType: String = ""
+            mimeType: String = "",
+            contractId: String? = null
         ): Intent = com.example.lagallens.presentation.feature.ocr.OcrSession.stamp(context, Intent(
             context,
             OcrProcessingActivity::class.java
         ).putExtra(EXTRA_DOCUMENT_NAME, documentName)
+            .putExtra(EXTRA_CONTRACT_ID, contractId)
             .putExtra(EXTRA_DOCUMENT_DETAILS, documentDetails)
             .putExtra(EXTRA_DOCUMENT_URI, documentUri)
             .putExtra(EXTRA_MIME_TYPE, mimeType)

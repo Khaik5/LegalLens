@@ -142,8 +142,8 @@ class RemoteContractRepository private constructor(
         true
     }
 
-    override suspend fun updateContract(contract: EmploymentContract): Boolean =
-        throw BackendNotConfiguredException("Contract content")
+    /** The backend keeps contract text as the document's OCR revision, so only the title is stored here. */
+    override suspend fun updateContract(contract: EmploymentContract): Boolean = renameContract(contract.id, contract.title)
 
     override suspend fun compareContracts(firstId: String, secondId: String): EmploymentContractComparison? =
         throw BackendNotConfiguredException("Contract comparison")

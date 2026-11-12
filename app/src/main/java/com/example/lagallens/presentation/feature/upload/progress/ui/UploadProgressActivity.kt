@@ -128,7 +128,8 @@ class UploadProgressActivity : com.example.lagallens.presentation.feature.ocr.Oc
                         effect.fileDetails,
                         documentUri = effect.documentUri,
                         documentId = effect.documentId,
-                        mimeType = effect.mimeType
+                        mimeType = effect.mimeType,
+                        contractId = effect.contractId
                     )
                 )
                 finish()

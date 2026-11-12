@@ -115,7 +115,7 @@ class UploadSourceActivity : com.example.lagallens.presentation.feature.ocr.OcrS
                 else effect.mimeTypes
             )
             UploadSourceUiEffect.OpenImagePicker -> imagePicker.launch(
-                if (isReal) arrayOf(DocumentFiles.JPEG, DocumentFiles.PNG) else arrayOf("image/*")
+                if (isReal) arrayOf(DocumentFiles.JPEG, DocumentFiles.PNG, DocumentFiles.HEIC, DocumentFiles.HEIF, DocumentFiles.WEBP) else arrayOf("image/*")
             )
             UploadSourceUiEffect.ShowFileSelected -> showMessage(R.string.upload_source_selected)
         }
@@ -145,10 +145,10 @@ class UploadSourceActivity : com.example.lagallens.presentation.feature.ocr.OcrS
         val byteCount = fileMetadata?.second
         val reportedType = try { contentResolver.getType(uri).orEmpty() }
             catch (_: Exception) { showMessage(R.string.upload_source_file_unreadable); return }
-        val mimeType = if (isReal && !DocumentFiles.isSupported(reportedType)) {
+        val mimeType = if (isReal && !DocumentFiles.isAccepted(reportedType)) {
             DocumentFiles.mimeType(fileName) ?: reportedType
         } else reportedType
-        val supported = if (isReal) DocumentFiles.isSupported(mimeType) else UploadFileValidator.isSupported(mimeType)
+        val supported = if (isReal) DocumentFiles.isAccepted(mimeType) else UploadFileValidator.isSupported(mimeType)
         if (!supported) {
             showMessage(if (isReal) R.string.upload_real_unsupported_format else R.string.upload_source_unsupported_file)
             return
