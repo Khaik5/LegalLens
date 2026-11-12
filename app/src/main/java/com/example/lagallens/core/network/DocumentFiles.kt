@@ -38,6 +38,6 @@ object DocumentFiles {
     /** The type the backend receives for a picked file. */
     fun uploadMimeType(mimeType: String): String = if (isConvertedToJpeg(mimeType)) JPEG else mimeType
 
-    /** The backend recognizes text in PDF and image files only; Word files already contain text. */
-    fun supportsOcr(mimeType: String): Boolean = uploadMimeType(mimeType).let { it == PDF || it == JPEG || it == PNG }
+    /** The backend recognizes text in PDF, image and Word files; it converts Word files to PDF first. */
+    fun supportsOcr(mimeType: String): Boolean = uploadMimeType(mimeType) in supportedTypes
 }

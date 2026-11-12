@@ -37,8 +37,17 @@ class DocumentViewerViewModelTest {
         assertNull(viewModel.uiState.value.previewUri)
     }
 
-    @Test fun wordDocumentIsNotPreviewed() = runTest {
+    @Test fun wordDocumentIsPreviewedFromTheBackendPdf() = runTest {
         repository.documents = listOf(document("1", DocumentFiles.DOCX, 10))
+
+        viewModel.onEvent(open)
+
+        assertEquals("file:///cache/1-1", viewModel.uiState.value.previewUri)
+        assertEquals(1, repository.cacheCalls)
+    }
+
+    @Test fun unsupportedDocumentIsNotPreviewed() = runTest {
+        repository.documents = listOf(document("1", "text/plain", 10))
 
         viewModel.onEvent(open)
 

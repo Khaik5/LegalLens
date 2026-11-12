@@ -46,7 +46,7 @@ class UploadProgressViewModelTest {
         assertEquals(1, effects.count { it is UploadProgressEffect.NavigateToOcrProcessing })
     }
 
-    @Test fun realWordFileOpensCreatedContractAfterUpload() = runTest {
+    @Test fun realWordFileContinuesToOcrWithTheBackendIds() = runTest {
         val repository = object : DocumentUploadRepository {
             override fun upload(request: DocumentUploadRequest) = flowOf(ProcessingState.Uploaded("15", "20"))
         }
@@ -59,7 +59,13 @@ class UploadProgressViewModelTest {
         ))
         runCurrent()
 
-        assertEquals(listOf(UploadProgressEffect.NavigateToContract("15")), effects)
+        assertEquals(
+            listOf(UploadProgressEffect.NavigateToOcrProcessing(
+                "contract.docx", "DOCX", "content://contract", documentId = "20",
+                mimeType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document", contractId = "15"
+            )),
+            effects
+        )
     }
 
     @Test fun realScanContinuesToOcrWithTheBackendIds() = runTest {
