@@ -9,6 +9,8 @@ data class NotificationResponse(
     val createdAt: String
 )
 
+data class UnreadCountResponse(val count: Int)
+
 data class NotificationPageResponse(
     val data: List<NotificationResponse>,
     val total: Long,

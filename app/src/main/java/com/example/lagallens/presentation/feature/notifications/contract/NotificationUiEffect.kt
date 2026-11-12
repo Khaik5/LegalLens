@@ -5,4 +5,5 @@ import androidx.annotation.StringRes
 sealed interface NotificationUiEffect {
     data class NavigateToContractDetail(val contractId: String) : NotificationUiEffect
     data class ShowMessage(@StringRes val messageRes: Int) : NotificationUiEffect
+    data class ShowDeletedWithUndo(val notificationId: String) : NotificationUiEffect
 }

@@ -8,11 +8,16 @@ import com.example.lagallens.data.datasource.local.datastore.AuthLocalDataSource
 import com.example.lagallens.domain.model.NotificationKind
 import com.example.lagallens.domain.model.NotificationRecord
 import com.example.lagallens.domain.repository.NotificationRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 internal interface NotificationReadStore {
     fun getReadIds(): Set<String>
     fun text(@StringRes resId: Int): String = ""
     fun updateReadIds(transform: (Set<String>) -> Set<String>)
+    fun getDeletedIds(): Set<String> = emptySet()
+    fun updateDeletedIds(transform: (Set<String>) -> Set<String>) = Unit
     fun <T> inSession(sessionKey: String?, action: () -> T): T = action()
 }
 
@@ -44,35 +49,61 @@ class FakeNotificationRepository internal constructor(private val store: Notific
                 val ids = transform(prefs.getStringSet(KEY_READ_IDS, emptySet()).orEmpty().toSet())
                 check(prefs.edit().putStringSet(KEY_READ_IDS, ids).commit())
             }
+            override fun getDeletedIds(): Set<String> = preferences().getStringSet(KEY_DELETED_IDS, emptySet()).orEmpty().toSet()
+            override fun updateDeletedIds(transform: (Set<String>) -> Set<String>) {
+                val prefs = preferences()
+                val ids = transform(prefs.getStringSet(KEY_DELETED_IDS, emptySet()).orEmpty().toSet())
+                check(prefs.edit().putStringSet(KEY_DELETED_IDS, ids).commit())
+            }
         }
     )
 
+    private val unreadCount = MutableStateFlow(0)
+
     private fun getAllLocal(): List<NotificationRecord> {
         val readIds = store.getReadIds()
+        val deletedIds = store.getDeletedIds()
         val now = System.currentTimeMillis()
-        return DEMO_NOTIFICATIONS.map { item ->
+        return DEMO_NOTIFICATIONS.filter { it.id !in deletedIds }.map { item ->
             NotificationRecord(
                 item.id, item.contractId, item.kind, item.id !in readIds && item.initiallyUnread,
                 store.text(item.titleRes), store.text(item.descriptionRes), now - item.ageMillis
             )
-        }
+        }.also { records -> unreadCount.value = records.count { it.isUnread } }
     }
 
     override suspend fun getAll(): List<NotificationRecord> = getAllLocal()
     override suspend fun getAllForSession(sessionKey: String?): List<NotificationRecord> = store.inSession(sessionKey) { getAllLocal() }
     override suspend fun markReadForSession(sessionKey: String?, notificationId: String) = store.inSession(sessionKey) {
         store.updateReadIds { it + notificationId }
+        getAllLocal()
+        Unit
     }
     override suspend fun markAllReadForSession(sessionKey: String?) = store.inSession(sessionKey) {
         store.updateReadIds { DEMO_NOTIFICATIONS.mapTo(mutableSetOf()) { item -> item.id } }
+        unreadCount.value = 0
     }
 
     override suspend fun markRead(notificationId: String) {
         store.updateReadIds { it + notificationId }
+        getAllLocal()
     }
 
     override suspend fun markAllRead() {
         store.updateReadIds { DEMO_NOTIFICATIONS.mapTo(mutableSetOf()) { item -> item.id } }
+        unreadCount.value = 0
+    }
+
+    override fun observeUnreadCount(): Flow<Int> = unreadCount.asStateFlow()
+
+    override suspend fun refreshUnreadCount(sessionKey: String?) {
+        store.inSession(sessionKey) { getAllLocal() }
+    }
+
+    override suspend fun deleteForSession(sessionKey: String?, notificationId: String) = store.inSession(sessionKey) {
+        store.updateDeletedIds { it + notificationId }
+        getAllLocal()
+        Unit
     }
 
     private data class DemoNotification(
@@ -88,6 +119,7 @@ class FakeNotificationRepository internal constructor(private val store: Notific
     private companion object {
         const val PREFERENCES_NAME = "notification_demo_state"
         const val KEY_READ_IDS = "read_notification_ids"
+        const val KEY_DELETED_IDS = "deleted_notification_ids"
         const val MINUTE = 60_000L
         val DEMO_NOTIFICATIONS = listOf(
             DemoNotification("analysis-bitexco", "collaborator", NotificationKind.ANALYSIS, true, R.string.notification_analysis_complete_title, R.string.notification_analysis_complete_description, 10 * MINUTE),

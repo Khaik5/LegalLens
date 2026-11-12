@@ -29,6 +29,8 @@ class NotificationViewModel @JvmOverloads constructor(
     private val app = application as LegalLensApplication
     private var loadedSession: String? = app.currentSessionKey()
     private var allNotifications = emptyList<NotificationItem>()
+    /** Swiped but not yet deleted on the server, with its position so Undo puts it back in place. */
+    private var pendingDelete: Pair<Int, NotificationItem>? = null
     private val _uiState = MutableStateFlow(NotificationUiState(notifications = allNotifications))
     val uiState = _uiState.asStateFlow()
 
@@ -62,6 +64,46 @@ class NotificationViewModel @JvmOverloads constructor(
             is NotificationUiEvent.FilterSelected -> selectFilter(event.filter)
             is NotificationUiEvent.NotificationClicked -> markNotificationRead(event.notificationId)
             NotificationUiEvent.MarkAllReadClicked -> markAllRead()
+            is NotificationUiEvent.NotificationSwiped -> hideForDelete(event.notificationId)
+            is NotificationUiEvent.UndoDeleteClicked -> undoDelete(event.notificationId)
+            is NotificationUiEvent.DeleteUndoWindowClosed -> if (pendingDelete?.second?.id == event.notificationId) commitPendingDelete()
+            NotificationUiEvent.ScreenStopped -> commitPendingDelete()
+        }
+    }
+
+    private fun hideForDelete(notificationId: String) {
+        // Only one undo is offered; an earlier swipe is deleted now.
+        commitPendingDelete()
+        val index = allNotifications.indexOfFirst { it.id == notificationId }
+        if (index < 0) return
+        pendingDelete = index to allNotifications[index]
+        allNotifications = allNotifications.filterNot { it.id == notificationId }
+        _uiState.update { state -> state.copy(notifications = filterNotifications(state.selectedFilter)) }
+        viewModelScope.launch { _uiEffect.send(NotificationUiEffect.ShowDeletedWithUndo(notificationId)) }
+    }
+
+    private fun undoDelete(notificationId: String) {
+        val (index, item) = pendingDelete?.takeIf { it.second.id == notificationId } ?: return
+        pendingDelete = null
+        restore(index, item)
+    }
+
+    private fun restore(index: Int, item: NotificationItem) {
+        if (allNotifications.any { it.id == item.id }) return
+        allNotifications = allNotifications.toMutableList().apply { add(index.coerceIn(0, size), item) }
+        _uiState.update { state -> state.copy(notifications = filterNotifications(state.selectedFilter)) }
+    }
+
+    private fun commitPendingDelete() {
+        val (index, item) = pendingDelete ?: return
+        pendingDelete = null
+        val session = app.currentSessionKey()
+        viewModelScope.launch {
+            val failure = runCatching { repository.deleteForSession(session, item.id) }.exceptionOrNull() ?: return@launch
+            if (failure is kotlinx.coroutines.CancellationException) throw failure
+            if (session != app.currentSessionKey()) return@launch
+            restore(index, item)
+            _uiEffect.send(NotificationUiEffect.ShowMessage(R.string.notification_delete_failed))
         }
     }
 
@@ -117,7 +159,7 @@ class NotificationViewModel @JvmOverloads constructor(
         runCatching { repository.getAllForSession(session) }
             .onSuccess { records ->
                 if (session != app.currentSessionKey()) return@onSuccess
-                allNotifications = records.map { record -> record.toItem() }
+                allNotifications = records.map { record -> record.toItem() }.filterNot { it.id == pendingDelete?.second?.id }
                 _uiState.update { it.copy(notifications = filterNotifications(it.selectedFilter)) }
             }
             .onFailure { failure ->

@@ -25,6 +25,10 @@ class NotificationRemoteDataSource(private val api: Lazy<NotificationApi>) {
 
     suspend fun markAllRead(scope: AuthSessionScope) = api.value.markAllRead(scope).requireSuccess()
 
+    suspend fun unreadCount(scope: AuthSessionScope) = api.value.unreadCount(scope).requireData("Unread notifications").count
+
+    suspend fun delete(scope: AuthSessionScope, id: String) = api.value.delete(scope, id).requireSuccess()
+
     private fun Response<Unit>.requireSuccess() {
         if (!isSuccessful) throw HttpException(this)
     }
