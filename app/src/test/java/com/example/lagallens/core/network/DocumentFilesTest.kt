@@ -16,11 +16,12 @@ class DocumentFilesTest {
         assertEquals(DocumentFiles.HEIC, DocumentFiles.mimeType("IMG_0001.HEIC"))
     }
 
-    @Test fun onlyPdfAndImagesGoThroughOcr() {
+    @Test fun pdfImagesAndWordGoThroughOcr() {
         assertTrue(DocumentFiles.supportsOcr(DocumentFiles.PDF))
         assertTrue(DocumentFiles.supportsOcr(DocumentFiles.PNG))
-        assertFalse(DocumentFiles.supportsOcr(DocumentFiles.DOCX))
-        assertFalse(DocumentFiles.supportsOcr(DocumentFiles.DOC))
+        assertTrue(DocumentFiles.supportsOcr(DocumentFiles.DOCX))
+        assertTrue(DocumentFiles.supportsOcr(DocumentFiles.DOC))
+        assertFalse(DocumentFiles.supportsOcr("text/plain"))
         assertEquals(DocumentFiles.PDF, DocumentFiles.uploadMimeType(DocumentFiles.PDF))
     }
 

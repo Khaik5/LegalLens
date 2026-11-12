@@ -230,7 +230,8 @@ class DocumentViewerActivity : AppCompatActivity() {
         val document = state.remoteDocument
         val previewUri = state.previewUri?.let(Uri::parse)
         if (document != null && previewUri != null && documentUri != previewUri) {
-            if (document.mimeType == DocumentFiles.PDF) {
+            // The backend previews Word files as PDF.
+            if (document.mimeType in setOf(DocumentFiles.PDF, DocumentFiles.DOC, DocumentFiles.DOCX)) {
                 openPdf(previewUri, document.displayName)
                 return@with
             }
@@ -247,14 +248,8 @@ class DocumentViewerActivity : AppCompatActivity() {
         viewerLoading.isVisible = state.status == DocumentViewerStatus.LOADING
         viewerError.isVisible = state.status == DocumentViewerStatus.ERROR
         val isRemote = remoteContractId != null
-        val isWord = document?.mimeType == DocumentFiles.DOC || document?.mimeType == DocumentFiles.DOCX
-        viewerErrorMessage.setText(when {
-            isWord -> R.string.viewer_word_download
-            isRemote -> R.string.viewer_remote_error
-            else -> R.string.viewer_error_message
-        })
+        viewerErrorMessage.setText(if (isRemote) R.string.viewer_remote_error else R.string.viewer_error_message)
         viewerRetry.setText(if (isRemote) R.string.upload_error_retry else R.string.viewer_choose_pdf)
-        viewerRetry.isVisible = !isWord
         viewerRetry.isEnabled = state.status != DocumentViewerStatus.LOADING
         viewerShare.isEnabled = if (isRemote) document != null && !state.isDownloading
             else state.status == DocumentViewerStatus.READY && documentUri != null
