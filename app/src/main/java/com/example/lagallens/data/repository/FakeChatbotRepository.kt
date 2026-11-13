@@ -1,6 +1,9 @@
 package com.example.lagallens.data.repository
 
 import android.content.Context
+import android.content.res.Configuration
+import androidx.appcompat.app.AppCompatDelegate
+import com.example.lagallens.R
 import com.example.lagallens.data.datasource.local.datastore.AccountStorageName
 import com.example.lagallens.data.datasource.local.datastore.AuthLocalDataSource
 import com.example.lagallens.domain.model.chatbot.ChatbotAttachment
@@ -13,6 +16,7 @@ import com.example.lagallens.domain.model.chatbot.ChatbotTranscriptMessage
 import com.example.lagallens.domain.repository.ChatbotRepository
 import org.json.JSONArray
 import org.json.JSONObject
+import java.util.Locale
 import java.util.UUID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
@@ -81,11 +85,26 @@ class FakeChatbotRepository(context: Context? = null, private val sessionUserId:
     private fun openConversationLocal(contractName: String, contractType: String, contractId: String?, conversationId: String?): ChatbotConversation {
         val id = conversationId?.takeIf(String::isNotBlank) ?: UUID.randomUUID().toString()
         val transcripts = readAll()
+        val localized = localizedContext()
+        val greetingText = localized?.getString(R.string.chatbot_initial_greeting) ?: DEMO_GREETING
         if (id !in transcripts) {
-            val greeting = ChatbotTranscriptMessage("1", false, DEMO_GREETING, System.currentTimeMillis())
+            val greeting = ChatbotTranscriptMessage("1", false, greetingText, System.currentTimeMillis())
             saveMessagesLocal(id, contractId, contractName, contractType, listOf(greeting))
         }
-        return ChatbotConversation(id, DEMO_GREETING, INITIAL_SUGGESTIONS, NEW_CHAT_SUGGESTIONS)
+        return ChatbotConversation(
+            id,
+            greetingText,
+            localized?.let { context -> INITIAL_SUGGESTION_RES.map(context::getString) } ?: INITIAL_SUGGESTIONS,
+            localized?.let { context -> NEW_CHAT_SUGGESTION_RES.map(context::getString) } ?: NEW_CHAT_SUGGESTIONS
+        )
+    }
+
+    /** The greeting and suggestions follow the app language; sample replies stay Vietnamese DEMO data. */
+    private fun localizedContext(): Context? = appContext?.let { context ->
+        val language = AppCompatDelegate.getApplicationLocales().toLanguageTags()
+            .ifBlank { context.resources.configuration.locales.toLanguageTags() }
+        val config = Configuration(context.resources.configuration).apply { setLocale(Locale.forLanguageTag(language.substringBefore(','))) }
+        context.createConfigurationContext(config)
     }
 
     override suspend fun sendMessage(conversationId: String, message: String): ChatbotReply = inActiveSession { sendMessageLocal(conversationId, message) }
@@ -267,5 +286,16 @@ class FakeChatbotRepository(context: Context? = null, private val sessionUserId:
         val EMPLOYMENT_TYPE_LABELS = listOf("lao động", "employment")
         val INITIAL_SUGGESTIONS = listOf("Thời hạn hợp đồng lao động là bao lâu?", "Lương được ghi trong hợp đồng thế nào?", "Quyền lợi và nghĩa vụ của người lao động là gì?", "Cần lưu ý điều khoản nào?")
         val NEW_CHAT_SUGGESTIONS = listOf("Rà soát điều khoản chấm dứt hợp đồng", "Giải thích thời gian thử việc", "Tóm tắt quyền lợi trong hợp đồng")
+        val INITIAL_SUGGESTION_RES = listOf(
+            R.string.chatbot_suggestion_contract_term,
+            R.string.chatbot_suggestion_salary,
+            R.string.chatbot_suggestion_rights_and_obligations,
+            R.string.chatbot_suggestion_notable_terms
+        )
+        val NEW_CHAT_SUGGESTION_RES = listOf(
+            R.string.chatbot_new_chat_suggestion_termination,
+            R.string.chatbot_new_chat_suggestion_probation,
+            R.string.chatbot_new_chat_suggestion_benefits
+        )
     }
 }

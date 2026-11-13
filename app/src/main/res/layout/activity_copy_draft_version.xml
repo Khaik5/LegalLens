@@ -45,6 +45,28 @@
         android:background="@drawable/bg_chatbot_source_document"
         android:orientation="vertical"
         android:padding="@dimen/dp_16">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+        <FrameLayout
+            android:layout_width="@dimen/analysis_document_icon_size"
+            android:layout_height="@dimen/analysis_document_icon_size"
+            android:background="@drawable/bg_analysis_summary_document_icon">
+            <ImageView
+                android:layout_width="@dimen/analysis_document_icon_art_size"
+                android:layout_height="@dimen/analysis_document_icon_art_size"
+                android:layout_gravity="center"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_ocr_saved_document" />
+        </FrameLayout>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_12"
+            android:layout_weight="1"
+            android:orientation="vertical">
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -61,6 +83,8 @@
             android:text="@string/chatbot_draft_copy_source_metadata"
             android:textColor="@color/legal_lens_secondary_text"
             android:textSize="@dimen/sp_12" />
+        </LinearLayout>
+        </LinearLayout>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -210,6 +234,21 @@
                 android:text="@string/chatbot_draft_copy_success_body"
                 android:textColor="@color/legal_lens_secondary_text"
                 android:textSize="@dimen/sp_14" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:layout_marginTop="@dimen/dp_24"
+                android:background="@drawable/bg_chatbot_source_badge"
+                android:fontFamily="@font/manrope"
+                android:paddingStart="@dimen/dp_8"
+                android:paddingTop="@dimen/dp_4"
+                android:paddingEnd="@dimen/dp_8"
+                android:paddingBottom="@dimen/dp_4"
+                android:text="@string/chatbot_draft_copy_success_badge"
+                android:textColor="@color/legal_lens_auth_accent"
+                android:textSize="@dimen/sp_11"
+                android:textStyle="bold" />
         </LinearLayout>
     </FrameLayout>
     <TextView
