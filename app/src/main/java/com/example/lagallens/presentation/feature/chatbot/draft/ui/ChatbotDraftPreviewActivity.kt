@@ -224,6 +224,7 @@ class ChatbotDraftPreviewActivity : DraftSessionActivity() {
         }
         sheetBinding.draftAiSuggestionTerm.setOnClickListener { sheetBinding.draftAiRequest.setText(R.string.chatbot_draft_ai_default_request) }
         sheetBinding.draftAiSuggestionPayment.setOnClickListener { sheetBinding.draftAiRequest.setText(R.string.chatbot_draft_ai_suggestion_payment_request) }
+        sheetBinding.draftAiSuggestionKeepRest.setOnClickListener { sheetBinding.draftAiRequest.setText(R.string.chatbot_draft_ai_suggestion_keep_rest_request) }
         sheetBinding.draftAiCancel.setOnClickListener { sheet.dismiss() }
         sheetBinding.draftAiSubmit.setOnClickListener {
             val text = sheetBinding.draftAiRequest.text?.toString().orEmpty().trim()
