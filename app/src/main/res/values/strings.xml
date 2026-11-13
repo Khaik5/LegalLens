@@ -809,11 +809,14 @@
     <string name="chatbot_history_third_timestamp" translatable="false">15/10/2026 · 10:05</string>
     <string name="chatbot_history_third_count" translatable="false">3 tin nhắn</string>
     <string name="chatbot_history_third_preview" translatable="false">Bên bán chịu trách nhiệm vận chuyển...</string>
-    <string name="chatbot_initial_greeting" translatable="false">Xin chào! Tôi đã sẵn sàng hỗ trợ. Dưới đây là một số câu hỏi gợi ý phù hợp nhất với loại hợp đồng thuê văn phòng này.</string>
-    <string name="chatbot_suggestion_contract_term" translatable="false">Thời hạn hợp đồng là bao lâu?</string>
-    <string name="chatbot_suggestion_salary" translatable="false">Lương được quy định như thế nào?</string>
-    <string name="chatbot_suggestion_notable_terms" translatable="false">Có điều khoản nào cần lưu ý?</string>
-    <string name="chatbot_suggestion_rights_and_obligations" translatable="false">Quyền và nghĩa vụ của tôi là gì?</string>
+    <string name="chatbot_initial_greeting">[DEMO] Tôi có thể minh họa các câu hỏi về hợp đồng lao động. Nội dung không phải tư vấn pháp lý.</string>
+    <string name="chatbot_suggestion_contract_term">Thời hạn hợp đồng lao động là bao lâu?</string>
+    <string name="chatbot_suggestion_salary">Lương được ghi trong hợp đồng thế nào?</string>
+    <string name="chatbot_suggestion_rights_and_obligations">Quyền lợi và nghĩa vụ của người lao động là gì?</string>
+    <string name="chatbot_suggestion_notable_terms">Cần lưu ý điều khoản nào?</string>
+    <string name="chatbot_new_chat_suggestion_termination">Rà soát điều khoản chấm dứt hợp đồng</string>
+    <string name="chatbot_new_chat_suggestion_probation">Giải thích thời gian thử việc</string>
+    <string name="chatbot_new_chat_suggestion_benefits">Tóm tắt quyền lợi trong hợp đồng</string>
     <string name="chatbot_citation_question" translatable="false">Mức phạt vi phạm hợp đồng được quy định thế nào?</string>
     <string name="chatbot_citation_response" translatable="false">Theo Điều 8.2 của hợp đồng, mức phạt vi phạm được thỏa thuận là 15% tổng giá trị hợp đồng.\n\nTuy nhiên, lưu ý rằng điều khoản này đang có rủi ro cao vì vượt quá mức trần 8% quy định bởi Luật Thương mại.</string>
     <string name="chatbot_citation_title" translatable="false">Điều 301 · Luật Thương mại 2005</string>
