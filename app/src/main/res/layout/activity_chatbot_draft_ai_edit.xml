@@ -55,26 +55,54 @@
                 android:orientation="vertical"
                 android:padding="@dimen/dp_16">
 
-                <TextView
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/manrope"
-                    android:text="@string/chatbot_draft_ai_source_label"
-                    android:textColor="@color/legal_lens_secondary_text"
-                    android:textSize="@dimen/sp_12" />
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <FrameLayout
+                        android:layout_width="@dimen/analysis_document_icon_size"
+                        android:layout_height="@dimen/analysis_document_icon_size"
+                        android:background="@drawable/bg_analysis_summary_document_icon">
+
+                        <ImageView
+                            android:layout_width="@dimen/analysis_document_icon_art_size"
+                            android:layout_height="@dimen/analysis_document_icon_art_size"
+                            android:layout_gravity="center"
+                            android:contentDescription="@null"
+                            android:src="@drawable/ic_ocr_saved_document" />
+                    </FrameLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/dp_12"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/draftAiSourceName"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/manrope"
+                            android:textColor="@color/legal_lens_primary"
+                            android:textSize="@dimen/sp_14"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/dp_4"
+                            android:fontFamily="@font/manrope"
+                            android:text="@string/chatbot_draft_ai_source_metadata"
+                            android:textColor="@color/legal_lens_secondary_text"
+                            android:textSize="@dimen/sp_12" />
+                    </LinearLayout>
+                </LinearLayout>
 
                 <TextView
-                    android:id="@+id/draftAiSourceName"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/dp_8"
-                    android:fontFamily="@font/manrope"
-                    android:textColor="@color/legal_lens_primary"
-                    android:textSize="@dimen/sp_14"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/draftAiScope"
+                    android:id="@+id/draftAiSourceBadge"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/dp_8"
@@ -85,20 +113,37 @@
                     android:paddingEnd="@dimen/dp_8"
                     android:paddingBottom="@dimen/dp_4"
                     android:textColor="@color/legal_lens_auth_accent"
-                    android:textSize="@dimen/sp_12"
+                    android:textSize="@dimen/sp_11"
                     android:textStyle="bold" />
             </LinearLayout>
 
-            <TextView
-                android:id="@+id/draftAiRequestCard"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/dp_16"
-                android:background="@drawable/bg_chatbot_user_message"
-                android:fontFamily="@font/manrope"
-                android:padding="@dimen/dp_12"
-                android:textColor="@color/legal_lens_status_text"
-                android:textSize="@dimen/sp_14" />
+                android:background="@drawable/bg_chatbot_source_document"
+                android:orientation="vertical"
+                android:padding="@dimen/dp_16">
+
+                <TextView
+                    android:id="@+id/draftAiScope"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/manrope"
+                    android:textAllCaps="true"
+                    android:textColor="@color/legal_lens_secondary_text"
+                    android:textSize="@dimen/sp_12"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/draftAiRequestCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dp_8"
+                    android:fontFamily="@font/manrope"
+                    android:textColor="@color/legal_lens_status_text"
+                    android:textSize="@dimen/sp_14" />
+            </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/draftAiLoading"
@@ -170,19 +215,33 @@
                 android:id="@+id/draftAiReady"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/dp_20"
-                android:background="@drawable/bg_chatbot_source_document"
+                android:layout_marginTop="@dimen/dp_32"
+                android:gravity="center_horizontal"
                 android:orientation="vertical"
-                android:padding="@dimen/dp_16"
                 android:visibility="gone">
+
+                <FrameLayout
+                    android:layout_width="@dimen/dp_56"
+                    android:layout_height="@dimen/dp_56"
+                    android:background="@drawable/bg_chatbot_ai_apply_success">
+
+                    <ImageView
+                        android:layout_width="@dimen/dp_28"
+                        android:layout_height="@dimen/dp_28"
+                        android:layout_gravity="center"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ic_chatbot_draft_success" />
+                </FrameLayout>
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dp_20"
                     android:fontFamily="@font/manrope"
+                    android:gravity="center"
                     android:text="@string/chatbot_draft_ai_proposal_title"
                     android:textColor="@color/legal_lens_primary"
-                    android:textSize="@dimen/sp_16"
+                    android:textSize="@dimen/sp_18"
                     android:textStyle="bold" />
 
                 <TextView
@@ -190,20 +249,25 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/dp_12"
                     android:fontFamily="@font/manrope"
+                    android:gravity="center"
+                    android:lineSpacingExtra="@dimen/dp_4"
                     android:text="@string/chatbot_draft_ai_proposal_change"
-                    android:textColor="@color/legal_lens_status_text"
+                    android:textColor="@color/legal_lens_secondary_text"
                     android:textSize="@dimen/sp_14" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/dp_12"
-                    android:background="@drawable/bg_chatbot_draft_warning"
+                    android:layout_marginTop="@dimen/dp_24"
+                    android:background="@drawable/bg_contract_export_success"
+                    android:drawableStart="@drawable/ic_chatbot_draft_success"
+                    android:drawablePadding="@dimen/dp_8"
                     android:fontFamily="@font/manrope"
+                    android:gravity="center_vertical"
                     android:padding="@dimen/dp_12"
                     android:text="@string/chatbot_draft_ai_proposal_note"
                     android:textColor="@color/legal_lens_secondary_text"
-                    android:textSize="@dimen/sp_12" />
+                    android:textSize="@dimen/sp_13" />
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

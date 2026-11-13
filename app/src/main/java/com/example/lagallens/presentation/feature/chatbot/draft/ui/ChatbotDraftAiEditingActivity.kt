@@ -82,7 +82,8 @@ class ChatbotDraftAiEditingActivity : DraftSessionActivity() {
         val ready = state.status == ChatbotDraftAiEditStatus.READY
         draftAiSourceName.text = getString(R.string.chatbot_draft_document_name, ChatbotDraftUiState.DRAFT_VERSION)
         draftAiRequestCard.text = state.request
-        draftAiScope.text = getString(if (state.scope == com.example.lagallens.presentation.feature.chatbot.draft.contract.ChatbotDraftAiEditUiState.WHOLE_CONTRACT_SCOPE) R.string.chatbot_draft_ai_scope_whole else R.string.chatbot_draft_ai_scope_selected)
+        draftAiSourceBadge.text = getString(R.string.chatbot_draft_ai_source_badge, ChatbotDraftUiState.DRAFT_VERSION)
+        draftAiScope.text = getString(if (state.scope == com.example.lagallens.presentation.feature.chatbot.draft.contract.ChatbotDraftAiEditUiState.WHOLE_CONTRACT_SCOPE) R.string.chatbot_draft_ai_request_label_whole else R.string.chatbot_draft_ai_request_label_selected)
         draftAiLoading.isVisible = loading
         draftAiError.isVisible = error
         draftAiReady.isVisible = ready
