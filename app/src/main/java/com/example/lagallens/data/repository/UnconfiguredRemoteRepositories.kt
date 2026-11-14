@@ -18,7 +18,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import com.example.lagallens.domain.model.processing.AnalysisJobState
 
+/** The backend has no user API to create or read analysis jobs yet. */
 class UnconfiguredRemoteAnalysisRepository : AnalysisRepository {
+    override val isAvailable: Boolean = false
     override suspend fun getOverview(identity: com.example.lagallens.domain.model.analysis.AnalysisIdentity): AnalysisOverview =
         throw BackendNotConfiguredException("Analysis")
     override suspend fun getDetail(identity: com.example.lagallens.domain.model.analysis.AnalysisIdentity, language: String): com.example.lagallens.domain.model.analysis.AnalysisDetail =
