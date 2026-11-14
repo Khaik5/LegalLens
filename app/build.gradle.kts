@@ -7,6 +7,8 @@ require(legalLensDataMode in setOf("DEMO", "REAL")) {
     "legalLensDataMode must be DEMO or REAL"
 }
 val legalLensApiBaseUrl = providers.gradleProperty("legalLensApiBaseUrl").orElse("").get()
+// Contract drafting is hidden until its backend flow is agreed; -PlegalLensContractDrafting=true shows it.
+val legalLensContractDrafting = providers.gradleProperty("legalLensContractDrafting").orElse("false").get().toBoolean()
 
 android {
     namespace = "com.example.lagallens"
@@ -27,6 +29,7 @@ android {
         testInstrumentationRunner = "com.example.lagallens.SandboxTestRunner"
         buildConfigField("String", "DATA_MODE", "\"$legalLensDataMode\"")
         buildConfigField("String", "API_BASE_URL", "\"$legalLensApiBaseUrl\"")
+        buildConfigField("boolean", "CONTRACT_DRAFTING_ENABLED", "$legalLensContractDrafting")
     }
 
     buildTypes {
@@ -34,6 +37,8 @@ android {
             initWith(getByName("debug"))
             applicationIdSuffix = ".testsandbox"
             matchingFallbacks += listOf("debug")
+            // The automated drafting tests run against this build.
+            buildConfigField("boolean", "CONTRACT_DRAFTING_ENABLED", "true")
         }
         debug {
             val debugApiBaseUrl = legalLensApiBaseUrl.ifBlank { "http://10.0.2.2:3000/" }

@@ -149,7 +149,10 @@ class ChatbotMessageAdapter(
         fun bind(item: ChatbotMessage) = with(binding) {
             val error = requireNotNull(item.error)
             chatbotErrorTitle.text = error.titleRes?.let { root.context.getString(it) } ?: error.title.ifBlank { root.context.getString(R.string.operation_failed) }
-            chatbotErrorRetryLabel.text = error.retryLabel.ifBlank { root.context.getString(R.string.freeze_retry) }
+            chatbotErrorRetryLabel.text = if (error.isRetrying) root.context.getString(R.string.chatbot_answer_checking)
+                else error.retryLabel.ifBlank { root.context.getString(R.string.freeze_retry) }
+            chatbotErrorRetry.isEnabled = !error.isRetrying
+            chatbotErrorRetry.alpha = if (error.isRetrying) RETRYING_ALPHA else 1f
             chatbotErrorRetry.setOnClickListener { onRetryClicked(item.id) }
         }
     }
@@ -161,6 +164,7 @@ class ChatbotMessageAdapter(
     }
 
     private companion object {
+        const val RETRYING_ALPHA = 0.5f
         const val VIEW_TYPE_ASSISTANT = 1
         const val VIEW_TYPE_USER = 2
         const val VIEW_TYPE_ASSISTANT_CITATION = 3
