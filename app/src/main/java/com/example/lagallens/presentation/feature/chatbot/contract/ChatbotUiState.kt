@@ -18,5 +18,6 @@ data class ChatbotUiState(
     val draftGenerationStatus: DraftGenerationStatus = DraftGenerationStatus.NONE,
     val isDrawerVisible: Boolean = false,
     val attachmentUri: String? = null,
-    val attachmentName: String? = null
+    val attachmentName: String? = null,
+    val isContractDraftingEnabled: Boolean = true
 )

@@ -844,6 +844,15 @@
     <string name="chatbot_error_title">Không thể kết nối. Vui lòng thử lại.</string>
     <string name="chatbot_error_retry">Thử lại</string>
     <string name="chatbot_error_retry_content_description">Thử gửi lại câu hỏi</string>
+    <string name="chatbot_remote_greeting">Tôi có thể trả lời câu hỏi về hợp đồng này kèm căn cứ pháp lý. Nội dung chỉ để tham khảo, không phải tư vấn pháp lý.</string>
+    <string name="chatbot_answer_pending">Câu hỏi đã được gửi nhưng chưa có câu trả lời. Hãy kiểm tra lại sau ít phút.</string>
+    <string name="chatbot_answer_check_again">Kiểm tra lại</string>
+    <string name="chatbot_answer_checking">Đang kiểm tra…</string>
+    <string name="chatbot_new_chat_question_description">Đặt câu hỏi về hợp đồng gốc.</string>
+    <string name="chatbot_answer_failed">Không thể tạo câu trả lời. Vui lòng thử lại.</string>
+    <string name="chatbot_legal_reference_section_title">Căn cứ pháp lý (%1$d)</string>
+    <string name="chatbot_legal_reference_article">Điều %1$s</string>
+    <string name="chatbot_legal_reference_unknown">Điều luật #%1$d</string>
 +    <string name="credit_store_title">Cửa hàng Credit</string>
     <string name="credit_store_back_description">Quay lại</string>
     <string name="credit_store_wallet_icon_description">Ví Credit</string>

@@ -482,6 +482,15 @@
     <string name="chatbot_error_title">Unable to connect. Please try again.</string>
     <string name="chatbot_error_retry">Try again</string>
     <string name="chatbot_error_retry_content_description">Resend the question</string>
+    <string name="chatbot_remote_greeting">I can answer questions about this contract with legal references. This is for reference only and is not legal advice.</string>
+    <string name="chatbot_answer_pending">Your question was sent but has no answer yet. Check again in a few minutes.</string>
+    <string name="chatbot_answer_check_again">Check again</string>
+    <string name="chatbot_answer_checking">Checking…</string>
+    <string name="chatbot_new_chat_question_description">Ask about the original contract.</string>
+    <string name="chatbot_answer_failed">The answer could not be created. Please try again.</string>
+    <string name="chatbot_legal_reference_section_title">Legal references (%1$d)</string>
+    <string name="chatbot_legal_reference_article">Article %1$s</string>
+    <string name="chatbot_legal_reference_unknown">Legal article #%1$d</string>
     <string name="chatbot_initial_greeting">[DEMO] I can illustrate questions about employment contracts. This is not legal advice.</string>
     <string name="chatbot_suggestion_contract_term">How long is the employment contract?</string>
     <string name="chatbot_suggestion_salary">How is the salary set out in the contract?</string>

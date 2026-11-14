@@ -40,5 +40,6 @@ data class ChatbotNoEvidence(
 data class ChatbotError(
     val title: String,
     val retryLabel: String,
-    val titleRes: Int? = null
+    val titleRes: Int? = null,
+    val isRetrying: Boolean = false
 )
