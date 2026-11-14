@@ -848,6 +848,7 @@
     <string name="chatbot_answer_pending">Câu hỏi đã được gửi nhưng chưa có câu trả lời. Hãy kiểm tra lại sau ít phút.</string>
     <string name="chatbot_answer_check_again">Kiểm tra lại</string>
     <string name="chatbot_answer_checking">Đang kiểm tra…</string>
+    <string name="analysis_ai_unavailable">Phân tích AI chưa sẵn sàng. Vui lòng thử lại sau.</string>
     <string name="chatbot_new_chat_question_description">Đặt câu hỏi về hợp đồng gốc.</string>
     <string name="chatbot_answer_failed">Không thể tạo câu trả lời. Vui lòng thử lại.</string>
     <string name="chatbot_legal_reference_section_title">Căn cứ pháp lý (%1$d)</string>
