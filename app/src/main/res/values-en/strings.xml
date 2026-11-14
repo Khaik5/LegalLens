@@ -486,6 +486,7 @@
     <string name="chatbot_answer_pending">Your question was sent but has no answer yet. Check again in a few minutes.</string>
     <string name="chatbot_answer_check_again">Check again</string>
     <string name="chatbot_answer_checking">Checking…</string>
+    <string name="analysis_ai_unavailable">AI analysis is not available yet. Please try again later.</string>
     <string name="chatbot_new_chat_question_description">Ask about the original contract.</string>
     <string name="chatbot_answer_failed">The answer could not be created. Please try again.</string>
     <string name="chatbot_legal_reference_section_title">Legal references (%1$d)</string>
