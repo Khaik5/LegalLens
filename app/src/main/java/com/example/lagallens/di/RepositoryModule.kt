@@ -25,7 +25,6 @@ import com.example.lagallens.data.datasource.remote.api.AuthSessionApi
 import com.example.lagallens.data.datasource.remote.api.ContractApi
 import com.example.lagallens.data.datasource.remote.api.UserApi
 import com.example.lagallens.data.repository.RemoteAuthRepository
-import com.example.lagallens.data.repository.UnconfiguredRemoteChatbotRepository
 import com.example.lagallens.data.repository.RemoteOcrRepository
 import com.example.lagallens.data.datasource.remote.OcrRemoteDataSource
 import com.example.lagallens.data.datasource.remote.api.OcrApi
@@ -73,6 +72,12 @@ import com.example.lagallens.data.repository.SessionScopedDraftRepository
 import com.example.lagallens.data.datasource.local.datastore.AccountStorageName
 import com.example.lagallens.data.repository.SessionScopedEmploymentRepositories
 import com.example.lagallens.data.datasource.remote.rotateTokens
+import com.example.lagallens.data.datasource.remote.ChatbotRemoteDataSource
+import com.example.lagallens.data.datasource.remote.api.ChatbotApi
+import com.example.lagallens.data.repository.RemoteChatbotContractInfo
+import com.example.lagallens.data.repository.RemoteChatbotLabels
+import com.example.lagallens.data.repository.RemoteChatbotRepository
+import com.example.lagallens.presentation.feature.contracts.contract.labelRes
 import retrofit2.Retrofit
 
 object RepositoryModule {
@@ -190,7 +195,56 @@ object RepositoryModule {
 
     fun provideChatbotRepository(context: Context): ChatbotRepository = when (DataModeConfig.current) {
         AppDataMode.DEMO -> FakeChatbotRepository(context.applicationContext)
-        AppDataMode.REAL -> UnconfiguredRemoteChatbotRepository(remoteSessionKey(context))
+        AppDataMode.REAL -> {
+            val appContext = context.applicationContext
+            val contracts by lazy { provideContractRepository(appContext) }
+            RemoteChatbotRepository(
+                EncryptedTokenStore(context),
+                ChatbotRemoteDataSource(lazy { authenticatedRetrofit(context).create(ChatbotApi::class.java) }),
+                labels = { remoteChatbotLabels(localizedContext(appContext)) },
+                contractInfo = { contractId ->
+                    contracts.getContract(contractId)?.let { contract ->
+                        RemoteChatbotContractInfo(contract.title, localizedContext(appContext).getString(contract.type.labelRes()))
+                    }
+                }
+            )
+        }
+    }
+
+    private fun remoteChatbotLabels(context: Context) = RemoteChatbotLabels(
+        greeting = context.getString(R.string.chatbot_remote_greeting),
+        initialSuggestions = listOf(
+            R.string.chatbot_suggestion_contract_term,
+            R.string.chatbot_suggestion_salary,
+            R.string.chatbot_suggestion_rights_and_obligations,
+            R.string.chatbot_suggestion_notable_terms
+        ).map(context::getString),
+        newConversationSuggestions = listOf(
+            R.string.chatbot_new_chat_suggestion_termination,
+            R.string.chatbot_new_chat_suggestion_probation,
+            R.string.chatbot_new_chat_suggestion_benefits
+        ).map(context::getString),
+        pendingTitle = context.getString(R.string.chatbot_answer_pending),
+        checkAgainLabel = context.getString(R.string.chatbot_answer_check_again),
+        failedTitle = context.getString(R.string.chatbot_answer_failed),
+        retryLabel = context.getString(R.string.chatbot_error_retry),
+        noEvidenceTitle = context.getString(R.string.chatbot_no_evidence_title),
+        referenceSectionTitle = { count -> context.getString(R.string.chatbot_legal_reference_section_title, count) },
+        articleTitle = { number, title, id ->
+            val article = number?.takeIf(String::isNotBlank)?.let { context.getString(R.string.chatbot_legal_reference_article, it) }
+            listOfNotNull(article, title?.takeIf(String::isNotBlank)).joinToString(". ")
+                .ifBlank { context.getString(R.string.chatbot_legal_reference_unknown, id) }
+        }
+    )
+
+    /** Resources in the language the user picked in Settings, which the application context does not follow. */
+    private fun localizedContext(context: Context): Context {
+        val language = androidx.appcompat.app.AppCompatDelegate.getApplicationLocales().toLanguageTags()
+            .ifBlank { context.resources.configuration.locales.toLanguageTags() }
+        val configuration = android.content.res.Configuration(context.resources.configuration).apply {
+            setLocale(java.util.Locale.forLanguageTag(language.substringBefore(',')))
+        }
+        return context.createConfigurationContext(configuration)
     }
 
     private fun documentRemote(context: Context) =

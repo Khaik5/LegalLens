@@ -346,71 +346,7 @@
                 android:textColor="@color/white"
                 android:textSize="@dimen/sp_14"
                 android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/chatbotNewSuggestionPayment"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-            android:minHeight="@dimen/chatbot_new_state_suggestion_height"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-                android:layout_marginTop="@dimen/chatbot_new_state_suggestion_gap"
-                android:background="@drawable/bg_chatbot_new_state_suggestion"
-                android:clickable="true"
-                android:focusable="true"
-                android:fontFamily="@font/manrope"
-                android:foreground="?attr/selectableItemBackground"
-                android:gravity="center"
-                android:includeFontPadding="false"
-                android:paddingStart="@dimen/chatbot_new_state_suggestion_padding"
-                android:paddingEnd="@dimen/chatbot_new_state_suggestion_padding"
-                android:textColor="@color/legal_lens_primary"
-                android:textSize="@dimen/sp_14"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/chatbotNewSuggestionPenalty"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-            android:minHeight="@dimen/chatbot_new_state_suggestion_height"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-                android:layout_marginTop="@dimen/chatbot_new_state_suggestion_gap"
-                android:background="@drawable/bg_chatbot_new_state_suggestion"
-                android:clickable="true"
-                android:focusable="true"
-                android:fontFamily="@font/manrope"
-                android:foreground="?attr/selectableItemBackground"
-                android:gravity="center"
-                android:includeFontPadding="false"
-                android:paddingStart="@dimen/chatbot_new_state_suggestion_padding"
-                android:paddingEnd="@dimen/chatbot_new_state_suggestion_padding"
-                android:textColor="@color/legal_lens_primary"
-                android:textSize="@dimen/sp_14"
-                android:textStyle="bold" />
         </LinearLayout>
-
-        <TextView android:fontFamily="@font/manrope"
-            android:id="@+id/chatbotNewStateDisclaimer"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/chatbot_new_state_side_padding"
-            android:layout_marginTop="@dimen/chatbot_new_state_disclaimer_margin_top"
-            android:layout_marginEnd="@dimen/chatbot_new_state_side_padding"
-            android:includeFontPadding="false"
-            android:background="@drawable/bg_chatbot_grounded_notice"
-            android:drawableStart="@drawable/ic_credit_low_info"
-            android:drawablePadding="@dimen/dp_8"
-            android:drawableTint="@color/legal_lens_auth_accent"
-            android:gravity="center_vertical"
-            android:padding="@dimen/dp_12"
-            android:lineSpacingExtra="@dimen/chatbot_new_state_disclaimer_line_spacing"
-            android:text="@string/chatbot_grounded_answer_notice"
-            android:textColor="@color/legal_lens_secondary_text"
-            android:textSize="@dimen/chatbot_new_state_disclaimer_text_size"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/chatbotNewSuggestions" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
 

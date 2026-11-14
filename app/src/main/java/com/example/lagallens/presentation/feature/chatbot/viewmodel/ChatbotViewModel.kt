@@ -1,5 +1,6 @@
 package com.example.lagallens.presentation.feature.chatbot.viewmodel
 
+import com.example.lagallens.core.constants.FeatureFlags
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -38,11 +39,12 @@ class ChatbotViewModel(
     private val openConversation: OpenChatbotConversationUseCase,
     private val sendMessage: SendChatbotMessageUseCase,
     private val retryMessage: RetryChatbotMessageUseCase,
+    private val isContractDraftingEnabled: Boolean = FeatureFlags.isContractDraftingEnabled,
     private val draftAi: () -> com.example.lagallens.domain.repository.DraftAiRepository
 ) : ViewModel() {
     private val ownerSession = openConversation.currentSessionKey()
     private val sessionJobs = mutableSetOf<Job>()
-    private val _uiState = MutableStateFlow(ChatbotUiState())
+    private val _uiState = MutableStateFlow(ChatbotUiState(isContractDraftingEnabled = isContractDraftingEnabled))
     val uiState = _uiState.asStateFlow()
 
     private val _uiEffect = Channel<ChatbotUiEffect>(Channel.BUFFERED)
@@ -273,6 +275,7 @@ class ChatbotViewModel(
     }
 
     private fun startDraftConversation(requestText: String, clarificationText: String) {
+        if (!isContractDraftingEnabled) return
         val previous = _uiState.value
         if (!previous.isConversationReady || previous.isReplyPending) return
         val request = ChatbotMessage(
@@ -391,7 +394,7 @@ class ChatbotViewModel(
         val activeConversationId = conversationId ?: return
         val question = failedQuestions[messageId] ?: return
         if (_uiState.value.isReplyPending) return
-        _uiState.update { it.copy(isReplyPending = true) }
+        _uiState.update { it.copy(isReplyPending = true).withRetrying(messageId, true) }
         launchForSession {
             val retriedMessage = try {
                 retryMessage.forSession(ownerSession, activeConversationId, question, failedAttachments[messageId]).toMessage(messageId)
@@ -399,7 +402,7 @@ class ChatbotViewModel(
                 throw cancellationException
             } catch (failure: Exception) {
                 if (openConversation.currentSessionKey() != ownerSession) return@launchForSession
-                _uiState.update { it.copy(isReplyPending = false) }
+                _uiState.update { it.copy(isReplyPending = false).withRetrying(messageId, false) }
                 emitEffect(ChatbotUiEffect.ShowMessage(failure.toFailureMessage()))
                 return@launchForSession
             }
@@ -419,6 +422,13 @@ class ChatbotViewModel(
             persistTranscript()
         }
     }
+
+    /** Shows on the card that its retry is running, since an unanswered question can take a while to check. */
+    private fun ChatbotUiState.withRetrying(messageId: Long, isRetrying: Boolean) = copy(
+        messages = messages.map { message ->
+            if (message.id == messageId) message.copy(error = message.error?.copy(isRetrying = isRetrying)) else message
+        }
+    )
 
     private fun persistTranscript() {
         val id = conversationId ?: return
@@ -525,7 +535,7 @@ class ChatbotViewModel(
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             require(modelClass.isAssignableFrom(ChatbotViewModel::class.java))
-            return ChatbotViewModel(openConversation, sendMessage, retryMessage, draftAi) as T
+            return ChatbotViewModel(openConversation, sendMessage, retryMessage, draftAi = draftAi) as T
         }
     }
 

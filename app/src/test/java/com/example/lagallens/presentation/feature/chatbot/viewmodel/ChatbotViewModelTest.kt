@@ -152,6 +152,60 @@ class ChatbotViewModelTest {
         assertEquals(true, error.errorRetryLabel != null)
     }
 
+    @Test
+    fun checkingAgainMarksTheCardUntilTheServerAnswers() = runTest {
+        val stored = FakeChatbotRepository()
+        val answer = kotlinx.coroutines.CompletableDeferred<com.example.lagallens.domain.model.chatbot.ChatbotReply>()
+        val pending = com.example.lagallens.domain.model.chatbot.ChatbotReply.RetryableError("Chưa có câu trả lời", "Kiểm tra lại")
+        val waiting = object : com.example.lagallens.domain.repository.ChatbotRepository by stored {
+            override suspend fun sendForSession(
+                sessionKey: String?, conversationId: String, message: String,
+                attachment: com.example.lagallens.domain.model.chatbot.ChatbotAttachment?
+            ) = pending
+            override suspend fun retryForSession(
+                sessionKey: String?, conversationId: String, message: String,
+                attachment: com.example.lagallens.domain.model.chatbot.ChatbotAttachment?
+            ) = answer.await()
+        }
+        val viewModel = viewModel(waiting)
+        openScreen(viewModel)
+        viewModel.onEvent(ChatbotUiEvent.MessageChanged("Lương?"))
+        viewModel.onEvent(ChatbotUiEvent.SendClicked)
+        advanceUntilIdle()
+        val card = viewModel.uiState.value.messages.last()
+
+        viewModel.onEvent(ChatbotUiEvent.ErrorRetryClicked(card.id))
+        advanceUntilIdle()
+
+        assertEquals(true, viewModel.uiState.value.messages.last().error?.isRetrying)
+        answer.complete(com.example.lagallens.domain.model.chatbot.ChatbotReply.Answer("10 triệu."))
+        advanceUntilIdle()
+        val replaced = viewModel.uiState.value.messages.last()
+        assertEquals("10 triệu.", replaced.content)
+        assertEquals(null, replaced.error)
+    }
+
+    @Test
+    fun draftingCannotStartWhenItIsDisabled() = runTest {
+        val viewModel = ChatbotViewModel(
+            openConversation = OpenChatbotConversationUseCase(FakeChatbotRepository()),
+            sendMessage = SendChatbotMessageUseCase(FakeChatbotRepository()),
+            retryMessage = RetryChatbotMessageUseCase(FakeChatbotRepository()),
+            draftAi = { com.example.lagallens.TestDraftAiRepository() },
+            isContractDraftingEnabled = false
+        )
+        openScreen(viewModel)
+        advanceUntilIdle()
+
+        viewModel.onEvent(ChatbotUiEvent.NewDraftClicked("Tạo hợp đồng mới", "Bạn cần thông tin gì?"))
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertEquals(false, state.isContractDraftingEnabled)
+        assertEquals(false, state.isDraftConversation)
+        assertEquals(true, state.messages.none { it.content == "Tạo hợp đồng mới" })
+    }
+
     private fun viewModel(repository: com.example.lagallens.domain.repository.ChatbotRepository = FakeChatbotRepository()): ChatbotViewModel {
         return ChatbotViewModel(
             openConversation = OpenChatbotConversationUseCase(repository),

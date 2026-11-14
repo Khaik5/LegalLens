@@ -88,7 +88,7 @@ class ChatbotActivity : AppCompatActivity() {
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
             keyboardVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
             val state = viewModel.uiState.value
-            binding.chatbotSuggestions.isVisible = !keyboardVisible && !state.isNewConversation && !state.isDraftReviewVisible && state.draftGenerationStatus == DraftGenerationStatus.NONE && (state.suggestions.isNotEmpty() || state.isDraftReviewReady || (!state.isDraftConversation && state.messages.size > 1))
+            binding.chatbotSuggestions.isVisible = !keyboardVisible && !state.isNewConversation && !state.isDraftReviewVisible && state.draftGenerationStatus == DraftGenerationStatus.NONE && (state.suggestions.isNotEmpty() || state.isDraftReviewReady || (state.isContractDraftingEnabled && !state.isDraftConversation && state.messages.size > 1))
             val ime = insets.getInsets(WindowInsetsCompat.Type.ime())
             view.setPadding(
                 systemBars.left,
@@ -172,12 +172,6 @@ class ChatbotActivity : AppCompatActivity() {
                 )
             )
         }
-        chatbotNewSuggestionPayment.setOnClickListener {
-            viewModel.onEvent(ChatbotUiEvent.SuggestionClicked(chatbotNewSuggestionPayment.text.toString()))
-        }
-        chatbotNewSuggestionPenalty.setOnClickListener {
-            viewModel.onEvent(ChatbotUiEvent.SuggestionClicked(chatbotNewSuggestionPenalty.text.toString()))
-        }
         chatbotInput.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEND) {
                 sendCurrentMessage()
@@ -250,21 +244,21 @@ class ChatbotActivity : AppCompatActivity() {
             chatbotInput.setText(state.messageDraft)
             chatbotInput.setSelection(state.messageDraft.length)
         }
-        chatbotSuggestions.isVisible = !keyboardVisible && !state.isNewConversation && !state.isDraftReviewVisible && !showGeneration && (state.suggestions.isNotEmpty() || state.isDraftReviewReady || (!state.isDraftConversation && state.messages.size > 1))
+        chatbotSuggestions.isVisible = !keyboardVisible && !state.isNewConversation && !state.isDraftReviewVisible && !showGeneration && (state.suggestions.isNotEmpty() || state.isDraftReviewReady || (state.isContractDraftingEnabled && !state.isDraftConversation && state.messages.size > 1))
         chatbotSuggestionContractTerm.text = state.suggestions.getOrNull(0).orEmpty()
         chatbotSuggestionSalary.text = state.suggestions.getOrNull(1).orEmpty()
         chatbotSuggestionNotableTerms.text = state.suggestions.getOrNull(2).orEmpty()
         chatbotSuggestionRightsAndObligations.text = state.suggestions.getOrNull(3).orEmpty()
         chatbotDraftReviewAction.isVisible = state.isDraftReviewReady
-        val showNewDraftAction = !state.isNewConversation && !state.isDraftConversation && state.messages.size > 1 && !state.isDraftReviewReady
+        val showNewDraftAction = state.isContractDraftingEnabled && !state.isNewConversation && !state.isDraftConversation && state.messages.size > 1 && !state.isDraftReviewReady
         chatbotSuggestionContractTerm.isVisible = !state.isDraftReviewReady && !showNewDraftAction
         chatbotSuggestionSalary.isVisible = !state.isDraftReviewReady && !showNewDraftAction
         chatbotSuggestionNotableTerms.isVisible = !state.isDraftReviewReady && !showNewDraftAction
         chatbotSuggestionRightsAndObligations.isVisible = !state.isDraftReviewReady && !showNewDraftAction
         chatbotNewDraftFromDocument.isVisible = showNewDraftAction
         chatbotNewSuggestionRisk.text = getString(R.string.chatbot_new_draft_from_document)
-        chatbotNewSuggestionPayment.text = getString(R.string.chatbot_new_chat_term_question)
-        chatbotNewSuggestionPenalty.text = getString(R.string.chatbot_new_chat_rights_question)
+        chatbotNewSuggestions.isVisible = state.isContractDraftingEnabled
+        chatbotNewStateDescription.setText(if (state.isContractDraftingEnabled) R.string.chatbot_new_chat_description else R.string.chatbot_new_chat_question_description)
         chatbotMore.setImageResource(
             R.drawable.ic_chatbot_new_chat_add
         )
