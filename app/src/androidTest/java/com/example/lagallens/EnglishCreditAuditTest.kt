@@ -53,7 +53,7 @@ class EnglishCreditAuditTest {
     }
 
     @Test fun popularPackageDescriptionIsEnglish() {
-        val intent = PurchaseConfirmationActivity.createIntent(app, com.example.lagallens.presentation.feature.creditstore.contract.CreditPackage("credits_15", 15, 79_000, "15 Credits", ""), 5)
+        val intent = PurchaseConfirmationActivity.createIntent(app, com.example.lagallens.presentation.feature.creditstore.contract.CreditPackage("credits_15", 15, 79_000, "15 Credits", "", isRecommended = true), 5)
         ActivityScenario.launch<PurchaseConfirmationActivity>(intent).use {
             awaitEnglish(it)
             onView(withText("Confirm Credit purchase")).check(matches(isDisplayed()))

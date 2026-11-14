@@ -123,7 +123,8 @@ class FullAuditDeviceTest {
         }
     }
 
-    @Test fun profileEmptyNameAndPhoneAreRejectedWithoutSaving() {
+    /** The phone number is optional; only the empty name blocks saving. */
+    @Test fun profileEmptyNameIsRejectedButEmptyPhoneIsAllowed() {
         ActivityScenario.launch(MainActivity::class.java).use {
             onView(withId(R.id.navProfile)).perform(click())
             onView(withId(R.id.actionEditProfile)).perform(scrollTo(), click())
@@ -131,7 +132,7 @@ class FullAuditDeviceTest {
             onView(withId(R.id.etProfilePhone)).perform(replaceText(""), closeSoftKeyboard())
             onView(withId(R.id.btnSaveProfile)).perform(click())
             onView(withId(R.id.tvProfileNameError)).check(matches(isDisplayed()))
-            onView(withId(R.id.tvProfilePhoneError)).check(matches(isDisplayed()))
+            onView(withId(R.id.tvProfilePhoneError)).check(matches(not(isDisplayed())))
         }
     }
 }
