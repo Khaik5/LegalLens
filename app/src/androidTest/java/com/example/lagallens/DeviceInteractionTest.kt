@@ -128,7 +128,7 @@ class DeviceInteractionTest {
         val context = ApplicationProvider.getApplicationContext<android.content.Context>()
         val intent = ChatbotActivity.createIntent(context, "Hợp đồng lao động mẫu", "Hợp đồng lao động")
         ActivityScenario.launch<ChatbotActivity>(intent).use {
-            onView(withId(R.id.chatbotBack)).perform(click())
+            onView(withId(R.id.chatbotMenu)).perform(click())
             onView(withId(R.id.chatbotDrawerHistory)).perform(click())
             Thread.sleep(800)
             onView(withId(R.id.chatbotHistorySearch)).perform(click())

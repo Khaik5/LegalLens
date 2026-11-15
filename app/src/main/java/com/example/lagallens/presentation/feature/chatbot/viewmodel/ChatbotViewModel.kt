@@ -116,6 +116,8 @@ class ChatbotViewModel(
             ChatbotUiEvent.AttachmentSavedClicked -> emitEffect(ChatbotUiEffect.ShowMessage(R.string.chatbot_attachment_saved_unavailable))
             is ChatbotUiEvent.AttachmentSelected -> _uiState.update { it.copy(attachmentUri = event.uri, attachmentName = event.name) }
             ChatbotUiEvent.AttachmentRemoved -> _uiState.update { it.copy(attachmentUri = null, attachmentName = null) }
+            ChatbotUiEvent.BackClicked -> emitEffect(ChatbotUiEffect.NavigateBack)
+            ChatbotUiEvent.SourceDocumentClicked -> _uiState.value.sourceContractId?.let { emitEffect(ChatbotUiEffect.NavigateToContractDetail(it)) }
             ChatbotUiEvent.DrawerOpened -> _uiState.update { it.copy(isDrawerVisible = true) }
             ChatbotUiEvent.DrawerDismissed -> _uiState.update { it.copy(isDrawerVisible = false) }
             ChatbotUiEvent.NewChatClicked -> resetConversation()
@@ -131,6 +133,7 @@ class ChatbotViewModel(
         if (hasOpened) return
         hasOpened = true
         previewDraftError = event.previewDraftError
+        _uiState.update { it.copy(sourceContractId = event.contractId?.takeIf(String::isNotBlank)) }
         launchForSession {
             val conversation = try {
                 openConversation.openForSession(ownerSession, event.contractName, event.contractType, event.contractId, event.conversationId)

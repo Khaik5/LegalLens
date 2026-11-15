@@ -712,6 +712,8 @@
     <string name="analysis_risk_citation_highlight" translatable="false">không quá 8%</string>
     <string name="analysis_risk_citation_return">Quay lại phân tích rủi ro</string>
     <string name="chatbot_back_content_description">Mở điều hướng hội thoại</string>
+    <string name="chatbot_navigate_back_content_description">Quay lại</string>
+    <string name="chatbot_open_source_contract_content_description">Mở chi tiết hợp đồng gốc</string>
     <string name="chatbot_more_content_description">Tùy chọn hội thoại</string>
     <string name="chatbot_default_contract_name" translatable="false">HĐ Lao động mẫu</string>
     <string name="chatbot_default_source_name" translatable="false">Hợp đồng lao động mẫu · DEMO</string>

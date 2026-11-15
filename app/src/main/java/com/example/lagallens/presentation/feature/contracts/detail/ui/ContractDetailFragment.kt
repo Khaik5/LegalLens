@@ -116,7 +116,7 @@ class ContractDetailFragment : Fragment() {
                         )
                         is ContractDetailUiEffect.NavigateToAnalysis -> openAnalysis(effect)
                         is ContractDetailUiEffect.NavigateToChatbot -> startActivity(
-                            ChatbotActivity.createIntent(
+                            ChatbotActivity.createFromContractDetailIntent(
                                 requireContext(),
                                 effect.contractName,
                                 getString(effect.contractTypeRes),
