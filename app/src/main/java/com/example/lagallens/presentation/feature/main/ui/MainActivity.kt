@@ -89,13 +89,23 @@ class MainActivity : AppCompatActivity() {
         super.onResumeFragments()
         val contractId = intent.getStringExtra(EXTRA_UPLOADED_CONTRACT) ?: return
         val session = intent.getStringExtra(EXTRA_UPLOAD_SESSION)
+        val replacesDetail = intent.getBooleanExtra(EXTRA_REPLACE_CONTRACT_DETAIL, false)
         intent.removeExtra(EXTRA_UPLOADED_CONTRACT)
         intent.removeExtra(EXTRA_UPLOAD_SESSION)
+        intent.removeExtra(EXTRA_REPLACE_CONTRACT_DETAIL)
         if (session == null || (application as LegalLensApplication).currentSessionKey() != session) return
         val host = supportFragmentManager.findFragmentById(R.id.mainNavHost) as? NavHostFragment ?: return
-        host.navController.navigate(
+        val navController = host.navController
+        val current = navController.currentBackStackEntry
+        val isShowingThisContract = current?.destination?.id == R.id.contractDetailFragment &&
+            current.arguments?.getString(ContractDetailFragment.ARG_CONTRACT_ID) == contractId
+        if (replacesDetail && isShowingThisContract) return
+        navController.navigate(
             R.id.contractDetailFragment,
-            Bundle().apply { putString(ContractDetailFragment.ARG_CONTRACT_ID, contractId) }
+            Bundle().apply { putString(ContractDetailFragment.ARG_CONTRACT_ID, contractId) },
+            // From the Chatbot, the new contract replaces the detail the chat was opened from,
+            // so Back leaves the contract instead of returning to a different one.
+            if (replacesDetail) navOptions { popUpTo(R.id.contractDetailFragment) { inclusive = true } } else null
         )
     }
 
@@ -230,12 +240,17 @@ class MainActivity : AppCompatActivity() {
     companion object {
         private const val EXTRA_UPLOADED_CONTRACT = "uploaded_contract"
         private const val EXTRA_UPLOAD_SESSION = "upload_owner_session"
+        private const val EXTRA_REPLACE_CONTRACT_DETAIL = "replace_contract_detail"
 
         fun contractDetailIntent(context: Context, contractId: String, session: String): Intent =
             Intent(context, MainActivity::class.java)
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
                 .putExtra(EXTRA_UPLOADED_CONTRACT, contractId)
                 .putExtra(EXTRA_UPLOAD_SESSION, session)
+
+        /** Opens a contract from the Chatbot, replacing the contract detail already open. */
+        fun contractDetailFromChatbotIntent(context: Context, contractId: String, session: String): Intent =
+            contractDetailIntent(context, contractId, session).putExtra(EXTRA_REPLACE_CONTRACT_DETAIL, true)
 
         private val stickerDestinationIds = setOf(
             R.id.contractListFragment,

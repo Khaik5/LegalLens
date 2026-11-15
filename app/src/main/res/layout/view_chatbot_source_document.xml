@@ -4,7 +4,19 @@
     android:layout_width="match_parent"
     android:layout_height="@dimen/chatbot_document_card_height"
     android:background="@drawable/bg_chatbot_source_document"
+    android:foreground="?attr/selectableItemBackground"
     android:padding="@dimen/chatbot_document_card_padding">
+
+    <ImageView
+        android:id="@+id/chatbotSourceOpen"
+        android:layout_width="@dimen/dp_20"
+        android:layout_height="@dimen/dp_20"
+        android:contentDescription="@null"
+        android:src="@drawable/ic_contract_search_chevron_right"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/chatbotSourceIcon"
@@ -29,7 +41,8 @@
         android:textColor="@color/legal_lens_primary"
         android:textSize="@dimen/chatbot_document_title_text_size"
         android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="@dimen/dp_8"
+        app:layout_constraintEnd_toStartOf="@id/chatbotSourceOpen"
         app:layout_constraintStart_toEndOf="@id/chatbotSourceIcon"
         app:layout_constraintTop_toTopOf="@id/chatbotSourceIcon" />
 

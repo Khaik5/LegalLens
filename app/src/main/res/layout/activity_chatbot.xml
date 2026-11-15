@@ -22,9 +22,9 @@
             android:layout_width="@dimen/chatbot_header_action_size"
             android:layout_height="@dimen/chatbot_header_action_size"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/chatbot_back_content_description"
+            android:contentDescription="@string/chatbot_navigate_back_content_description"
             android:padding="@dimen/chatbot_header_action_padding"
-            android:src="@drawable/ic_chatbot_menu"
+            android:src="@drawable/ic_contract_search_back"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -38,7 +38,7 @@
             android:gravity="center_vertical"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/chatbotMore"
+            app:layout_constraintEnd_toStartOf="@id/chatbotMenu"
             app:layout_constraintStart_toEndOf="@id/chatbotBack"
             app:layout_constraintTop_toTopOf="parent">
 
@@ -70,13 +70,13 @@
         </LinearLayout>
 
         <ImageButton
-            android:id="@+id/chatbotMore"
+            android:id="@+id/chatbotMenu"
             android:layout_width="@dimen/chatbot_header_action_size"
             android:layout_height="@dimen/chatbot_header_action_size"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/chatbot_more_content_description"
+            android:contentDescription="@string/chatbot_back_content_description"
             android:padding="@dimen/chatbot_header_action_padding"
-            android:src="@drawable/ic_analysis_risk_overview_more"
+            android:src="@drawable/ic_chatbot_menu"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

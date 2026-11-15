@@ -5,6 +5,8 @@ enum class DraftGenerationStatus { NONE, LOADING, ERROR, SUCCESS }
 data class ChatbotUiState(
     val contractName: String = "",
     val contractType: String = "",
+    /** The contract the chat is about; null for a chat without a contract. */
+    val sourceContractId: String? = null,
     val messageDraft: String = "",
     val messages: List<ChatbotMessage> = emptyList(),
     val suggestions: List<String> = emptyList(),

@@ -6,7 +6,11 @@ import com.example.lagallens.domain.usecase.OpenChatbotConversationUseCase
 import com.example.lagallens.domain.usecase.RetryChatbotMessageUseCase
 import com.example.lagallens.domain.usecase.SendChatbotMessageUseCase
 import com.example.lagallens.presentation.feature.chatbot.contract.ChatbotMessageAuthor
+import com.example.lagallens.presentation.feature.chatbot.contract.ChatbotUiEffect
 import com.example.lagallens.presentation.feature.chatbot.contract.ChatbotUiEvent
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.advanceUntilIdle
 import org.junit.Assert.assertEquals
@@ -204,6 +208,32 @@ class ChatbotViewModelTest {
         assertEquals(false, state.isContractDraftingEnabled)
         assertEquals(false, state.isDraftConversation)
         assertEquals(true, state.messages.none { it.content == "Tạo hợp đồng mới" })
+    }
+
+    @Test
+    fun backAndSourceDocumentEmitNavigationForTheOpenedContract() = runTest {
+        val viewModel = viewModel()
+        viewModel.onEvent(ChatbotUiEvent.ScreenOpened(contractName = "HĐ Lao động mẫu", contractType = "Hợp đồng lao động", contractId = "office-lease"))
+
+        viewModel.onEvent(ChatbotUiEvent.SourceDocumentClicked)
+        viewModel.onEvent(ChatbotUiEvent.BackClicked)
+
+        assertEquals(
+            listOf(ChatbotUiEffect.NavigateToContractDetail("office-lease"), ChatbotUiEffect.NavigateBack),
+            viewModel.uiEffect.take(2).toList()
+        )
+    }
+
+    @Test
+    fun sourceDocumentWithoutAContractDoesNothing() = runTest {
+        val viewModel = viewModel()
+        openScreen(viewModel)
+
+        viewModel.onEvent(ChatbotUiEvent.SourceDocumentClicked)
+        viewModel.onEvent(ChatbotUiEvent.BackClicked)
+
+        assertEquals(null, viewModel.uiState.value.sourceContractId)
+        assertEquals(ChatbotUiEffect.NavigateBack, viewModel.uiEffect.first())
     }
 
     private fun viewModel(repository: com.example.lagallens.domain.repository.ChatbotRepository = FakeChatbotRepository()): ChatbotViewModel {

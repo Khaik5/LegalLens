@@ -394,6 +394,8 @@
     <string name="analysis_failure_retry">Retry analysis</string>
     <string name="analysis_failure_return_home">Back to home</string>
     <string name="chatbot_back_content_description">Open conversation navigation</string>
+    <string name="chatbot_navigate_back_content_description">Back</string>
+    <string name="chatbot_open_source_contract_content_description">Open the original contract details</string>
     <string name="chatbot_default_source_name" translatable="false">Sample employment contract · DEMO</string>
     <string name="chatbot_more_content_description">Conversation options</string>
     <string name="chatbot_attach_content_description">Attach file</string>
