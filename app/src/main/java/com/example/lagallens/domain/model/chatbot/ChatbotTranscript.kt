@@ -20,5 +20,8 @@ data class ChatbotTranscript(
     val contractName: String,
     val contractType: String,
     val updatedAtEpochMillis: Long,
-    val messages: List<ChatbotTranscriptMessage>
+    /** Empty when the transcript comes from a history summary; read it with getMessages. */
+    val messages: List<ChatbotTranscriptMessage>,
+    val messageCount: Int = messages.size,
+    val lastMessagePreview: String = messages.lastOrNull()?.content.orEmpty()
 )

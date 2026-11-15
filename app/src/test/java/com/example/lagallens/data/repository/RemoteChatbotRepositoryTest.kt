@@ -178,6 +178,25 @@ class RemoteChatbotRepositoryTest {
         assertEquals(1_794_303_000_000L, history.updatedAtEpochMillis)
     }
 
+    @Test fun historyUsesTheServerSummaryWithoutReadingMessages() = runTest {
+        api.conversations = listOf(
+            ConversationResponse(
+                5, 12, "Tên cũ", "2026-11-10T09:00:00.000Z", "2026-11-10T09:00:00.000Z",
+                lastMessage = "60 ngày.", lastMessageAt = "2026-11-10T09:30:00.000Z", messageCount = 2, requestStatus = "COMPLETED"
+            ),
+            ConversationResponse(6, null, "Trống", null, null, messageCount = 0)
+        )
+
+        val history = repository.getConversations().single()
+
+        assertEquals(0, api.messageReads)
+        assertEquals("5", history.conversationId)
+        assertEquals("Contract 12", history.contractName)
+        assertEquals(2, history.messageCount)
+        assertEquals("60 ngày.", history.lastMessagePreview)
+        assertEquals(1_794_303_000_000L, history.updatedAtEpochMillis)
+    }
+
     @Test fun anArticleThatCannotBeLoadedKeepsAFallbackTitle() = runTest {
         api.missingArticles = true
         api.messages = listOf(

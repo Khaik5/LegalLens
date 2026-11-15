@@ -112,6 +112,24 @@ class RemoteChatbotRepository(
         val conversations = remote.conversations(scope)
         val contracts = conversations.mapNotNull { it.contractId?.toString() }.distinct()
             .associateWith { runCatching { contractInfo(it) }.getOrNull() }
+        // The server summary (count and last message) avoids reading every transcript.
+        if (conversations.all { it.messageCount != null }) {
+            return@inSession conversations.filter { (it.messageCount ?: 0) > 0 }.map { conversation ->
+                val contractId = conversation.contractId?.toString()
+                val contract = contractId?.let(contracts::get)
+                ChatbotTranscript(
+                    conversationId = conversation.id.toString(),
+                    contractId = contractId,
+                    contractName = contract?.name ?: conversation.title.orEmpty(),
+                    contractType = contract?.typeLabel.orEmpty(),
+                    updatedAtEpochMillis = conversation.lastMessageAt.toEpochMillisOrNull()
+                        ?: conversation.updatedAt.toEpochMillisOrNull() ?: 0L,
+                    messages = emptyList(),
+                    messageCount = conversation.messageCount ?: 0,
+                    lastMessagePreview = conversation.lastMessage.orEmpty()
+                )
+            }
+        }
         coroutineScope {
             conversations.chunked(PARALLEL_LOADS).flatMap { batch ->
                 batch.map { conversation ->
