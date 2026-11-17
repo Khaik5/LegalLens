@@ -475,6 +475,9 @@
     <string name="analysis_start_disclaimer_body">Kết quả do LegalLens tạo ra chỉ nhằm mục đích tham khảo, không thay thế tư vấn của luật sư hoặc kết luận của cơ quan có thẩm quyền.</string>
     <string name="analysis_start_action">Bắt đầu phân tích</string>
     <string name="analysis_processing_title">Mô phỏng phân tích · DEMO</string>
+    <string name="analysis_processing_title_real">Đang phân tích hợp đồng</string>
+    <string name="analysis_result_title_real">Kết quả phân tích</string>
+    <string name="analysis_risk_overview_disclaimer_real">Kết quả do AI phân tích, chỉ mang tính tham khảo và không phải tư vấn pháp lý.</string>
     <string name="analysis_processing_read_contract_title">Đọc hợp đồng</string>
     <string name="analysis_processing_read_contract_description">Đã hoàn thành phân tích tệp tin</string>
     <string name="analysis_processing_extract_clauses_title">Trích xuất điều khoản</string>
