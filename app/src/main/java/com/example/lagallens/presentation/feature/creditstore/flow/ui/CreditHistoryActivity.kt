@@ -27,6 +27,14 @@ import com.example.lagallens.presentation.feature.creditstore.ui.CreditStoreActi
 class CreditHistoryActivity : CreditFlowActivity() {
     private val binding by lazy { ActivityCreditHistoryBinding.inflate(layoutInflater) }
     private val owner by lazy { intent.getStringExtra(EXTRA_OWNER).orEmpty() }
+    private enum class HistoryFilter { ALL, PURCHASE, USAGE }
+
+    private var selectedFilter = HistoryFilter.ALL
+    private var shownTransactions = emptyList<com.example.lagallens.domain.model.credit.CreditTransaction>()
+    private var shownBackendUnavailable = false
+    private var shownLoading = false
+    private var shownFailed = false
+
     private fun isOwner(): Boolean = owner.isNotBlank() && (application as LegalLensApplication).creditRepository.activeSessionKey() == owner
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,6 +66,20 @@ class CreditHistoryActivity : CreditFlowActivity() {
                 else renderTransactions(transactions)
             }
         }
+        selectedFilter = savedInstanceState?.getString(STATE_FILTER)?.let { HistoryFilter.valueOf(it) } ?: HistoryFilter.ALL
+        styleTabs()
+        mapOf(
+            binding.tabCreditHistoryAll to HistoryFilter.ALL,
+            binding.tabCreditHistoryPurchase to HistoryFilter.PURCHASE,
+            binding.tabCreditHistoryUsage to HistoryFilter.USAGE
+        ).forEach { (tab, filter) ->
+            tab.setOnClickListener {
+                if (selectedFilter == filter) return@setOnClickListener
+                selectedFilter = filter
+                styleTabs()
+                renderTransactions(shownTransactions, shownBackendUnavailable, shownLoading, shownFailed)
+            }
+        }
         listOf(binding.creditHistoryBack, binding.creditHistoryBuyMore).forEach { it.bindPressFeedback() }
         binding.creditHistoryBack.setOnClickListener {
             viewModel.onEvent(CreditFlowUiEvent.BackClicked)
@@ -70,6 +92,31 @@ class CreditHistoryActivity : CreditFlowActivity() {
         collectEffects(::handleEffect)
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putString(STATE_FILTER, selectedFilter.name)
+        super.onSaveInstanceState(outState)
+    }
+
+    private fun styleTabs() {
+        mapOf(
+            binding.tabCreditHistoryAll to HistoryFilter.ALL,
+            binding.tabCreditHistoryPurchase to HistoryFilter.PURCHASE,
+            binding.tabCreditHistoryUsage to HistoryFilter.USAGE
+        ).forEach { (tab, filter) ->
+            val isSelected = filter == selectedFilter
+            tab.background = if (isSelected) androidx.core.content.ContextCompat.getDrawable(this, R.drawable.bg_credit_history_segment_selected) else null
+            tab.setTextColor(androidx.core.content.ContextCompat.getColor(this, if (isSelected) R.color.legal_lens_auth_accent else R.color.legal_lens_secondary_text))
+            tab.setTypeface(null, if (isSelected) android.graphics.Typeface.BOLD else android.graphics.Typeface.NORMAL)
+        }
+    }
+
+    private fun matchesFilter(transaction: com.example.lagallens.domain.model.credit.CreditTransaction): Boolean = when (selectedFilter) {
+        HistoryFilter.ALL -> true
+        // DEMO ledger entries have no kind, so they are told apart by their amount and sign.
+        HistoryFilter.PURCHASE -> transaction.kind == CreditTransactionKind.PURCHASE || (transaction.kind == null && transaction.amountVnd > 0)
+        HistoryFilter.USAGE -> transaction.kind == CreditTransactionKind.USAGE || (transaction.kind == null && transaction.creditDelta < 0)
+    }
+
     override fun onResume() {
         super.onResume()
         if (!isOwner()) { window.decorView.alpha = 0f; finish() } else window.decorView.alpha = 1f
@@ -78,11 +125,16 @@ class CreditHistoryActivity : CreditFlowActivity() {
     override fun onPause() { window.decorView.alpha = 0f; super.onPause() }
 
     private fun renderTransactions(
-        transactions: List<com.example.lagallens.domain.model.credit.CreditTransaction>,
+        allTransactions: List<com.example.lagallens.domain.model.credit.CreditTransaction>,
         backendUnavailable: Boolean = false,
         loading: Boolean = false,
         failed: Boolean = false
     ) {
+        shownTransactions = allTransactions
+        shownBackendUnavailable = backendUnavailable
+        shownLoading = loading
+        shownFailed = failed
+        val transactions = allTransactions.filter(::matchesFilter)
         val scrollView = (0 until binding.creditHistoryRoot.childCount)
             .mapNotNull { binding.creditHistoryRoot.getChildAt(it) as? ScrollView }.firstOrNull() ?: return
         val content = scrollView.getChildAt(0) as? LinearLayout ?: return
@@ -150,6 +202,7 @@ class CreditHistoryActivity : CreditFlowActivity() {
 
     companion object {
         private const val EXTRA_OWNER = "credit_history_owner"
+        private const val STATE_FILTER = "credit_history_filter"
         fun createIntent(context: Context): Intent = Intent(context, CreditHistoryActivity::class.java)
             .putExtra(EXTRA_OWNER, (context.applicationContext as LegalLensApplication).creditRepository.activeSessionKey())
     }
