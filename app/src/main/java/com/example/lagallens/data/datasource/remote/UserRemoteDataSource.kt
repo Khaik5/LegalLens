@@ -2,6 +2,8 @@ package com.example.lagallens.data.datasource.remote
 
 import com.example.lagallens.core.network.AuthSessionScope
 import com.example.lagallens.data.datasource.remote.api.UserApi
+import com.example.lagallens.data.model.request.ConfirmEmailChangeRequest
+import com.example.lagallens.data.model.request.RequestEmailChangeRequest
 import com.example.lagallens.data.model.request.UpdateMyProfileRequest
 import com.google.gson.GsonBuilder
 import okhttp3.MediaType.Companion.toMediaType
@@ -21,6 +23,20 @@ class UserRemoteDataSource(private val api: Lazy<UserApi>) {
         scope,
         MultipartBody.Part.createFormData("file", "avatar.jpg", jpeg.toRequestBody(JPEG))
     ).requireData("Avatar upload")
+
+    suspend fun requestEmailChange(scope: AuthSessionScope, email: String, currentPassword: String) =
+        api.value.requestEmailChange(scope, RequestEmailChangeRequest(email, currentPassword))
+            .requireData("Email change request")
+
+    suspend fun confirmEmailChange(scope: AuthSessionScope, challengeId: String, code: String) =
+        api.value.confirmEmailChange(scope, ConfirmEmailChangeRequest(challengeId, code))
+            .requireData("Email change confirmation")
+
+    suspend fun deleteAvatar(scope: AuthSessionScope) {
+        val response = api.value.deleteAvatar(scope)
+        response.errorBody()?.close()
+        if (!response.isSuccessful) throw HttpException(response)
+    }
 
     /** Returns null when the account has no avatar. The caller closes the body. */
     suspend fun avatar(scope: AuthSessionScope): ResponseBody? = try {

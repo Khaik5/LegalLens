@@ -33,6 +33,7 @@ class ProfileEditViewModel : ViewModel() {
                 ProfileEditUiEffect.OpenPhotoPicker
             )
             is ProfileEditUiEvent.PhotoSelected -> _uiState.update { it.copy(photoUri = event.uri) }
+            ProfileEditUiEvent.PhotoRemoved -> _uiState.update { it.copy(photoUri = null) }
             ProfileEditUiEvent.SaveClicked -> saveProfile()
         }
     }

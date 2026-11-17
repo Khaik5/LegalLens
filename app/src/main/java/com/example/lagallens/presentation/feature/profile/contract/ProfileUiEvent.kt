@@ -11,5 +11,6 @@ sealed interface ProfileUiEvent {
     data object ChangePasswordClicked : ProfileUiEvent
     data class ProfileUpdated(val name: String, val phone: String, val photoUri: String? = null) : ProfileUiEvent
     data object LogoutClicked : ProfileUiEvent
+    data object RemoveAvatarClicked : ProfileUiEvent
     data object LogoutConfirmed : ProfileUiEvent
 }
