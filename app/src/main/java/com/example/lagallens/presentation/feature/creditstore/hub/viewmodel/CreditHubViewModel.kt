@@ -47,6 +47,7 @@ class CreditHubViewModel(private val creditRepository: CreditRepository) : ViewM
             CreditHubUiEvent.BackClicked -> emitEffect(CreditHubUiEffect.NavigateBack)
             CreditHubUiEvent.BuyCreditsClicked -> emitEffect(CreditHubUiEffect.NavigateToStore)
             CreditHubUiEvent.HistoryClicked -> emitEffect(CreditHubUiEffect.NavigateToHistory)
+            CreditHubUiEvent.PaymentsClicked -> emitEffect(CreditHubUiEffect.NavigateToPayments)
             CreditHubUiEvent.UnlockResultsClicked -> emitEffect(CreditHubUiEffect.NavigateToUnlockConfirmation)
         }
     }
