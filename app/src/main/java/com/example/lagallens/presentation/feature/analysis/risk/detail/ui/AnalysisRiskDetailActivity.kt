@@ -1,5 +1,6 @@
 package com.example.lagallens.presentation.feature.analysis.risk.detail.ui
 
+import com.example.lagallens.presentation.common.utils.demoTagged
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -84,7 +85,7 @@ class AnalysisRiskDetailActivity : com.example.lagallens.presentation.feature.an
         analysisRiskDetailSeverity.setBackgroundResource(state.severityBackgroundRes)
         analysisRiskDetailSeverity.setTextColor(getColor(state.severityColorRes))
         analysisRiskDetailTitle.text = state.title
-        analysisRiskDetailTitle.text = getString(R.string.analysis_snapshot_demo_metadata, analysisRiskDetailTitle.text)
+        analysisRiskDetailTitle.text = demoTagged(analysisRiskDetailTitle.text)
         analysisRiskDetailAttentionReason.text = state.attentionReason
         analysisRiskDetailClauseExcerpt.text = state.clauseExcerpt
         analysisRiskDetailClauseReference.text = state.clauseReference

@@ -348,6 +348,9 @@
     <string name="analysis_result_score_label">/100</string>
     <string name="analysis_result_risk_heading">Risk assessment:</string>
     <string name="analysis_result_key_facts">Key facts</string>
+    <string name="analysis_processing_title_real">Analyzing contract</string>
+    <string name="analysis_result_title_real">Analysis results</string>
+    <string name="analysis_risk_overview_disclaimer_real">Results are AI-generated, for reference only, and not legal advice.</string>
     <string name="analysis_result_risks">Risks</string>
     <string name="analysis_result_references">References</string>
     <string name="analysis_result_summary_title">Summary</string>

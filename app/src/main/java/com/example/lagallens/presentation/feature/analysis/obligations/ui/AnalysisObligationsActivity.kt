@@ -1,5 +1,6 @@
 package com.example.lagallens.presentation.feature.analysis.obligations.ui
 
+import com.example.lagallens.presentation.common.utils.demoTagged
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -91,7 +92,7 @@ class AnalysisObligationsActivity : com.example.lagallens.presentation.feature.a
     private fun render(state: AnalysisObligationsUiState) = with(binding) {
         analysisContentEmpty.visibility = if (state.status == com.example.lagallens.presentation.feature.analysis.SnapshotContentStatus.EMPTY) android.view.View.VISIBLE else android.view.View.GONE
         analysisObligationsDocumentName.text = state.documentName
-        analysisObligationsDocumentMetadata.text = getString(R.string.analysis_snapshot_demo_metadata, state.documentMetadata)
+        analysisObligationsDocumentMetadata.text = demoTagged(state.documentMetadata)
         obligationsAdapter.submitList(state.items)
         lockedAdapter.update(state.lockedCount, validatedUnlockStatus?.cost)
         val rights = state.selectedTab == com.example.lagallens.domain.model.analysis.AnalysisObligationTab.RIGHTS

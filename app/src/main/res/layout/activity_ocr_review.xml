@@ -77,7 +77,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/ocr_review_alert_icon_margin_end"
                     android:layout_weight="1"
-                    android:text="@string/ocr_review_alert"
+                    android:id="@+id/ocrReviewAlertText"
+                    android:text="@string/ocr_review_alert_generic"
                     android:textColor="@color/ocr_review_amber"
                     android:textSize="@dimen/ocr_review_alert_text_size"
                     android:textStyle="bold" />

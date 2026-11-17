@@ -18,6 +18,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.lagallens.LegalLensApplication
 import com.example.lagallens.R
+import com.example.lagallens.presentation.common.utils.isDemoData
 import com.example.lagallens.databinding.ActivityAnalysisResultBinding
 import com.example.lagallens.presentation.feature.analysis.legalreferences.ui.AnalysisLegalReferencesActivity
 import com.example.lagallens.presentation.feature.analysis.obligations.ui.AnalysisObligationsActivity
@@ -57,6 +58,7 @@ class AnalysisResultActivity : com.example.lagallens.presentation.feature.analys
         }
         binding = ActivityAnalysisResultBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        if (!isDemoData()) binding.analysisResultTitle.setText(R.string.analysis_result_title_real)
         ViewCompat.setOnApplyWindowInsetsListener(binding.analysisResultRoot) { view, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)

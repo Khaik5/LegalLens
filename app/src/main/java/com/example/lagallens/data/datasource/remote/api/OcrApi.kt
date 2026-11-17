@@ -8,6 +8,7 @@ import com.example.lagallens.data.model.response.OcrConfirmResponse
 import com.example.lagallens.data.model.response.OcrCorrectionResponse
 import com.example.lagallens.data.model.response.OcrJobResponse
 import com.example.lagallens.data.model.response.OcrResultResponse
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
@@ -35,6 +36,10 @@ interface OcrApi {
         @Path("id") documentId: String,
         @Body request: OcrConfirmRequest
     ): ApiEnvelope<OcrConfirmResponse>
+
+    /** Stops the active recognition job; answers 204 and ignores a job that already finished. */
+    @POST("documents/{id}/ocr/cancel")
+    suspend fun cancel(@Tag scope: AuthSessionScope, @Path("id") documentId: String): Response<Unit>
 
     @PATCH("documents/{id}/ocr")
     suspend fun correct(

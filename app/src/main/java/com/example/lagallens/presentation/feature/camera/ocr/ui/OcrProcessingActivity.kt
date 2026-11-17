@@ -16,6 +16,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.lagallens.R
 import com.example.lagallens.databinding.ActivityOcrProcessingBinding
+import com.example.lagallens.presentation.common.utils.pulseDotsWhileStarted
 import com.example.lagallens.domain.model.camera.ScanPage
 import com.example.lagallens.presentation.common.adapter.ProcessingTimelineStepAdapter
 import com.example.lagallens.presentation.feature.camera.ocr.contract.OcrProcessingUiEffect
@@ -45,6 +46,7 @@ class OcrProcessingActivity : com.example.lagallens.presentation.feature.ocr.Ocr
             isAppearanceLightNavigationBars = true
         }
         setContentView(binding.root)
+        binding.ocrProcessingDots.pulseDotsWhileStarted(this)
         applyWindowInsets()
         initializeDocumentMetadata()
         bindView()
