@@ -105,6 +105,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
+                android:id="@+id/ocrResultNationalTitle"
                 android:text="@string/ocr_result_national_title"
                 android:textColor="@color/ocr_review_navy"
                 android:textSize="@dimen/sp_16"
@@ -115,6 +116,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/ocr_result_subtitle_top_margin"
                 android:gravity="center"
+                android:id="@+id/ocrResultNationalSubtitle"
                 android:text="@string/ocr_result_national_subtitle"
                 android:textColor="@color/ocr_review_text"
                 android:textSize="@dimen/sp_13"
@@ -123,6 +125,7 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/ocr_review_border_width"
+                android:id="@+id/ocrResultDivider"
                 android:layout_marginTop="@dimen/ocr_result_divider_top_margin"
                 android:background="@color/ocr_review_border" />
 
@@ -130,6 +133,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/ocr_result_contract_title_top_margin"
+                android:id="@+id/ocrResultContractTitle"
                 android:text="@string/ocr_result_contract_title"
                 android:textColor="@color/ocr_review_navy"
                 android:textSize="@dimen/sp_15"
@@ -149,7 +153,7 @@
     <LinearLayout
         android:id="@+id/ocr_result_footer"
         android:layout_width="0dp"
-        android:layout_height="@dimen/ocr_result_footer_height"
+        android:layout_height="wrap_content"
         android:background="@drawable/bg_ocr_review_footer"
         android:gravity="center_vertical"
         android:orientation="horizontal"

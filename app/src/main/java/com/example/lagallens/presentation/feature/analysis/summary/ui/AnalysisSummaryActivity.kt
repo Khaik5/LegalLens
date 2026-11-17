@@ -1,5 +1,6 @@
 package com.example.lagallens.presentation.feature.analysis.summary.ui
 
+import com.example.lagallens.presentation.common.utils.demoTagged
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -92,7 +93,7 @@ class AnalysisSummaryActivity : com.example.lagallens.presentation.feature.analy
     private fun render(state: AnalysisSummaryUiState) = with(binding) {
         analysisContentEmpty.visibility = if (state.status == com.example.lagallens.presentation.feature.analysis.SnapshotContentStatus.EMPTY) android.view.View.VISIBLE else android.view.View.GONE
         analysisSummaryDocumentName.text = state.documentName
-        analysisSummaryDocumentMetadata.text = getString(R.string.analysis_snapshot_demo_metadata, state.documentMetadata)
+        analysisSummaryDocumentMetadata.text = demoTagged(state.documentMetadata)
         summaryAdapter.submitList(state.sections)
         lockedAdapter.update(state.lockedCount, validatedUnlockStatus?.cost)
     }

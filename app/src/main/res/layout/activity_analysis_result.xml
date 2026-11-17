@@ -32,6 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/analysis_header_title_margin_start"
             android:layout_weight="1"
+            android:id="@+id/analysisResultTitle"
             android:text="@string/analysis_result_title"
             android:textColor="@color/ocr_saved_navy"
             android:textSize="@dimen/analysis_header_title_text_size"

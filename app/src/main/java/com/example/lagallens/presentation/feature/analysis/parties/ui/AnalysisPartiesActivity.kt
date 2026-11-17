@@ -1,5 +1,6 @@
 package com.example.lagallens.presentation.feature.analysis.parties.ui
 
+import com.example.lagallens.presentation.common.utils.demoTagged
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -84,7 +85,7 @@ class AnalysisPartiesActivity : com.example.lagallens.presentation.feature.analy
     private fun render(state: AnalysisPartiesUiState) = with(binding) {
         analysisContentEmpty.visibility = if (state.status == com.example.lagallens.presentation.feature.analysis.SnapshotContentStatus.EMPTY) android.view.View.VISIBLE else android.view.View.GONE
         analysisPartiesDocumentName.text = state.documentName
-        analysisPartiesDocumentMetadata.text = getString(R.string.analysis_snapshot_demo_metadata, state.documentMetadata)
+        analysisPartiesDocumentMetadata.text = demoTagged(state.documentMetadata)
         analysisPartiesItems.removeAllViews()
         state.parties.forEachIndexed { index, party ->
             val card = layoutInflater.inflate(R.layout.item_analysis_party, analysisPartiesItems, false)
