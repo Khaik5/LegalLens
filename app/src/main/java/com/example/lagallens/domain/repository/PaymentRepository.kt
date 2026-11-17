@@ -2,6 +2,7 @@ package com.example.lagallens.domain.repository
 
 import com.example.lagallens.domain.model.credit.CreditOffer
 import com.example.lagallens.domain.model.payment.BankTransfer
+import com.example.lagallens.domain.model.payment.PaymentHistoryEntry
 import com.example.lagallens.domain.model.payment.PaymentRecord
 import kotlinx.coroutines.flow.Flow
 
@@ -17,4 +18,6 @@ interface PaymentRepository {
     suspend fun getBankTransfer(paymentId: String): BankTransfer? = null
     suspend fun cancelPayment(paymentId: String): PaymentRecord
     suspend fun get(paymentId: String): PaymentRecord?
+    /** Newest first. A data source without recorded purchases returns an empty list. */
+    suspend fun getHistory(): List<PaymentHistoryEntry> = emptyList()
 }

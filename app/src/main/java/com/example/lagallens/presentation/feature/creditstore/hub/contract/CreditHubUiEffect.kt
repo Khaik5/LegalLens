@@ -5,5 +5,6 @@ sealed interface CreditHubUiEffect {
     data object NavigateBack : CreditHubUiEffect
     data object NavigateToStore : CreditHubUiEffect
     data object NavigateToHistory : CreditHubUiEffect
+    data object NavigateToPayments : CreditHubUiEffect
     data object NavigateToUnlockConfirmation : CreditHubUiEffect
 }
