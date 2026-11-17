@@ -12,6 +12,8 @@ import com.example.lagallens.data.model.response.CreditPackageResponse
 import com.example.lagallens.data.model.response.CreditTransactionPageResponse
 import com.example.lagallens.data.model.response.CreditWalletResponse
 import com.example.lagallens.data.model.response.PackagePaymentResponse
+import com.example.lagallens.data.model.response.PaymentItemResponse
+import com.example.lagallens.data.model.response.PaymentPageResponse
 import com.example.lagallens.data.model.response.PaymentStatusResponse
 import com.example.lagallens.domain.model.payment.BankTransferUnavailableException
 import com.example.lagallens.domain.model.payment.PaymentStatus
@@ -30,6 +32,22 @@ class RemotePaymentRepositoryTest {
         RemoteRepositorySession(), CreditRemoteDataSource(lazyOf(PackagesFixture())), PaymentRemoteDataSource(lazyOf(api)),
         pollIntervalMillis = 1, now = { 1_000L }
     )
+
+    @Test fun historyKeepsTheServerOrderAndMapsEveryStatus() = runTest {
+        api.history = listOf(
+            PaymentItemResponse(3, 15, 79_000, "PENDING", "2026-11-17T01:00:00Z"),
+            PaymentItemResponse(2, 5, 29_000, "SUCCESS", "2026-11-16T01:00:00Z"),
+            PaymentItemResponse(1, 5, 29_000, "REFUNDED", null)
+        )
+
+        val history = repository.getHistory()
+
+        assertEquals(listOf("3", "2", "1"), history.map { it.paymentId })
+        assertEquals(listOf(PaymentStatus.PENDING, PaymentStatus.SUCCESS, PaymentStatus.CANCELLED), history.map { it.status })
+        assertEquals(79_000L, history.first().amountVnd)
+        assertEquals(java.time.Instant.parse("2026-11-17T01:00:00Z").toEpochMilli(), history.first().createdAtEpochMillis)
+        assertEquals(0L, history.last().createdAtEpochMillis)
+    }
 
     @Test fun theAppPaymentIdIsTheIdempotencyKeyAndTheRecordUsesThePackage() = runTest {
         val record = repository.createPayment("pay-1", "7")
@@ -110,6 +128,11 @@ class RemotePaymentRepositoryTest {
             transferFailure?.let { throw HttpException(Response.error<Any>(it, "{}".toResponseBody())) }
             return ApiEnvelope(true, BankTransferResponse(paymentId, 49_000, "LL900", "https://qr.example/img", "2027-01-15T08:00:00Z"))
         }
+
+        var history = listOf<PaymentItemResponse>()
+
+        override suspend fun list(scope: AuthSessionScope, page: Int, limit: Int) =
+            ApiEnvelope(true, PaymentPageResponse(history, history.size.toLong(), page, limit))
 
         override suspend fun status(scope: AuthSessionScope, paymentId: Long) =
             ApiEnvelope(true, PaymentStatusResponse(paymentId, statuses[minOf(reads++, statuses.lastIndex)]))
