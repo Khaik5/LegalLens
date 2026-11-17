@@ -250,7 +250,6 @@
             </LinearLayout>
 
             <LinearLayout
-            <LinearLayout
                 android:id="@+id/creditHubPayments"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" android:minHeight="@dimen/credit_hub_action_height" android:paddingTop="@dimen/dp_8" android:paddingBottom="@dimen/dp_8"
@@ -312,6 +311,7 @@
                     android:src="@drawable/ic_contract_search_chevron_right" />
             </LinearLayout>
 
+            <LinearLayout
                 android:id="@+id/creditHubUnlock"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" android:minHeight="@dimen/credit_hub_action_height" android:paddingTop="@dimen/dp_8" android:paddingBottom="@dimen/dp_8"
