@@ -55,6 +55,9 @@ class OcrReviewActivity : com.example.lagallens.presentation.feature.ocr.OcrSess
             insets
         }
         ViewCompat.requestApplyInsets(binding.ocrReviewRoot)
+        // The percentage is the real recognition confidence of this document, or "—" when the backend sent none.
+        val confidence = intent.getStringExtra(EXTRA_CONFIDENCE).orEmpty()
+        binding.ocrReviewAlertText.text = if (confidence.any(Char::isDigit)) getString(R.string.ocr_review_alert_confidence, confidence) else getString(R.string.ocr_review_alert_generic)
         viewModel.onEvent(OcrReviewEvent.ScreenOpened(
             intent.getStringExtra(EXTRA_DOCUMENT_ID).orEmpty(),
             intent.getStringExtra(EXTRA_CONTRACT_ID),
@@ -145,6 +148,7 @@ class OcrReviewActivity : com.example.lagallens.presentation.feature.ocr.OcrSess
         const val EXTRA_DOCUMENT_ID = "ocr_review_document_id"
         const val EXTRA_CONTRACT_ID = "ocr_review_contract_id"
         const val EXTRA_DOCUMENT_TEXT = "ocr_review_document_text"
+        private const val EXTRA_CONFIDENCE = "ocr_review_confidence"
 
         private const val EXTRA_WARNING_SECTIONS = "ocr_review_warning_sections"
         private const val EXTRA_WARNING_CONFIDENCES = "ocr_review_warning_confidences"
@@ -159,11 +163,12 @@ class OcrReviewActivity : com.example.lagallens.presentation.feature.ocr.OcrSess
             return sections.indices.map { OcrReviewWarning(sections[it], confidences[it], values[it], sources[it]) }
         }
 
-        fun createIntent(context: Context, documentId: String = "", contractId: String? = null, documentText: String = "", warnings: List<com.example.lagallens.domain.model.ocr.OcrWarning> = emptyList()): Intent =
+        fun createIntent(context: Context, documentId: String = "", contractId: String? = null, documentText: String = "", warnings: List<com.example.lagallens.domain.model.ocr.OcrWarning> = emptyList(), confidencePercentage: String = ""): Intent =
             com.example.lagallens.presentation.feature.ocr.OcrSession.stamp(context, Intent(context, OcrReviewActivity::class.java)
                 .putExtra(EXTRA_DOCUMENT_ID, documentId)
                 .putExtra(EXTRA_CONTRACT_ID, contractId)
                 .putExtra(EXTRA_DOCUMENT_TEXT, documentText)
+                .putExtra(EXTRA_CONFIDENCE, confidencePercentage)
                 .putStringArrayListExtra(EXTRA_WARNING_SECTIONS, ArrayList(warnings.map { it.section }))
                 .putStringArrayListExtra(EXTRA_WARNING_CONFIDENCES, ArrayList(warnings.map { it.confidence }))
                 .putStringArrayListExtra(EXTRA_WARNING_VALUES, ArrayList(warnings.map { it.recognizedValue }))

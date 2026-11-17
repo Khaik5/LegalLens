@@ -1,5 +1,6 @@
 package com.example.lagallens.presentation.feature.ocr.result.ui
 
+import androidx.core.view.isVisible
 import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
@@ -89,8 +90,8 @@ class OcrResultActivity : com.example.lagallens.presentation.feature.ocr.OcrSess
             )
         )
         ViewCompat.setOnApplyWindowInsetsListener(binding.ocrResultRoot) { view, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            view.setPadding(systemBars.left, systemBars.top, systemBars.right, 0)
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
+            view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
         bindEvents()
@@ -115,6 +116,8 @@ class OcrResultActivity : com.example.lagallens.presentation.feature.ocr.OcrSess
 
     private fun render(state: OcrResultUiState) = with(binding) {
         if (!isOcrSessionValid()) { root.visibility = android.view.View.INVISIBLE; return@with }
+        // The Vietnamese state heading and title belong to the DEMO sample text only; real OCR text already has its own.
+        listOf(ocrResultNationalTitle, ocrResultNationalSubtitle, ocrResultDivider, ocrResultContractTitle).forEach { it.isVisible = state.isSampleContent }
         if (state.errorMessageRes != null) {
             ocrResultConfidenceLabel.text = ""
             ocrResultConfidencePercentage.text = ""
@@ -135,7 +138,7 @@ class OcrResultActivity : com.example.lagallens.presentation.feature.ocr.OcrSess
             }
             OcrResultUiEffect.NavigateToReview -> {
                 val state = viewModel.uiState.value
-                ocrReviewLauncher.launch(OcrReviewActivity.createIntent(this, state.documentId, state.contractId, state.documentText, state.warnings))
+                ocrReviewLauncher.launch(OcrReviewActivity.createIntent(this, state.documentId, state.contractId, state.documentText, state.warnings, state.confidencePercentage))
             }
             is OcrResultUiEffect.NavigateToSaved -> {
                 startActivity(

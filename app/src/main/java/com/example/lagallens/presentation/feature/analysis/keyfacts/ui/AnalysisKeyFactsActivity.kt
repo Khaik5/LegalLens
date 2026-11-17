@@ -1,5 +1,6 @@
 package com.example.lagallens.presentation.feature.analysis.keyfacts.ui
 
+import com.example.lagallens.presentation.common.utils.demoTagged
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -90,7 +91,7 @@ class AnalysisKeyFactsActivity : com.example.lagallens.presentation.feature.anal
     private fun render(state: AnalysisKeyFactsUiState) = with(binding) {
         analysisContentEmpty.visibility = if (state.status == com.example.lagallens.presentation.feature.analysis.SnapshotContentStatus.EMPTY) android.view.View.VISIBLE else android.view.View.GONE
         analysisKeyFactsDocumentName.text = state.documentName
-        analysisKeyFactsDocumentMetadata.text = getString(R.string.analysis_snapshot_demo_metadata, state.documentMetadata)
+        analysisKeyFactsDocumentMetadata.text = demoTagged(state.documentMetadata)
         keyFactsAdapter.submitList(state.facts)
         lockedAdapter.update(state.lockedCount, validatedUnlockStatus?.cost)
     }
