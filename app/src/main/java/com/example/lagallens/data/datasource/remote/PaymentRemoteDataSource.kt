@@ -11,6 +11,8 @@ class PaymentRemoteDataSource(private val api: Lazy<PaymentApi>) {
     suspend fun bankTransfer(scope: AuthSessionScope, paymentId: Long) =
         api.value.bankTransfer(scope, paymentId).requireData("Bank transfer")
 
+    suspend fun history(scope: AuthSessionScope) = api.value.list(scope).requireData("Payment history").data
+
     suspend fun status(scope: AuthSessionScope, paymentId: Long) = api.value.status(scope, paymentId).requireData("Payment status")
 
     suspend fun cancel(scope: AuthSessionScope, paymentId: Long) = api.value.cancel(scope, paymentId).requireData("Payment cancellation")

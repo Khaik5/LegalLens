@@ -17,6 +17,7 @@ import com.example.lagallens.R
 import com.example.lagallens.presentation.common.utils.bindPressFeedback
 import com.example.lagallens.databinding.ActivityCreditHubBinding
 import com.example.lagallens.presentation.feature.creditstore.flow.ui.CreditHistoryActivity
+import com.example.lagallens.presentation.feature.creditstore.payments.ui.PaymentHistoryActivity
 import com.example.lagallens.presentation.feature.creditstore.hub.contract.CreditHubUiEffect
 import com.example.lagallens.presentation.feature.creditstore.hub.contract.CreditHubUiEvent
 import com.example.lagallens.presentation.feature.creditstore.hub.contract.CreditHubUiState
@@ -45,12 +46,15 @@ class CreditHubActivity : AppCompatActivity() {
     }
 
     private fun bindView() = with(binding) {
-        listOf(creditHubBuy, creditHubHistory, creditHubUnlock).forEach { it.bindPressFeedback() }
+        listOf(creditHubBuy, creditHubHistory, creditHubPayments, creditHubUnlock).forEach { it.bindPressFeedback() }
         creditHubBack.setOnClickListener {
             viewModel.onEvent(CreditHubUiEvent.BackClicked)
         }
         creditHubBuy.setOnClickListener {
             viewModel.onEvent(CreditHubUiEvent.BuyCreditsClicked)
+        }
+        creditHubPayments.setOnClickListener {
+            viewModel.onEvent(CreditHubUiEvent.PaymentsClicked)
         }
         creditHubHistory.setOnClickListener {
             viewModel.onEvent(CreditHubUiEvent.HistoryClicked)
@@ -90,6 +94,7 @@ class CreditHubActivity : AppCompatActivity() {
             CreditHubUiEffect.NavigateBack -> finish()
             CreditHubUiEffect.NavigateToStore -> startActivity(CreditStoreActivity.createIntent(this))
             CreditHubUiEffect.NavigateToHistory -> startActivity(CreditHistoryActivity.createIntent(this))
+            CreditHubUiEffect.NavigateToPayments -> startActivity(PaymentHistoryActivity.createIntent(this))
             CreditHubUiEffect.NavigateToUnlockConfirmation -> {
                 val resultId = intent.getStringExtra(EXTRA_RESULT_ID).orEmpty()
                 val cost = intent.getIntExtra(EXTRA_UNLOCK_COST, 0)
