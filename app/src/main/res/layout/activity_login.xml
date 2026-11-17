@@ -72,7 +72,8 @@
                 android:text="@string/login_welcome_back"
                 android:textColor="@color/legal_lens_primary"
                 android:textSize="@dimen/sp_24"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+               />
 
             <TextView
                 android:id="@+id/loginSubtitleText"

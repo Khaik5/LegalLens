@@ -283,7 +283,7 @@
     <string name="camera_permission_title">Quyền truy cập</string>
     <string name="camera_permission_heading">Cho phép chụp ảnh</string>
     <string name="camera_permission_description">LegalLens cần quyền truy cập camera để quét trực tiếp văn bản hợp đồng giấy, phân tích tự động rủi ro và thực hiện OCR chuyên sâu của đối tác.</string>
-    <string name="camera_permission_secure">Bảo mật dữ liệu camera 100%%</string>
+    <string name="camera_permission_secure" formatted="false">Bảo mật dữ liệu camera 100%</string>
     <string name="camera_permission_manual">Chỉ chụp khi có hành động thủ công</string>
     <string name="camera_permission_allow">Cho phép truy cập</string>
     <string name="camera_permission_later">Quay lại sau</string>
@@ -860,7 +860,7 @@
     <string name="credit_store_back_description">Quay lại</string>
     <string name="credit_store_wallet_icon_description">Ví Credit</string>
     <string name="credit_store_intro_title" formatted="false">Credit để mở kết quả 100%</string>
-    <string name="credit_store_intro_description">Mua một lần, dùng theo nhu cầu.Credit không hết hạn, không tự động gia hạn.</string>
+    <string name="credit_store_intro_description">Mua một lần, dùng theo nhu cầu. Credit không hết hạn, không tự động gia hạn.</string>
     <string name="credit_store_step_one" translatable="false">1</string>
     <string name="credit_store_step_one_description">Xem trước 40% kết quả miễn phí.</string>
     <string name="credit_store_step_two" translatable="false">2</string>

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/dp_116"
+    android:layout_height="wrap_content"
+    android:minHeight="@dimen/dp_116"
     android:layout_marginBottom="@dimen/dp_12"
     android:background="@drawable/bg_contract_card"
     android:clickable="true"
@@ -11,7 +12,8 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/dp_42"
+        android:layout_height="wrap_content"
+        android:minHeight="@dimen/dp_42"
         android:gravity="top"
         android:orientation="horizontal">
 
@@ -25,7 +27,7 @@
 
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/dp_12"
             android:layout_weight="1"
             android:orientation="vertical">
@@ -33,10 +35,10 @@
             <TextView
                 android:id="@+id/tvTitle"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/dp_22"
+                android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:includeFontPadding="false"
-                android:maxLines="1"
+                android:maxLines="2"
                 android:textColor="@color/legal_lens_primary"
                 android:textSize="@dimen/sp_15"
                 android:textStyle="bold" />
