@@ -3,8 +3,10 @@ package com.example.lagallens.data.datasource.remote
 import com.example.lagallens.core.network.AuthSessionScope
 import com.example.lagallens.core.network.EmptyApiResponseException
 import com.example.lagallens.data.datasource.remote.api.ContractApi
+import com.example.lagallens.data.model.request.CompareContractsRequest
 import com.example.lagallens.data.model.request.CreateContractRequest
 import com.example.lagallens.data.model.request.UpdateContractRequest
+import com.example.lagallens.data.model.response.ContractComparisonResponse
 import com.example.lagallens.data.model.response.ContractResponse
 import retrofit2.HttpException
 
@@ -47,4 +49,7 @@ class ContractRemoteDataSource(private val api: Lazy<ContractApi>) {
             error.response()?.errorBody()?.close()
         }
     }
+
+    suspend fun compare(scope: AuthSessionScope, firstId: Long, secondId: Long): ContractComparisonResponse =
+        api.value.compare(scope, CompareContractsRequest(firstId, secondId)).requireData("Contract comparison")
 }

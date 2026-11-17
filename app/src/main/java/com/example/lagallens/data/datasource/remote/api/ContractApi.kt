@@ -1,9 +1,11 @@
 package com.example.lagallens.data.datasource.remote.api
 
 import com.example.lagallens.core.network.AuthSessionScope
+import com.example.lagallens.data.model.request.CompareContractsRequest
 import com.example.lagallens.data.model.request.CreateContractRequest
 import com.example.lagallens.data.model.request.UpdateContractRequest
 import com.example.lagallens.data.model.response.ApiEnvelope
+import com.example.lagallens.data.model.response.ContractComparisonResponse
 import com.example.lagallens.data.model.response.ContractPageResponse
 import com.example.lagallens.data.model.response.ContractResponse
 import retrofit2.http.Body
@@ -27,6 +29,9 @@ interface ContractApi {
 
     @GET("contracts/{id}")
     suspend fun get(@Tag scope: AuthSessionScope, @Path("id") id: String): ApiEnvelope<ContractResponse>
+
+    @POST("contracts/compare")
+    suspend fun compare(@Tag scope: AuthSessionScope, @Body request: CompareContractsRequest): ApiEnvelope<ContractComparisonResponse>
 
     @POST("contracts")
     suspend fun create(@Tag scope: AuthSessionScope, @Body request: CreateContractRequest): ApiEnvelope<ContractResponse>

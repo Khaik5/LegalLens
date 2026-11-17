@@ -38,7 +38,7 @@
     <string name="compare_tab_overview">Tổng quan</string>
     <string name="compare_tab_risk">Rủi ro</string>
     <string name="compare_tab_clauses">Điều khoản</string>
-    <string name="compare_loading">Đang đối chiếu nội dung DEMO…</string>
+    <string name="compare_loading">Đang đối chiếu nội dung…</string>
     <string name="compare_loading_message">Đang đối chiếu nội dung tương ứng và tổng hợp khác biệt giữa hợp đồng A và B.</string>
     <string name="compare_loading_stage">Đang nhận diện điều khoản tương ứng</string>
     <string name="compare_loading_next">Tiếp theo: tổng hợp điểm giống, khác và rủi ro tham chiếu.</string>
@@ -51,6 +51,26 @@
     <string name="compare_result_demo_heading">Khác biệt nội dung (DEMO)</string>
     <string name="compare_difference_demo_explanation">Đối chiếu trực tiếp nội dung lưu trong từng tài liệu. Hãy kiểm tra bản gốc.</string>
     <string name="compare_no_text_difference">Không có khác biệt ở mục này</string>
+    <string name="compare_no_text_difference_any">Hai hợp đồng không có điều khoản nào khác nhau.</string>
+    <string name="compare_overview_empty">Hai hợp đồng không có khác biệt ở thông tin chính.</string>
+    <string name="compare_clauses_summary">%1$d điều khoản sửa · %2$d thêm · %3$d xóa</string>
+    <string name="compare_change_added">Thêm</string>
+    <string name="compare_change_removed">Xóa</string>
+    <string name="compare_change_modified">Sửa</string>
+    <string name="compare_clause_text_a">A · %1$s</string>
+    <string name="compare_value_yes">Có</string>
+    <string name="compare_value_no">Không</string>
+    <string name="compare_value_missing" translatable="false">—</string>
+    <string name="compare_clause_text_b">B · %1$s</string>
+    <string name="compare_risk_not_analyzed">Cần phân tích cả hai hợp đồng để so sánh điểm rủi ro.</string>
+    <string name="compare_risk_not_analyzed_short">Chưa phân tích</string>
+    <string name="compare_risk_score_value">%1$s/100</string>
+    <string name="compare_risk_delta">Chênh lệch điểm (B − A): %1$s</string>
+    <string name="compare_error_document_missing">Một trong hai hợp đồng chưa có tài liệu để so sánh.</string>
+    <string name="compare_error_ocr_not_ready">Một trong hai hợp đồng chưa nhận dạng xong văn bản. Hãy hoàn tất OCR rồi thử lại.</string>
+    <string name="compare_error_document_unavailable">Tài liệu của một hợp đồng không còn khả dụng. Hãy tải lên lại.</string>
+    <string name="compare_error_too_large">Tài liệu quá lớn để so sánh.</string>
+    <string name="compare_error_not_found">Không tìm thấy một trong hai hợp đồng.</string>
     <string name="compare_different_types">Hai hợp đồng khác loại, không phải hai phiên bản. Chỉ đối chiếu nội dung tương ứng; cần chuyên gia xác nhận kết luận.</string>
     <string name="compare_clause_notice">Nội dung tóm lược từ kết quả hiện có, không phải trích dẫn nguyên văn. Kiểm tra tài liệu gốc trước khi đưa ra quyết định.</string>
     <string name="compare_clauses_heading">Điều khoản &amp; khác biệt</string>
