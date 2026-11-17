@@ -1,15 +1,18 @@
 package com.example.lagallens.data.repository
 
+import com.example.lagallens.core.network.ApiFailureMapper
 import com.example.lagallens.core.network.AuthSessionScope
-import com.example.lagallens.core.network.BackendNotConfiguredException
 import com.example.lagallens.data.datasource.local.datastore.AuthSessionStore
 import com.example.lagallens.data.datasource.local.datastore.currentSessionScope
 import com.example.lagallens.data.datasource.local.datastore.requireUserId
 import com.example.lagallens.data.datasource.remote.ContractRemoteDataSource
 import com.example.lagallens.data.datasource.remote.DocumentRemoteDataSource
+import com.example.lagallens.data.mapper.toComparison
 import com.example.lagallens.data.mapper.toContract
 import com.example.lagallens.data.mapper.toDocument
 import com.example.lagallens.data.model.response.ContractResponse
+import com.example.lagallens.domain.model.ContractComparisonBlocker
+import com.example.lagallens.domain.model.ContractComparisonUnavailableException
 import com.example.lagallens.domain.model.EmploymentContract
 import com.example.lagallens.domain.model.EmploymentContractComparison
 import com.example.lagallens.domain.repository.ContractRepository
@@ -145,8 +148,28 @@ class RemoteContractRepository private constructor(
     /** The backend keeps contract text as the document's OCR revision, so only the title is stored here. */
     override suspend fun updateContract(contract: EmploymentContract): Boolean = renameContract(contract.id, contract.title)
 
-    override suspend fun compareContracts(firstId: String, secondId: String): EmploymentContractComparison? =
-        throw BackendNotConfiguredException("Contract comparison")
+    override suspend fun compareContracts(firstId: String, secondId: String): EmploymentContractComparison? {
+        val first = firstId.toLongOrNull()
+        val second = secondId.toLongOrNull()
+        if (first == null || second == null || first == second) return null
+        return inSession { scope ->
+            try {
+                remote.compare(scope, first, second).toComparison()
+            } catch (error: HttpException) {
+                throw error.toComparisonBlocker()?.let { ContractComparisonUnavailableException(it, error) } ?: error
+            }
+        }
+    }
+
+    private fun HttpException.toComparisonBlocker(): ContractComparisonBlocker? =
+        when (ApiFailureMapper.map(this).details?.code) {
+            "CONTRACT_DOCUMENT_REQUIRED" -> ContractComparisonBlocker.DOCUMENT_MISSING
+            "CONTRACT_OCR_NOT_READY" -> ContractComparisonBlocker.OCR_NOT_READY
+            "CONTRACT_DOCUMENT_UNAVAILABLE" -> ContractComparisonBlocker.DOCUMENT_UNAVAILABLE
+            "COMPARISON_CONTENT_TOO_LARGE" -> ContractComparisonBlocker.TOO_LARGE
+            "CONTRACT_NOT_FOUND" -> ContractComparisonBlocker.NOT_FOUND
+            else -> null
+        }
 
     private suspend fun <T> inSession(action: suspend (AuthSessionScope) -> T): T = withContext(Dispatchers.IO) {
         val key = checkNotNull(activeSessionKey()) { "No active session" }
