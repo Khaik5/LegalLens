@@ -77,16 +77,18 @@ class RemoteOcrRepository(
         )
     }
 
-    /** Best effort: a failure here must not replace the cancellation that is already in progress. */
-    private suspend fun cancelRecognition(scope: AuthSessionScope, documentId: String) {
+    /** Best effort: a failure here must not replace the cancellation that is already in progress. Returns whether the backend accepted it. */
+    private suspend fun cancelRecognition(scope: AuthSessionScope, documentId: String): Boolean =
         withContext(NonCancellable + Dispatchers.IO) {
             try {
                 remote.cancel(scope, documentId)
+                true
             } catch (_: HttpException) {
+                false
             } catch (_: IOException) {
+                false
             }
         }
-    }
 
     private suspend fun startJob(scope: AuthSessionScope, documentId: String) {
         try {

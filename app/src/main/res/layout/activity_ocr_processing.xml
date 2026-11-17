@@ -117,7 +117,7 @@
         app:layout_constraintStart_toStartOf="parent">
 
         <LinearLayout
-            android:id="@+id/ocr_processing_dots"
+            android:id="@+id/ocrProcessingDots"
             android:layout_width="@dimen/ocr_processing_footer_dots_width"
             android:layout_height="@dimen/ocr_processing_footer_dot_size"
             android:orientation="horizontal">

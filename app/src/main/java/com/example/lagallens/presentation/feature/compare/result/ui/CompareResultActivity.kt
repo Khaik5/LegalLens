@@ -21,6 +21,7 @@ import com.example.lagallens.databinding.ActivityCompareResultBinding
 import com.example.lagallens.databinding.ItemCompareClauseBinding
 import com.example.lagallens.databinding.ItemCompareOverviewBinding
 import com.example.lagallens.domain.model.ContractChangeType
+import com.example.lagallens.domain.model.ContractFieldValue
 import com.example.lagallens.domain.model.EmploymentContractComparison
 import com.example.lagallens.domain.model.EmploymentContractRisk
 import com.example.lagallens.presentation.common.utils.applySystemBarInsets
@@ -116,7 +117,7 @@ class CompareResultActivity : AppCompatActivity() {
         // Backend comparisons list labelled fields; DEMO ones only have text sections.
         val rows = comparison.fieldDifferences
             .filter { it.changeType != ContractChangeType.UNCHANGED }
-            .map { Triple(it.label, it.firstValue, it.secondValue) }
+            .map { Triple(it.label, it.firstValue?.let(::valueText), it.secondValue?.let(::valueText)) }
             .ifEmpty {
                 comparison.differences.filter { it.changeType != ContractChangeType.UNCHANGED }
                     .take(OVERVIEW_SAMPLE_ROWS).map { Triple(it.section, it.firstText, it.secondText) }
@@ -128,10 +129,15 @@ class CompareResultActivity : AppCompatActivity() {
         rows.forEach { (label, first, second) ->
             val row = ItemCompareOverviewBinding.inflate(LayoutInflater.from(context), this, false)
             row.compareOverviewTitle.text = label
-            row.compareOverviewA.text = first?.takeIf { it.isNotBlank() } ?: NO_VALUE
-            row.compareOverviewB.text = second?.takeIf { it.isNotBlank() } ?: NO_VALUE
+            row.compareOverviewA.text = first?.takeIf { it.isNotBlank() } ?: getString(R.string.compare_value_missing)
+            row.compareOverviewB.text = second?.takeIf { it.isNotBlank() } ?: getString(R.string.compare_value_missing)
             addView(row.root)
         }
+    }
+
+    private fun valueText(value: ContractFieldValue): String = when (value) {
+        is ContractFieldValue.Text -> value.value
+        is ContractFieldValue.Flag -> getString(if (value.isYes) R.string.compare_value_yes else R.string.compare_value_no)
     }
 
     private fun renderRisk(comparison: EmploymentContractComparison) = with(binding) {
@@ -167,8 +173,8 @@ class CompareResultActivity : AppCompatActivity() {
             item.compareClauseChange.setText(changeLabel(difference.changeType))
             item.compareClauseChange.setTextColor(ContextCompat.getColor(this@CompareResultActivity, changeColor(difference.changeType)))
             item.compareClauseDetails.isVisible = key in expanded
-            item.compareClauseTextA.text = getString(R.string.compare_clause_text_a, difference.firstText.ifBlank { NO_VALUE })
-            item.compareClauseTextB.text = getString(R.string.compare_clause_text_b, difference.secondText.ifBlank { NO_VALUE })
+            item.compareClauseTextA.text = getString(R.string.compare_clause_text_a, difference.firstText.ifBlank { getString(R.string.compare_value_missing) })
+            item.compareClauseTextB.text = getString(R.string.compare_clause_text_b, difference.secondText.ifBlank { getString(R.string.compare_value_missing) })
             item.compareClauseHeader.bindPressFeedback()
             item.compareClauseHeader.setOnClickListener { viewModel.onEvent(CompareResultUiEvent.SectionClicked(key)) }
             compareClausesList.addView(item.root)
@@ -216,7 +222,6 @@ class CompareResultActivity : AppCompatActivity() {
     }
 
     companion object {
-        private const val NO_VALUE = "—"
         private const val OVERVIEW_SAMPLE_ROWS = 6
         private const val EXTRA_FIRST_ID = "compare_first_id"
         private const val EXTRA_SECOND_ID = "compare_second_id"

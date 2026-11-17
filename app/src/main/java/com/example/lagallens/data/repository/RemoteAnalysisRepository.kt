@@ -75,16 +75,18 @@ class RemoteAnalysisRepository(
         }
     }.flowOn(Dispatchers.IO)
 
-    /** Best effort: a failure here must not replace the cancellation that is already in progress. */
-    private suspend fun cancelJob(scope: AuthSessionScope, jobId: String) {
+    /** Best effort: a failure here must not replace the cancellation that is already in progress. Returns whether the backend accepted it. */
+    private suspend fun cancelJob(scope: AuthSessionScope, jobId: String): Boolean =
         withContext(NonCancellable + Dispatchers.IO) {
             try {
                 analysis.cancel(scope, jobId)
+                true
             } catch (_: HttpException) {
+                false
             } catch (_: IOException) {
+                false
             }
         }
-    }
 
     override suspend fun getOverview(identity: AnalysisIdentity): AnalysisOverview =
         identity.overview ?: AnalysisResultMapper.toOverview(loadResult(identity))

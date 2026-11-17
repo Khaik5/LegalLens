@@ -20,6 +20,7 @@ import java.util.Date
 import java.util.Locale
 import com.example.lagallens.databinding.ActivityCreditHistoryBinding
 import com.example.lagallens.presentation.common.utils.bindPressFeedback
+import com.example.lagallens.presentation.feature.creditstore.flow.contract.CreditHistoryFilter
 import com.example.lagallens.presentation.feature.creditstore.flow.contract.CreditFlowUiEffect
 import com.example.lagallens.presentation.feature.creditstore.flow.contract.CreditFlowUiEvent
 import com.example.lagallens.presentation.feature.creditstore.ui.CreditStoreActivity
@@ -27,9 +28,7 @@ import com.example.lagallens.presentation.feature.creditstore.ui.CreditStoreActi
 class CreditHistoryActivity : CreditFlowActivity() {
     private val binding by lazy { ActivityCreditHistoryBinding.inflate(layoutInflater) }
     private val owner by lazy { intent.getStringExtra(EXTRA_OWNER).orEmpty() }
-    private enum class HistoryFilter { ALL, PURCHASE, USAGE }
-
-    private var selectedFilter = HistoryFilter.ALL
+    private var selectedFilter = CreditHistoryFilter.ALL
     private var shownTransactions = emptyList<com.example.lagallens.domain.model.credit.CreditTransaction>()
     private var shownBackendUnavailable = false
     private var shownLoading = false
@@ -66,12 +65,12 @@ class CreditHistoryActivity : CreditFlowActivity() {
                 else renderTransactions(transactions)
             }
         }
-        selectedFilter = savedInstanceState?.getString(STATE_FILTER)?.let { HistoryFilter.valueOf(it) } ?: HistoryFilter.ALL
+        selectedFilter = savedInstanceState?.getString(STATE_FILTER)?.let { CreditHistoryFilter.valueOf(it) } ?: CreditHistoryFilter.ALL
         styleTabs()
         mapOf(
-            binding.tabCreditHistoryAll to HistoryFilter.ALL,
-            binding.tabCreditHistoryPurchase to HistoryFilter.PURCHASE,
-            binding.tabCreditHistoryUsage to HistoryFilter.USAGE
+            binding.tabCreditHistoryAll to CreditHistoryFilter.ALL,
+            binding.tabCreditHistoryPurchase to CreditHistoryFilter.PURCHASE,
+            binding.tabCreditHistoryUsage to CreditHistoryFilter.USAGE
         ).forEach { (tab, filter) ->
             tab.setOnClickListener {
                 if (selectedFilter == filter) return@setOnClickListener
@@ -99,22 +98,15 @@ class CreditHistoryActivity : CreditFlowActivity() {
 
     private fun styleTabs() {
         mapOf(
-            binding.tabCreditHistoryAll to HistoryFilter.ALL,
-            binding.tabCreditHistoryPurchase to HistoryFilter.PURCHASE,
-            binding.tabCreditHistoryUsage to HistoryFilter.USAGE
+            binding.tabCreditHistoryAll to CreditHistoryFilter.ALL,
+            binding.tabCreditHistoryPurchase to CreditHistoryFilter.PURCHASE,
+            binding.tabCreditHistoryUsage to CreditHistoryFilter.USAGE
         ).forEach { (tab, filter) ->
             val isSelected = filter == selectedFilter
             tab.background = if (isSelected) androidx.core.content.ContextCompat.getDrawable(this, R.drawable.bg_credit_history_segment_selected) else null
             tab.setTextColor(androidx.core.content.ContextCompat.getColor(this, if (isSelected) R.color.legal_lens_auth_accent else R.color.legal_lens_secondary_text))
             tab.setTypeface(null, if (isSelected) android.graphics.Typeface.BOLD else android.graphics.Typeface.NORMAL)
         }
-    }
-
-    private fun matchesFilter(transaction: com.example.lagallens.domain.model.credit.CreditTransaction): Boolean = when (selectedFilter) {
-        HistoryFilter.ALL -> true
-        // DEMO ledger entries have no kind, so they are told apart by their amount and sign.
-        HistoryFilter.PURCHASE -> transaction.kind == CreditTransactionKind.PURCHASE || (transaction.kind == null && transaction.amountVnd > 0)
-        HistoryFilter.USAGE -> transaction.kind == CreditTransactionKind.USAGE || (transaction.kind == null && transaction.creditDelta < 0)
     }
 
     override fun onResume() {
@@ -134,7 +126,7 @@ class CreditHistoryActivity : CreditFlowActivity() {
         shownBackendUnavailable = backendUnavailable
         shownLoading = loading
         shownFailed = failed
-        val transactions = allTransactions.filter(::matchesFilter)
+        val transactions = allTransactions.filter(selectedFilter::matches)
         val scrollView = (0 until binding.creditHistoryRoot.childCount)
             .mapNotNull { binding.creditHistoryRoot.getChildAt(it) as? ScrollView }.firstOrNull() ?: return
         val content = scrollView.getChildAt(0) as? LinearLayout ?: return
