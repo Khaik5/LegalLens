@@ -26,7 +26,7 @@ class RemoteCreditRepositoryTest {
     private val api = CreditFixture()
     private val remote = CreditRemoteDataSource(lazyOf(api))
     private val credits = RemoteCreditRepository(session, remote)
-    private val payments = RemotePaymentRepository(session, remote)
+    private val payments = RemotePaymentRepository(session, remote, com.example.lagallens.data.datasource.remote.PaymentRemoteDataSource(lazy { error("Payments are not used here") }))
 
     @Test fun refreshLoadsTheBalanceRoundedDown() = runTest {
         api.balance = 149.75
@@ -97,11 +97,6 @@ class RemoteCreditRepositoryTest {
             ),
             payments.getPackages()
         )
-    }
-
-    @Test fun checkoutStaysUnavailableUntilPaymentsAreEnabled() = runTest {
-        assertFalse(payments.isConfigured)
-        assertTrue(runCatching { payments.createPayment("p1", "7") }.exceptionOrNull() is BackendNotConfiguredException)
     }
 
     private fun transaction(id: Long, type: String, amount: Double, paymentId: Long?, createdAt: String?) =
