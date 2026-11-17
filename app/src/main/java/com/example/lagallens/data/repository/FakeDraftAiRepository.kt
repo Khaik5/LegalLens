@@ -2,7 +2,6 @@ package com.example.lagallens.data.repository
 
 import android.content.Context
 import com.example.lagallens.R
-import com.example.lagallens.core.network.BackendNotConfiguredException
 import com.example.lagallens.domain.model.Draft
 import com.example.lagallens.domain.model.DraftStage
 import com.example.lagallens.domain.repository.DraftAiRepository
@@ -74,14 +73,4 @@ internal class FakeDraftAiRepository(
         drafts.saveDraft(stage, title(stage), DraftContentFactory.create(context, stage), contractId, conversationId = conversationId, isTitleGenerated = true)
 
     private fun title(stage: DraftStage) = context.getString(R.string.chatbot_draft_document_name, stage.legacyKey)
-}
-
-class UnconfiguredRemoteDraftAiRepository : DraftAiRepository {
-    private fun unavailable(): Nothing = throw BackendNotConfiguredException("Draft AI")
-    override suspend fun generateDraft(request: DraftGenerationRequest): Draft = unavailable()
-    override suspend fun resolveSource(sourceDraftId: String?, sourceKey: String, contractId: String?): Draft = unavailable()
-    override suspend fun regenerate(sourceDraftId: String?, sourceKey: String, contractId: String?): Draft = unavailable()
-    override suspend fun proposeEdit(request: DraftEditRequest): DraftEditProposal = unavailable()
-    override suspend fun applyEdit(proposalId: String, sourceDraftId: String?, contractId: String?): Draft = unavailable()
-    override suspend fun copyVersion(sourceDraftId: String?, contractId: String?): Draft = unavailable()
 }

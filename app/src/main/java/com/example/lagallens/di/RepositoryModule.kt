@@ -51,7 +51,6 @@ import com.example.lagallens.data.datasource.remote.DocumentRemoteDataSource
 import com.example.lagallens.data.datasource.remote.api.DocumentApi
 import com.example.lagallens.domain.repository.DocumentUploadRepository
 import com.example.lagallens.data.repository.FakeDraftRepository
-import com.example.lagallens.data.repository.UnconfiguredRemoteDraftRepository
 import com.example.lagallens.domain.repository.ContractRepository
 import com.example.lagallens.domain.repository.DocumentRepository
 import com.example.lagallens.domain.repository.DraftRepository
@@ -154,13 +153,28 @@ object RepositoryModule {
                     { action -> auth.withSession(scope, action) })
             }
         }
-        AppDataMode.REAL -> UnconfiguredRemoteDraftRepository()
+        AppDataMode.REAL -> remoteDraftRepository(context)
     }
+
+    private fun draftRemote(context: Context) =
+        com.example.lagallens.data.datasource.remote.DraftRemoteDataSource(lazy { authenticatedRetrofit(context).create(com.example.lagallens.data.datasource.remote.api.DraftApi::class.java) })
+
+    private fun remoteDraftRepository(context: Context) = com.example.lagallens.data.repository.RemoteDraftRepository(
+        EncryptedTokenStore(context), draftRemote(context), com.example.lagallens.data.repository.SharedPreferencesDraftVersionMarks(context)
+    )
 
     fun provideDraftAiRepository(context: Context, drafts: DraftRepository): com.example.lagallens.domain.repository.DraftAiRepository =
         when (DataModeConfig.current) {
             AppDataMode.DEMO -> com.example.lagallens.data.repository.FakeDraftAiRepository(context.applicationContext, drafts)
-            AppDataMode.REAL -> com.example.lagallens.data.repository.UnconfiguredRemoteDraftAiRepository()
+            AppDataMode.REAL -> {
+                val appContext = context.applicationContext
+                com.example.lagallens.data.repository.RemoteDraftAiRepository(
+                    EncryptedTokenStore(context), draftRemote(context),
+                    checkNotNull(drafts as? com.example.lagallens.data.repository.RemoteDraftRepository) { "REAL mode needs the remote draft repository" },
+                    com.example.lagallens.data.repository.SharedPreferencesDraftVersionMarks(appContext),
+                    regenerateInstruction = { localizedContext(appContext).getString(R.string.chatbot_draft_regenerate_instruction) }
+                )
+            }
         }
 
     fun provideAuthRepository(context: Context, onDemoAccountCreated: suspend (String) -> Unit = {}): AuthRepository {
