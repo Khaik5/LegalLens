@@ -6,9 +6,11 @@ import com.example.lagallens.data.datasource.remote.ContractRemoteDataSource
 import com.example.lagallens.data.datasource.remote.DocumentRemoteDataSource
 import com.example.lagallens.data.datasource.remote.api.ContractApi
 import com.example.lagallens.data.datasource.remote.api.DocumentApi
+import com.example.lagallens.data.model.request.CompareContractsRequest
 import com.example.lagallens.data.model.request.CreateContractRequest
 import com.example.lagallens.data.model.request.UpdateContractRequest
 import com.example.lagallens.data.model.response.ApiEnvelope
+import com.example.lagallens.data.model.response.ContractComparisonResponse
 import com.example.lagallens.data.model.response.ContractPageResponse
 import com.example.lagallens.data.model.response.ContractResponse
 import com.example.lagallens.data.model.response.DocumentResponse
@@ -110,6 +112,8 @@ class RemoteContractDocumentDetailsTest {
         override suspend fun create(scope: AuthSessionScope, request: CreateContractRequest) = ApiEnvelope(true, contract)
         override suspend fun update(scope: AuthSessionScope, id: String, request: UpdateContractRequest) = ApiEnvelope(true, contract)
         override suspend fun delete(scope: AuthSessionScope, id: String): ApiEnvelope<Unit> = ApiEnvelope(true, null)
+        override suspend fun compare(scope: AuthSessionScope, request: CompareContractsRequest): ApiEnvelope<ContractComparisonResponse> =
+            error("Unexpected compare")
     }
 
     private class DocumentsFixture : DocumentApi {

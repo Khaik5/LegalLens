@@ -4,9 +4,13 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.widget.TextView
 import androidx.activity.viewModels
+import androidx.annotation.ColorRes
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.Lifecycle
@@ -14,7 +18,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.lagallens.R
 import com.example.lagallens.databinding.ActivityCompareResultBinding
+import com.example.lagallens.databinding.ItemCompareClauseBinding
 import com.example.lagallens.databinding.ItemCompareOverviewBinding
+import com.example.lagallens.domain.model.ContractChangeType
+import com.example.lagallens.domain.model.ContractFieldValue
+import com.example.lagallens.domain.model.EmploymentContractComparison
+import com.example.lagallens.domain.model.EmploymentContractRisk
 import com.example.lagallens.presentation.common.utils.applySystemBarInsets
 import com.example.lagallens.presentation.common.utils.animateContentEntrance
 import com.example.lagallens.presentation.common.utils.bindPressFeedback
@@ -26,11 +35,13 @@ import com.example.lagallens.presentation.feature.compare.result.contract.Compar
 import com.example.lagallens.presentation.feature.compare.result.viewmodel.CompareResultViewModel
 import com.example.lagallens.presentation.feature.compare.select.contract.CompareContract
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 class CompareResultActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCompareResultBinding
     private val viewModel by viewModels<CompareResultViewModel>()
     private var visibleTab: CompareResultTab? = null
+    private var renderedComparison: EmploymentContractComparison? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,19 +56,12 @@ class CompareResultActivity : AppCompatActivity() {
         setContentView(binding.root)
         binding.root.applySystemBarInsets()
         listOf(binding.compareResultBack, binding.compareResultRetry, binding.compareTabOverview,
-            binding.compareTabRisk, binding.compareTabClauses, binding.compareShowRisk,
-            binding.comparePaymentToggle, binding.compareTermToggle, binding.compareTrialToggle,
-            binding.compareCycleToggle).forEach { it.bindPressFeedback() }
+            binding.compareTabRisk, binding.compareTabClauses).forEach { it.bindPressFeedback() }
         binding.compareResultBack.setOnClickListener { viewModel.onEvent(CompareResultUiEvent.BackClicked) }
         binding.compareResultRetry.setOnClickListener { viewModel.onEvent(CompareResultUiEvent.RetryClicked) }
         binding.compareTabOverview.setOnClickListener { viewModel.onEvent(CompareResultUiEvent.TabClicked(CompareResultTab.OVERVIEW)) }
         binding.compareTabRisk.setOnClickListener { viewModel.onEvent(CompareResultUiEvent.TabClicked(CompareResultTab.RISK)) }
         binding.compareTabClauses.setOnClickListener { viewModel.onEvent(CompareResultUiEvent.TabClicked(CompareResultTab.CLAUSES)) }
-        binding.compareShowRisk.setOnClickListener { viewModel.onEvent(CompareResultUiEvent.TabClicked(CompareResultTab.RISK)) }
-        binding.comparePaymentToggle.setOnClickListener { viewModel.onEvent(CompareResultUiEvent.SectionClicked("payment")) }
-        binding.compareTermToggle.setOnClickListener { viewModel.onEvent(CompareResultUiEvent.SectionClicked("term")) }
-        binding.compareTrialToggle.setOnClickListener { viewModel.onEvent(CompareResultUiEvent.SectionClicked("trial")) }
-        binding.compareCycleToggle.setOnClickListener { viewModel.onEvent(CompareResultUiEvent.SectionClicked("cycle")) }
         val firstId = intent.getStringExtra(EXTRA_FIRST_ID).orEmpty()
         val secondId = intent.getStringExtra(EXTRA_SECOND_ID).orEmpty()
         if (firstId.isBlank() || secondId.isBlank() || firstId == secondId) { finish(); return }
@@ -75,8 +79,11 @@ class CompareResultActivity : AppCompatActivity() {
         compareResultDocumentB.text = getString(R.string.compare_document_b, state.documentB)
         compareResultLoading.isVisible = state.status == CompareResultStatus.LOADING
         compareResultError.isVisible = state.status == CompareResultStatus.ERROR
+        compareResultErrorMessage.setText(state.errorMessageRes ?: R.string.compare_error_message)
         compareResultNoExample.isVisible = state.status == CompareResultStatus.NO_EXAMPLE
         val ready = state.status == CompareResultStatus.READY
+        // Without a finished comparison there is nothing to switch between, so the tabs are hidden instead of looking broken.
+        (compareTabOverview.parent as android.view.View).isVisible = ready
         compareOverviewContent.isVisible = ready && state.selectedTab == CompareResultTab.OVERVIEW
         compareRiskContent.isVisible = ready && state.selectedTab == CompareResultTab.RISK
         compareClausesContent.isVisible = ready && state.selectedTab == CompareResultTab.CLAUSES
@@ -88,53 +95,124 @@ class CompareResultActivity : AppCompatActivity() {
             }.animateContentEntrance(0f)
         }
         visibleTab = if (ready) state.selectedTab else null
-        state.comparison?.let { comparison ->
-            val rows = listOf(compareOverviewType, compareOverviewTerm, compareOverviewFee, compareOverviewTrial, compareOverviewPayment, compareOverviewDamages)
-            rows.forEachIndexed { index, row ->
-                val difference = comparison.differences.getOrNull(index)
-                row.root.isVisible = difference != null
-                if (difference != null) {
-                    row.compareOverviewTitle.text = difference.section
-                    row.compareOverviewA.text = difference.firstText.ifBlank { "—" }
-                    row.compareOverviewB.text = difference.secondText.ifBlank { "—" }
-                }
+        val comparison = state.comparison
+        if (comparison == null) {
+            renderedComparison = null
+        } else {
+            if (comparison !== renderedComparison) {
+                renderedComparison = comparison
+                renderOverview(comparison)
+                renderRisk(comparison)
             }
-            val differences = comparison.differences
-            val sections = listOf("payment", "term", "trial", "cycle")
-            val differencesByIndex = (0..3).map(differences::getOrNull)
-            val firstDifference = differencesByIndex[0]
-            comparePaymentDetails.isVisible = firstDifference != null && sections[0] in state.expandedSections
-            firstDifference?.let { difference ->
-                (comparePaymentDetails.getChildAt(0) as? TextView)?.text = "A · ${difference.firstText.ifBlank { "—" }}"
-                (comparePaymentDetails.getChildAt(1) as? TextView)?.text = "B · ${difference.secondText.ifBlank { "—" }}"
-                (comparePaymentDetails.getChildAt(2) as? TextView)?.text = getString(R.string.compare_difference_demo_explanation)
-            }
-            comparePaymentToggle.text = firstDifference?.section ?: getString(R.string.compare_no_text_difference)
-            comparePaymentToggle.isEnabled = firstDifference != null
-            listOf(compareTermDetails, compareTrialDetails, compareCycleDetails).forEachIndexed { index, view ->
-                val difference = differencesByIndex[index + 1]
-                val sectionKey = sections[index + 1]
-                view.isVisible = difference != null && sectionKey in state.expandedSections
-                if (difference != null) view.text = "A · ${difference.firstText.ifBlank { "—" }}\n\nB · ${difference.secondText.ifBlank { "—" }}"
-                val title = difference?.section ?: getString(R.string.compare_no_text_difference)
-                val toggle = listOf(compareTermToggle, compareTrialToggle, compareCycleToggle)[index]
-                (toggle.getChildAt(0) as? TextView)?.text = title
-                toggle.isEnabled = difference != null
-            }
-            (compareClausesContent.getChildAt(0) as? TextView)?.text = getString(R.string.compare_result_demo_notice)
-            compareRiskContent.getChildAt(0)?.isVisible = false
-            (compareRiskContent.getChildAt(1) as? TextView)?.text = getString(R.string.compare_result_demo_heading)
-            for (index in 0..2) {
-                val textView = compareRiskContent.getChildAt(index + 2) as? TextView ?: continue
-                val difference = differences.getOrNull(index)
-                textView.isVisible = difference != null
-                if (difference != null) textView.text = "${difference.section}\nA: ${difference.firstText.ifBlank { "—" }}\nB: ${difference.secondText.ifBlank { "—" }}"
-            }
-            compareResultNotice.text = getString(R.string.compare_result_demo_notice)
+            renderClauses(comparison, state.expandedSections)
         }
+        compareResultNotice.isVisible = comparison?.isSample == true
         listOf(compareTabOverview to CompareResultTab.OVERVIEW, compareTabRisk to CompareResultTab.RISK, compareTabClauses to CompareResultTab.CLAUSES).forEach { (view, tab) ->
             updateTab(view, state.selectedTab == tab, ready)
         }
+    }
+
+    private fun renderOverview(comparison: EmploymentContractComparison) = with(binding.compareOverviewContent) {
+        removeAllViews()
+        // Backend comparisons list labelled fields; DEMO ones only have text sections.
+        val rows = comparison.fieldDifferences
+            .filter { it.changeType != ContractChangeType.UNCHANGED }
+            .map { Triple(it.label, it.firstValue?.let(::valueText), it.secondValue?.let(::valueText)) }
+            .ifEmpty {
+                comparison.differences.filter { it.changeType != ContractChangeType.UNCHANGED }
+                    .take(OVERVIEW_SAMPLE_ROWS).map { Triple(it.section, it.firstText, it.secondText) }
+            }
+        if (rows.isEmpty()) {
+            addView(messageView(R.string.compare_overview_empty))
+            return@with
+        }
+        rows.forEach { (label, first, second) ->
+            val row = ItemCompareOverviewBinding.inflate(LayoutInflater.from(context), this, false)
+            row.compareOverviewTitle.text = label
+            row.compareOverviewA.text = first?.takeIf { it.isNotBlank() } ?: getString(R.string.compare_value_missing)
+            row.compareOverviewB.text = second?.takeIf { it.isNotBlank() } ?: getString(R.string.compare_value_missing)
+            addView(row.root)
+        }
+    }
+
+    private fun valueText(value: ContractFieldValue): String = when (value) {
+        is ContractFieldValue.Text -> value.value
+        is ContractFieldValue.Flag -> getString(if (value.isYes) R.string.compare_value_yes else R.string.compare_value_no)
+    }
+
+    private fun renderRisk(comparison: EmploymentContractComparison) = with(binding) {
+        val risk = comparison.riskComparison
+        compareRiskEmpty.isVisible = risk == null
+        compareRiskScores.isVisible = risk != null
+        compareRiskDelta.isVisible = risk != null
+        if (risk == null) return@with
+        bindScore(compareRiskScoreA, compareRiskLevelA, risk.first.score, risk.first.risk)
+        bindScore(compareRiskScoreB, compareRiskLevelB, risk.second.score, risk.second.risk)
+        compareRiskDelta.text = getString(R.string.compare_risk_delta, String.format(Locale.getDefault(), "%+.1f", risk.scoreDelta))
+    }
+
+    private fun bindScore(scoreView: TextView, levelView: TextView, score: Double, risk: EmploymentContractRisk) {
+        scoreView.text = getString(R.string.compare_risk_score_value, String.format(Locale.getDefault(), "%.0f", score))
+        scoreView.setTextColor(ContextCompat.getColor(this, riskColor(risk)))
+        levelView.setText(riskLabel(risk))
+    }
+
+    private fun renderClauses(comparison: EmploymentContractComparison, expanded: Set<String>) = with(binding) {
+        val changed = comparison.differences.filter { it.changeType != ContractChangeType.UNCHANGED }
+        val summary = comparison.summary
+        compareClausesSummary.isVisible = !comparison.isSample
+        compareClausesSummary.text = getString(
+            R.string.compare_clauses_summary, summary.changedSections, summary.addedSections, summary.removedSections
+        )
+        compareClausesEmpty.isVisible = changed.isEmpty()
+        compareClausesList.removeAllViews()
+        changed.forEachIndexed { index, difference ->
+            val key = "clause:$index"
+            val item = ItemCompareClauseBinding.inflate(LayoutInflater.from(this@CompareResultActivity), compareClausesList, false)
+            item.compareClauseTitle.text = difference.section
+            item.compareClauseChange.setText(changeLabel(difference.changeType))
+            item.compareClauseChange.setTextColor(ContextCompat.getColor(this@CompareResultActivity, changeColor(difference.changeType)))
+            item.compareClauseDetails.isVisible = key in expanded
+            item.compareClauseTextA.text = getString(R.string.compare_clause_text_a, difference.firstText.ifBlank { getString(R.string.compare_value_missing) })
+            item.compareClauseTextB.text = getString(R.string.compare_clause_text_b, difference.secondText.ifBlank { getString(R.string.compare_value_missing) })
+            item.compareClauseHeader.bindPressFeedback()
+            item.compareClauseHeader.setOnClickListener { viewModel.onEvent(CompareResultUiEvent.SectionClicked(key)) }
+            compareClausesList.addView(item.root)
+        }
+    }
+
+    private fun messageView(@StringRes text: Int) = TextView(this).apply {
+        setText(text)
+        setTextColor(ContextCompat.getColor(context, R.color.legal_lens_secondary_text))
+        val padding = resources.getDimensionPixelSize(R.dimen.dp_16)
+        setPadding(padding, padding, padding, padding)
+        setBackgroundResource(R.drawable.bg_compare_notice)
+    }
+
+    @StringRes private fun changeLabel(type: ContractChangeType) = when (type) {
+        ContractChangeType.ADDED -> R.string.compare_change_added
+        ContractChangeType.REMOVED -> R.string.compare_change_removed
+        else -> R.string.compare_change_modified
+    }
+
+    @ColorRes private fun changeColor(type: ContractChangeType) = when (type) {
+        ContractChangeType.ADDED -> R.color.contract_complete
+        ContractChangeType.REMOVED -> R.color.contract_risk_high
+        else -> R.color.contract_pending
+    }
+
+    @StringRes private fun riskLabel(risk: EmploymentContractRisk) = when (risk) {
+        EmploymentContractRisk.LOW -> R.string.contract_low_risk
+        EmploymentContractRisk.MEDIUM -> R.string.contract_medium_risk
+        EmploymentContractRisk.HIGH, EmploymentContractRisk.CRITICAL -> R.string.contract_high_risk
+        EmploymentContractRisk.NOT_ANALYZED -> R.string.compare_risk_not_analyzed_short
+    }
+
+    @ColorRes private fun riskColor(risk: EmploymentContractRisk) = when (risk) {
+        EmploymentContractRisk.LOW -> R.color.contract_complete
+        EmploymentContractRisk.MEDIUM -> R.color.contract_pending
+        EmploymentContractRisk.HIGH, EmploymentContractRisk.CRITICAL -> R.color.contract_risk_high
+        EmploymentContractRisk.NOT_ANALYZED -> R.color.legal_lens_secondary_text
     }
 
     private fun updateTab(view: TextView, selected: Boolean, enabled: Boolean) {
@@ -144,6 +222,7 @@ class CompareResultActivity : AppCompatActivity() {
     }
 
     companion object {
+        private const val OVERVIEW_SAMPLE_ROWS = 6
         private const val EXTRA_FIRST_ID = "compare_first_id"
         private const val EXTRA_SECOND_ID = "compare_second_id"
         private const val EXTRA_FIRST_NAME = "compare_first_name"
