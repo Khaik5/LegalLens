@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/dp_12"
+    android:background="@drawable/bg_contract_search_result"
+    android:orientation="vertical"
+    android:padding="@dimen/dp_14">
+
+    <LinearLayout
+        android:id="@+id/compareClauseHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center_vertical"
+        android:minHeight="@dimen/dp_40"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/compareClauseTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="@color/legal_lens_primary"
+            android:textSize="@dimen/sp_14"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/compareClauseChange"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_8"
+            android:textSize="@dimen/sp_12"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/compareClauseDetails"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_1"
+            android:layout_marginTop="@dimen/dp_8"
+            android:background="@color/legal_lens_input_stroke" />
+
+        <TextView
+            android:id="@+id/compareClauseTextA"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_8"
+            android:lineSpacingExtra="@dimen/dp_2"
+            android:textColor="@color/legal_lens_primary"
+            android:textSize="@dimen/sp_13" />
+
+        <TextView
+            android:id="@+id/compareClauseTextB"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_8"
+            android:lineSpacingExtra="@dimen/dp_2"
+            android:textColor="@color/legal_lens_primary"
+            android:textSize="@dimen/sp_13" />
+    </LinearLayout>
+</LinearLayout>

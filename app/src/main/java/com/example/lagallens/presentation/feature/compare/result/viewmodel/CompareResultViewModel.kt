@@ -4,6 +4,9 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.lagallens.LegalLensApplication
+import com.example.lagallens.R
+import com.example.lagallens.domain.model.ContractComparisonBlocker
+import com.example.lagallens.domain.model.ContractComparisonUnavailableException
 import com.example.lagallens.presentation.feature.compare.result.contract.CompareResultStatus
 import com.example.lagallens.presentation.feature.compare.result.contract.CompareResultUiEffect
 import com.example.lagallens.presentation.feature.compare.result.contract.CompareResultUiEvent
@@ -56,7 +59,7 @@ class CompareResultViewModel(application: Application) : AndroidViewModel(applic
     }
 
     private fun load(showError: Boolean) {
-        state.update { it.copy(status = CompareResultStatus.LOADING, comparison = null) }
+        state.update { it.copy(status = CompareResultStatus.LOADING, comparison = null, errorMessageRes = null) }
         viewModelScope.launch {
             try {
                 if (showError) throw IllegalStateException("Demo error preview")
@@ -75,9 +78,20 @@ class CompareResultViewModel(application: Application) : AndroidViewModel(applic
                 }
             } catch (cancellationException: CancellationException) {
                 throw cancellationException
+            } catch (unavailable: ContractComparisonUnavailableException) {
+                if (app.currentSessionKey() != ownerSession) return@launch
+                state.update { it.copy(status = CompareResultStatus.ERROR, errorMessageRes = unavailable.blocker.messageRes()) }
             } catch (_: Exception) {
                 state.update { it.copy(status = CompareResultStatus.ERROR) }
             }
         }
+    }
+
+    private fun ContractComparisonBlocker.messageRes() = when (this) {
+        ContractComparisonBlocker.DOCUMENT_MISSING -> R.string.compare_error_document_missing
+        ContractComparisonBlocker.OCR_NOT_READY -> R.string.compare_error_ocr_not_ready
+        ContractComparisonBlocker.DOCUMENT_UNAVAILABLE -> R.string.compare_error_document_unavailable
+        ContractComparisonBlocker.TOO_LARGE -> R.string.compare_error_too_large
+        ContractComparisonBlocker.NOT_FOUND -> R.string.compare_error_not_found
     }
 }

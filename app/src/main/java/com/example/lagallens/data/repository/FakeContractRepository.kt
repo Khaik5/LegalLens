@@ -1,6 +1,7 @@
 package com.example.lagallens.data.repository
 
 import com.example.lagallens.data.datasource.local.datastore.EmploymentDemoDataSource
+import com.example.lagallens.domain.model.ContractChangeType
 import com.example.lagallens.domain.model.ContractTextDifference
 import com.example.lagallens.domain.model.EmploymentContract
 import com.example.lagallens.domain.model.EmploymentContractComparison
@@ -25,9 +26,16 @@ class FakeContractRepository(private val dataSource: EmploymentDemoDataSource) :
         val differences = sectionOrder.mapNotNull { section ->
             val left = firstSections[section].orEmpty()
             val right = secondSections[section].orEmpty()
-            if (left == right) null else ContractTextDifference(section, left, right)
+            if (left == right) null else ContractTextDifference(
+                section, left, right,
+                when {
+                    left.isEmpty() -> ContractChangeType.ADDED
+                    right.isEmpty() -> ContractChangeType.REMOVED
+                    else -> ContractChangeType.MODIFIED
+                }
+            )
         }
-        return EmploymentContractComparison(first, second, differences)
+        return EmploymentContractComparison(first, second, differences, isSample = true)
     }
 
     private fun String.toSections(): LinkedHashMap<String, String> {
