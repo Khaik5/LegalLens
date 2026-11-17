@@ -14,6 +14,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.lagallens.R
+import com.example.lagallens.presentation.common.utils.isDemoData
 import com.example.lagallens.databinding.ActivityAnalysisRiskOverviewBinding
 import com.example.lagallens.presentation.common.utils.bindPressFeedback
 import com.example.lagallens.presentation.feature.analysis.risk.contract.AnalysisRiskOverviewUiEffect
@@ -39,6 +40,7 @@ class AnalysisRiskOverviewActivity : com.example.lagallens.presentation.feature.
         }
         binding = ActivityAnalysisRiskOverviewBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        if (!isDemoData()) binding.analysisRiskOverviewDisclaimer.setText(R.string.analysis_risk_overview_disclaimer_real)
         ViewCompat.setOnApplyWindowInsetsListener(binding.analysisRiskOverviewRoot) { view, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
