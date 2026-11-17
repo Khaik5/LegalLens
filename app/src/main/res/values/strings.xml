@@ -1035,4 +1035,19 @@
     <string name="analysis_open_existing">Xem kết quả</string>
     <string name="analysis_start_new">Phân tích mới</string>
     <string name="analysis_snapshot_demo_metadata">[DEMO] %1$s</string>
+    <string name="credit_flow_qr_title">Quét mã để chuyển khoản</string>
+    <string name="credit_flow_qr_image_description">Mã VietQR để thanh toán gói Credit</string>
+    <string name="credit_flow_qr_transfer_content">Nội dung chuyển khoản</string>
+    <string name="credit_flow_qr_amount">Số tiền cần chuyển</string>
+    <string name="credit_flow_qr_expires_in">Còn lại để thanh toán</string>
+    <string name="credit_flow_qr_expired">Đã hết thời gian thanh toán</string>
+    <string name="credit_flow_qr_note">Nhập đúng nội dung chuyển khoản và đúng số tiền để Credit được cộng tự động.</string>
+    <string name="credit_flow_qr_copy">Sao chép nội dung</string>
+    <string name="credit_flow_qr_copied">Đã sao chép nội dung chuyển khoản</string>
+    <string name="credit_flow_qr_unavailable">Chưa thể hiển thị mã chuyển khoản. Vui lòng thử lại sau.</string>
+    <string name="credit_flow_qr_amount_value">%1$s đ</string>
+    <string name="analysis_legal_references_effective_from">Hiệu lực từ %1$s</string>
+    <string name="analysis_legal_references_effective_unknown">Chưa có thông tin hiệu lực</string>
+    <string name="analysis_legal_reference_unknown_value">Chưa có thông tin</string>
+    <string name="analysis_legal_reference_detail_text_heading">Nội dung trích dẫn</string>
 </resources>

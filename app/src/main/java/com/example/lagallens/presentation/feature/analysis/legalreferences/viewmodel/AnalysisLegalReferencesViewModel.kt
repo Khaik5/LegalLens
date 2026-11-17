@@ -27,10 +27,13 @@ class AnalysisLegalReferencesViewModel(private var allReferences: List<AnalysisL
     private val _uiEffect = Channel<AnalysisLegalReferencesUiEffect>(Channel.BUFFERED)
     val uiEffect = _uiEffect.receiveAsFlow()
 
-    fun setDemoReferences(references: List<AnalysisLegalReference>, unlocked: Boolean) {
+    fun setDemoReferences(references: List<AnalysisLegalReference>, unlocked: Boolean) = setReferences(references, unlocked, isDemo = true)
+
+    /** [isDemo] marks illustrative samples; backend references are shown without that notice. */
+    fun setReferences(references: List<AnalysisLegalReference>, unlocked: Boolean, isDemo: Boolean) {
         allReferences = references
         isUnlocked = unlocked
-        _uiState.update { it.copy(isDemo = true) }
+        _uiState.update { it.copy(isDemo = isDemo) }
         updateQuery(_uiState.value.query)
     }
 

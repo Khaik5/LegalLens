@@ -17,8 +17,14 @@ data class OcrResultResponse(
     val text: String?,
     val confidence: Double?,
     val pages: List<OcrPageResponse>?,
-    val originalConfidence: Double? = null
+    val originalConfidence: Double? = null,
+    /** Identifies the latest revision; analysis jobs are created from it. Null on older backends. */
+    val revisionId: String? = null,
+    /** PENDING until the owner confirms the revision, then APPROVED. */
+    val reviewStatus: String? = null
 )
+
+data class OcrConfirmResponse(val revisionId: String, val revision: Int, val reviewStatus: String?)
 
 data class OcrPageResponse(val page: Int, val text: String?, val confidence: Double?)
 
