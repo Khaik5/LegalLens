@@ -825,6 +825,7 @@
     <string name="credit_flow_qr_copied">Transfer content copied</string>
     <string name="credit_flow_qr_unavailable">The transfer code cannot be shown right now. Please try again later.</string>
     <string name="credit_flow_qr_amount_value">%1$s VND</string>
+    <string name="chatbot_draft_regenerate_instruction">Write a different version of the contract from the same conversation.</string>
     <string name="analysis_legal_references_effective_from">Effective from %1$s</string>
     <string name="analysis_legal_references_effective_unknown">No effective-date information</string>
     <string name="analysis_legal_reference_unknown_value">Not available</string>
