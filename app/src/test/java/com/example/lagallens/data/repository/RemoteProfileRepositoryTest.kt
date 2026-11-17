@@ -6,12 +6,20 @@ import com.example.lagallens.data.datasource.local.datastore.ProfileEdits
 import com.example.lagallens.data.datasource.local.datastore.ProfileLocalEdits
 import com.example.lagallens.data.datasource.remote.UserRemoteDataSource
 import com.example.lagallens.data.datasource.remote.api.UserApi
+import com.example.lagallens.data.model.request.ConfirmEmailChangeRequest
+import com.example.lagallens.data.model.request.RequestEmailChangeRequest
 import com.example.lagallens.data.model.response.ApiEnvelope
+import com.example.lagallens.data.model.response.ChallengeResponse
+import com.example.lagallens.data.model.response.EmailChangeConfirmationResponse
 import com.example.lagallens.data.model.response.UserResponse
 import com.example.lagallens.domain.model.UserProfile
+import com.example.lagallens.domain.repository.EmailAlreadyUsedException
+import com.example.lagallens.domain.repository.EmailChangeCodeRejectedException
+import com.example.lagallens.domain.repository.EmailChangeRejectedException
 import com.example.lagallens.domain.repository.ProfileAvatarUpdateException
 import com.example.lagallens.domain.repository.ProfilePhoneRejectedException
 import com.google.gson.JsonParser
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -21,6 +29,7 @@ import okio.Buffer
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertSame
+import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import retrofit2.HttpException
@@ -43,6 +52,42 @@ class RemoteProfileRepositoryTest {
         assertEquals(UserProfile("Original Name", "tester@example.test", "0901234567", "file://avatar/42/v1"), first)
         assertEquals(first, second)
         assertEquals(1, api.avatarReads)
+    }
+
+    @Test fun removingTheAvatarDeletesItOnTheServerAndForgetsTheCachedImage() = runTest {
+        api.user = api.user.copy(avatar = AVATAR_PATH)
+        assertEquals("file://avatar/42/v1", repository.getProfile().photoUri)
+
+        val profile = repository.removeAvatar()
+
+        assertEquals(1, api.avatarDeletions)
+        assertNull(profile.photoUri)
+        assertNull(avatars.files["42"])
+        assertNull(repository.getProfile().photoUri)
+    }
+
+    @Test fun anEmailChangeSendsTheCodeThenSignsTheDeviceOut() = runTest {
+        session.allowSessionClear = true
+
+        val challenge = repository.requestEmailChange(" new@example.test ", "secret")
+        val confirmed = repository.confirmEmailChange(challenge.challengeId, " 123456 ")
+
+        assertEquals(listOf(RequestEmailChangeRequest("new@example.test", "secret")), api.emailRequests)
+        assertEquals(listOf(ConfirmEmailChangeRequest("challenge-1", "123456")), api.emailConfirmations)
+        assertEquals("new@example.test", confirmed)
+        assertEquals(listOf("session"), session.clearedSessions)
+    }
+
+    @Test fun emailChangeFailuresAreTranslatedToDomainErrors() = runTest {
+        api.emailRequestFailure = httpError(400)
+        assertThrows(EmailChangeRejectedException::class.java) { runBlocking { repository.requestEmailChange("new@example.test", "wrong") } }
+
+        api.emailRequestFailure = httpError(409)
+        assertThrows(EmailAlreadyUsedException::class.java) { runBlocking { repository.requestEmailChange("new@example.test", "secret") } }
+
+        api.emailConfirmFailure = httpError(400)
+        assertThrows(EmailChangeCodeRejectedException::class.java) { runBlocking { repository.confirmEmailChange("challenge-1", "000000") } }
+        assertTrue(session.clearedSessions.isEmpty())
     }
 
     @Test fun accountWithoutAvatarHasNoPhotoAndClearsAnOldCache() = runTest {
@@ -190,6 +235,30 @@ class RemoteProfileRepositoryTest {
         override suspend fun avatar(scope: AuthSessionScope): ResponseBody {
             avatarReads++
             return "image".toResponseBody()
+        }
+
+        var avatarDeletions = 0
+        var emailRequestFailure: Exception? = null
+        var emailConfirmFailure: Exception? = null
+        val emailRequests = mutableListOf<RequestEmailChangeRequest>()
+        val emailConfirmations = mutableListOf<ConfirmEmailChangeRequest>()
+
+        override suspend fun deleteAvatar(scope: AuthSessionScope): Response<Unit> {
+            avatarDeletions++
+            user = user.copy(avatar = null, updatedAt = "deleted")
+            return Response.success(Unit)
+        }
+
+        override suspend fun requestEmailChange(scope: AuthSessionScope, request: RequestEmailChangeRequest): ApiEnvelope<ChallengeResponse> {
+            emailRequests += request
+            emailRequestFailure?.let { throw it }
+            return ApiEnvelope(true, ChallengeResponse("challenge-1", 600, 60))
+        }
+
+        override suspend fun confirmEmailChange(scope: AuthSessionScope, request: ConfirmEmailChangeRequest): ApiEnvelope<EmailChangeConfirmationResponse> {
+            emailConfirmations += request
+            emailConfirmFailure?.let { throw it }
+            return ApiEnvelope(true, EmailChangeConfirmationResponse(emailRequests.last().email, true))
         }
     }
 

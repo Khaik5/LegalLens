@@ -6,5 +6,6 @@ sealed interface ProfileEditUiEvent {
     data class PhoneChanged(val value: String) : ProfileEditUiEvent
     data object ChangePhotoClicked : ProfileEditUiEvent
     data class PhotoSelected(val uri: String) : ProfileEditUiEvent
+    data object PhotoRemoved : ProfileEditUiEvent
     data object SaveClicked : ProfileEditUiEvent
 }

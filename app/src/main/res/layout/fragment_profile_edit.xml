@@ -100,6 +100,20 @@
                     android:textColor="@color/legal_lens_secondary_text"
                     android:textSize="@dimen/sp_12"
                     android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/btnRemovePhoto"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/dp_20"
+                    android:layout_marginTop="@dimen/dp_4"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:includeFontPadding="false"
+                    android:text="@string/profile_edit_remove_photo"
+                    android:textColor="@color/legal_lens_error"
+                    android:textSize="@dimen/sp_12"
+                    android:visibility="invisible" />
             </LinearLayout>
 
             <LinearLayout
@@ -178,6 +192,21 @@
                         android:contentDescription="@null"
                         android:src="@drawable/ic_profile_edit_lock" />
                 </FrameLayout>
+
+                <TextView
+                    android:id="@+id/btnChangeEmail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dp_6"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:includeFontPadding="false"
+                    android:minHeight="@dimen/dp_32"
+                    android:gravity="center_vertical"
+                    android:textColor="@color/legal_lens_secondary_text"
+                    android:text="@string/profile_edit_change_email"
+                    android:textSize="@dimen/sp_13"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="wrap_content"
