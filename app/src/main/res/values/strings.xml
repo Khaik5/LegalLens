@@ -475,6 +475,9 @@
     <string name="analysis_result_score_label">/100</string>
     <string name="analysis_result_risk_heading">Đánh giá rủi ro:</string>
     <string name="analysis_result_medium">Trung bình</string>
+    <string name="analysis_processing_title_real">Đang phân tích hợp đồng</string>
+    <string name="analysis_result_title_real">Kết quả phân tích</string>
+    <string name="analysis_risk_overview_disclaimer_real">Kết quả do AI phân tích, chỉ mang tính tham khảo và không phải tư vấn pháp lý.</string>
     <string name="analysis_result_risk_assessment_description">Hợp đồng có một vài điều khoản cần thương thảo lại để đảm bảo quyền lợi tốt nhất.</string>
     <string name="analysis_result_key_facts">Key Facts</string>
     <string name="analysis_result_risks">Rủi ro</string>

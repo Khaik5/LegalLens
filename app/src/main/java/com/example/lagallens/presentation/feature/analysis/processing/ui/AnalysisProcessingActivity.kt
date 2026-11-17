@@ -16,6 +16,8 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.lagallens.R
 import com.example.lagallens.databinding.ActivityAnalysisProcessingBinding
+import com.example.lagallens.presentation.common.utils.isDemoData
+import com.example.lagallens.presentation.common.utils.pulseDotsWhileStarted
 import com.example.lagallens.presentation.common.adapter.ProcessingTimelineStepAdapter
 import com.example.lagallens.presentation.feature.analysis.processing.contract.AnalysisProcessingUiEffect
 import com.example.lagallens.presentation.feature.analysis.processing.contract.AnalysisProcessingUiEvent
@@ -45,6 +47,8 @@ class AnalysisProcessingActivity : AppCompatActivity() {
         }
         binding = ActivityAnalysisProcessingBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        binding.analysisProcessingDots.pulseDotsWhileStarted(this)
+        if (!isDemoData()) binding.analysisProcessingTitle.setText(R.string.analysis_processing_title_real)
         val owner = intent.getStringExtra(EXTRA_SESSION_KEY).orEmpty()
         val app = application as com.example.lagallens.LegalLensApplication
         if (owner.isBlank() || app.currentSessionKey() != owner) { binding.root.visibility = android.view.View.INVISIBLE; viewModel.invalidateSession(); finish(); return }
