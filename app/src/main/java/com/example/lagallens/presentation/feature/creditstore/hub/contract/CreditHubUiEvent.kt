@@ -4,5 +4,6 @@ sealed interface CreditHubUiEvent {
     data object BackClicked : CreditHubUiEvent
     data object BuyCreditsClicked : CreditHubUiEvent
     data object HistoryClicked : CreditHubUiEvent
+    data object PaymentsClicked : CreditHubUiEvent
     data object UnlockResultsClicked : CreditHubUiEvent
 }
