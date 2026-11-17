@@ -12,6 +12,7 @@ import com.example.lagallens.domain.model.processing.UploadFailure
 import com.example.lagallens.domain.repository.OcrRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -38,12 +39,17 @@ class RemoteOcrRepository(
             emit(ProcessingState.Failed())
             return@flow
         }
+        var isRecognizing = false
         try {
             val existing = remote.latest(scope, documentId)
             if (existing == null || existing.status in FINISHED_WITHOUT_TEXT) startJob(scope, documentId)
+            isRecognizing = existing?.status != COMPLETED
             emit(ProcessingState.Running(stage = RECOGNIZING_STAGE))
             emit(awaitJob(scope, documentId))
+            isRecognizing = false
         } catch (cancelled: CancellationException) {
+            // The user left the screen, so recognition no longer has anyone waiting for it.
+            if (isRecognizing) cancelRecognition(scope, documentId)
             throw cancelled
         } catch (error: HttpException) {
             error.response()?.errorBody()?.close()
@@ -69,6 +75,17 @@ class RemoteOcrRepository(
             documentText = result.text.orEmpty(),
             confidence = confidence
         )
+    }
+
+    /** Best effort: a failure here must not replace the cancellation that is already in progress. */
+    private suspend fun cancelRecognition(scope: AuthSessionScope, documentId: String) {
+        withContext(NonCancellable + Dispatchers.IO) {
+            try {
+                remote.cancel(scope, documentId)
+            } catch (_: HttpException) {
+            } catch (_: IOException) {
+            }
+        }
     }
 
     private suspend fun startJob(scope: AuthSessionScope, documentId: String) {

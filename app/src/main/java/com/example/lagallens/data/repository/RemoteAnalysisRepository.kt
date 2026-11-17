@@ -15,6 +15,7 @@ import com.example.lagallens.domain.model.processing.AnalysisJobState
 import com.example.lagallens.domain.repository.AnalysisRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
@@ -44,6 +45,7 @@ class RemoteAnalysisRepository(
             emit(AnalysisJobState.Failed)
             return@flow
         }
+        var activeJobId: String? = null
         try {
             emit(AnalysisJobState.Running(FIRST_STAGE))
             val revisionId = approvedRevisionId(scope, documentId)
@@ -52,9 +54,18 @@ class RemoteAnalysisRepository(
                 return@flow
             }
             // The operation ID is the idempotency key, so a retry after process death joins the same job.
-            val jobId = analysis.create(scope, operationId, AnalysisJobRequest(contract, document, revisionId)).jobId
-            awaitJob(scope, jobId)
+            val created = analysis.create(scope, operationId, AnalysisJobRequest(contract, document, revisionId))
+            // Retrying reuses the operation ID, so the backend answers with the job that already failed.
+            if (created.status == FAILED && !analysis.retry(scope, created.jobId)) {
+                emit(AnalysisJobState.Failed)
+                return@flow
+            }
+            activeJobId = created.jobId
+            awaitJob(scope, created.jobId)
+            activeJobId = null
         } catch (cancelled: CancellationException) {
+            // The user left the screen, so nobody is waiting for this analysis any more.
+            activeJobId?.let { cancelJob(scope, it) }
             throw cancelled
         } catch (error: HttpException) {
             error.response()?.errorBody()?.close()
@@ -63,6 +74,17 @@ class RemoteAnalysisRepository(
             emit(AnalysisJobState.Failed)
         }
     }.flowOn(Dispatchers.IO)
+
+    /** Best effort: a failure here must not replace the cancellation that is already in progress. */
+    private suspend fun cancelJob(scope: AuthSessionScope, jobId: String) {
+        withContext(NonCancellable + Dispatchers.IO) {
+            try {
+                analysis.cancel(scope, jobId)
+            } catch (_: HttpException) {
+            } catch (_: IOException) {
+            }
+        }
+    }
 
     override suspend fun getOverview(identity: AnalysisIdentity): AnalysisOverview =
         identity.overview ?: AnalysisResultMapper.toOverview(loadResult(identity))
@@ -112,6 +134,7 @@ class RemoteAnalysisRepository(
 
     private companion object {
         const val APPROVED = "APPROVED"
+        const val FAILED = "FAILED"
         const val FIRST_STAGE = 3
         const val LAST_STAGE = 6
         const val POLL_INTERVAL_MILLIS = 2_000L
