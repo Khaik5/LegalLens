@@ -9,6 +9,7 @@ import com.example.lagallens.data.model.response.AnalysisResultResponse
 import com.example.lagallens.data.model.response.AnalysisUnlockResponse
 import com.example.lagallens.data.model.response.AnalysisUnlockStatusResponse
 import com.example.lagallens.data.model.response.ApiEnvelope
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
@@ -42,6 +43,13 @@ interface AnalysisApi {
 
     @POST("analysis/jobs/{id}/unlock")
     suspend fun unlock(@Tag scope: AuthSessionScope, @Path("id") jobId: String): ApiEnvelope<AnalysisUnlockResponse>
+
+    @POST("analysis/jobs/{id}/cancel")
+    suspend fun cancel(@Tag scope: AuthSessionScope, @Path("id") jobId: String): Response<Unit>
+
+    /** Only a FAILED job the backend marked retryable can be retried; it goes back to PENDING. */
+    @POST("analysis/jobs/{id}/retry")
+    suspend fun retry(@Tag scope: AuthSessionScope, @Path("id") jobId: String): Response<Unit>
 
     @GET("contracts/{id}/analysis/latest")
     suspend fun latest(@Tag scope: AuthSessionScope, @Path("id") contractId: String): ApiEnvelope<AnalysisLatestResponse>
