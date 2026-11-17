@@ -128,6 +128,10 @@ class ChatbotActivity : AppCompatActivity() {
         chatbotMessages.apply {
             layoutManager = LinearLayoutManager(this@ChatbotActivity)
             adapter = messageAdapter
+            addOnLayoutChangeListener { _, _, top, _, bottom, _, oldTop, _, oldBottom ->
+                val shrank = oldBottom - oldTop > 0 && bottom - top < oldBottom - oldTop
+                if (shrank && messageAdapter.itemCount > 0) post { scrollToPosition(messageAdapter.itemCount - 1) }
+            }
         }
         chatbotBack.setOnClickListener { viewModel.onEvent(ChatbotUiEvent.BackClicked) }
         chatbotMenu.setOnClickListener { viewModel.onEvent(ChatbotUiEvent.DrawerOpened) }

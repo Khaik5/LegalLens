@@ -38,6 +38,21 @@
             android:textStyle="bold" />
     </LinearLayout>
 
+    <ScrollView
+        android:id="@+id/activity_camera_permission_scroll"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        android:overScrollMode="never"
+        app:layout_constraintBottom_toTopOf="@id/camera_permission_actions"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/camera_permission_app_bar">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
     <View
         android:id="@+id/camera_permission_icon_outer"
         android:layout_width="@dimen/camera_permission_icon_outer_size"
@@ -45,7 +60,7 @@
         android:background="@drawable/bg_camera_permission_outer"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/camera_permission_app_bar"
+        app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="@dimen/camera_permission_icon_top_margin" />
 
     <ImageView
@@ -140,7 +155,11 @@
         </LinearLayout>
     </LinearLayout>
 
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+
     <LinearLayout
+        android:id="@+id/camera_permission_actions"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/camera_permission_side_padding"

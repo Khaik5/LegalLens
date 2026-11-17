@@ -162,7 +162,8 @@
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rvAssistantActions"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/dp_84"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/dp_minus_6"
                     android:layout_marginTop="@dimen/dp_12"
                     android:clipToPadding="false"
                     android:overScrollMode="never"

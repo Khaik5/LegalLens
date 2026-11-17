@@ -8,15 +8,24 @@
     android:background="@color/legal_lens_background"
     tools:context=".presentation.feature.success.ui.SuccessActivity">
 
-    <LinearLayout
+    <ScrollView
+        android:id="@+id/successScroll"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/dp_171"
-        android:gravity="center_horizontal"
-        android:orientation="vertical"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        android:overScrollMode="never"
+        app:layout_constraintBottom_toTopOf="@id/startUsingButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:paddingTop="@dimen/success_content_top"
+        android:paddingBottom="@dimen/dp_16">
 
         <FrameLayout
             android:id="@+id/successSeal"
@@ -91,13 +100,14 @@
                 android:textSize="@dimen/sp_14" />
         </LinearLayout>
     </LinearLayout>
+    </ScrollView>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/startUsingButton"
         android:layout_width="0dp"
         android:layout_height="@dimen/dp_54"
         android:layout_marginHorizontal="@dimen/dp_24"
-        android:layout_marginBottom="@dimen/dp_120"
+        android:layout_marginBottom="@dimen/success_button_bottom"
         android:elevation="@dimen/dp_0"
         android:fontFamily="sans-serif"
         android:insetBottom="@dimen/dp_0"

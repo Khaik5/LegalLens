@@ -13,7 +13,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager
 import com.example.lagallens.R
 import com.example.lagallens.databinding.FragmentContractDetailBinding
 import com.example.lagallens.presentation.common.utils.animateContentEntrance
@@ -63,7 +63,8 @@ class ContractDetailFragment : Fragment() {
             }
         }
         binding.rvAssistantActions.apply {
-            layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+            layoutManager = GridLayoutManager(requireContext(), ASSISTANT_ACTION_COLUMNS)
+            isNestedScrollingEnabled = false
             adapter = assistantAdapter
         }
         binding.btnBack.setOnClickListener { viewModel.onEvent(ContractDetailUiEvent.BackClicked) }
@@ -219,6 +220,7 @@ class ContractDetailFragment : Fragment() {
 
     companion object {
         private const val UNKNOWN_VALUE = "\u2014"
+        private const val ASSISTANT_ACTION_COLUMNS = 3
         const val ARG_CONTRACT_ID = "contractId"
     }
 }

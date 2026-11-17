@@ -419,6 +419,7 @@
             android:layout_marginEnd="@dimen/chatbot_composer_gap"
             android:background="@drawable/bg_chatbot_input"
             android:fontFamily="@font/manrope"
+            android:ellipsize="end"
             android:hint="@string/chatbot_input_hint"
             android:imeOptions="actionSend"
             android:includeFontPadding="false"
