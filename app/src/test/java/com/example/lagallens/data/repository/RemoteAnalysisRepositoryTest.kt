@@ -33,6 +33,7 @@ import com.example.lagallens.domain.model.analysis.AnalysisPreview
 import com.example.lagallens.domain.model.analysis.AnalysisSeverity
 import com.example.lagallens.domain.model.processing.AnalysisJobState
 import com.example.lagallens.domain.repository.AnalysisUnlockOutcome
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
 import okhttp3.ResponseBody.Companion.toResponseBody
@@ -105,6 +106,44 @@ class RemoteAnalysisRepositoryTest {
         analysisApi.jobs = mutableListOf(job("PROCESSING"), job("FAILED"))
 
         assertEquals(AnalysisJobState.Failed, repository.process("op-1", "27", "41", "session").toList().last())
+    }
+
+    @Test fun aFailedJobIsRetriedWhenTheSameOperationStartsAgain() = runTest {
+        ocrApi.latest = ocr("APPROVED")
+        analysisApi.createdStatus = "FAILED"
+        analysisApi.jobs = mutableListOf(job("PROCESSING"), job("COMPLETED"))
+
+        val states = repository.process("op-1", "27", "41", "session").toList()
+
+        assertEquals(listOf("job-1"), analysisApi.retried)
+        assertEquals(AnalysisJobState.Completed("job-1"), states.last())
+    }
+
+    @Test fun aFailedJobThatCannotBeRetriedStaysFailed() = runTest {
+        ocrApi.latest = ocr("APPROVED")
+        analysisApi.createdStatus = "FAILED"
+        analysisApi.retryable = false
+
+        assertEquals(AnalysisJobState.Failed, repository.process("op-1", "27", "41", "session").toList().last())
+    }
+
+    @Test fun leavingTheScreenWhileWaitingCancelsTheJob() = runTest {
+        ocrApi.latest = ocr("APPROVED")
+        analysisApi.jobs = mutableListOf(job("PROCESSING", progress = 10), job("PROCESSING", progress = 90))
+
+        // Stops collecting after the first stage, as a cleared ViewModel does.
+        repository.process("op-1", "27", "41", "session").take(2).toList()
+
+        assertEquals(listOf("job-1"), analysisApi.cancelled)
+    }
+
+    @Test fun aFinishedJobIsNotCancelled() = runTest {
+        ocrApi.latest = ocr("APPROVED")
+        analysisApi.jobs = mutableListOf(job("COMPLETED"))
+
+        repository.process("op-1", "27", "41", "session").toList()
+
+        assertTrue(analysisApi.cancelled.isEmpty())
     }
 
     @Test fun anUnconfiguredProviderIsReportedAsFailure() = runTest {
@@ -246,12 +285,16 @@ class RemoteAnalysisRepositoryTest {
         var latest: AnalysisLatestResponse? = null
         var unlockStatus = AnalysisUnlockStatusResponse(false, 2, 10)
         var unlockFailure: Exception? = null
+        var createdStatus = "PENDING"
+        var retryable = true
+        val cancelled = mutableListOf<String>()
+        val retried = mutableListOf<String>()
         private var reads = 0
 
         override suspend fun create(scope: AuthSessionScope, idempotencyKey: String, request: AnalysisJobRequest): ApiEnvelope<AnalysisJobCreatedResponse> {
             created += idempotencyKey to request
             createFailure?.let { throw it }
-            return ApiEnvelope(true, AnalysisJobCreatedResponse("job-1", "PENDING"))
+            return ApiEnvelope(true, AnalysisJobCreatedResponse("job-1", createdStatus))
         }
 
         override suspend fun job(scope: AuthSessionScope, jobId: String): ApiEnvelope<AnalysisJobResponse> =
@@ -269,11 +312,23 @@ class RemoteAnalysisRepositoryTest {
             return ApiEnvelope(true, AnalysisUnlockResponse(true, 8))
         }
 
+        override suspend fun cancel(scope: AuthSessionScope, jobId: String): Response<Unit> {
+            cancelled += jobId
+            return Response.success(Unit)
+        }
+
+        override suspend fun retry(scope: AuthSessionScope, jobId: String): Response<Unit> {
+            retried += jobId
+            return if (retryable) Response.success(Unit) else Response.error(409, "{}".toResponseBody())
+        }
+
         override suspend fun latest(scope: AuthSessionScope, contractId: String): ApiEnvelope<AnalysisLatestResponse> =
             latest?.let { ApiEnvelope(true, it) } ?: throw HttpException(Response.error<Any>(404, "{}".toResponseBody()))
     }
 
     private class OcrFixture : OcrApi {
+        override suspend fun cancel(scope: AuthSessionScope, documentId: String): Response<Unit> = Response.success(Unit)
+
         var latest: OcrResultResponse? = null
         val confirmed = mutableListOf<Int>()
 

@@ -20,6 +20,13 @@ class OcrRemoteDataSource(private val api: Lazy<OcrApi>) {
         null
     }
 
+    /** The backend answers 409 or 404 when no job is active; that is not a failure for the caller. */
+    suspend fun cancel(scope: AuthSessionScope, documentId: String) {
+        val response = api.value.cancel(scope, documentId)
+        response.errorBody()?.close()
+        if (!response.isSuccessful && response.code() != 404 && response.code() != 409) throw HttpException(response)
+    }
+
     suspend fun confirm(scope: AuthSessionScope, documentId: String, expectedRevision: Int) =
         api.value.confirm(scope, documentId, OcrConfirmRequest(expectedRevision)).requireData("OCR confirmation")
 
