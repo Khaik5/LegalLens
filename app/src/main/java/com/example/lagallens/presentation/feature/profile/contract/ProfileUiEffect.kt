@@ -13,5 +13,6 @@ sealed interface ProfileUiEffect {
     data object NavigateToAuthentication : ProfileUiEffect
     data object ShowLogoutFailed : ProfileUiEffect
     data object ProfileSaveSucceeded : ProfileUiEffect
+    data object AvatarRemoved : ProfileUiEffect
     data class ProfileSaveFailed(@param:StringRes val messageRes: Int) : ProfileUiEffect
 }
