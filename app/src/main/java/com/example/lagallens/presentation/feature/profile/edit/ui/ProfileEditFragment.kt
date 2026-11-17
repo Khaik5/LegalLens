@@ -16,6 +16,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import com.example.lagallens.LegalLensApplication
 import com.example.lagallens.R
 import com.example.lagallens.databinding.FragmentProfileEditBinding
 import com.example.lagallens.presentation.common.utils.bindPressFeedback
@@ -25,9 +26,9 @@ import com.example.lagallens.presentation.feature.profile.edit.contract.ProfileE
 import com.example.lagallens.presentation.feature.profile.edit.contract.ProfileEditUiEvent
 import com.example.lagallens.presentation.feature.profile.edit.contract.ProfileEditUiState
 import com.example.lagallens.presentation.feature.profile.edit.viewmodel.ProfileEditViewModel
+import com.example.lagallens.presentation.feature.profile.email.ui.ProfileEmailChangeDialog
 import com.example.lagallens.presentation.feature.profile.viewmodel.ProfileViewModel
 import kotlinx.coroutines.launch
-import com.example.lagallens.presentation.common.utils.applySystemBarAndKeyboardInsets
 
 class ProfileEditFragment : Fragment() {
     private val photoPicker = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
@@ -52,8 +53,6 @@ class ProfileEditFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        // The nav host already pads for the status bar; this keeps the Save button above the keyboard.
-        binding.root.applySystemBarAndKeyboardInsets(top = false)
         bindView()
         collectProfileState()
         collectUiState()
@@ -70,6 +69,10 @@ class ProfileEditFragment : Fragment() {
                             Toast.makeText(requireContext(), R.string.profile_edit_save_success, Toast.LENGTH_SHORT).show()
                             findNavController().navigateUp()
                         }
+                        ProfileUiEffect.AvatarRemoved -> {
+                            viewModel.onEvent(ProfileEditUiEvent.PhotoRemoved)
+                            Toast.makeText(requireContext(), R.string.profile_edit_remove_photo_success, Toast.LENGTH_SHORT).show()
+                        }
                         is ProfileUiEffect.ProfileSaveFailed ->
                             Toast.makeText(requireContext(), effect.messageRes, Toast.LENGTH_SHORT).show()
                         else -> Unit
@@ -81,6 +84,15 @@ class ProfileEditFragment : Fragment() {
 
     private fun bindView() {
         listOf(binding.btnBack, binding.btnChangePhoto, binding.btnSaveProfile).forEach { it.bindPressFeedback() }
+        binding.btnRemovePhoto.setOnClickListener {
+            profileViewModel.onEvent(ProfileUiEvent.RemoveAvatarClicked)
+        }
+        val app = requireActivity().application as LegalLensApplication
+        binding.btnChangeEmail.isVisible = app.userProfileRepository.canChangeEmail
+        binding.btnChangeEmail.setOnClickListener {
+            ProfileEmailChangeDialog.newInstance(binding.etProfileEmail.text.toString())
+                .show(childFragmentManager, ProfileEmailChangeDialog.TAG)
+        }
         binding.btnBack.setOnClickListener {
             findNavController().navigateUp()
         }
@@ -136,6 +148,7 @@ class ProfileEditFragment : Fragment() {
     private fun render(state: ProfileEditUiState) {
         binding.tvProfileEditAvatar.text = state.name.initials()
         binding.ivProfileEditAvatar.isVisible = state.photoUri != null
+        binding.btnRemovePhoto.visibility = if (state.photoUri != null) View.VISIBLE else View.INVISIBLE
         binding.ivProfileEditAvatar.setImageURI(state.photoUri?.let(Uri::parse))
         updateInput(binding.etProfileName, state.name)
         updateInput(binding.etProfileEmail, state.email)

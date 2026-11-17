@@ -12,11 +12,16 @@ import com.example.lagallens.data.datasource.remote.UserRemoteDataSource
 import com.example.lagallens.data.mapper.toProfile
 import com.example.lagallens.data.model.request.UpdateMyProfileRequest
 import com.example.lagallens.data.model.response.UserResponse
+import com.example.lagallens.domain.repository.EmailAlreadyUsedException
+import com.example.lagallens.domain.repository.EmailChangeChallenge
+import com.example.lagallens.domain.repository.EmailChangeCodeRejectedException
+import com.example.lagallens.domain.repository.EmailChangeRejectedException
 import com.example.lagallens.domain.repository.ProfileAvatarUpdateException
 import com.example.lagallens.domain.repository.ProfilePhoneRejectedException
 import com.example.lagallens.domain.repository.ProfileRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -79,6 +84,58 @@ class RemoteProfileRepository internal constructor(
             lastProfile = LoadedProfile(scope.key, updated, newPhoto)
             updated.toProfile(newPhoto)
         }
+    }
+
+    override suspend fun removeAvatar() = withContext(Dispatchers.IO) {
+        val scope = checkNotNull(tokens.currentSessionScope()) { "No active session" }
+        val userId = tokens.requireUserId(scope)
+        edits.withLock {
+            check(tokens.requireUserId(scope) == userId && clearedSession != scope.key)
+            remote.deleteAvatar(scope)
+            avatars.clear(userId)
+            // The avatar's version is the profile's updatedAt, so the profile is read again.
+            val user = remote.me(scope)
+            checkOwner(scope, userId, user)
+            lastProfile = LoadedProfile(scope.key, user, null)
+            user.toProfile(null)
+        }
+    }
+
+    override val canChangeEmail = true
+
+    override suspend fun requestEmailChange(newEmail: String, currentPassword: String) = withContext(Dispatchers.IO) {
+        val scope = checkNotNull(tokens.currentSessionScope()) { "No active session" }
+        try {
+            val challenge = remote.requestEmailChange(scope, newEmail.trim(), currentPassword)
+            EmailChangeChallenge(checkNotNull(challenge.challengeId) { "The backend sent no challenge" }, challenge.expiresIn)
+        } catch (error: HttpException) {
+            error.response()?.errorBody()?.close()
+            when (error.code()) {
+                400 -> throw EmailChangeRejectedException(error)
+                409 -> throw EmailAlreadyUsedException(error)
+                else -> throw error
+            }
+        }
+    }
+
+    override suspend fun confirmEmailChange(challengeId: String, code: String) = withContext(Dispatchers.IO) {
+        val scope = checkNotNull(tokens.currentSessionScope()) { "No active session" }
+        val confirmed = try {
+            remote.confirmEmailChange(scope, challengeId, code.trim())
+        } catch (error: HttpException) {
+            error.response()?.errorBody()?.close()
+            when (error.code()) {
+                400 -> throw EmailChangeCodeRejectedException(error)
+                409 -> throw EmailAlreadyUsedException(error)
+                else -> throw error
+            }
+        }
+        // The backend has ended every session, so this device's tokens are no longer valid.
+        withContext(NonCancellable) {
+            tokens.clearIfSessionMatches(scope.key)
+            lastProfile = null
+        }
+        confirmed.email
     }
 
     /** Forgets the cached profile of the signed-out session; its avatar file is removed with the session cache. */

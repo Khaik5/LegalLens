@@ -18,7 +18,14 @@ internal class RemoteRepositorySession : AuthSessionStore {
         error("Unexpected rotation")
     override fun updateUserIfSessionMatches(sessionKey: String, userId: String, email: String) =
         error("Unexpected identity update")
-    override fun clearIfSessionMatches(sessionKey: String) = error("Unexpected session clear")
+    /** Tests that expect the sign-out of a session turn this on and read [clearedSessions]. */
+    var allowSessionClear = false
+    val clearedSessions = mutableListOf<String>()
+    override fun clearIfSessionMatches(sessionKey: String): Boolean {
+        check(allowSessionClear) { "Unexpected session clear" }
+        clearedSessions += sessionKey
+        return true
+    }
     override fun clearIfRefreshMatches(expectedRefresh: String) = error("Unexpected refresh clear")
     override fun clearAccessTokenIfMatches(sessionKey: String, expectedToken: String) = error("Unexpected access clear")
 }
