@@ -24,6 +24,7 @@ import com.example.lagallens.presentation.feature.onboarding.viewmodel.Onboardin
 import com.example.lagallens.presentation.common.utils.MotionTokens
 import com.example.lagallens.presentation.common.utils.animateContentEntrance
 import com.example.lagallens.presentation.common.utils.bindPressFeedback
+import com.example.lagallens.presentation.common.utils.applySystemBarInsets
 import kotlinx.coroutines.launch
 
 class OnboardingActivity : AppCompatActivity() {
@@ -45,6 +46,7 @@ class OnboardingActivity : AppCompatActivity() {
         setContentView(binding.root)
         window.statusBarColor = getColor(R.color.onboarding_background)
         window.navigationBarColor = getColor(R.color.onboarding_background)
+        binding.onboardingRoot.applySystemBarInsets(top = false, bottom = true)
 
         playEntranceMotion()
         setUpPager()

@@ -4,6 +4,8 @@ import androidx.annotation.StringRes
 import com.example.lagallens.R
 
 data class AnalysisLegalReferenceDetailUiState(
+    /** Backend text; when set it replaces the resource fields below. */
+    val text: com.example.lagallens.presentation.feature.analysis.legalreferences.model.AnalysisLegalReferenceText? = null,
     val referenceId: String = "",
     val documentName: String = "",
     val documentMetadata: String = "",

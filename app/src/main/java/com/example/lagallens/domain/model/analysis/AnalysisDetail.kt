@@ -6,7 +6,9 @@ data class AnalysisDetail(
     val keyFacts: List<AnalysisKeyFactEntry>,
     val parties: List<AnalysisPartyEntry>,
     val obligations: List<AnalysisObligationEntry>,
-    val findings: List<AnalysisFinding>
+    val findings: List<AnalysisFinding>,
+    /** Legal basis from the backend; the DEMO result has none and shows sample references instead. */
+    val citations: List<AnalysisCitation> = emptyList()
 )
 
 data class AnalysisSummaryEntry(val id: String, val title: String, val description: String)
@@ -44,4 +46,17 @@ data class AnalysisFinding(
     val consequence: String,
     val explanation: String? = null,
     val recommendation: String? = null
+)
+
+/** One legal article an analysis relies on. Fields the backend has not stored are null. */
+data class AnalysisCitation(
+    val id: String,
+    val legalArticleId: Long?,
+    val documentTitle: String?,
+    val articleNumber: String?,
+    val title: String,
+    val topic: String?,
+    val excerpt: String,
+    val effectiveDate: String?,
+    val validityStatus: String?
 )

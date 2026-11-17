@@ -131,7 +131,10 @@
         <TextView
             android:id="@+id/ocr_saved_return"
             android:layout_width="0dp"
-            android:layout_height="@dimen/ocr_saved_action_height"
+            android:layout_height="wrap_content"
+            android:minHeight="@dimen/ocr_saved_action_height"
+            android:paddingHorizontal="@dimen/dp_8"
+            android:paddingVertical="@dimen/dp_8"
             android:layout_weight="1"
             android:background="@drawable/bg_ocr_failure_secondary_action"
             android:clickable="true"
@@ -146,7 +149,10 @@
         <TextView
             android:id="@+id/ocr_saved_analyze"
             android:layout_width="0dp"
-            android:layout_height="@dimen/ocr_saved_action_height"
+            android:layout_height="wrap_content"
+            android:minHeight="@dimen/ocr_saved_action_height"
+            android:paddingHorizontal="@dimen/dp_8"
+            android:paddingVertical="@dimen/dp_8"
             android:layout_marginStart="@dimen/ocr_saved_action_gap"
             android:layout_weight="1"
             android:background="@drawable/bg_ocr_failure_primary_action"

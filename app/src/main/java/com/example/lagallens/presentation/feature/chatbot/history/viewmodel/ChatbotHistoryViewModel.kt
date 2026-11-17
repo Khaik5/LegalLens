@@ -69,8 +69,8 @@ class ChatbotHistoryViewModel(private val repository: ChatbotRepository? = null)
                                 contractName = record.contractName,
                                 contractType = record.contractType,
                                 timestamp = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(Date(record.updatedAtEpochMillis)),
-                                messageCount = "${record.messages.size} tin nhắn",
-                                preview = record.messages.lastOrNull()?.content.orEmpty(),
+                                messageCount = "${record.messageCount} tin nhắn",
+                                preview = record.lastMessagePreview,
                                 contractId = record.contractId
                             )
                         }

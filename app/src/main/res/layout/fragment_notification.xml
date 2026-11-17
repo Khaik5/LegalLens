@@ -135,7 +135,7 @@
         android:paddingStart="@dimen/dp_16"
         android:paddingTop="@dimen/dp_8"
         android:paddingEnd="@dimen/dp_16"
-        android:paddingBottom="@dimen/dp_16"
+        android:paddingBottom="@dimen/main_content_bottom_clearance"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

@@ -28,3 +28,5 @@ suspend fun DraftRepository.latestDraft(stage: DraftStage, contractId: String?):
     if (contractId == null) getLatestDraft(stage)
     else getDrafts().filter { it.stage == stage && it.contractId == contractId }
         .maxWithOrNull(compareBy<Draft> { it.versionNo }.thenBy { it.updatedAt })
+        // A data source may list drafts without their text.
+        ?.let { if (it.content.isBlank()) getDraft(it.draftId) ?: it else it }

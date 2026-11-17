@@ -3,8 +3,10 @@ package com.example.lagallens.data.repository
 import com.example.lagallens.core.network.AuthSessionScope
 import com.example.lagallens.data.datasource.remote.OcrRemoteDataSource
 import com.example.lagallens.data.datasource.remote.api.OcrApi
+import com.example.lagallens.data.model.request.OcrConfirmRequest
 import com.example.lagallens.data.model.request.OcrCorrectionRequest
 import com.example.lagallens.data.model.response.ApiEnvelope
+import com.example.lagallens.data.model.response.OcrConfirmResponse
 import com.example.lagallens.data.model.response.OcrCorrectionResponse
 import com.example.lagallens.data.model.response.OcrJobResponse
 import com.example.lagallens.data.model.response.OcrResultResponse
@@ -151,6 +153,9 @@ class RemoteOcrRepositoryTest {
             return result?.let { ApiEnvelope(true, it) }
                 ?: throw HttpException(Response.error<Any>(404, "{}".toResponseBody()))
         }
+
+        override suspend fun confirm(scope: AuthSessionScope, documentId: String, request: OcrConfirmRequest) =
+            ApiEnvelope(true, OcrConfirmResponse("rev-1", request.expectedRevision, "APPROVED"))
 
         override suspend fun correct(scope: AuthSessionScope, documentId: String, request: OcrCorrectionRequest) =
             ApiEnvelope(true, OcrCorrectionResponse("job-1", request.expectedRevision + 1, request.text))
