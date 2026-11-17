@@ -13,6 +13,7 @@ import com.example.lagallens.data.model.response.OcrResultResponse
 import com.example.lagallens.domain.model.ocr.OcrResultNotReadyException
 import com.example.lagallens.domain.model.processing.ProcessingState
 import com.example.lagallens.domain.model.processing.UploadFailure
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
 import okhttp3.ResponseBody.Companion.toResponseBody
@@ -29,6 +30,31 @@ class RemoteOcrRepositoryTest {
 
     private fun job(status: String, text: String? = null, confidence: Double? = null, retryable: Boolean = false) =
         OcrResultResponse("job-1", status, if (status == "COMPLETED") 100 else 0, null, retryable, text?.let { 1 }, text, confidence, null)
+
+    @Test fun leavingTheScreenWhileRecognizingCancelsTheJob() = runTest {
+        api.results = mutableListOf(null, job("PROCESSING"))
+
+        repository.process("41").take(1).toList()
+
+        assertEquals(listOf("41"), api.cancelledFor)
+    }
+
+    @Test fun openingTheScreenAgainAfterACancelStartsANewJob() = runTest {
+        api.results = mutableListOf(job("CANCELLED"), job("COMPLETED", "Hợp đồng lao động", 0.83))
+
+        val states = repository.process("41").toList()
+
+        assertEquals(listOf("41"), api.createdFor)
+        assertEquals(ProcessingState.Completed, states.last())
+    }
+
+    @Test fun aFinishedRecognitionIsNotCancelled() = runTest {
+        api.results = mutableListOf(null, job("COMPLETED", "Hợp đồng lao động", 0.83))
+
+        repository.process("41").toList()
+
+        assertTrue(api.cancelledFor.isEmpty())
+    }
 
     @Test fun startsAJobAndWaitsUntilItCompletes() = runTest {
         api.results = mutableListOf(null, job("PENDING"), job("PROCESSING"), job("COMPLETED", "Hợp đồng lao động", 0.83))
@@ -132,6 +158,7 @@ class RemoteOcrRepositoryTest {
         var createFailure: Exception? = null
         var networkFailuresBeforePoll = 0
         val createdFor = mutableListOf<String>()
+        val cancelledFor = mutableListOf<String>()
         val idempotencyKeys = mutableListOf<String>()
         private var reads = 0
 
@@ -152,6 +179,11 @@ class RemoteOcrRepositoryTest {
             reads++
             return result?.let { ApiEnvelope(true, it) }
                 ?: throw HttpException(Response.error<Any>(404, "{}".toResponseBody()))
+        }
+
+        override suspend fun cancel(scope: AuthSessionScope, documentId: String): Response<Unit> {
+            cancelledFor += documentId
+            return Response.success(Unit)
         }
 
         override suspend fun confirm(scope: AuthSessionScope, documentId: String, request: OcrConfirmRequest) =
