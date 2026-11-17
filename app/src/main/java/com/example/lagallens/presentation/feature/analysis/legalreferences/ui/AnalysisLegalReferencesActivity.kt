@@ -21,6 +21,7 @@ import com.example.lagallens.presentation.feature.analysis.legalreferences.contr
 import com.example.lagallens.presentation.feature.analysis.legalreferences.contract.AnalysisLegalReferencesUiEvent
 import com.example.lagallens.presentation.feature.analysis.legalreferences.contract.AnalysisLegalReferencesUiState
 import com.example.lagallens.presentation.feature.analysis.legalreferences.detail.ui.AnalysisLegalReferenceDetailActivity
+import com.example.lagallens.presentation.feature.analysis.legalreferences.model.toLegalReference
 import com.example.lagallens.presentation.feature.analysis.legalreferences.viewmodel.AnalysisLegalReferencesViewModel
 import kotlinx.coroutines.launch
 import com.example.lagallens.presentation.common.utils.applySystemBarAndKeyboardInsets
@@ -77,6 +78,8 @@ class AnalysisLegalReferencesActivity : com.example.lagallens.presentation.featu
     override fun onAnalysisValidated(identity: com.example.lagallens.domain.model.analysis.AnalysisIdentity, detail: com.example.lagallens.domain.model.analysis.AnalysisDetail) {
         if (com.example.lagallens.di.DataModeConfig.current == com.example.lagallens.di.AppDataMode.DEMO) {
             viewModel.setDemoReferences(com.example.lagallens.presentation.feature.analysis.legalreferences.model.DemoLegalReferences.items, validatedUnlockStatus?.isUnlocked == true)
+        } else {
+            viewModel.setReferences(detail.citations.map { it.toLegalReference() }, validatedUnlockStatus?.isUnlocked == true, isDemo = false)
         }
     }
 

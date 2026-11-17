@@ -222,6 +222,7 @@ class LegalLensApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        registerActivityLifecycleCallbacks(com.example.lagallens.presentation.common.utils.ContentWidthLimiter)
         // The dark palette is incomplete and has no approved design, so the app stays light until it does.
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         clearSessionCachesOnSessionChange()

@@ -29,6 +29,7 @@ import com.example.lagallens.databinding.ActivityChatbotBinding
 import com.example.lagallens.presentation.common.utils.bindPressFeedback
 import com.example.lagallens.presentation.feature.analysis.legalreferences.detail.ui.AnalysisLegalReferenceDetailActivity
 import com.example.lagallens.presentation.feature.chatbot.adapter.ChatbotMessageAdapter
+import com.example.lagallens.presentation.feature.main.ui.MainActivity
 import com.example.lagallens.presentation.feature.chatbot.contract.ChatbotUiEffect
 import com.example.lagallens.presentation.feature.chatbot.contract.ChatbotUiEvent
 import com.example.lagallens.presentation.feature.chatbot.contract.ChatbotUiState
@@ -122,14 +123,19 @@ class ChatbotActivity : AppCompatActivity() {
     }
 
     private fun bindViews() = with(binding) {
-        listOf(chatbotBack, chatbotMore, chatbotAttach, chatbotSend, chatbotAttachmentChip,
+        listOf(chatbotBack, chatbotMenu, chatbotSourceDocument.root, chatbotAttach, chatbotSend, chatbotAttachmentChip,
             chatbotDrawerNewChat, chatbotDrawerHistory, chatbotDrawerHelp).forEach { it.bindPressFeedback() }
         chatbotMessages.apply {
             layoutManager = LinearLayoutManager(this@ChatbotActivity)
             adapter = messageAdapter
+            addOnLayoutChangeListener { _, _, top, _, bottom, _, oldTop, _, oldBottom ->
+                val shrank = oldBottom - oldTop > 0 && bottom - top < oldBottom - oldTop
+                if (shrank && messageAdapter.itemCount > 0) post { scrollToPosition(messageAdapter.itemCount - 1) }
+            }
         }
-        chatbotBack.setOnClickListener { viewModel.onEvent(ChatbotUiEvent.DrawerOpened) }
-        chatbotMore.setOnClickListener { viewModel.onEvent(ChatbotUiEvent.NewChatClicked) }
+        chatbotBack.setOnClickListener { viewModel.onEvent(ChatbotUiEvent.BackClicked) }
+        chatbotMenu.setOnClickListener { viewModel.onEvent(ChatbotUiEvent.DrawerOpened) }
+        chatbotSourceDocument.root.setOnClickListener { viewModel.onEvent(ChatbotUiEvent.SourceDocumentClicked) }
         chatbotDrawerScrim.setOnClickListener { viewModel.onEvent(ChatbotUiEvent.DrawerDismissed) }
         chatbotDrawerActiveChat.setOnClickListener { viewModel.onEvent(ChatbotUiEvent.DrawerDismissed) }
         chatbotDrawerNewChat.setOnClickListener { viewModel.onEvent(ChatbotUiEvent.NewChatClicked) }
@@ -224,6 +230,11 @@ class ChatbotActivity : AppCompatActivity() {
         chatbotDrawerActiveChat.text = state.contractName
         chatbotSourceDocument.chatbotSourceName.text = sourceDocumentName(state.contractName)
         chatbotDraftReview.chatbotDraftSourceName.text = sourceDocumentName(state.contractName)
+        val canOpenSourceContract = state.sourceContractId != null
+        chatbotSourceDocument.root.isClickable = canOpenSourceContract
+        chatbotSourceDocument.chatbotSourceOpen.isVisible = canOpenSourceContract
+        chatbotSourceDocument.root.contentDescription =
+            if (canOpenSourceContract) getString(R.string.chatbot_open_source_contract_content_description) else null
         chatbotSourceDocument.root.isVisible = !showGeneration && !state.isDraftReviewVisible && (!state.isDraftConversation || !state.isDraftReviewReady)
         chatbotDraftSourceBadge.isVisible = !showGeneration && state.isDraftConversation && state.isDraftReviewReady && !state.isDraftReviewVisible
         chatbotInput.isEnabled = state.isConversationReady && !state.isReplyPending && !showGeneration
@@ -259,12 +270,6 @@ class ChatbotActivity : AppCompatActivity() {
         chatbotNewSuggestionRisk.text = getString(R.string.chatbot_new_draft_from_document)
         chatbotNewSuggestions.isVisible = state.isContractDraftingEnabled
         chatbotNewStateDescription.setText(if (state.isContractDraftingEnabled) R.string.chatbot_new_chat_description else R.string.chatbot_new_chat_question_description)
-        chatbotMore.setImageResource(
-            R.drawable.ic_chatbot_new_chat_add
-        )
-        chatbotMore.contentDescription = getString(
-            R.string.chatbot_new_state_add_content_description
-        )
         if (messageAdapter.currentList != state.messages) {
             messageAdapter.submitList(state.messages) {
                 if (state.messages.isNotEmpty()) chatbotMessages.scrollToPosition(state.messages.lastIndex)
@@ -285,6 +290,7 @@ class ChatbotActivity : AppCompatActivity() {
                 )
             )
             ChatbotUiEffect.NavigateBack -> finish()
+            is ChatbotUiEffect.NavigateToContractDetail -> openContractDetail(effect.contractId)
             ChatbotUiEffect.NavigateToHistory -> startActivity(ChatbotHistoryActivity.createIntent(this))
             ChatbotUiEffect.NavigateToHelp -> helpLauncher.launch(ChatbotHelpActivity.createIntent(this))
             ChatbotUiEffect.OpenAttachmentPicker -> attachmentPicker.launch(arrayOf("application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "image/*"))
@@ -336,6 +342,17 @@ class ChatbotActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
+    /** Returns to the contract detail below this chat, or opens it when the chat came from History. */
+    private fun openContractDetail(contractId: String) {
+        val openedFromThisContract = intent.getBooleanExtra(EXTRA_FROM_CONTRACT_DETAIL, false) &&
+            intent.getStringExtra(EXTRA_CONTRACT_ID) == contractId
+        if (!openedFromThisContract) {
+            val session = intent.getStringExtra(EXTRA_SESSION_KEY) ?: return
+            startActivity(MainActivity.contractDetailFromChatbotIntent(this, contractId, session))
+        }
+        finish()
+    }
+
     private val chatbotBackCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             if (viewModel.uiState.value.isDrawerVisible) {
@@ -350,6 +367,7 @@ class ChatbotActivity : AppCompatActivity() {
     companion object {
         private const val EXTRA_CONTRACT_NAME = "chatbot_contract_name"
         private const val EXTRA_SESSION_KEY = "chatbot_session_key"
+        private const val EXTRA_FROM_CONTRACT_DETAIL = "chatbot_from_contract_detail"
         private const val EXTRA_CONTRACT_TYPE = "chatbot_contract_type"
         private const val EXTRA_CONTRACT_ID = "chatbot_contract_id"
         private const val EXTRA_CONVERSATION_ID = "chatbot_conversation_id"
@@ -358,6 +376,9 @@ class ChatbotActivity : AppCompatActivity() {
         private const val EXTRA_CONTINUE_DRAFT = "chatbot_continue_draft"
         private const val EXTRA_PREVIEW_DRAFT_ERROR = "chatbot_preview_draft_error"
         private const val EXTRA_PREVIEW_REGENERATION_ERROR = "chatbot_preview_regeneration_error"
+
+        fun createFromContractDetailIntent(context: Context, contractName: String, contractType: String, contractId: String): Intent =
+            createIntent(context, contractName, contractType, contractId).putExtra(EXTRA_FROM_CONTRACT_DETAIL, true)
 
         fun createIntent(context: Context, contractName: String, contractType: String, contractId: String? = null): Intent =
             Intent(context, ChatbotActivity::class.java)

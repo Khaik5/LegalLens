@@ -20,11 +20,11 @@ class ResponsiveLayoutTest {
             scenario.onActivity { activity ->
                 val title = activity.findViewById<View>(R.id.chatbotHeaderLabels)
                 val back = activity.findViewById<View>(R.id.chatbotBack)
-                val more = activity.findViewById<View>(R.id.chatbotMore)
+                val more = activity.findViewById<View>(R.id.chatbotMenu)
                 val a = Rect(); val b = Rect(); val c = Rect()
                 title.getGlobalVisibleRect(a); back.getGlobalVisibleRect(b); more.getGlobalVisibleRect(c)
-                assertTrue("Title overlaps menu", a.left >= b.right)
-                assertTrue("Title overlaps action", a.right <= c.left)
+                assertTrue("Title overlaps back button", a.left >= b.right)
+                assertTrue("Title overlaps menu button", a.right <= c.left)
             }
         }
     }

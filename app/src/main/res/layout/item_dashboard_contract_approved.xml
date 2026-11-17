@@ -35,7 +35,7 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:includeFontPadding="false"
-                android:maxLines="1"
+                android:maxLines="2"
                 android:text="@string/dashboard_office_lease"
                 android:textColor="@color/dashboard_primary_text"
                 android:textSize="@dimen/sp_14"

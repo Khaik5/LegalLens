@@ -150,7 +150,8 @@ class ScreenTourDeviceTest {
         )
         ActivityScenario.launch<ChatbotActivity>(intent).use {
             waitFor(R.id.chatbotSend); Thread.sleep(800); shot("chatbot")
-            onView(withId(R.id.chatbotMore)).perform(click())
+            onView(withId(R.id.chatbotMenu)).perform(click())
+            onView(withId(R.id.chatbotDrawerNewChat)).perform(click())
             waitFor(R.id.chatbotNewSuggestionRisk); shot("chatbot-new")
             onView(withId(R.id.chatbotNewSuggestionRisk)).perform(click())
             Thread.sleep(2_500); shot("chatbot-draft-question")

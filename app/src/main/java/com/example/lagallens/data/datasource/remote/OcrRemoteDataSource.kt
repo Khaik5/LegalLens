@@ -2,6 +2,7 @@ package com.example.lagallens.data.datasource.remote
 
 import com.example.lagallens.core.network.AuthSessionScope
 import com.example.lagallens.data.datasource.remote.api.OcrApi
+import com.example.lagallens.data.model.request.OcrConfirmRequest
 import com.example.lagallens.data.model.request.OcrCorrectionRequest
 import com.example.lagallens.data.model.response.OcrResultResponse
 import retrofit2.HttpException
@@ -18,6 +19,9 @@ class OcrRemoteDataSource(private val api: Lazy<OcrApi>) {
         if (error.code() != 404) throw error
         null
     }
+
+    suspend fun confirm(scope: AuthSessionScope, documentId: String, expectedRevision: Int) =
+        api.value.confirm(scope, documentId, OcrConfirmRequest(expectedRevision)).requireData("OCR confirmation")
 
     suspend fun correct(scope: AuthSessionScope, documentId: String, expectedRevision: Int, text: String) =
         api.value.correct(scope, documentId, OcrCorrectionRequest(expectedRevision, text)).requireData("OCR correction")

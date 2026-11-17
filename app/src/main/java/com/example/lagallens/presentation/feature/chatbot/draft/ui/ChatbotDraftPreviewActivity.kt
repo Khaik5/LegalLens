@@ -24,6 +24,7 @@ import com.example.lagallens.BuildConfig
 import com.example.lagallens.R
 import com.example.lagallens.databinding.ActivityChatbotDraftPreviewBinding
 import com.example.lagallens.databinding.DialogChatbotDraftRegenerationBinding
+import com.example.lagallens.presentation.common.utils.applySystemBarAndKeyboardInsets
 import com.example.lagallens.presentation.common.utils.applySystemBarInsets
 import com.example.lagallens.presentation.feature.chatbot.draft.adapter.ChatbotDraftPageAdapter
 import com.example.lagallens.presentation.feature.chatbot.draft.contract.ChatbotDraftPage
@@ -206,6 +207,9 @@ class ChatbotDraftPreviewActivity : DraftSessionActivity() {
         val sheet = BottomSheetDialog(this)
         val sheetBinding = com.example.lagallens.databinding.BottomSheetChatbotDraftAiEditBinding.inflate(layoutInflater)
         sheet.setContentView(sheetBinding.root)
+        sheetBinding.root.applySystemBarAndKeyboardInsets(top = false)
+        sheet.behavior.skipCollapsed = true
+        sheet.behavior.state = com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
         var selectedScope = scope
         fun renderScope() {
             val whole = selectedScope == com.example.lagallens.presentation.feature.chatbot.draft.contract.ChatbotDraftAiEditUiState.WHOLE_CONTRACT_SCOPE

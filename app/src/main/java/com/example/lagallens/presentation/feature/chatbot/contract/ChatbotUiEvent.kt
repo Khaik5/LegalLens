@@ -30,6 +30,8 @@ sealed interface ChatbotUiEvent {
     data object AttachmentSavedClicked : ChatbotUiEvent
     data class AttachmentSelected(val uri: String, val name: String) : ChatbotUiEvent
     data object AttachmentRemoved : ChatbotUiEvent
+    data object BackClicked : ChatbotUiEvent
+    data object SourceDocumentClicked : ChatbotUiEvent
     data object DrawerOpened : ChatbotUiEvent
     data object DrawerDismissed : ChatbotUiEvent
     data object NewChatClicked : ChatbotUiEvent

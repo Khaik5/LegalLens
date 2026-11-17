@@ -14,7 +14,7 @@
         android:paddingStart="@dimen/dp_20"
         android:paddingTop="@dimen/dp_24"
         android:paddingEnd="@dimen/dp_20"
-        android:paddingBottom="@dimen/dp_24">
+        android:paddingBottom="@dimen/main_content_bottom_clearance">
 
         <LinearLayout
             android:id="@+id/dashboardGreeting"

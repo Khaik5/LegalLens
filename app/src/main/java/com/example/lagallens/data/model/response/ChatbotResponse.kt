@@ -7,7 +7,12 @@ data class ConversationResponse(
     val contractId: Long?,
     val title: String?,
     val createdAt: String?,
-    val updatedAt: String?
+    val updatedAt: String?,
+    /** Summary fields; absent on backends older than BE-04. */
+    val lastMessage: String? = null,
+    val lastMessageAt: String? = null,
+    val messageCount: Int? = null,
+    val requestStatus: String? = null
 )
 
 /**

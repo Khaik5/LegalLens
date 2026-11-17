@@ -283,7 +283,7 @@
     <string name="camera_permission_title">Quyền truy cập</string>
     <string name="camera_permission_heading">Cho phép chụp ảnh</string>
     <string name="camera_permission_description">LegalLens cần quyền truy cập camera để quét trực tiếp văn bản hợp đồng giấy, phân tích tự động rủi ro và thực hiện OCR chuyên sâu của đối tác.</string>
-    <string name="camera_permission_secure">Bảo mật dữ liệu camera 100%%</string>
+    <string name="camera_permission_secure" formatted="false">Bảo mật dữ liệu camera 100%</string>
     <string name="camera_permission_manual">Chỉ chụp khi có hành động thủ công</string>
     <string name="camera_permission_allow">Cho phép truy cập</string>
     <string name="camera_permission_later">Quay lại sau</string>
@@ -712,6 +712,8 @@
     <string name="analysis_risk_citation_highlight" translatable="false">không quá 8%</string>
     <string name="analysis_risk_citation_return">Quay lại phân tích rủi ro</string>
     <string name="chatbot_back_content_description">Mở điều hướng hội thoại</string>
+    <string name="chatbot_navigate_back_content_description">Quay lại</string>
+    <string name="chatbot_open_source_contract_content_description">Mở chi tiết hợp đồng gốc</string>
     <string name="chatbot_more_content_description">Tùy chọn hội thoại</string>
     <string name="chatbot_default_contract_name" translatable="false">HĐ Lao động mẫu</string>
     <string name="chatbot_default_source_name" translatable="false">Hợp đồng lao động mẫu · DEMO</string>
@@ -848,6 +850,7 @@
     <string name="chatbot_answer_pending">Câu hỏi đã được gửi nhưng chưa có câu trả lời. Hãy kiểm tra lại sau ít phút.</string>
     <string name="chatbot_answer_check_again">Kiểm tra lại</string>
     <string name="chatbot_answer_checking">Đang kiểm tra…</string>
+    <string name="analysis_ai_unavailable">Phân tích AI chưa sẵn sàng. Vui lòng thử lại sau.</string>
     <string name="chatbot_new_chat_question_description">Đặt câu hỏi về hợp đồng gốc.</string>
     <string name="chatbot_answer_failed">Không thể tạo câu trả lời. Vui lòng thử lại.</string>
     <string name="chatbot_legal_reference_section_title">Căn cứ pháp lý (%1$d)</string>
@@ -857,7 +860,7 @@
     <string name="credit_store_back_description">Quay lại</string>
     <string name="credit_store_wallet_icon_description">Ví Credit</string>
     <string name="credit_store_intro_title" formatted="false">Credit để mở kết quả 100%</string>
-    <string name="credit_store_intro_description">Mua một lần, dùng theo nhu cầu.Credit không hết hạn, không tự động gia hạn.</string>
+    <string name="credit_store_intro_description">Mua một lần, dùng theo nhu cầu. Credit không hết hạn, không tự động gia hạn.</string>
     <string name="credit_store_step_one" translatable="false">1</string>
     <string name="credit_store_step_one_description">Xem trước 40% kết quả miễn phí.</string>
     <string name="credit_store_step_two" translatable="false">2</string>
@@ -1032,4 +1035,20 @@
     <string name="analysis_open_existing">Xem kết quả</string>
     <string name="analysis_start_new">Phân tích mới</string>
     <string name="analysis_snapshot_demo_metadata">[DEMO] %1$s</string>
+    <string name="credit_flow_qr_title">Quét mã để chuyển khoản</string>
+    <string name="credit_flow_qr_image_description">Mã VietQR để thanh toán gói Credit</string>
+    <string name="credit_flow_qr_transfer_content">Nội dung chuyển khoản</string>
+    <string name="credit_flow_qr_amount">Số tiền cần chuyển</string>
+    <string name="credit_flow_qr_expires_in">Còn lại để thanh toán</string>
+    <string name="credit_flow_qr_expired">Đã hết thời gian thanh toán</string>
+    <string name="credit_flow_qr_note">Nhập đúng nội dung chuyển khoản và đúng số tiền để Credit được cộng tự động.</string>
+    <string name="credit_flow_qr_copy">Sao chép nội dung</string>
+    <string name="credit_flow_qr_copied">Đã sao chép nội dung chuyển khoản</string>
+    <string name="credit_flow_qr_unavailable">Chưa thể hiển thị mã chuyển khoản. Vui lòng thử lại sau.</string>
+    <string name="credit_flow_qr_amount_value">%1$s đ</string>
+    <string name="chatbot_draft_regenerate_instruction">Soạn lại bản hợp đồng khác từ cùng nội dung hội thoại.</string>
+    <string name="analysis_legal_references_effective_from">Hiệu lực từ %1$s</string>
+    <string name="analysis_legal_references_effective_unknown">Chưa có thông tin hiệu lực</string>
+    <string name="analysis_legal_reference_unknown_value">Chưa có thông tin</string>
+    <string name="analysis_legal_reference_detail_text_heading">Nội dung trích dẫn</string>
 </resources>

@@ -34,7 +34,7 @@ internal class FloatingPremiumStickerPositionStore(context: Context) {
         const val KEY_VERTICAL_FRACTION = "vertical_fraction"
         const val EDGE_LEFT = "left"
         const val EDGE_RIGHT = "right"
-        const val DEFAULT_VERTICAL_FRACTION = 0.28f
+        const val DEFAULT_VERTICAL_FRACTION = 0.66f
     }
 }
 

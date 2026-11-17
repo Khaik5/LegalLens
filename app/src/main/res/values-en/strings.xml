@@ -240,7 +240,7 @@
     <string name="camera_permission_title">Permission</string>
     <string name="camera_permission_heading">Allow photo capture</string>
     <string name="camera_permission_description">LegalLens needs camera access to scan paper contracts, analyse risks automatically and perform in-depth OCR.</string>
-    <string name="camera_permission_secure">100%% camera data security</string>
+    <string name="camera_permission_secure" formatted="false">100% camera data security</string>
     <string name="camera_permission_manual">Captures only after a manual action</string>
     <string name="camera_permission_allow">Allow access</string>
     <string name="camera_permission_later">Maybe later</string>
@@ -394,6 +394,8 @@
     <string name="analysis_failure_retry">Retry analysis</string>
     <string name="analysis_failure_return_home">Back to home</string>
     <string name="chatbot_back_content_description">Open conversation navigation</string>
+    <string name="chatbot_navigate_back_content_description">Back</string>
+    <string name="chatbot_open_source_contract_content_description">Open the original contract details</string>
     <string name="chatbot_default_source_name" translatable="false">Sample employment contract · DEMO</string>
     <string name="chatbot_more_content_description">Conversation options</string>
     <string name="chatbot_attach_content_description">Attach file</string>
@@ -486,6 +488,7 @@
     <string name="chatbot_answer_pending">Your question was sent but has no answer yet. Check again in a few minutes.</string>
     <string name="chatbot_answer_check_again">Check again</string>
     <string name="chatbot_answer_checking">Checking…</string>
+    <string name="analysis_ai_unavailable">AI analysis is not available yet. Please try again later.</string>
     <string name="chatbot_new_chat_question_description">Ask about the original contract.</string>
     <string name="chatbot_answer_failed">The answer could not be created. Please try again.</string>
     <string name="chatbot_legal_reference_section_title">Legal references (%1$d)</string>
@@ -504,13 +507,13 @@
     <string name="credit_store_wallet_icon_description">Credit wallet</string>
     <string name="credit_store_intro_title" formatted="false">Credits unlock 100% of results</string>
     <string name="credit_store_intro_description">Buy once and use when needed. Credits do not expire and do not renew automatically.</string>
-    <string name="credit_store_step_one_description">Preview 40%% of results for free.</string>
-    <string name="credit_store_step_two_description">Use Credits to unlock 100%% when needed.</string>
+    <string name="credit_store_step_one_description" formatted="false">Preview 40% of results for free.</string>
+    <string name="credit_store_step_two_description" formatted="false">Use Credits to unlock 100% when needed.</string>
     <string name="credit_store_step_three_description">Unlocked results can be reviewed free forever.</string>
     <string name="credit_store_balance_label">Current balance</string>
     <string name="credit_store_balance_credits">%1$d Credits</string>
     <string name="credit_store_top_up">Top up</string>
-    <string name="credit_store_footer_note">Credits never expire · When you run out, preview 40%% and keep using all features.</string>
+    <string name="credit_store_footer_note" formatted="false">Credits never expire · When you run out, preview 40% and keep using all features.</string>
     <string name="credit_store_top_up_action">Top up Credits</string>
     <string name="credit_store_select_package">Choose a top-up package</string>
     <string name="credit_store_history_title">Transaction history</string>
@@ -581,7 +584,7 @@
     <string name="credit_hub_history_description">View your Credit purchase and usage history</string>
     <string name="credit_hub_unlock_title">Unlock results</string>
     <string name="credit_hub_unlock_description">View analysis results that have not been unlocked</string>
-    <string name="credit_hub_info">You can preview 40%% of AI analysis results for free. Use Credits to unlock 100%% of the content. Unlocked results can be reviewed without paying more Credits.</string>
+    <string name="credit_hub_info" formatted="false">You can preview 40% of AI analysis results for free. Use Credits to unlock 100% of the content. Unlocked results can be reviewed without paying more Credits.</string>
     <string name="splash_initializing_security">INITIALISING SECURITY</string>
     <string name="splash_connection_error">Could not connect to restore your session.</string>
     <string name="splash_retry">Try again</string>
@@ -700,7 +703,7 @@
     <string name="unlock_confirmation_shield_description">Unlock AI result</string>
     <string name="unlock_confirmation_info_description">Credit information</string>
     <string name="unlock_confirmation_heading">Unlock AI result</string>
-    <string name="unlock_confirmation_description">You have previewed 40%% for free. Confirm to unlock 100%% of this contract risk-analysis result.</string>
+    <string name="unlock_confirmation_description" formatted="false">You have previewed 40% for free. Confirm to unlock 100% of this contract risk-analysis result.</string>
     <string name="unlock_confirmation_result_title">Contract risk-analysis result</string>
     <string name="unlock_confirmation_contract_label">Contract</string>
     <string name="unlock_confirmation_current_label">Current</string>
@@ -811,4 +814,20 @@
     <string name="analysis_start_new">New analysis</string>
     <string name="analysis_snapshot_demo_metadata">[DEMO] %1$s</string>
     <string name="unlock_confirmation_result_meta">ID %1$s · 40%% previewed for free</string>
+    <string name="credit_flow_qr_title">Scan to transfer</string>
+    <string name="credit_flow_qr_image_description">VietQR code to pay for the Credit package</string>
+    <string name="credit_flow_qr_transfer_content">Transfer content</string>
+    <string name="credit_flow_qr_amount">Amount to transfer</string>
+    <string name="credit_flow_qr_expires_in">Time left to pay</string>
+    <string name="credit_flow_qr_expired">The payment time has run out</string>
+    <string name="credit_flow_qr_note">Enter the exact transfer content and amount so Credits are added automatically.</string>
+    <string name="credit_flow_qr_copy">Copy content</string>
+    <string name="credit_flow_qr_copied">Transfer content copied</string>
+    <string name="credit_flow_qr_unavailable">The transfer code cannot be shown right now. Please try again later.</string>
+    <string name="credit_flow_qr_amount_value">%1$s VND</string>
+    <string name="chatbot_draft_regenerate_instruction">Write a different version of the contract from the same conversation.</string>
+    <string name="analysis_legal_references_effective_from">Effective from %1$s</string>
+    <string name="analysis_legal_references_effective_unknown">No effective-date information</string>
+    <string name="analysis_legal_reference_unknown_value">Not available</string>
+    <string name="analysis_legal_reference_detail_text_heading">Quoted text</string>
 </resources>

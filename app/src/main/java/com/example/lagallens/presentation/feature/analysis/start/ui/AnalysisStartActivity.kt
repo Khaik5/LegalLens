@@ -28,7 +28,9 @@ import kotlinx.coroutines.launch
 
 class AnalysisStartActivity : AppCompatActivity() {
     private lateinit var binding: ActivityAnalysisStartBinding
-    private val viewModel by viewModels<AnalysisStartViewModel>()
+    private val viewModel by viewModels<AnalysisStartViewModel> {
+        AnalysisStartViewModel.Factory((application as com.example.lagallens.LegalLensApplication).analysisRepository.isAvailable)
+    }
     private val benefitAdapter = AnalysisStartBenefitAdapter()
     private var ownerSession: String? = null
     private var navigated = false
@@ -102,6 +104,8 @@ class AnalysisStartActivity : AppCompatActivity() {
     private fun handleEffect(effect: AnalysisStartUiEffect) {
         when (effect) {
             AnalysisStartUiEffect.NavigateBack -> finish()
+            is AnalysisStartUiEffect.ShowMessage ->
+                android.widget.Toast.makeText(this, effect.messageRes, android.widget.Toast.LENGTH_LONG).show()
             is AnalysisStartUiEffect.NavigateToAnalysisProcessing -> {
                 val session = ownerSession
                 if (navigated) return

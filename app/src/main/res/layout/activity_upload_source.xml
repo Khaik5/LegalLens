@@ -70,7 +70,8 @@
             <LinearLayout
                 android:id="@+id/upload_source_pdf"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/upload_card_height"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/upload_card_height"
                 android:layout_marginTop="@dimen/upload_card_top_margin"
                 android:background="@drawable/bg_upload_card"
                 android:clickable="true"
@@ -115,7 +116,8 @@
             <LinearLayout
                 android:id="@+id/upload_source_docx"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/upload_card_height"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/upload_card_height"
                 android:layout_marginTop="@dimen/upload_card_spacing"
                 android:background="@drawable/bg_upload_card"
                 android:clickable="true"
@@ -160,7 +162,8 @@
             <LinearLayout
                 android:id="@+id/upload_source_gallery"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/upload_card_height"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/upload_card_height"
                 android:layout_marginTop="@dimen/upload_card_spacing"
                 android:background="@drawable/bg_upload_card"
                 android:clickable="true"
@@ -205,7 +208,8 @@
             <LinearLayout
                 android:id="@+id/upload_source_camera"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/upload_camera_card_height"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/upload_camera_card_height"
                 android:layout_marginTop="@dimen/upload_card_spacing"
                 android:background="@drawable/bg_upload_card"
                 android:clickable="true"

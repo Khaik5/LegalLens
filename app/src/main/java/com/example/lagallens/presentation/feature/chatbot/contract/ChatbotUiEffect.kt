@@ -5,6 +5,7 @@ import androidx.annotation.StringRes
 sealed interface ChatbotUiEffect {
     data class ShowDraftPreview(val draftId: String?) : ChatbotUiEffect
     data object NavigateBack : ChatbotUiEffect
+    data class NavigateToContractDetail(val contractId: String) : ChatbotUiEffect
     data object NavigateToHistory : ChatbotUiEffect
     data object NavigateToHelp : ChatbotUiEffect
     data class NavigateToLegalReference(val referenceId: String) : ChatbotUiEffect
