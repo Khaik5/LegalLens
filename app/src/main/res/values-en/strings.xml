@@ -603,6 +603,18 @@
     <string name="credit_hub_unlock_title">Unlock results</string>
     <string name="credit_hub_unlock_description">View analysis results that have not been unlocked</string>
     <string name="credit_hub_info" formatted="false">You can preview 40% of AI analysis results for free. Use Credits to unlock 100% of the content. Unlocked results can be reviewed without paying more Credits.</string>
+    <string name="credit_hub_payments_title">Payment history</string>
+    <string name="credit_hub_payments_description">See your Credit purchases, including pending or cancelled ones</string>
+    <string name="payment_history_title">Payment history</string>
+    <string name="payment_history_empty">You have no Credit purchases yet.</string>
+    <string name="payment_history_error">Payment history could not be loaded. Please try again.</string>
+    <string name="payment_history_retry">Try again</string>
+    <string name="payment_history_credits">%1$d Credits</string>
+    <string name="payment_history_amount">%1$s VND</string>
+    <string name="payment_history_status_pending">Awaiting payment</string>
+    <string name="payment_history_status_success">Successful</string>
+    <string name="payment_history_status_failed">Failed</string>
+    <string name="payment_history_status_cancelled">Cancelled</string>
     <string name="splash_initializing_security">INITIALISING SECURITY</string>
     <string name="splash_connection_error">Could not connect to restore your session.</string>
     <string name="splash_retry">Try again</string>

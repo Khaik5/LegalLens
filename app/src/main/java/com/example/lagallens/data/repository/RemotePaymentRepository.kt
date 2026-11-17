@@ -10,6 +10,7 @@ import com.example.lagallens.data.mapper.toCreditOffer
 import com.example.lagallens.domain.model.credit.CreditOffer
 import com.example.lagallens.domain.model.payment.BankTransfer
 import com.example.lagallens.domain.model.payment.BankTransferUnavailableException
+import com.example.lagallens.domain.model.payment.PaymentHistoryEntry
 import com.example.lagallens.domain.model.payment.PaymentRecord
 import com.example.lagallens.domain.model.payment.PaymentStatus
 import com.example.lagallens.domain.repository.PaymentRepository
@@ -118,6 +119,21 @@ class RemotePaymentRepository(
     }
 
     override suspend fun get(paymentId: String): PaymentRecord? = records[paymentId]
+
+    override suspend fun getHistory(): List<PaymentHistoryEntry> = withContext(Dispatchers.IO) {
+        val scope = requireScope()
+        val entries = payments.history(scope).map { item ->
+            PaymentHistoryEntry(
+                paymentId = item.id.toString(),
+                credits = item.creditAmount,
+                amountVnd = item.amountVnd,
+                status = mapStatus(item.status),
+                createdAtEpochMillis = item.createdAt?.let { runCatching { Instant.parse(it).toEpochMilli() }.getOrNull() } ?: 0L
+            )
+        }
+        check(tokens.currentSessionScope()?.key == scope.key) { "Session changed" }
+        entries
+    }
 
     private fun requireScope(): AuthSessionScope = checkNotNull(tokens.currentSessionScope()) { "No active session" }
 

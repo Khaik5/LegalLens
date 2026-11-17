@@ -7,3 +7,19 @@ data class BankTransferResponse(val paymentId: Long, val amountVnd: Long, val pa
 
 /** [status] is PENDING, SUCCESS, FAILED, CANCELLED or REFUNDED. */
 data class PaymentStatusResponse(val id: Long?, val status: String)
+
+/** [createdAt] is an ISO instant; [creditAmount] is the Credits the package gives. */
+data class PaymentItemResponse(
+    val id: Long,
+    val creditAmount: Int,
+    val amountVnd: Long,
+    val status: String,
+    val createdAt: String?
+)
+
+data class PaymentPageResponse(
+    val data: List<PaymentItemResponse>,
+    val total: Long,
+    val page: Int,
+    val limit: Int
+)
