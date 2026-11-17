@@ -77,6 +77,7 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
             ProfileUiEvent.PrivacyClicked -> emitEffect(ProfileUiEffect.NavigateToPrivacy)
             ProfileUiEvent.AboutClicked -> emitEffect(ProfileUiEffect.NavigateToAbout)
             is ProfileUiEvent.ProfileUpdated -> saveProfile(event)
+            ProfileUiEvent.RemoveAvatarClicked -> removeAvatar()
             ProfileUiEvent.LogoutClicked -> emitEffect(ProfileUiEffect.ShowLogoutConfirmation)
             ProfileUiEvent.LogoutConfirmed -> logout()
         }
@@ -127,6 +128,29 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
                     } else {
                         state.copy(name = saved.name, email = saved.email, phone = saved.phone, photoUri = saved.photoUri, isSaving = false)
                     }
+                }
+                _uiEffect.send(ProfileUiEffect.ProfileSaveFailed(message))
+            }
+        }
+    }
+
+    private fun removeAvatar() {
+        if (_uiState.value.isSaving) return
+        _uiState.update { it.copy(isSaving = true) }
+        viewModelScope.launch {
+            try {
+                val profile = profileRepository.removeAvatar()
+                _uiState.update { it.copy(photoUri = profile.photoUri, isSaving = false) }
+                _uiEffect.send(ProfileUiEffect.AvatarRemoved)
+            } catch (cancellation: CancellationException) {
+                throw cancellation
+            } catch (failure: Exception) {
+                _uiState.update { it.copy(isSaving = false) }
+                val apiFailure = ApiFailureMapper.map(failure)
+                val message = if (apiFailure.kind == ApiFailureKind.NETWORK) {
+                    R.string.profile_edit_no_connection
+                } else {
+                    R.string.profile_edit_remove_photo_failed
                 }
                 _uiEffect.send(ProfileUiEffect.ProfileSaveFailed(message))
             }

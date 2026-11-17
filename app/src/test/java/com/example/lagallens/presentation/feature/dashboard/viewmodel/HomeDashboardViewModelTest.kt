@@ -35,6 +35,7 @@ class HomeDashboardViewModelTest {
     private object Profiles : ProfileRepository {
         override suspend fun getProfile() = UserProfile(name = "Trần B", email = "b@example.test")
         override suspend fun saveProfile(name: String, phone: String, photoUri: String?) = getProfile()
+        override suspend fun removeAvatar() = getProfile()
     }
 
     private fun contract(id: String, updatedAt: Long, risk: EmploymentContractRisk) =
