@@ -1,8 +1,10 @@
 package com.example.lagallens.data.datasource.remote.api
 
 import com.example.lagallens.core.network.AuthSessionScope
+import com.example.lagallens.data.model.request.OcrConfirmRequest
 import com.example.lagallens.data.model.request.OcrCorrectionRequest
 import com.example.lagallens.data.model.response.ApiEnvelope
+import com.example.lagallens.data.model.response.OcrConfirmResponse
 import com.example.lagallens.data.model.response.OcrCorrectionResponse
 import com.example.lagallens.data.model.response.OcrJobResponse
 import com.example.lagallens.data.model.response.OcrResultResponse
@@ -25,6 +27,14 @@ interface OcrApi {
 
     @GET("documents/{id}/ocr")
     suspend fun latest(@Tag scope: AuthSessionScope, @Path("id") documentId: String): ApiEnvelope<OcrResultResponse>
+
+    /** The owner approves the current revision; analysis only accepts an approved one. */
+    @POST("documents/{id}/ocr/confirm")
+    suspend fun confirm(
+        @Tag scope: AuthSessionScope,
+        @Path("id") documentId: String,
+        @Body request: OcrConfirmRequest
+    ): ApiEnvelope<OcrConfirmResponse>
 
     @PATCH("documents/{id}/ocr")
     suspend fun correct(

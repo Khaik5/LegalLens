@@ -814,4 +814,19 @@
     <string name="analysis_start_new">New analysis</string>
     <string name="analysis_snapshot_demo_metadata">[DEMO] %1$s</string>
     <string name="unlock_confirmation_result_meta">ID %1$s · 40%% previewed for free</string>
+    <string name="credit_flow_qr_title">Scan to transfer</string>
+    <string name="credit_flow_qr_image_description">VietQR code to pay for the Credit package</string>
+    <string name="credit_flow_qr_transfer_content">Transfer content</string>
+    <string name="credit_flow_qr_amount">Amount to transfer</string>
+    <string name="credit_flow_qr_expires_in">Time left to pay</string>
+    <string name="credit_flow_qr_expired">The payment time has run out</string>
+    <string name="credit_flow_qr_note">Enter the exact transfer content and amount so Credits are added automatically.</string>
+    <string name="credit_flow_qr_copy">Copy content</string>
+    <string name="credit_flow_qr_copied">Transfer content copied</string>
+    <string name="credit_flow_qr_unavailable">The transfer code cannot be shown right now. Please try again later.</string>
+    <string name="credit_flow_qr_amount_value">%1$s VND</string>
+    <string name="analysis_legal_references_effective_from">Effective from %1$s</string>
+    <string name="analysis_legal_references_effective_unknown">No effective-date information</string>
+    <string name="analysis_legal_reference_unknown_value">Not available</string>
+    <string name="analysis_legal_reference_detail_text_heading">Quoted text</string>
 </resources>

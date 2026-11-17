@@ -21,6 +21,8 @@ import com.example.lagallens.presentation.feature.analysis.legalreferences.detai
 import com.example.lagallens.presentation.feature.analysis.legalreferences.detail.contract.AnalysisLegalReferenceDetailUiEvent
 import com.example.lagallens.presentation.feature.analysis.legalreferences.detail.contract.AnalysisLegalReferenceDetailUiState
 import com.example.lagallens.presentation.feature.analysis.legalreferences.detail.viewmodel.AnalysisLegalReferenceDetailViewModel
+import com.example.lagallens.presentation.feature.analysis.legalreferences.model.LegalReferenceFormat
+import com.example.lagallens.presentation.feature.analysis.legalreferences.model.toLegalReference
 import com.example.lagallens.presentation.feature.analysis.risk.detail.ui.AnalysisRiskDetailActivity
 import kotlinx.coroutines.launch
 
@@ -55,8 +57,9 @@ class AnalysisLegalReferenceDetailActivity : com.example.lagallens.presentation.
 
     override fun onAnalysisValidated(identity: com.example.lagallens.domain.model.analysis.AnalysisIdentity, detail: com.example.lagallens.domain.model.analysis.AnalysisDetail) {
         val referenceId = intent.getStringExtra(EXTRA_REFERENCE_ID).orEmpty()
-        if (com.example.lagallens.di.DataModeConfig.current != com.example.lagallens.di.AppDataMode.DEMO ||
-            !com.example.lagallens.presentation.feature.analysis.legalreferences.model.DemoLegalReferences.canView(referenceId, validatedUnlockStatus?.isUnlocked == true)) {
+        val isDemo = com.example.lagallens.di.DataModeConfig.current == com.example.lagallens.di.AppDataMode.DEMO
+        val backendReference = if (isDemo) null else visibleCitation(detail, referenceId)
+        if (if (isDemo) !com.example.lagallens.presentation.feature.analysis.legalreferences.model.DemoLegalReferences.canView(referenceId, validatedUnlockStatus?.isUnlocked == true) else backendReference == null) {
             android.widget.Toast.makeText(this, R.string.analysis_citation_unavailable, android.widget.Toast.LENGTH_LONG).show()
             finish()
             return
@@ -68,7 +71,14 @@ class AnalysisLegalReferenceDetailActivity : com.example.lagallens.presentation.
                 documentMetadata = intent.getStringExtra(EXTRA_DOCUMENT_METADATA).orEmpty()
             )
         )
+        backendReference?.let { viewModel.setReference(it.toLegalReference().text!!) }
         binding.root.visibility = android.view.View.VISIBLE
+    }
+
+    /** A locked citation is never opened, even if its ID is known. */
+    private fun visibleCitation(detail: com.example.lagallens.domain.model.analysis.AnalysisDetail, referenceId: String): com.example.lagallens.domain.model.analysis.AnalysisCitation? {
+        val visible = com.example.lagallens.domain.model.analysis.AnalysisPreview.visibleCount(detail.citations.size, validatedUnlockStatus?.isUnlocked == true)
+        return detail.citations.take(visible).firstOrNull { it.id == referenceId }
     }
 
     private fun bindEvents() = with(binding) {
@@ -91,6 +101,7 @@ class AnalysisLegalReferenceDetailActivity : com.example.lagallens.presentation.
     }
 
     private fun render(state: AnalysisLegalReferenceDetailUiState) = with(binding) {
+        state.text?.let { renderBackend(it); return@with }
         analysisLegalReferenceDetailLawTitle.setText(state.titleRes)
         analysisLegalReferenceDetailArticle.setText(state.articleRes)
         analysisLegalReferenceDetailEffectiveDate.setText(state.effectiveDateRes)
@@ -104,6 +115,19 @@ class AnalysisLegalReferenceDetailActivity : com.example.lagallens.presentation.
         analysisLegalReferenceDetailStatus.setText(state.statusRes)
         analysisLegalReferenceDetailRiskTitle.setText(state.relatedRiskTitleRes)
         analysisLegalReferenceDetailRiskSubtitle.setText(state.relatedRiskSubtitleRes)
+    }
+
+    private fun renderBackend(text: com.example.lagallens.presentation.feature.analysis.legalreferences.model.AnalysisLegalReferenceText) = with(binding) {
+        analysisLegalReferenceDetailLawTitle.text = text.title
+        analysisLegalReferenceDetailArticle.text = text.articleNumber?.let { LegalReferenceFormat.article(this@AnalysisLegalReferenceDetailActivity, it) }.orEmpty()
+        analysisLegalReferenceDetailEffectiveDate.text = LegalReferenceFormat.effective(this@AnalysisLegalReferenceDetailActivity, text.effectiveDate)
+        analysisLegalReferenceDetailFullText.text = text.description
+        analysisLegalReferenceDetailTextHeading.setText(R.string.analysis_legal_reference_detail_text_heading)
+        // Issuer and document type are not stored by the backend yet, so the block stays hidden.
+        analysisLegalReferenceDetailMetadata.isVisible = false
+        analysisLegalReferenceDetailRiskHeading.isVisible = false
+        analysisLegalReferenceDetailRisk.isVisible = false
+        analysisLegalReferenceDetailStatus.text = LegalReferenceFormat.status(this@AnalysisLegalReferenceDetailActivity, text.validityStatus)
     }
 
     private fun handleEffect(effect: AnalysisLegalReferenceDetailUiEffect) {

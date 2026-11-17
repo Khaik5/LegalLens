@@ -20,6 +20,11 @@ class AnalysisLegalReferenceDetailViewModel : ViewModel() {
     private val _uiEffect = Channel<AnalysisLegalReferenceDetailUiEffect>(Channel.BUFFERED)
     val uiEffect = _uiEffect.receiveAsFlow()
 
+    /** Shows a backend reference; nothing is invented for the fields the backend has not stored. */
+    fun setReference(reference: com.example.lagallens.presentation.feature.analysis.legalreferences.model.AnalysisLegalReferenceText) {
+        _uiState.update { it.copy(text = reference) }
+    }
+
     fun onEvent(event: AnalysisLegalReferenceDetailUiEvent) {
         when (event) {
             is AnalysisLegalReferenceDetailUiEvent.ScreenOpened -> _uiState.update {

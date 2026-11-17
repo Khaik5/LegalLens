@@ -13,7 +13,6 @@ import com.example.lagallens.data.repository.FakeOcrRepository
 import com.example.lagallens.data.repository.OnboardingPreferencesRepository
 import com.example.lagallens.data.repository.ProfileSettingsRepositoryImpl
 import com.example.lagallens.data.repository.ProfileRepositoryImpl
-import com.example.lagallens.data.repository.UnconfiguredRemoteAnalysisRepository
 import com.example.lagallens.core.network.NetworkModule
 import com.example.lagallens.data.datasource.local.datastore.EncryptedTokenStore
 import com.example.lagallens.data.datasource.local.datastore.currentSessionScope
@@ -97,7 +96,7 @@ object RepositoryModule {
                 provideAnalysisIdentityRepository(context),
                 finance(context)
             )
-            AppDataMode.REAL -> com.example.lagallens.data.repository.UnconfiguredRemoteAnalysisUnlockRepository()
+            AppDataMode.REAL -> com.example.lagallens.data.repository.RemoteAnalysisUnlockRepository(EncryptedTokenStore(context), analysisRemote(context))
         }
 
     private var financeRepository: com.example.lagallens.data.repository.DemoFinanceRepository? = null
@@ -127,14 +126,7 @@ object RepositoryModule {
 
     fun provideAnalysisIdentityRepository(context: Context): com.example.lagallens.domain.repository.AnalysisIdentityRepository {
         if (DataModeConfig.current == AppDataMode.DEMO) return employmentRepositories(context).analysisIdentities
-        return object : com.example.lagallens.domain.repository.AnalysisIdentityRepository {
-            private val session = remoteSessionKey(context)
-            override fun sessionKey(): String? = session()
-            override suspend fun create(operationId: String, contractId: String, documentId: String, sessionKey: String): com.example.lagallens.domain.model.analysis.AnalysisIdentity =
-                throw IllegalStateException("Analysis backend unavailable")
-            override suspend fun get(resultId: String, sessionKey: String): com.example.lagallens.domain.model.analysis.AnalysisIdentity? = null
-            override suspend fun latest(contractId: String, sessionKey: String): com.example.lagallens.domain.model.analysis.AnalysisIdentity? = null
-        }
+        return com.example.lagallens.data.repository.RemoteAnalysisIdentityRepository(EncryptedTokenStore(context), analysisRemote(context))
     }
 
     fun provideContractRepository(context: Context): ContractRepository = when (DataModeConfig.current) {
@@ -185,12 +177,6 @@ object RepositoryModule {
                 RemoteAuthRepository(tokens, remote)
             }
         }
-    }
-
-    /** REAL session identity shared by remote repositories across token rotation. */
-    private fun remoteSessionKey(context: Context): () -> String? {
-        val tokens = EncryptedTokenStore(context)
-        return { tokens.currentSessionScope()?.key }
     }
 
     fun provideChatbotRepository(context: Context): ChatbotRepository = when (DataModeConfig.current) {
@@ -258,6 +244,9 @@ object RepositoryModule {
             )
         }
 
+    private fun analysisRemote(context: Context) =
+        com.example.lagallens.data.datasource.remote.AnalysisRemoteDataSource(lazy { authenticatedRetrofit(context).create(com.example.lagallens.data.datasource.remote.api.AnalysisApi::class.java) })
+
     private fun ocrRemote(context: Context) =
         OcrRemoteDataSource(lazy { authenticatedRetrofit(context).create(OcrApi::class.java) })
 
@@ -273,7 +262,20 @@ object RepositoryModule {
                 app.getString(if (language == "en") com.example.lagallens.R.string.analysis_snapshot_english_unavailable else com.example.lagallens.R.string.analysis_result_unavailable)
             })
         }
-        AppDataMode.REAL -> UnconfiguredRemoteAnalysisRepository()
+        AppDataMode.REAL -> {
+            val appContext = context.applicationContext
+            com.example.lagallens.data.repository.RemoteAnalysisRepository(
+                EncryptedTokenStore(context), analysisRemote(context), ocrRemote(context),
+                obligationLabels = {
+                    val strings = localizedContext(appContext)
+                    com.example.lagallens.data.mapper.AnalysisObligationLabels(
+                        employer = strings.getString(R.string.analysis_obligations_employer_heading),
+                        employee = strings.getString(R.string.analysis_obligations_employee_heading),
+                        other = strings.getString(R.string.analysis_obligations_title)
+                    )
+                }
+            )
+        }
     }
 
     fun provideNotificationRepository(context: Context): NotificationRepository = when (DataModeConfig.current) {
@@ -332,7 +334,10 @@ object RepositoryModule {
 
     fun providePaymentRepository(context: Context, creditRepository: CreditRepository): PaymentRepository = when (DataModeConfig.current) {
         AppDataMode.DEMO -> com.example.lagallens.data.repository.IoFinanceRepository(finance(context))
-        AppDataMode.REAL -> RemotePaymentRepository(EncryptedTokenStore(context), creditRemoteDataSource(context))
+        AppDataMode.REAL -> RemotePaymentRepository(
+            EncryptedTokenStore(context), creditRemoteDataSource(context),
+            com.example.lagallens.data.datasource.remote.PaymentRemoteDataSource(lazy { authenticatedRetrofit(context).create(com.example.lagallens.data.datasource.remote.api.PaymentApi::class.java) })
+        )
     }
 
     private fun creditRemoteDataSource(context: Context) =

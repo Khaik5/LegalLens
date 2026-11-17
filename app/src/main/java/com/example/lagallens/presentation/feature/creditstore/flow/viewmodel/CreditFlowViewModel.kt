@@ -4,6 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.lagallens.domain.repository.PaymentRepository
+import com.example.lagallens.domain.model.payment.BankTransfer
+import com.example.lagallens.domain.model.payment.BankTransferUnavailableException
+import com.example.lagallens.domain.model.payment.PaymentRecord
 import com.example.lagallens.domain.model.payment.PaymentStatus
 import com.example.lagallens.presentation.feature.creditstore.flow.contract.CreditFlowUiEffect
 import com.example.lagallens.presentation.feature.creditstore.flow.contract.CreditFlowUiEvent
@@ -17,6 +20,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 
 class CreditFlowViewModel(private val paymentRepository: PaymentRepository) : ViewModel() {
     private val ownerSession = paymentRepository.activeSessionKey()
@@ -79,8 +83,9 @@ class CreditFlowViewModel(private val paymentRepository: PaymentRepository) : Vi
             if (repository.activeSessionKey() != session) return@launch
             val finalEffect = try {
                 repository.createPayment(event.paymentId, event.packageId)
-                val payment = repository.observePayment(event.paymentId).first { it.status != PaymentStatus.PENDING }
-                if (payment.status == PaymentStatus.SUCCESS) CreditFlowUiEffect.PaymentSucceeded(payment) else CreditFlowUiEffect.PaymentFailed
+                val transfer = loadBankTransfer(repository, event.paymentId, session)
+                val payment = awaitPayment(repository, event.paymentId, transfer?.expiresAtEpochMillis)
+                if (payment?.status == PaymentStatus.SUCCESS) CreditFlowUiEffect.PaymentSucceeded(payment) else CreditFlowUiEffect.PaymentFailed
             } catch (cancellation: CancellationException) {
                 throw cancellation
             } catch (_: Exception) {
@@ -90,10 +95,39 @@ class CreditFlowViewModel(private val paymentRepository: PaymentRepository) : Vi
         }
     }
 
+    /** Shows the transfer code when the data source has one; a missing code never stops the payment from being tracked. */
+    private suspend fun loadBankTransfer(repository: PaymentRepository, paymentId: String, session: String?): BankTransfer? {
+        val transfer = try {
+            repository.getBankTransfer(paymentId)
+        } catch (cancellation: CancellationException) {
+            throw cancellation
+        } catch (_: BankTransferUnavailableException) {
+            if (repository.activeSessionKey() == session) _uiState.update { it.copy(isBankTransferUnavailable = true) }
+            return null
+        }
+        if (transfer != null && repository.activeSessionKey() == session) _uiState.update { it.copy(bankTransfer = transfer) }
+        return transfer
+    }
+
+    /** Waits for a final status; an unpaid transfer is cancelled when its time runs out. Null means it expired. */
+    private suspend fun awaitPayment(repository: PaymentRepository, paymentId: String, expiresAtEpochMillis: Long?): PaymentRecord? {
+        val wait = suspend { repository.observePayment(paymentId).first { it.status != PaymentStatus.PENDING } }
+        if (expiresAtEpochMillis == null) return wait()
+        val remaining = expiresAtEpochMillis - System.currentTimeMillis() + EXPIRY_GRACE_MILLIS
+        val payment = withTimeoutOrNull(remaining.coerceAtLeast(0L)) { wait() }
+        if (payment == null) runCatching { repository.cancelPayment(paymentId) }
+        return payment
+    }
+
     private fun emitEffect(effect: CreditFlowUiEffect, session: String? = paymentRepository.activeSessionKey()) {
         viewModelScope.launch {
             if (paymentRepository.activeSessionKey() == session) _uiEffect.send(effect)
         }
+    }
+
+    private companion object {
+        /** The backend may confirm a transfer shortly after the code expires. */
+        const val EXPIRY_GRACE_MILLIS = 30_000L
     }
 
     class Factory(private val repository: PaymentRepository) : ViewModelProvider.Factory {
