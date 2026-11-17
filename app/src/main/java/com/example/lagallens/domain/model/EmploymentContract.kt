@@ -51,15 +51,21 @@ data class ContractComparisonSummary(
     val unchangedSections: Int = 0
 )
 
-/** [firstValue] and [secondValue] are display text; null means the contract does not state the field. */
+/** Null means the contract does not state the field. */
 data class ContractFieldDifference(
     val field: String,
     val label: String,
-    val firstValue: String?,
-    val secondValue: String?,
+    val firstValue: ContractFieldValue?,
+    val secondValue: ContractFieldValue?,
     val changeType: ContractChangeType
 )
 
 data class ContractRiskScore(val score: Double, val risk: EmploymentContractRisk)
 
 data class ContractRiskComparison(val first: ContractRiskScore, val second: ContractRiskScore, val scoreDelta: Double)
+
+/** A contract term as the backend states it: text (numbers keep their digits) or a yes/no flag. */
+sealed interface ContractFieldValue {
+    data class Text(val value: String) : ContractFieldValue
+    data class Flag(val isYes: Boolean) : ContractFieldValue
+}

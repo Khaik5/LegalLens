@@ -8,6 +8,8 @@
     <string name="compare_change_removed">Removed</string>
     <string name="compare_change_modified">Changed</string>
     <string name="compare_clause_text_a">A · %1$s</string>
+    <string name="compare_value_yes">Yes</string>
+    <string name="compare_value_no">No</string>
     <string name="compare_clause_text_b">B · %1$s</string>
     <string name="compare_risk_not_analyzed">Both contracts must be analyzed to compare risk scores.</string>
     <string name="compare_risk_not_analyzed_short">Not analyzed</string>

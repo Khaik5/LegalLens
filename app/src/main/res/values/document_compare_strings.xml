@@ -58,6 +58,9 @@
     <string name="compare_change_removed">Xóa</string>
     <string name="compare_change_modified">Sửa</string>
     <string name="compare_clause_text_a">A · %1$s</string>
+    <string name="compare_value_yes">Có</string>
+    <string name="compare_value_no">Không</string>
+    <string name="compare_value_missing" translatable="false">—</string>
     <string name="compare_clause_text_b">B · %1$s</string>
     <string name="compare_risk_not_analyzed">Cần phân tích cả hai hợp đồng để so sánh điểm rủi ro.</string>
     <string name="compare_risk_not_analyzed_short">Chưa phân tích</string>

@@ -5,6 +5,7 @@ import com.example.lagallens.data.model.response.ContractComparisonResponse
 import com.example.lagallens.domain.model.ContractChangeType
 import com.example.lagallens.domain.model.ContractComparisonSummary
 import com.example.lagallens.domain.model.ContractFieldDifference
+import com.example.lagallens.domain.model.ContractFieldValue
 import com.example.lagallens.domain.model.ContractRiskComparison
 import com.example.lagallens.domain.model.ContractRiskScore
 import com.example.lagallens.domain.model.ContractTextDifference
@@ -26,7 +27,7 @@ internal fun ContractComparisonResponse.toComparison() = EmploymentContractCompa
         unchangedSections = summary.unchangedSections
     ),
     fieldDifferences = overview.differences.map {
-        ContractFieldDifference(it.field, it.label, it.firstValue.toDisplayValue(), it.secondValue.toDisplayValue(), it.changeType.toChangeType())
+        ContractFieldDifference(it.field, it.label, it.firstValue.toFieldValue(), it.secondValue.toFieldValue(), it.changeType.toChangeType())
     },
     riskComparison = riskComparison?.let {
         ContractRiskComparison(
@@ -66,10 +67,10 @@ private fun String?.toRisk() = when (this?.uppercase()) {
     else -> EmploymentContractRisk.NOT_ANALYZED
 }
 
-/** Numbers arrive as JSON doubles, so a whole number is shown without ".0". */
-private fun Any?.toDisplayValue(): String? = when (this) {
+/** Numbers arrive as JSON doubles, so a whole number keeps no ".0". */
+private fun Any?.toFieldValue(): ContractFieldValue? = when (this) {
     null -> null
-    is Double -> if (this % 1.0 == 0.0) toLong().toString() else toString()
-    is Boolean -> if (this) "✓" else "✗"
-    else -> toString().takeIf { it.isNotBlank() }
+    is Boolean -> ContractFieldValue.Flag(this)
+    is Double -> ContractFieldValue.Text(if (this % 1.0 == 0.0) toLong().toString() else toString())
+    else -> toString().takeIf { it.isNotBlank() }?.let(ContractFieldValue::Text)
 }

@@ -22,6 +22,7 @@ import com.example.lagallens.domain.model.ContractChangeType
 import com.example.lagallens.domain.model.ContractComparisonBlocker
 import com.example.lagallens.domain.model.ContractComparisonSummary
 import com.example.lagallens.domain.model.ContractComparisonUnavailableException
+import com.example.lagallens.domain.model.ContractFieldValue
 import com.example.lagallens.domain.model.EmploymentContractRisk
 import com.example.lagallens.domain.model.EmploymentContractStatus
 import kotlinx.coroutines.channels.Channel
@@ -225,9 +226,9 @@ class RemoteContractRepositoryTest {
         assertEquals("", result.differences[1].firstText)
         assertEquals(68.5, checkNotNull(result.riskComparison).scoreDelta, 0.0)
         assertEquals(EmploymentContractRisk.CRITICAL, result.riskComparison?.second?.risk)
-        // Whole numbers lose ".0" and booleans become marks.
-        assertEquals(listOf("15000000.00", null, "✓"), result.fieldDifferences.map { it.firstValue })
-        assertEquals(listOf("18000000.00", "12", "✗"), result.fieldDifferences.map { it.secondValue })
+        // Whole numbers lose ".0"; booleans stay flags for the screen to word.
+        assertEquals(listOf(ContractFieldValue.Text("15000000.00"), null, ContractFieldValue.Flag(true)), result.fieldDifferences.map { it.firstValue })
+        assertEquals(listOf(ContractFieldValue.Text("18000000.00"), ContractFieldValue.Text("12"), ContractFieldValue.Flag(false)), result.fieldDifferences.map { it.secondValue })
     }
 
     @Test fun aComparisonWithoutRiskScoresHasNoRiskComparison() = runTest {
