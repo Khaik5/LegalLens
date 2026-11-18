@@ -32,19 +32,25 @@ class RemoteProfileSettingsRepository(
 ) : ProfileSettingsRepository {
     private val lock = Mutex()
 
+    /** Counts changes the user made on this device; a sync that read the backend before one must not overwrite it. */
+    private val localChanges = java.util.concurrent.atomic.AtomicInteger()
+
     override fun observeSettings(): Flow<ProfileSettings> = local.observeSettings()
 
     override suspend fun updateAppearance(appearance: ProfileAppearance) {
+        localChanges.incrementAndGet()
         local.updateAppearance(appearance)
         send(PatchProfilePreferencesRequest(appearance = appearance.name))
     }
 
     override suspend fun updateLanguage(language: ProfileLanguage) {
+        localChanges.incrementAndGet()
         local.updateLanguage(language)
         send(PatchProfilePreferencesRequest(language = language.name))
     }
 
     override suspend fun updateNotificationPreferences(isPushEnabled: Boolean, isEmailEnabled: Boolean, isInAppEnabled: Boolean) {
+        localChanges.incrementAndGet()
         local.updateNotificationPreferences(isPushEnabled, isEmailEnabled, isInAppEnabled)
         send(PatchProfilePreferencesRequest(isPushEnabled = isPushEnabled, isEmailEnabled = isEmailEnabled, isInAppEnabled = isInAppEnabled))
     }
@@ -63,9 +69,11 @@ class RemoteProfileSettingsRepository(
                 // Left by a previous account on this device; it must not reach this one.
                 else -> local.clearPending()
             }
+            val changesBefore = localChanges.get()
             val settings = remote.get(scope).toProfileSettings()
             check(tokens.requireUserId(scope) == userId) { "Session changed" }
-            local.replace(settings)
+            // A change made while the backend copy was loading is newer; its own send brings the backend up to date.
+            if (localChanges.get() == changesBefore) local.replace(settings)
         }
     }
 
