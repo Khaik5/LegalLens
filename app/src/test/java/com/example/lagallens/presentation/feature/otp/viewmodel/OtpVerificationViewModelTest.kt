@@ -31,6 +31,32 @@ import org.junit.Test
 class OtpVerificationViewModelTest {
     @get:Rule val mainDispatcher = MainDispatcherRule()
 
+    @Test fun verifiedOtpIsRemovedFromSavedStateAndVisibleDigits() = runTest {
+        val state = SavedStateHandle()
+        val vm = viewModel(TestAuthRepository(), state) { testScheduler.currentTime }
+        try {
+            vm.onEvent(initialized())
+            enterCode(vm)
+            runCurrent()
+            assertTrue(vm.uiState.value.isVerified)
+            assertEquals(null, state.get<ArrayList<String>>("otpDigits"))
+            assertEquals(List(6) { "" }, vm.uiState.value.digits)
+        } finally { vm.viewModelScope.cancel() }
+    }
+
+    @Test fun leavingOtpScreenClearsSavedDigits() = runTest {
+        val state = SavedStateHandle()
+        val vm = viewModel(TestAuthRepository(), state) { testScheduler.currentTime }
+        try {
+            vm.onEvent(initialized())
+            vm.onEvent(OtpVerificationUiEvent.DigitChanged(0, "0"))
+            vm.onEvent(OtpVerificationUiEvent.BackClicked)
+            assertEquals(null, state.get<ArrayList<String>>("otpDigits"))
+            assertEquals(List(6) { "" }, vm.uiState.value.digits)
+            assertEquals(OtpVerificationUiEffect.CloseScreen, vm.uiEffect.first())
+        } finally { vm.viewModelScope.cancel() }
+    }
+
     @Test fun resendUsesServerTimingAndNewChallengeSurvivesRecreation() = runTest {
         val auth = TestAuthRepository()
         val savedState = SavedStateHandle()

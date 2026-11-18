@@ -45,10 +45,10 @@ class ProfilePasswordViewModel(private val changePassword: ChangePasswordUseCase
 
     private fun submitPasswordChange() {
         val state = _uiState.value
-        val currentPasswordError = if (state.currentPassword.isBlank()) {
-            R.string.profile_password_current_required
-        } else {
-            null
+        val currentPasswordError = when {
+            state.currentPassword.isEmpty() -> R.string.profile_password_current_required
+            state.currentPassword.length !in 8..72 -> R.string.profile_password_current_length_invalid
+            else -> null
         }
         val newPasswordError = when {
             !state.meetsSecurityRequirements -> R.string.profile_password_requirements_not_met
