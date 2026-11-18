@@ -64,4 +64,8 @@ interface DraftApi {
 
     @POST("draft-ai-jobs/{id}/cancel")
     suspend fun cancel(@Tag scope: AuthSessionScope, @Path("id") jobId: String): ApiEnvelope<DraftAiJobCreatedResponse>
+
+    /** Only a FAILED job can be retried (409 otherwise); it goes back to waiting for the provider. */
+    @POST("draft-ai-jobs/{id}/retry")
+    suspend fun retry(@Tag scope: AuthSessionScope, @Path("id") jobId: String): ApiEnvelope<DraftAiJobCreatedResponse>
 }

@@ -5,7 +5,9 @@ import com.example.lagallens.data.datasource.local.datastore.AuthSessionStore
 import com.example.lagallens.data.datasource.local.datastore.currentSessionScope
 import com.example.lagallens.data.datasource.remote.DraftRemoteDataSource
 import com.example.lagallens.data.model.request.DraftAiJobRequest
+import com.example.lagallens.data.model.response.DraftAiJobCreatedResponse
 import com.example.lagallens.data.model.response.DraftAiJobResponse
+import retrofit2.HttpException
 import com.example.lagallens.domain.model.Draft
 import com.example.lagallens.domain.model.DraftStage
 import com.example.lagallens.domain.repository.DraftAiRepository
@@ -55,12 +57,15 @@ class RemoteDraftAiRepository(
     }
 
     override suspend fun proposeEdit(request: DraftEditRequest): DraftEditProposal = inSession { scope, _ ->
-        val (draftId, _) = requireNotNull(request.draftId?.let(RemoteDraftId::parse)) { "Unknown draft" }
-        // The suggestion is made on the newest backend version of this draft.
-        val baseVersion = remote.get(scope, draftId).version
+        val (draftId, viewedVersion) = requireNotNull(request.draftId?.let(RemoteDraftId::parse)) { "Unknown draft" }
+        // The suggestion is made on the version the user is looking at. If a newer one exists the backend answers
+        // 409 instead of silently editing a different text.
+        val baseVersion = viewedVersion
         val instruction = listOf(request.scope, request.instruction).filter { it.isNotBlank() }.joinToString("\n")
-        val created = remote.createJob(scope, UUID.randomUUID().toString(), DraftAiJobRequest("EDIT", instruction, draftId = draftId, baseVersion = baseVersion))
+        val jobRequest = DraftAiJobRequest("EDIT", instruction, draftId = draftId, baseVersion = baseVersion)
+        val created = startJob(scope, jobRequest)
         val job = awaitJob(scope, created.jobId)
+        finishRequest(scope, jobRequest)
         val change = job.changes.orEmpty().firstOrNull()
         DraftEditProposal(
             proposalId = job.jobId,
@@ -85,16 +90,53 @@ class RemoteDraftAiRepository(
     private suspend fun generate(conversationId: String?, contractId: String?, instruction: String, stage: DraftStage): Draft =
         inSession { scope, userId ->
             val conversation = requireNotNull(conversationId?.toLongOrNull()) { "A conversation is required" }
-            val created = remote.createJob(
-                scope, UUID.randomUUID().toString(),
-                DraftAiJobRequest("GENERATE", instruction, conversationId = conversation, contractId = contractId?.toLongOrNull())
-            )
+            val jobRequest = DraftAiJobRequest("GENERATE", instruction, conversationId = conversation, contractId = contractId?.toLongOrNull())
+            val created = startJob(scope, jobRequest)
             awaitJob(scope, created.jobId)
             // The generated text is written as the next version of the new, still empty draft.
             val saved = remote.apply(scope, created.jobId)
+            finishRequest(scope, jobRequest)
             marks.put(userId, saved.id, saved.version, DraftVersionMark(stage, isSaved = false))
             drafts.loadVersion(scope, userId, saved.id, saved.version)
         }
+
+    /**
+     * Idempotency keys of requests that did not finish, by session and request. Asking again for the same thing
+     * reuses the key, and the backend answers with the job it already has: a lost response or a failed job does
+     * not start a second one (for a new draft, a second empty draft). A finished request forgets its key, so
+     * asking the same thing later is a new request, as regenerating a draft is.
+     */
+    private val pendingKeys = java.util.concurrent.ConcurrentHashMap<String, String>()
+
+    private fun fingerprint(scope: AuthSessionScope, request: DraftAiJobRequest) = "${scope.key}|$request"
+
+    private suspend fun startJob(scope: AuthSessionScope, request: DraftAiJobRequest): DraftAiJobCreatedResponse {
+        val fingerprint = fingerprint(scope, request)
+        val key = pendingKeys.getOrPut(fingerprint) { UUID.randomUUID().toString() }
+        val created = remote.createJob(scope, key, request)
+        return when (created.status) {
+            // A cancelled job can never run again, so the same key would only return the dead job.
+            "CANCELLED" -> {
+                val fresh = UUID.randomUUID().toString().also { pendingKeys[fingerprint] = it }
+                remote.createJob(scope, fresh, request)
+            }
+            "FAILED" -> {
+                try {
+                    remote.retry(scope, created.jobId)
+                } catch (error: HttpException) {
+                    // Not failed any more (another call already restarted it): follow the job as it is.
+                    if (error.code() != 409) throw error
+                    error.response()?.errorBody()?.close()
+                }
+                created
+            }
+            else -> created
+        }
+    }
+
+    private fun finishRequest(scope: AuthSessionScope, request: DraftAiJobRequest) {
+        pendingKeys.remove(fingerprint(scope, request))
+    }
 
     /** Waits for COMPLETED; short network drops are tolerated because the job keeps running on the backend. */
     private suspend fun awaitJob(scope: AuthSessionScope, jobId: String): DraftAiJobResponse {
