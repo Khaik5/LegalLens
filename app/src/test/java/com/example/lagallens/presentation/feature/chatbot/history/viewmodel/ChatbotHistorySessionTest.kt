@@ -65,7 +65,8 @@ class ChatbotHistorySessionTest {
         vm.onEvent(ChatbotHistoryUiEvent.ScreenOpened())
         testScheduler.runCurrent()
         val item = vm.uiState.value.conversations.single()
-        assertEquals("4 tin nhắn", item.messageCount)
+        assertEquals(4, item.messageCountQuantity)
+        assertEquals("", item.messageCount)
         assertEquals("60 ngày.", item.preview)
     }
 }

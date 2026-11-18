@@ -2,6 +2,7 @@
     <string name="ocr_review_document_text_title">Recognized text · editable</string>
     <string name="ocr_review_empty_document">The text is empty. Add content before saving the contract.</string>
     <string name="ocr_result_contract_title">EMPLOYMENT CONTRACT</string>
+    <string name="ocr_result_default_contract_name">New employment contract</string>
     <string name="ocr_review_alert_confidence">Needs review — OCR confidence: %1$s</string>
     <string name="ocr_review_alert_generic">Review the OCR result before continuing</string>
 </resources>

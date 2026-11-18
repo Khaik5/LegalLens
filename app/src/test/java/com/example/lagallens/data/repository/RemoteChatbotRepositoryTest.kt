@@ -210,6 +210,18 @@ class RemoteChatbotRepositoryTest {
         assertNull(repository.getMessages("5")[1].noEvidenceTitle)
     }
 
+    @Test fun cancellationDuringHistoryContractLookupIsPropagated() = runTest {
+        api.conversations = listOf(ConversationResponse(5, 12, "Contract", null, null, messageCount = 1))
+        val cancelled = kotlinx.coroutines.CancellationException("cancelled")
+        val subject = RemoteChatbotRepository(
+            RemoteRepositorySession(), ChatbotRemoteDataSource(lazyOf(api)), labels = { labels },
+            contractInfo = { throw cancelled }
+        )
+        val result = runCatching { subject.getConversations() }
+        assertTrue("Cancellation must escape the contract lookup: $result", result.exceptionOrNull() is kotlinx.coroutines.CancellationException)
+        assertEquals(cancelled.message, result.exceptionOrNull()?.message)
+    }
+
     private fun question(id: Long, content: String, status: String?, result: String? = null) = ChatMessageResponse(
         id, "USER", content, "2026-11-10T09:30:00.000Z", status, null, "client", result?.let(JsonParser::parseString)
     )
