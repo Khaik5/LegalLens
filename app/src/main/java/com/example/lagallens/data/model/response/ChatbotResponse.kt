@@ -27,7 +27,9 @@ data class ChatMessageResponse(
     val requestStatus: String?,
     val errorCode: String?,
     val clientMessageId: String?,
-    val result: JsonElement?
+    val result: JsonElement?,
+    /** The request this question started; absent on older backends. Lets a FAILED question be retried after a restart. */
+    val requestId: Long? = null
 )
 
 /** Returned when a question is queued or retried; [id] is the request to retry. */
