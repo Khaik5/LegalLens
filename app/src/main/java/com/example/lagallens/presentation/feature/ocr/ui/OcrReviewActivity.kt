@@ -20,6 +20,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.lagallens.R
 import com.example.lagallens.databinding.ActivityOcrReviewBinding
+import com.example.lagallens.data.datasource.local.OcrEditDraftStore
+import com.example.lagallens.presentation.feature.ocr.OcrTextHandoff
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.debounce
 import com.example.lagallens.presentation.feature.ocr.contract.OcrReviewEffect
 import com.example.lagallens.presentation.feature.ocr.contract.OcrReviewEvent
 import com.example.lagallens.presentation.feature.ocr.contract.OcrReviewUiState
@@ -27,9 +32,13 @@ import com.example.lagallens.presentation.feature.ocr.contract.OcrReviewWarning
 import com.example.lagallens.presentation.feature.ocr.viewmodel.OcrReviewViewModel
 import kotlinx.coroutines.launch
 
+@OptIn(FlowPreview::class)
 class OcrReviewActivity : com.example.lagallens.presentation.feature.ocr.OcrSessionActivity() {
     private lateinit var binding: ActivityOcrReviewBinding
     private val viewModel by viewModels<OcrReviewViewModel>()
+    private val drafts by lazy { OcrEditDraftStore(applicationContext) }
+    private val documentId get() = intent.getStringExtra(EXTRA_DOCUMENT_ID).orEmpty()
+    private var originalText = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,6 +50,14 @@ class OcrReviewActivity : com.example.lagallens.presentation.feature.ocr.OcrSess
             isAppearanceLightStatusBars = true
             isAppearanceLightNavigationBars = true
         }
+        // The text is kept in memory (see OcrTextHandoff); it is gone after process death. Confirming an empty
+        // text would overwrite the saved document, so the screen must not open without it.
+        // The text under review was kept in the session cache while it was edited, so the review resumes from it.
+        val handedOver = OcrTextHandoff.peek(intent.getStringExtra(EXTRA_DOCUMENT_TEXT_TOKEN))
+        val resumed = if (handedOver == null) drafts.load(OcrEditDraftStore.PURPOSE_REVIEW, ownerSession, documentId) else null
+        val reviewText = handedOver ?: resumed?.edited
+        if (reviewText == null) { finish(); return }
+        originalText = handedOver ?: resumed!!.original
         binding = ActivityOcrReviewBinding.inflate(layoutInflater)
         setContentView(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(binding.ocrReviewRoot) { view, insets ->
@@ -61,11 +78,37 @@ class OcrReviewActivity : com.example.lagallens.presentation.feature.ocr.OcrSess
         viewModel.onEvent(OcrReviewEvent.ScreenOpened(
             intent.getStringExtra(EXTRA_DOCUMENT_ID).orEmpty(),
             intent.getStringExtra(EXTRA_CONTRACT_ID),
-            intent.getStringExtra(EXTRA_DOCUMENT_TEXT).orEmpty(),
+            reviewText,
             warningsFrom(intent)
         ))
         bindEvents()
         observeViewModel()
+    }
+
+    override fun onDestroy() {
+        if (isFinishing) {
+            OcrTextHandoff.release(intent.getStringExtra(EXTRA_DOCUMENT_TEXT_TOKEN))
+            drafts.clear(OcrEditDraftStore.PURPOSE_REVIEW, ownerSession, documentId)
+        }
+        super.onDestroy()
+    }
+
+    /** Keeps the text being reviewed, or removes the draft when it is back to what was recognised. */
+    private fun persistDraft(state: OcrReviewUiState) {
+        val session = ownerSession
+        val document = documentId
+        if (isFinishing || !isOcrSessionValid() || state.documentText.isEmpty()) return
+        val original = originalText
+        lifecycleScope.launch(Dispatchers.IO) {
+            if (state.documentText == original) drafts.clear(OcrEditDraftStore.PURPOSE_REVIEW, session, document)
+            else drafts.save(OcrEditDraftStore.PURPOSE_REVIEW, session, document, OcrEditDraftStore.Draft(original, state.documentText))
+        }
+    }
+
+    // The debounce stops with the screen; the last characters typed must not wait for it.
+    override fun onStop() {
+        if (::binding.isInitialized) persistDraft(viewModel.uiState.value)
+        super.onStop()
     }
 
     private fun bindEvents() = with(binding) {
@@ -85,6 +128,7 @@ class OcrReviewActivity : com.example.lagallens.presentation.feature.ocr.OcrSess
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch { viewModel.uiState.collect(::render) }
                 launch { viewModel.effects.collect(::handleEffect) }
+                launch { viewModel.uiState.debounce(DRAFT_SAVE_DELAY_MILLIS).collect(::persistDraft) }
             }
         }
     }
@@ -137,17 +181,18 @@ class OcrReviewActivity : com.example.lagallens.presentation.feature.ocr.OcrSess
                     .putExtra(EXTRA_REVIEW_CONFIRMED, true)
                     .putExtra(EXTRA_DOCUMENT_ID, effect.documentId)
                     .putExtra(EXTRA_CONTRACT_ID, effect.contractId)
-                    .putExtra(EXTRA_DOCUMENT_TEXT, effect.documentText))
+                    .putExtra(EXTRA_DOCUMENT_TEXT_TOKEN, OcrTextHandoff.put(effect.documentText)))
                 finish()
             }
         }
     }
 
     companion object {
+        private const val DRAFT_SAVE_DELAY_MILLIS = 400L
         const val EXTRA_REVIEW_CONFIRMED = "extra_review_confirmed"
         const val EXTRA_DOCUMENT_ID = "ocr_review_document_id"
         const val EXTRA_CONTRACT_ID = "ocr_review_contract_id"
-        const val EXTRA_DOCUMENT_TEXT = "ocr_review_document_text"
+        const val EXTRA_DOCUMENT_TEXT_TOKEN = "ocr_review_document_text_token"
         private const val EXTRA_CONFIDENCE = "ocr_review_confidence"
 
         private const val EXTRA_WARNING_SECTIONS = "ocr_review_warning_sections"
@@ -167,7 +212,7 @@ class OcrReviewActivity : com.example.lagallens.presentation.feature.ocr.OcrSess
             com.example.lagallens.presentation.feature.ocr.OcrSession.stamp(context, Intent(context, OcrReviewActivity::class.java)
                 .putExtra(EXTRA_DOCUMENT_ID, documentId)
                 .putExtra(EXTRA_CONTRACT_ID, contractId)
-                .putExtra(EXTRA_DOCUMENT_TEXT, documentText)
+                .putExtra(EXTRA_DOCUMENT_TEXT_TOKEN, OcrTextHandoff.put(documentText))
                 .putExtra(EXTRA_CONFIDENCE, confidencePercentage)
                 .putStringArrayListExtra(EXTRA_WARNING_SECTIONS, ArrayList(warnings.map { it.section }))
                 .putStringArrayListExtra(EXTRA_WARNING_CONFIDENCES, ArrayList(warnings.map { it.confidence }))

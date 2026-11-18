@@ -102,6 +102,10 @@
     <string name="ocr_editor_bold_content_description">In đậm văn bản đã chọn</string>
     <string name="ocr_editor_italic_content_description">In nghiêng văn bản đã chọn</string>
     <string name="ocr_editor_list_content_description">Thêm gạch đầu dòng</string>
+    <string name="ocr_editor_discard_title">Bỏ các chỉnh sửa?</string>
+    <string name="ocr_editor_discard_body">Các thay đổi chưa lưu trong văn bản OCR sẽ bị mất.</string>
+    <string name="ocr_editor_discard_action">Bỏ chỉnh sửa</string>
+    <string name="ocr_editor_discard_keep_editing">Tiếp tục chỉnh sửa</string>
     <string name="ocr_review_bold_content_description">In đậm văn bản đã chọn</string>
     <string name="ocr_review_italic_content_description">In nghiêng văn bản đã chọn</string>
     <string name="ocr_review_list_content_description">Thêm gạch đầu dòng</string>

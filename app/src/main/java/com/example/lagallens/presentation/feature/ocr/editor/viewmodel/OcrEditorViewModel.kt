@@ -19,16 +19,26 @@ class OcrEditorViewModel : ViewModel() {
     private val _uiEffect = Channel<OcrEditorUiEffect>(Channel.BUFFERED)
     val uiEffect = _uiEffect.receiveAsFlow()
 
+    // The Activity re-sends Initialize on every recreation (rotation, font or theme change) while this
+    // ViewModel survives, so only the first call may seed the text; later ones would drop the user's edits.
+    private var initialized = false
+
     fun onEvent(event: OcrEditorUiEvent) {
         when (event) {
-            is OcrEditorUiEvent.Initialize -> _uiState.update {
-                it.copy(
-                    originalText = event.originalText,
-                    text = event.originalText,
-                    isOriginalText = true
-                )
+            is OcrEditorUiEvent.Initialize -> if (!initialized) {
+                initialized = true
+                _uiState.update {
+                    it.copy(
+                        originalText = event.originalText,
+                        text = event.editedText,
+                        isOriginalText = event.editedText == event.originalText
+                    )
+                }
             }
-            OcrEditorUiEvent.BackClicked -> emitEffect(OcrEditorUiEffect.NavigateBack)
+            OcrEditorUiEvent.BackClicked ->
+                if (_uiState.value.isOriginalText) emitEffect(OcrEditorUiEffect.NavigateBack)
+                else emitEffect(OcrEditorUiEffect.ConfirmDiscard)
+            OcrEditorUiEvent.DiscardConfirmed -> emitEffect(OcrEditorUiEffect.NavigateBack)
             is OcrEditorUiEvent.TextChanged -> _uiState.update {
                 it.copy(text = event.text, isOriginalText = event.text == it.originalText)
             }
