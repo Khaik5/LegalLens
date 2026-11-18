@@ -4,6 +4,7 @@ import com.example.lagallens.core.constants.FeatureFlags
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.lagallens.presentation.common.utils.isDemoData
 import com.example.lagallens.presentation.common.utils.toFailureMessage
 import com.example.lagallens.R
 import com.example.lagallens.domain.model.chatbot.ChatbotReply
@@ -60,6 +61,8 @@ class ChatbotViewModel(
     private var newChatSuggestions: List<String> = emptyList()
     private var draftTransition: Job? = null
     private var draftGeneration: Job? = null
+    /** The send or retry waiting for an answer; a new conversation cancels it so the old answer cannot land in the new chat. */
+    private var replyJob: Job? = null
     private var previewDraftError = false
     private var generatedDraftId: String? = null
 
@@ -112,10 +115,15 @@ class ChatbotViewModel(
                 event.referenceId?.let(ChatbotUiEffect::NavigateToLegalReference) ?: ChatbotUiEffect.ShowMessage(R.string.analysis_citation_unavailable)
             )
             is ChatbotUiEvent.ErrorRetryClicked -> retryMessage(event.messageId)
-            ChatbotUiEvent.AttachmentClicked -> emitEffect(ChatbotUiEffect.OpenAttachmentSheet)
-            ChatbotUiEvent.AttachmentCameraClicked -> emitEffect(ChatbotUiEffect.OpenCamera)
+            // The backend call carries no file, so outside DEMO attaching would only pretend the file was read.
+            ChatbotUiEvent.AttachmentClicked ->
+                if (isDemoData()) emitEffect(ChatbotUiEffect.OpenAttachmentSheet) else emitEffect(ChatbotUiEffect.ShowMessage(R.string.chatbot_attachment_not_sent))
+            ChatbotUiEvent.AttachmentCameraClicked ->
+                if (isDemoData()) emitEffect(ChatbotUiEffect.OpenCamera) else emitEffect(ChatbotUiEffect.ShowMessage(R.string.chatbot_attachment_not_sent))
             ChatbotUiEvent.AttachmentSavedClicked -> emitEffect(ChatbotUiEffect.ShowMessage(R.string.chatbot_attachment_saved_unavailable))
-            is ChatbotUiEvent.AttachmentSelected -> _uiState.update { it.copy(attachmentUri = event.uri, attachmentName = event.name) }
+            is ChatbotUiEvent.AttachmentSelected ->
+                if (isDemoData()) _uiState.update { it.copy(attachmentUri = event.uri, attachmentName = event.name) }
+                else emitEffect(ChatbotUiEffect.ShowMessage(R.string.chatbot_attachment_not_sent))
             ChatbotUiEvent.AttachmentRemoved -> _uiState.update { it.copy(attachmentUri = null, attachmentName = null) }
             ChatbotUiEvent.BackClicked -> emitEffect(ChatbotUiEffect.NavigateBack)
             ChatbotUiEvent.SourceDocumentClicked -> _uiState.value.sourceContractId?.let { emitEffect(ChatbotUiEffect.NavigateToContractDetail(it)) }
@@ -206,7 +214,7 @@ class ChatbotViewModel(
             )
         }
         persistTranscript()
-        launchForSession {
+        replyJob = launchForSession {
             try {
                 val reply = sendMessage.forSession(ownerSession, activeConversationId, message, attachment)
                 if (openConversation.currentSessionKey() == ownerSession) appendReply(message, reply, attachment)
@@ -239,6 +247,7 @@ class ChatbotViewModel(
     }
 
     private fun resetConversation() {
+        replyJob?.cancel()
         draftTransition?.cancel()
         draftGeneration?.cancel()
         failedQuestions.clear()
@@ -399,7 +408,7 @@ class ChatbotViewModel(
         val question = failedQuestions[messageId] ?: return
         if (_uiState.value.isReplyPending) return
         _uiState.update { it.copy(isReplyPending = true).withRetrying(messageId, true) }
-        launchForSession {
+        replyJob = launchForSession {
             val retriedMessage = try {
                 retryMessage.forSession(ownerSession, activeConversationId, question, failedAttachments[messageId]).toMessage(messageId)
             } catch (cancellationException: CancellationException) {
