@@ -46,13 +46,15 @@ class ContractDetailViewModel(
         }
     }
 
-    fun loadContract(contractId: String?) {
+    /** [refresh] reloads an already shown contract in place, e.g. when returning from an analysis. */
+    fun loadContract(contractId: String?, refresh: Boolean = false) {
         if (activeSession != repository.activeSessionKey()) {
             activeSession = repository.activeSessionKey()
             clearContract()
         }
         if (contractId.isNullOrBlank()) return
-        if (currentContractId == contractId && (currentContract != null || loadJob?.isActive == true)) return
+        if (currentContractId == contractId && loadJob?.isActive == true) return
+        if (currentContractId == contractId && currentContract != null && !refresh) return
         if (currentContractId != contractId) clearContract()
         currentContractId = contractId
         val session = activeSession
