@@ -102,9 +102,12 @@ class RemoteAnalysisRepository(
     /** Null when the document has no finished OCR text to analyse. */
     private suspend fun approvedRevisionId(scope: AuthSessionScope, documentId: String): String? {
         val latest = ocr.latest(scope, documentId) ?: return null
-        val revision = latest.revision ?: return null
+        val newest = latest.revision ?: return null
         if (latest.status != "COMPLETED") return null
         if (latest.reviewStatus == APPROVED && latest.revisionId != null) return latest.revisionId
+        // The revision the user reviewed, not whatever is newest now: if the text changed elsewhere since, the
+        // backend answers with a conflict and the analysis is not started on text nobody looked at.
+        val revision = ocr.viewedRevision(scope, documentId) ?: newest
         return ocr.confirm(scope, documentId, revision).revisionId
     }
 
@@ -131,6 +134,9 @@ class RemoteAnalysisRepository(
                 emit(AnalysisJobState.Running(stage))
             }
         }
+        // Nobody waits for this job any more, and the backend allows one active job per contract: left running it
+        // would make the next analysis of this contract fail with a conflict.
+        cancelJob(scope, jobId)
         emit(AnalysisJobState.Failed)
     }
 
