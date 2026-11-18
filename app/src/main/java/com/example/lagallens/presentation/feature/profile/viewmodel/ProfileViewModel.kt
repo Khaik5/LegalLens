@@ -30,6 +30,8 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
     private val _uiEffect = Channel<ProfileUiEffect>(Channel.BUFFERED)
     val uiEffect = _uiEffect.receiveAsFlow()
 
+    private var loading = false
+
     init {
         loadProfile()
         observeActivityCounts()
@@ -83,17 +85,26 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
+    /** Tries again after a failed first load, e.g. when a profile screen is shown once the network is back. */
+    fun reloadIfUnavailable() {
+        val state = _uiState.value
+        if (state.isBackendUnavailable && !state.isLoading && !state.isSaving && !loading) loadProfile()
+    }
+
     private fun loadProfile() {
+        loading = true
         viewModelScope.launch {
             try {
                 val profile = profileRepository.getProfile()
                 _uiState.update {
-                    it.copy(name = profile.name, email = profile.email, phone = profile.phone, photoUri = profile.photoUri, isLoading = false)
+                    it.copy(name = profile.name, email = profile.email, phone = profile.phone, photoUri = profile.photoUri, isLoading = false, isBackendUnavailable = false)
                 }
             } catch (cancellation: CancellationException) {
                 throw cancellation
             } catch (_: Exception) {
                 _uiState.update { it.copy(isLoading = false, isBackendUnavailable = true) }
+            } finally {
+                loading = false
             }
         }
     }
