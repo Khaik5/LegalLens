@@ -161,7 +161,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/ocr_failure_footer"
         android:layout_width="0dp"
-        android:layout_height="@dimen/ocr_failure_footer_height"
+        android:layout_height="wrap_content"
         android:background="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -181,6 +181,8 @@
             android:layout_height="@dimen/ocr_failure_button_height"
             android:layout_marginStart="@dimen/ocr_failure_side_padding"
             android:layout_marginTop="@dimen/ocr_failure_footer_content_top_margin"
+            android:layout_marginBottom="@dimen/ocr_failure_footer_content_top_margin"
+            app:layout_constraintBottom_toBottomOf="parent"
             android:layout_marginEnd="@dimen/ocr_failure_side_padding"
             android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
