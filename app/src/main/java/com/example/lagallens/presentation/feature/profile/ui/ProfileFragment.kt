@@ -119,17 +119,26 @@ class ProfileFragment : Fragment() {
                 viewModel.uiEffect.collect { effect ->
                     when (effect) {
                         is ProfileUiEffect.ShowActionUnavailable -> showActionUnavailable(effect.actionTitleRes)
-                        ProfileUiEffect.NavigateToEditProfile -> findNavController().navigate(
-                            R.id.action_profileFragment_to_profileEditFragment
-                        )
-                        ProfileUiEffect.NavigateToSettings -> findNavController().navigate(
-                            R.id.action_profileFragment_to_profileSettingsFragment
-                        )
+                        ProfileUiEffect.NavigateToEditProfile -> {
+                            val navController = findNavController()
+                            if (navController.currentDestination?.id == R.id.profileFragment) {
+                                navController.navigate(R.id.action_profileFragment_to_profileEditFragment)
+                            }
+                        }
+                        ProfileUiEffect.NavigateToSettings -> {
+                            val navController = findNavController()
+                            if (navController.currentDestination?.id == R.id.profileFragment) {
+                                navController.navigate(R.id.action_profileFragment_to_profileSettingsFragment)
+                            }
+                        }
                         ProfileUiEffect.NavigateToPrivacy -> startActivity(ProfileInformationActivity.createIntent(requireContext(), true))
                         ProfileUiEffect.NavigateToAbout -> startActivity(ProfileInformationActivity.createIntent(requireContext(), false))
-                        ProfileUiEffect.NavigateToChangePassword -> findNavController().navigate(
-                            R.id.action_profileFragment_to_profilePasswordFragment
-                        )
+                        ProfileUiEffect.NavigateToChangePassword -> {
+                            val navController = findNavController()
+                            if (navController.currentDestination?.id == R.id.profileFragment) {
+                                navController.navigate(R.id.action_profileFragment_to_profilePasswordFragment)
+                            }
+                        }
                         ProfileUiEffect.ShowLogoutConfirmation -> showLogoutConfirmation()
                         ProfileUiEffect.NavigateToAuthentication -> navigateToAuthentication()
                         ProfileUiEffect.ShowLogoutFailed -> Toast.makeText(requireContext(), R.string.profile_logout_failed, Toast.LENGTH_LONG).show()

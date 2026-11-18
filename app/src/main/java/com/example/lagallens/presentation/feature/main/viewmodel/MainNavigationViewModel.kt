@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -47,6 +48,10 @@ class MainNavigationViewModel(
         val session = currentSession() ?: return
         try {
             notifications.refreshUnreadCount(session)
+            // The repository's count is a StateFlow shared by the whole app: when the refresh gives the value it
+            // already held, it emits nothing, and a screen that had reset its badge would stay at 0. Read it again.
+            val count = notifications.observeUnreadCount().firstOrNull()
+            if (count != null && currentSession() == session) _uiState.update { it.copy(unreadNotifications = count) }
         } catch (cancellation: CancellationException) {
             throw cancellation
         } catch (_: Exception) {

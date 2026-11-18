@@ -75,12 +75,20 @@ class SplashViewModelTest {
         assertTrue(results.isEmpty())
     }
 
+    @Test fun preferencesReadFailureStillOpensOnboarding() = runTest {
+        val model = viewModel(readOnboarding = { throw IOException("disk") }) { error("Must not restore") }
+        model.onEvent(SplashUiEvent.ScreenStarted)
+        advanceUntilIdle()
+        assertEquals(SplashUiEffect.NavigateToOnboarding, model.uiEffect.first())
+    }
+
     private fun viewModel(
         onboarded: Boolean = true,
+        readOnboarding: suspend () -> Boolean = { onboarded },
         restore: suspend () -> SessionRestoreResult
     ): SplashViewModel {
         val onboarding = object : OnboardingRepository {
-            override suspend fun isCompleted() = onboarded
+            override suspend fun isCompleted() = readOnboarding()
             override suspend fun markCompleted() = Unit
         }
         val auth = object : AuthRepository {
