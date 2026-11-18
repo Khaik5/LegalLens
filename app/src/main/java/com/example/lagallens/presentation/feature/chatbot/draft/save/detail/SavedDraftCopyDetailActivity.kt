@@ -23,6 +23,9 @@ import com.example.lagallens.presentation.feature.chatbot.draft.ui.ChatbotDraftP
 
 class SavedDraftCopyDetailActivity : DraftSessionActivity() {
     private lateinit var binding: ActivitySavedDraftCopyDetailBinding
+    // The draft this screen shows; the export must use it, because the version label ("D2") alone cannot
+    // identify one backend version and would fall back to the newest draft of that stage.
+    private var draftId: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,7 +38,7 @@ class SavedDraftCopyDetailActivity : DraftSessionActivity() {
         binding.savedDraftBack.setOnClickListener { finish() }
         val version = intent.getStringExtra(EXTRA_VERSION) ?: ChatbotDraftUiState.APPROVED_AI_VERSION
         val contractId = intent.getStringExtra(EXTRA_CONTRACT_ID)
-        var draftId = intent.getStringExtra(EXTRA_DRAFT_ID)
+        draftId = intent.getStringExtra(EXTRA_DRAFT_ID)
         binding.savedDraftTitle.text = getString(R.string.chatbot_draft_document_name, version)
         lifecycleScope.launch {
             val app = application as LegalLensApplication
@@ -66,7 +69,7 @@ class SavedDraftCopyDetailActivity : DraftSessionActivity() {
 
     private fun showExportSheet() {
         if (supportFragmentManager.findFragmentByTag(DraftPdfExportBottomSheet.TAG) == null) {
-            DraftPdfExportBottomSheet.newInstance(intent.getStringExtra(EXTRA_VERSION) ?: ChatbotDraftUiState.APPROVED_AI_VERSION).show(supportFragmentManager, DraftPdfExportBottomSheet.TAG)
+            DraftPdfExportBottomSheet.newInstance(draftId ?: intent.getStringExtra(EXTRA_VERSION) ?: ChatbotDraftUiState.APPROVED_AI_VERSION).show(supportFragmentManager, DraftPdfExportBottomSheet.TAG)
         }
     }
 

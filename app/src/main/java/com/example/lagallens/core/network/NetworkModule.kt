@@ -50,6 +50,17 @@ object NetworkModule {
                 .build()
         )
 
+    /**
+     * For file uploads and downloads. The 60 s limit of the normal client covers the whole call, which a 20 MB
+     * upload on a slow mobile connection cannot meet; the per-read and per-write timeouts still end a stalled
+     * transfer. It derives from [authenticated], so interceptors, the token authenticator and the connection
+     * pool are shared and a refresh is never run twice at the same time.
+     */
+    fun provideTransferRetrofit(authenticated: Retrofit): Retrofit =
+        retrofit((authenticated.callFactory() as OkHttpClient).newBuilder().callTimeout(TRANSFER_CALL_TIMEOUT_MINUTES, TimeUnit.MINUTES).build())
+
+    private const val TRANSFER_CALL_TIMEOUT_MINUTES = 10L
+
     private fun retrofit(client: OkHttpClient): Retrofit {
         val baseUrl = configuredBaseUrl()
             ?: throw BackendNotConfiguredException("Network (set an HTTPS API base URL or use the local debug build)")
