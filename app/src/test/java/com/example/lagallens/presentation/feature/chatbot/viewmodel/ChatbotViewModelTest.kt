@@ -8,12 +8,14 @@ import com.example.lagallens.domain.usecase.SendChatbotMessageUseCase
 import com.example.lagallens.presentation.feature.chatbot.contract.ChatbotMessageAuthor
 import com.example.lagallens.presentation.feature.chatbot.contract.ChatbotUiEffect
 import com.example.lagallens.presentation.feature.chatbot.contract.ChatbotUiEvent
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.advanceUntilIdle
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
@@ -234,6 +236,80 @@ class ChatbotViewModelTest {
 
         assertEquals(null, viewModel.uiState.value.sourceContractId)
         assertEquals(ChatbotUiEffect.NavigateBack, viewModel.uiEffect.first())
+    }
+
+    @Test fun failedOpenCanBeRetriedOnTheNextScreenOpened() = runTest {
+        val delegate = FakeChatbotRepository()
+        var calls = 0
+        val repository = object : com.example.lagallens.domain.repository.ChatbotRepository by delegate {
+            override suspend fun openForSession(sessionKey: String?, contractName: String, contractType: String, contractId: String?, conversationId: String?): com.example.lagallens.domain.model.chatbot.ChatbotConversation {
+                if (++calls == 1) throw java.io.IOException("offline")
+                return delegate.openConversation(contractName, contractType, contractId, conversationId)
+            }
+        }
+        val model = viewModel(repository)
+        openScreen(model)
+        advanceUntilIdle()
+        assertEquals(false, model.uiState.value.isConversationReady)
+        openScreen(model)
+        advanceUntilIdle()
+        assertEquals(2, calls)
+        assertEquals(true, model.uiState.value.isConversationReady)
+        openScreen(model)
+        assertEquals(2, calls)
+    }
+
+    @Test fun failedOpenOffersARetryInsteadOfOnlyAToast() = runTest {
+        val repository = object : com.example.lagallens.domain.repository.ChatbotRepository by FakeChatbotRepository() {
+            override suspend fun openForSession(sessionKey: String?, contractName: String, contractType: String, contractId: String?, conversationId: String?): com.example.lagallens.domain.model.chatbot.ChatbotConversation =
+                throw java.io.IOException("offline")
+        }
+        val model = viewModel(repository)
+        val effect = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { model.uiEffect.first() }
+
+        openScreen(model)
+        advanceUntilIdle()
+
+        assertTrue(effect.await() is com.example.lagallens.presentation.feature.chatbot.contract.ChatbotUiEffect.ShowOpenFailed)
+    }
+
+    @Test fun historyLoadFailureCanAlsoBeRetried() = runTest {
+        var reads = 0
+        val repository = object : com.example.lagallens.domain.repository.ChatbotRepository by FakeChatbotRepository() {
+            override suspend fun messagesForSession(sessionKey: String?, conversationId: String): List<com.example.lagallens.domain.model.chatbot.ChatbotTranscriptMessage> {
+                if (++reads == 1) throw java.io.IOException("offline")
+                return emptyList()
+            }
+        }
+        val model = viewModel(repository)
+        val opened = ChatbotUiEvent.ScreenOpened("Contract", "Employment", conversationId = "saved")
+        model.onEvent(opened)
+        advanceUntilIdle()
+        assertEquals(false, model.uiState.value.isConversationReady)
+        model.onEvent(opened)
+        advanceUntilIdle()
+        assertEquals(2, reads)
+        assertEquals(true, model.uiState.value.isConversationReady)
+    }
+
+    @Test fun repeatedScreenOpenedDoesNotDuplicateAnInFlightOpen() = runTest {
+        val gate = kotlinx.coroutines.CompletableDeferred<Unit>()
+        val delegate = FakeChatbotRepository()
+        var calls = 0
+        val repository = object : com.example.lagallens.domain.repository.ChatbotRepository by delegate {
+            override suspend fun openForSession(sessionKey: String?, contractName: String, contractType: String, contractId: String?, conversationId: String?): com.example.lagallens.domain.model.chatbot.ChatbotConversation {
+                calls++
+                gate.await()
+                return delegate.openConversation(contractName, contractType, contractId, conversationId)
+            }
+        }
+        val model = viewModel(repository)
+        openScreen(model)
+        openScreen(model)
+        assertEquals(1, calls)
+        gate.complete(Unit)
+        advanceUntilIdle()
+        assertEquals(true, model.uiState.value.isConversationReady)
     }
 
     private fun viewModel(repository: com.example.lagallens.domain.repository.ChatbotRepository = FakeChatbotRepository()): ChatbotViewModel {

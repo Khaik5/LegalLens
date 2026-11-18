@@ -27,11 +27,13 @@ class ChatbotHistoryAdapter(private val onClick: (ChatbotHistoryConversation) ->
         fun bind(item: ChatbotHistoryConversation, onClick: (ChatbotHistoryConversation) -> Unit) = with(binding) {
             chatbotHistoryContractName.text = item.contractName
             chatbotHistoryTimestamp.text = item.timestamp
-            chatbotHistoryMessageCount.text = item.messageCount
+            chatbotHistoryMessageCount.text = item.messageCountQuantity?.let { count ->
+                root.resources.getQuantityString(R.plurals.chatbot_history_message_count, count, count)
+            } ?: item.messageCount
             chatbotHistoryPreview.text = item.preview
             chatbotHistoryContinue.isVisible = item.isDraftRequest
             chatbotHistoryIcon.isVisible = item.isDraftRequest
-            chatbotHistoryMessageCount.isVisible = item.messageCount.isNotBlank()
+            chatbotHistoryMessageCount.isVisible = item.messageCountQuantity != null || item.messageCount.isNotBlank()
             root.setBackgroundResource(if (item.isDraftRequest) R.drawable.bg_chatbot_draft_review else R.drawable.bg_chatbot_source_document)
             root.setOnClickListener { onClick(item) }
             chatbotHistoryContinue.setOnClickListener { onClick(item) }
