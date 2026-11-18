@@ -35,7 +35,9 @@ class OtpVerificationViewModel(
     private val savedState: SavedStateHandle,
     private val nowMillis: () -> Long = SystemClock::elapsedRealtime
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(OtpVerificationUiState())
+    private val _uiState = MutableStateFlow(OtpVerificationUiState(
+        digits = savedState.get<ArrayList<String>>(OTP_DIGITS)?.toList() ?: List(6) { "" }
+    ))
     val uiState = _uiState.asStateFlow()
 
     private val _uiEffect = Channel<OtpVerificationUiEffect>(Channel.BUFFERED)
@@ -45,15 +47,29 @@ class OtpVerificationViewModel(
     fun onEvent(event: OtpVerificationUiEvent) {
         when (event) {
             is OtpVerificationUiEvent.Initialized -> initialize(event)
-            OtpVerificationUiEvent.BackClicked -> _uiEffect.trySend(OtpVerificationUiEffect.CloseScreen)
-            is OtpVerificationUiEvent.DigitChanged -> _uiState.update {
-                val digits = it.digits.toMutableList()
-                digits[event.index] = event.value.take(1)
-                it.copy(digits = digits, errorResId = null)
+            OtpVerificationUiEvent.BackClicked -> {
+                clearDigits()
+                _uiEffect.trySend(OtpVerificationUiEffect.CloseScreen)
             }
+            is OtpVerificationUiEvent.DigitChanged -> updateDigits(event)
             OtpVerificationUiEvent.SubmitClicked -> submitCode()
             OtpVerificationUiEvent.ResendClicked -> resendCode()
         }
+    }
+
+    private fun clearDigits() {
+        savedState.remove<ArrayList<String>>(OTP_DIGITS)
+        _uiState.update { it.copy(digits = List(6) { "" }) }
+    }
+
+    private fun updateDigits(event: OtpVerificationUiEvent.DigitChanged) {
+        if (event.index !in _uiState.value.digits.indices) return
+        val digits = _uiState.value.digits.toMutableList()
+        val entered = event.value.filter { it in '0'..'9' }.take(digits.size - event.index)
+        if (entered.isEmpty()) digits[event.index] = ""
+        else entered.forEachIndexed { offset, digit -> digits[event.index + offset] = digit.toString() }
+        savedState[OTP_DIGITS] = ArrayList(digits)
+        _uiState.update { it.copy(digits = digits, errorResId = null) }
     }
 
     private fun initialize(event: OtpVerificationUiEvent.Initialized) {
@@ -96,6 +112,7 @@ class OtpVerificationViewModel(
                     it.copy(isVerifying = false, errorResId = result.reason.toAuthMessage())
                 }
                 is AuthResult.Success -> {
+                    clearDigits()
                     _uiState.update { it.copy(isVerifying = false, isVerified = true) }
                     val effect = when (val verified = result.value) {
                         OtpVerification.Verified -> OtpVerificationUiEffect.NavigateToSuccess
@@ -126,6 +143,7 @@ class OtpVerificationViewModel(
                 }
                 is AuthResult.Success -> {
                     saveChallenge(result.value)
+                    savedState[OTP_DIGITS] = ArrayList(List(6) { "" })
                     _uiState.update { it.copy(isResending = false, isVerified = false, digits = List(6) { "" }) }
                     startCountdown()
                 }
@@ -165,5 +183,6 @@ class OtpVerificationViewModel(
         const val PURPOSE = "purpose"
         const val EXPIRES_AT = "expiresAt"
         const val RESEND_AT = "resendAt"
+        const val OTP_DIGITS = "otpDigits"
     }
 }

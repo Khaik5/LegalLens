@@ -76,8 +76,7 @@ class ProfilePasswordFragment : Fragment() {
         }
 
         requirementMinimumLength.tvPasswordRequirement.setText(R.string.profile_password_minimum_requirement)
-        requirementMixedCase.tvPasswordRequirement.setText(R.string.profile_password_case_requirement)
-        requirementNumberOrSpecial.tvPasswordRequirement.setText(R.string.profile_password_number_requirement)
+        requirementMaximumLength.tvPasswordRequirement.setText(R.string.profile_password_maximum_requirement)
     }
 
     private fun observeViewModel() {
@@ -97,8 +96,7 @@ class ProfilePasswordFragment : Fragment() {
         renderError(tvNewPasswordError, state.newPasswordErrorRes)
         renderError(tvConfirmationPasswordError, state.confirmationErrorRes)
         renderRequirement(requirementMinimumLength, state.hasMinimumLength)
-        renderRequirement(requirementMixedCase, state.hasMixedCase)
-        renderRequirement(requirementNumberOrSpecial, state.hasNumberOrSpecial)
+        renderRequirement(requirementMaximumLength, state.hasMaximumLength)
         (activity as? MainActivity)?.setPasswordChangePending(state.isSubmitting)
         btnUpdatePassword.isEnabled = !state.isSubmitting
     }

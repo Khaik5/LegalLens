@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.lagallens.R
+import com.example.lagallens.core.utils.isValidEmail
 import com.example.lagallens.core.network.ApiFailureKind
 import com.example.lagallens.core.network.ApiFailureMapper
 import com.example.lagallens.domain.repository.EmailAlreadyUsedException
@@ -52,7 +53,7 @@ class ProfileEmailChangeViewModel(
         if (state.isSubmitting) return
         val email = state.newEmail.trim()
         val emailError = when {
-            !EMAIL_PATTERN.matches(email) -> R.string.profile_email_change_email_invalid
+            !isValidEmail(email) -> R.string.profile_email_change_email_invalid
             email.equals(currentEmail.trim(), ignoreCase = true) -> R.string.profile_email_change_email_same
             else -> null
         }
@@ -146,6 +147,5 @@ class ProfileEmailChangeViewModel(
 
     private companion object {
         const val CODE_LENGTH = 6
-        val EMAIL_PATTERN = Regex("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$")
     }
 }

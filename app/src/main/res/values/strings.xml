@@ -36,6 +36,7 @@
     <string name="register_email_invalid">Vui lòng nhập email hợp lệ</string>
     <string name="register_password_required">Vui lòng nhập mật khẩu</string>
     <string name="register_password_minimum_length">Mật khẩu cần ít nhất 8 ký tự</string>
+    <string name="register_password_maximum_length">Mật khẩu không được dài quá 72 ký tự</string>
     <string name="register_confirm_password_required">Vui lòng xác nhận mật khẩu</string>
     <string name="register_password_mismatch">Mật khẩu xác nhận không khớp</string>
     <string name="full_name_hint">Nguyễn Văn A</string>
@@ -230,15 +231,17 @@
     <string name="profile_password_confirm_hint">Nhập lại mật khẩu mới</string>
     <string name="profile_password_requirements">YÊU CẦU MẬT KHẨU AN TOÀN</string>
     <string name="profile_password_minimum_requirement">Tối thiểu từ 8 ký tự trở lên</string>
+    <string name="profile_password_maximum_requirement">Tối đa 72 ký tự</string>
     <string name="profile_password_case_requirement">Chứa ít nhất 1 chữ hoa và 1 chữ thường</string>
     <string name="profile_password_number_requirement">Chứa tối thiểu 1 chữ số hoặc ký tự đặc biệt</string>
     <string name="profile_password_submit">Cập nhật mật khẩu</string>
     <string name="profile_password_current_required">Vui lòng nhập mật khẩu hiện tại.</string>
+    <string name="profile_password_current_length_invalid">Mật khẩu hiện tại phải có từ 8 đến 72 ký tự.</string>
     <string name="profile_password_confirmation_mismatch">Mật khẩu xác nhận không khớp.</string>
     <string name="profile_password_backend_unavailable">Không thể đổi mật khẩu. Vui lòng thử lại.</string>
     <string name="profile_password_sign_in_again">Đã đổi mật khẩu. Vui lòng đăng nhập lại.</string>
     <string name="profile_password_rate_limited">Bạn đã gửi quá nhiều yêu cầu. Vui lòng thử lại sau.</string>
-    <string name="profile_password_requirements_not_met">Mật khẩu mới chưa đáp ứng yêu cầu bảo mật.</string>
+    <string name="profile_password_requirements_not_met">Mật khẩu phải có từ 8 đến 72 ký tự.</string>
     <string name="profile_password_current_incorrect">Mật khẩu hiện tại không đúng.</string>
     <string name="profile_password_updated">Đã cập nhật mật khẩu.</string>
     <string name="profile_password_same_as_current">Mật khẩu mới phải khác mật khẩu hiện tại.</string>
