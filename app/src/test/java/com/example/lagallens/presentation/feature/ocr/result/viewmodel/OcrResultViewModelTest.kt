@@ -22,6 +22,17 @@ class OcrResultViewModelTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
+    @Test fun blankDocumentNameUsesTheLocalizedTitlePassedByTheFactory() {
+        val contracts = MemoryContractRepository()
+        val vm = OcrResultViewModel(
+            GetOcrResultUseCase(FakeOcrRepository()), MemoryDocumentRepository(), contracts,
+            defaultContractTitle = "New employment contract"
+        )
+        vm.onEvent(OcrResultUiEvent.ScreenOpened("", "PDF", "document-title", initialContent = "test content"))
+        vm.onEvent(OcrResultUiEvent.ReviewConfirmed())
+        assertEquals("New employment contract", contracts.records.values.single().title)
+    }
+
     @Test
     fun documentUpdateReplacesTheDisplayedOcrText() {
         val viewModel = viewModel()

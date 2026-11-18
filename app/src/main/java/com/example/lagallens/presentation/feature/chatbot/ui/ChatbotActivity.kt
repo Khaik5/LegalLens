@@ -103,6 +103,11 @@ class ChatbotActivity : AppCompatActivity() {
         bindViews()
         onBackPressedDispatcher.addCallback(this, chatbotBackCallback)
         observeViewModel()
+        sendScreenOpened()
+    }
+
+    /** Also the retry after a failed open: the ViewModel ignores it while the conversation is open or opening. */
+    private fun sendScreenOpened() {
         viewModel.onEvent(
             ChatbotUiEvent.ScreenOpened(
                 contractName = intent.getStringExtra(EXTRA_CONTRACT_NAME)
@@ -305,6 +310,10 @@ class ChatbotActivity : AppCompatActivity() {
                 )
             )
             is ChatbotUiEffect.ShowMessage -> android.widget.Toast.makeText(this, effect.messageRes, android.widget.Toast.LENGTH_SHORT).show()
+            is ChatbotUiEffect.ShowOpenFailed -> com.google.android.material.snackbar.Snackbar
+                .make(binding.root, effect.messageRes, com.google.android.material.snackbar.Snackbar.LENGTH_INDEFINITE)
+                .setAction(R.string.chatbot_open_retry) { sendScreenOpened() }
+                .show()
         }
     }
 
