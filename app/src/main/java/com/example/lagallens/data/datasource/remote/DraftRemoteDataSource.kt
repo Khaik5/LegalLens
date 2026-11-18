@@ -30,4 +30,5 @@ class DraftRemoteDataSource(private val api: Lazy<DraftApi>) {
     suspend fun job(scope: AuthSessionScope, jobId: String) = api.value.job(scope, jobId).requireData("Draft AI job")
     suspend fun apply(scope: AuthSessionScope, jobId: String) = api.value.apply(scope, jobId).requireData("Draft AI apply")
     suspend fun cancel(scope: AuthSessionScope, jobId: String) = api.value.cancel(scope, jobId).requireData("Draft AI cancel")
+    suspend fun retry(scope: AuthSessionScope, jobId: String) = api.value.retry(scope, jobId).requireData("Draft AI retry")
 }
