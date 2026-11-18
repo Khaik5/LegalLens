@@ -8,6 +8,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.Lifecycle
@@ -47,6 +48,7 @@ class CreditHubActivity : AppCompatActivity() {
 
     private fun bindView() = with(binding) {
         listOf(creditHubBuy, creditHubHistory, creditHubPayments, creditHubUnlock).forEach { it.bindPressFeedback() }
+        creditHubRetry.setOnClickListener { viewModel.onEvent(CreditHubUiEvent.RetryClicked) }
         creditHubBack.setOnClickListener {
             viewModel.onEvent(CreditHubUiEvent.BackClicked)
         }
@@ -82,6 +84,7 @@ class CreditHubActivity : AppCompatActivity() {
     }
 
     private fun render(state: CreditHubUiState) {
+        binding.creditHubRetry.isVisible = state.isBalanceUnavailable && !state.isBackendUnavailable
         binding.creditHubBalance.text = if (state.isBackendUnavailable) getString(R.string.credit_backend_not_configured)
         else if (state.isBalanceUnavailable) getString(R.string.credit_balance_load_failed)
         else getString(R.string.credit_hub_balance, if (viewModel.isOwnerSession()) state.balanceCredits else 0)
