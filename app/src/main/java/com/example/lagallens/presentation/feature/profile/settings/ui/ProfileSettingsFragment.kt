@@ -125,6 +125,10 @@ class ProfileSettingsFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiEffect.collect { effect ->
                     when (effect) {
+                        ProfileSettingsUiEffect.ShowSaveFailed -> {
+                            render(viewModel.uiState.value)
+                            android.widget.Toast.makeText(requireContext(), R.string.profile_settings_save_failed, android.widget.Toast.LENGTH_LONG).show()
+                        }
                         ProfileSettingsUiEffect.NavigateBack -> findNavController().navigateUp()
                         is ProfileSettingsUiEffect.ShowLanguagePicker -> {
                             ProfileLanguageBottomSheet.newInstance(effect.language).show(

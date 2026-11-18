@@ -143,6 +143,8 @@ class OnboardingActivity : AppCompatActivity() {
                 startActivity(Intent(this, HomeActivity::class.java))
                 finish()
             }
+            OnboardingUiEffect.ShowSaveFailed ->
+                android.widget.Toast.makeText(this, R.string.profile_settings_save_failed, android.widget.Toast.LENGTH_LONG).show()
         }
     }
 

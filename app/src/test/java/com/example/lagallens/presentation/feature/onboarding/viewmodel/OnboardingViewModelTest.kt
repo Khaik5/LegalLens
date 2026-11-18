@@ -31,6 +31,25 @@ class OnboardingViewModelTest {
     }
 
     @Test
+    fun aStorageFailureIsReportedAndTheNextTapCanTryAgain() = runTest {
+        var failing = true
+        val repository = object : OnboardingRepository {
+            override suspend fun isCompleted(): Boolean = false
+            override suspend fun markCompleted() { if (failing) throw java.io.IOException("disk") }
+        }
+        val viewModel = OnboardingViewModel(CompleteOnboardingUseCase(repository))
+        val first = async(start = CoroutineStart.UNDISPATCHED) { viewModel.uiEffect.first() }
+
+        viewModel.onEvent(OnboardingUiEvent.SkipClicked)
+        assertEquals(OnboardingUiEffect.ShowSaveFailed, first.await())
+
+        failing = false
+        val second = async(start = CoroutineStart.UNDISPATCHED) { viewModel.uiEffect.first() }
+        viewModel.onEvent(OnboardingUiEvent.SkipClicked)
+        assertEquals(OnboardingUiEffect.NavigateToHome, second.await())
+    }
+
+    @Test
     fun selectedPageControlsTheRenderedPageIndex() {
         val viewModel = OnboardingViewModel(CompleteOnboardingUseCase(FakeOnboardingRepository()))
 
