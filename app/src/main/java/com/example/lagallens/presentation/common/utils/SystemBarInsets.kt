@@ -15,7 +15,7 @@ fun View.applySystemBarInsets() {
  * `adjustResize`, so without the keyboard inset a bottom-anchored button or the end of a form stays hidden.
  * Pass [top] = false when a parent already pads for the status bar.
  */
-fun View.applySystemBarAndKeyboardInsets(top: Boolean = true) {
+fun View.applySystemBarAndKeyboardInsets(top: Boolean = true, bottomReserved: () -> Int = { 0 }) {
     val initialPadding = Insets.of(paddingLeft, paddingTop, paddingRight, paddingBottom)
     ViewCompat.setOnApplyWindowInsetsListener(this) { view, windowInsets ->
         val systemBars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
@@ -24,7 +24,7 @@ fun View.applySystemBarAndKeyboardInsets(top: Boolean = true) {
             left = initialPadding.left + systemBars.left,
             top = initialPadding.top + if (top) systemBars.top else 0,
             right = initialPadding.right + systemBars.right,
-            bottom = initialPadding.bottom + maxOf(systemBars.bottom, keyboard.bottom)
+            bottom = initialPadding.bottom + (maxOf(systemBars.bottom, keyboard.bottom) - bottomReserved()).coerceAtLeast(0)
         )
         windowInsets
     }
