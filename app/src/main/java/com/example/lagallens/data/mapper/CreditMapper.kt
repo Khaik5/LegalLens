@@ -20,7 +20,7 @@ internal fun CreditTransactionResponse.toCreditTransaction() = CreditTransaction
     amountVnd = 0,
     creditDelta = amount.roundToInt(),
     status = "COMPLETED",
-    createdAtEpochMillis = createdAt?.let { Instant.parse(it).toEpochMilli() } ?: 0L,
+    createdAtEpochMillis = runCatching { Instant.parse(createdAt).toEpochMilli() }.getOrNull() ?: 0L,
     kind = when (type) {
         "PURCHASE" -> CreditTransactionKind.PURCHASE
         "USAGE" -> CreditTransactionKind.USAGE

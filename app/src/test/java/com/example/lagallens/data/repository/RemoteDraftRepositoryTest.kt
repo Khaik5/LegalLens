@@ -138,6 +138,58 @@ class RemoteDraftRepositoryTest {
         assertFalse(applied.isSaved)
     }
 
+    @Test fun aLostResponseDoesNotStartASecondJobWhenTheSameRequestIsRepeated() = runTest {
+        api.createFailure = java.io.IOException("lost")
+        val request = DraftGenerationRequest("16", null, listOf("Soạn hợp đồng"))
+
+        assertTrue(runCatching { ai.generateDraft(request) }.isFailure)
+        api.jobStatuses = mutableListOf("COMPLETED")
+        ai.generateDraft(request)
+
+        assertEquals(2, api.idempotencyKeys.size)
+        assertEquals(1, api.idempotencyKeys.distinct().size)
+        // One draft was created for the job, not one per attempt.
+        assertEquals(1, api.jobRequests.size)
+    }
+
+    @Test fun aFailedJobIsRetriedOnTheBackendWhenTheSameRequestIsRepeated() = runTest {
+        val request = DraftGenerationRequest("16", null, listOf("Soạn hợp đồng"))
+        api.jobStatuses = mutableListOf("FAILED")
+        assertTrue(runCatching { ai.generateDraft(request) }.exceptionOrNull() is DraftAiJobFailedException)
+
+        api.createStatuses = mutableListOf("FAILED")
+        api.jobStatuses = mutableListOf("COMPLETED")
+        ai.generateDraft(request)
+
+        assertEquals(listOf("job-1"), api.retried)
+        assertEquals(1, api.idempotencyKeys.distinct().size)
+        assertEquals(listOf("job-1"), api.applied)
+    }
+
+    @Test fun aCancelledJobIsReplacedByANewOneWithANewKey() = runTest {
+        val request = DraftGenerationRequest("16", null, listOf("Soạn hợp đồng"))
+        api.jobStatuses = mutableListOf("WAITING_PROVIDER")
+        runCatching { ai.generateDraft(request) }
+
+        api.createStatuses = mutableListOf("CANCELLED")
+        api.jobStatuses = mutableListOf("COMPLETED")
+        ai.generateDraft(request)
+
+        assertEquals(3, api.idempotencyKeys.size)
+        assertEquals(2, api.idempotencyKeys.distinct().size)
+        assertTrue(api.retried.isEmpty())
+    }
+
+    @Test fun aFinishedRequestForgetsItsKeySoAskingAgainIsANewRequest() = runTest {
+        val request = DraftGenerationRequest("16", null, listOf("Soạn hợp đồng"))
+        api.jobStatuses = mutableListOf("COMPLETED")
+
+        ai.generateDraft(request)
+        ai.generateDraft(request)
+
+        assertEquals(2, api.idempotencyKeys.distinct().size)
+    }
+
     private class InMemoryMarks : DraftVersionMarks {
         private val values = mutableMapOf<String, DraftVersionMark>()
         override fun get(userId: String, draftId: Long, version: Int) = values["$userId:$draftId:$version"]
@@ -200,10 +252,27 @@ class RemoteDraftRepositoryTest {
         override suspend fun version(scope: AuthSessionScope, draftId: Long, version: Int) =
             ApiEnvelope(true, DraftVersionResponse(version, "title $draftId", text(draftId, version), null))
 
+        val idempotencyKeys = mutableListOf<String>()
+        val retried = mutableListOf<String>()
+        /** Status the backend reports for the job when a request arrives; one entry per call, then WAITING_PROVIDER. */
+        var createStatuses = mutableListOf<String>()
+        var createFailure: Exception? = null
+        private val createdByKey = mutableMapOf<String, DraftAiJobCreatedResponse>()
+
         override suspend fun createJob(scope: AuthSessionScope, idempotencyKey: String, request: DraftAiJobRequest): ApiEnvelope<DraftAiJobCreatedResponse> {
+            idempotencyKeys += idempotencyKey
+            createFailure?.let { createFailure = null; throw it }
+            val status = if (createStatuses.isEmpty()) "WAITING_PROVIDER" else createStatuses.removeAt(0)
+            // Like the backend: the same key gives the job that already exists, without creating a draft again.
+            createdByKey[idempotencyKey]?.let { return ApiEnvelope(true, it.copy(status = status)) }
             jobRequests += request
             val draft = request.draftId ?: nextId++.also { versionsOf[it] = mutableListOf(1 to ""); currentVersion[it] = 1 }
-            return ApiEnvelope(true, DraftAiJobCreatedResponse("job-1", draft, "WAITING_PROVIDER"))
+            return ApiEnvelope(true, DraftAiJobCreatedResponse("job-1", draft, status).also { createdByKey[idempotencyKey] = it })
+        }
+
+        override suspend fun retry(scope: AuthSessionScope, jobId: String): ApiEnvelope<DraftAiJobCreatedResponse> {
+            retried += jobId
+            return ApiEnvelope(true, DraftAiJobCreatedResponse(jobId, 0, "WAITING_PROVIDER"))
         }
 
         override suspend fun job(scope: AuthSessionScope, jobId: String): ApiEnvelope<DraftAiJobResponse> {
