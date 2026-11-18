@@ -12,7 +12,11 @@ import com.example.lagallens.presentation.feature.creditstore.flow.contract.Cred
 import com.example.lagallens.presentation.feature.creditstore.flow.contract.CreditFlowUiEvent
 import com.example.lagallens.presentation.feature.creditstore.flow.contract.CreditFlowUiState
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -40,8 +44,19 @@ class CreditFlowViewModel(private val paymentRepository: PaymentRepository) : Vi
             CreditFlowUiEvent.BackClicked -> {
                 val session = activePaymentSession
                 paymentJob?.cancel()
-                activePaymentId?.let { id -> viewModelScope.launch {
-                    if (paymentRepository.activeSessionKey() == session) runCatching { paymentRepository.cancelPayment(id) }
+                // The screen closes right away and clears this ViewModel, which would cancel the request mid-flight
+                // and leave the payment open on the backend. The backend only cancels a still-pending payment (409
+                // otherwise), so a transfer that was already paid is never undone by this call.
+                activePaymentId?.let { id -> viewModelScope.launch(start = CoroutineStart.UNDISPATCHED) {
+                    withContext(NonCancellable) {
+                        if (paymentRepository.activeSessionKey() == session) {
+                            try {
+                                paymentRepository.cancelPayment(id)
+                            } catch (_: Exception) {
+                                // Already paid, already cancelled or offline: nothing more the screen can do.
+                            }
+                        }
+                    }
                 } }
                 emitEffect(CreditFlowUiEffect.NavigateBack)
             }
@@ -109,14 +124,54 @@ class CreditFlowViewModel(private val paymentRepository: PaymentRepository) : Vi
         return transfer
     }
 
-    /** Waits for a final status; an unpaid transfer is cancelled when its time runs out. Null means it expired. */
+    /**
+     * Waits for a final status; an unpaid transfer is cancelled when its time runs out. Null means it expired.
+     * The wait is always bounded: without a known expiry the backend's default payment window applies.
+     */
     private suspend fun awaitPayment(repository: PaymentRepository, paymentId: String, expiresAtEpochMillis: Long?): PaymentRecord? {
-        val wait = suspend { repository.observePayment(paymentId).first { it.status != PaymentStatus.PENDING } }
-        if (expiresAtEpochMillis == null) return wait()
-        val remaining = expiresAtEpochMillis - System.currentTimeMillis() + EXPIRY_GRACE_MILLIS
-        val payment = withTimeoutOrNull(remaining.coerceAtLeast(0L)) { wait() }
-        if (payment == null) runCatching { repository.cancelPayment(paymentId) }
-        return payment
+        val deadline = (expiresAtEpochMillis ?: (System.currentTimeMillis() + DEFAULT_PAYMENT_WINDOW_MILLIS)) + EXPIRY_GRACE_MILLIS
+        val payment = withTimeoutOrNull((deadline - System.currentTimeMillis()).coerceAtLeast(0L)) {
+            pollUntilFinal(repository, paymentId)
+        }
+        return payment ?: settleAfterDeadline(repository, paymentId)
+    }
+
+    /**
+     * A failed status request does not mean the payment failed: the transfer may already be paid and only the
+     * status call broke. So an error never ends the wait; it is retried until the payment window closes.
+     */
+    private suspend fun pollUntilFinal(repository: PaymentRepository, paymentId: String): PaymentRecord {
+        while (true) {
+            try {
+                return repository.observePayment(paymentId).first { it.status != PaymentStatus.PENDING }
+            } catch (cancellation: CancellationException) {
+                throw cancellation
+            } catch (_: Exception) {
+                delay(STATUS_RETRY_MILLIS)
+            }
+        }
+    }
+
+    /**
+     * The window is over. The backend cancels only a pending payment and answers 409 for one that was paid in the
+     * meantime, so a failed cancel means the status must be read once more before reporting the payment as expired.
+     */
+    private suspend fun settleAfterDeadline(repository: PaymentRepository, paymentId: String): PaymentRecord? {
+        try {
+            repository.cancelPayment(paymentId)
+            return null
+        } catch (cancellation: CancellationException) {
+            throw cancellation
+        } catch (_: Exception) {
+            val latest = try {
+                withTimeoutOrNull(FINAL_CHECK_MILLIS) { repository.observePayment(paymentId).first() }
+            } catch (cancellation: CancellationException) {
+                throw cancellation
+            } catch (_: Exception) {
+                null
+            }
+            return latest?.takeIf { it.status == PaymentStatus.SUCCESS }
+        }
     }
 
     private fun emitEffect(effect: CreditFlowUiEffect, session: String? = paymentRepository.activeSessionKey()) {
@@ -128,6 +183,10 @@ class CreditFlowViewModel(private val paymentRepository: PaymentRepository) : Vi
     private companion object {
         /** The backend may confirm a transfer shortly after the code expires. */
         const val EXPIRY_GRACE_MILLIS = 30_000L
+        /** Backend default when the transfer details gave no expiry (PAYMENT_EXPIRES_MINUTES defaults to 15). */
+        const val DEFAULT_PAYMENT_WINDOW_MILLIS = 15 * 60_000L
+        const val STATUS_RETRY_MILLIS = 4_000L
+        const val FINAL_CHECK_MILLIS = 10_000L
     }
 
     class Factory(private val repository: PaymentRepository) : ViewModelProvider.Factory {

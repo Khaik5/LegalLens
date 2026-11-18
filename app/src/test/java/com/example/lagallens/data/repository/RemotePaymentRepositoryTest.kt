@@ -28,8 +28,9 @@ import retrofit2.Response
 
 class RemotePaymentRepositoryTest {
     private val api = PaymentFixture()
+    private val packages = PackagesFixture()
     private val repository = RemotePaymentRepository(
-        RemoteRepositorySession(), CreditRemoteDataSource(lazyOf(PackagesFixture())), PaymentRemoteDataSource(lazyOf(api)),
+        RemoteRepositorySession(), CreditRemoteDataSource(lazyOf(packages)), PaymentRemoteDataSource(lazyOf(api)),
         pollIntervalMillis = 1, now = { 1_000L }
     )
 
@@ -108,7 +109,71 @@ class RemotePaymentRepositoryTest {
         assertEquals(PaymentStatus.CANCELLED, repository.get("pay-1")?.status)
     }
 
+    @Test fun aPaymentLostFromMemoryIsFoundAgainByItsPurchaseId() = runTest {
+        repository.createPayment("pay-1", "7")
+        // The process was killed: a new repository knows nothing, the backend still has the payment.
+        val afterRestart = RemotePaymentRepository(
+            RemoteRepositorySession(), CreditRemoteDataSource(lazyOf(packages)), PaymentRemoteDataSource(lazyOf(api)),
+            pollIntervalMillis = 1, now = { 1_000L }
+        )
+        assertNull(afterRestart.get("pay-1"))
+        api.statuses = mutableListOf("SUCCESS")
+
+        val recovered = afterRestart.createPayment("pay-1", "7")
+        val paid = afterRestart.observePayment("pay-1").toList().last()
+
+        assertEquals(listOf("pay-1", "pay-1"), api.idempotencyKeys)
+        assertEquals(PaymentStatus.PENDING, recovered.status)
+        assertEquals(PaymentStatus.SUCCESS, paid.status)
+        assertEquals(55, paid.credits)
+    }
+
+    @Test fun aGatewayErrorWhilePollingIsRetriedInsteadOfEndingThePayment() = runTest {
+        repository.createPayment("pay-1", "7")
+        api.statusFailures = mutableListOf(502, 429)
+        api.statuses = mutableListOf("SUCCESS")
+
+        val states = repository.observePayment("pay-1").toList().map { it.status }
+
+        assertEquals(listOf(PaymentStatus.SUCCESS), states)
+    }
+
+    @Test fun aPersistentGatewayErrorStillEndsThePoll() = runTest {
+        repository.createPayment("pay-1", "7")
+        api.statusFailures = mutableListOf(502, 502, 502, 502, 502)
+
+        val failure = runCatching { repository.observePayment("pay-1").toList() }.exceptionOrNull()
+
+        assertEquals(HttpException::class, failure!!::class)
+    }
+
+    @Test fun aClientErrorWhilePollingIsNotRetried() = runTest {
+        repository.createPayment("pay-1", "7")
+        api.statusFailures = mutableListOf(404)
+
+        val failure = runCatching { repository.observePayment("pay-1").toList() }.exceptionOrNull() as HttpException
+
+        assertEquals(404, failure.code())
+        assertEquals(1, api.statusCalls)
+    }
+
+    @Test fun aFailedPackageLookupDoesNotFailTheCreatedPaymentAndCreditsComeFromHistory() = runTest {
+        packages.failing = true
+        api.history = listOf(PaymentItemResponse(900, 55, 49_000, "SUCCESS", "2026-11-17T01:00:00Z"))
+        api.statuses = mutableListOf("SUCCESS")
+
+        val created = repository.createPayment("pay-1", "7")
+        val paid = repository.observePayment("pay-1").toList().last()
+
+        assertEquals(PaymentStatus.PENDING, created.status)
+        assertEquals(0, created.credits)
+        assertEquals(55, paid.credits)
+        assertEquals(49_000L, paid.amountVnd)
+    }
+
     private class PaymentFixture : PaymentApi {
+        var statusFailures = mutableListOf<Int>()
+        var statusCalls = 0
         val idempotencyKeys = mutableListOf<String>()
         val requests = mutableListOf<InitiatePackagePaymentRequest>()
         var transferRequestedFor: Long? = null
@@ -134,17 +199,25 @@ class RemotePaymentRepositoryTest {
         override suspend fun list(scope: AuthSessionScope, page: Int, limit: Int) =
             ApiEnvelope(true, PaymentPageResponse(history, history.size.toLong(), page, limit))
 
-        override suspend fun status(scope: AuthSessionScope, paymentId: Long) =
-            ApiEnvelope(true, PaymentStatusResponse(paymentId, statuses[minOf(reads++, statuses.lastIndex)]))
+        override suspend fun status(scope: AuthSessionScope, paymentId: Long): ApiEnvelope<PaymentStatusResponse> {
+            statusCalls++
+            if (statusFailures.isNotEmpty()) {
+                throw HttpException(Response.error<Any>(statusFailures.removeAt(0), "{}".toResponseBody()))
+            }
+            return ApiEnvelope(true, PaymentStatusResponse(paymentId, statuses[minOf(reads++, statuses.lastIndex)]))
+        }
 
         override suspend fun cancel(scope: AuthSessionScope, paymentId: Long) =
             ApiEnvelope(true, PaymentStatusResponse(paymentId, cancelStatus))
     }
 
     private class PackagesFixture : CreditApi {
+        var failing = false
         override suspend fun wallet(scope: AuthSessionScope): ApiEnvelope<CreditWalletResponse> = error("unused")
         override suspend fun transactions(scope: AuthSessionScope, page: Int, limit: Int): ApiEnvelope<CreditTransactionPageResponse> = error("unused")
-        override suspend fun packages(scope: AuthSessionScope) =
-            ApiEnvelope(true, listOf(CreditPackageResponse(7, "BASIC", "Gói cơ bản", null, 50, 5, 49_000, 1)))
+        override suspend fun packages(scope: AuthSessionScope): ApiEnvelope<List<CreditPackageResponse>> {
+            if (failing) throw java.io.IOException("offline")
+            return ApiEnvelope(true, listOf(CreditPackageResponse(7, "BASIC", "Gói cơ bản", null, 50, 5, 49_000, 1)))
+        }
     }
 }
