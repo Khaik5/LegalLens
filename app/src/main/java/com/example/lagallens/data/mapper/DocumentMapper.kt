@@ -17,5 +17,5 @@ internal fun DocumentResponse.toDocument() = EmploymentDocument(
         else -> DocumentFiles.mimeType(fileName) ?: "application/octet-stream"
     },
     content = "",
-    updatedAtMillis = Instant.parse(uploadedAt).toEpochMilli()
+    updatedAtMillis = runCatching { Instant.parse(uploadedAt).toEpochMilli() }.getOrNull() ?: 0L
 )
