@@ -1077,6 +1077,10 @@
     <string name="credit_flow_qr_note">Nhập đúng nội dung chuyển khoản và đúng số tiền để Credit được cộng tự động.</string>
     <string name="credit_flow_qr_copy">Sao chép nội dung</string>
     <string name="credit_flow_qr_copied">Đã sao chép nội dung chuyển khoản</string>
+    <string name="credit_flow_payment_failed">Thanh toán không thành công. Vui lòng thử lại.</string>
+    <string name="credit_flow_payment_unconfirmed">Chưa xác nhận được giao dịch. Vui lòng kiểm tra lịch sử thanh toán trước khi mua lại.</string>
+    <string name="credit_flow_payment_expired">Mã chuyển khoản đã hết hạn.</string>
+    <string name="credit_flow_payment_cancelled">Giao dịch đã bị huỷ.</string>
     <string name="credit_flow_qr_unavailable">Chưa thể hiển thị mã chuyển khoản. Vui lòng thử lại sau.</string>
     <string name="credit_flow_qr_amount_value">%1$s đ</string>
     <string name="chatbot_draft_regenerate_instruction">Soạn lại bản hợp đồng khác từ cùng nội dung hội thoại.</string>
