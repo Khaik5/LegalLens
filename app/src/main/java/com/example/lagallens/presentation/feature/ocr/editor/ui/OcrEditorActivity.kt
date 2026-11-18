@@ -18,19 +18,38 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.example.lagallens.R
 import com.example.lagallens.databinding.ActivityOcrEditorBinding
 import com.example.lagallens.presentation.common.utils.bindPressFeedback
+import com.example.lagallens.data.datasource.local.OcrEditDraftStore
+import com.example.lagallens.presentation.feature.ocr.OcrTextHandoff
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.debounce
 import com.example.lagallens.presentation.feature.ocr.editor.contract.OcrEditorUiEffect
 import com.example.lagallens.presentation.feature.ocr.editor.contract.OcrEditorUiEvent
 import com.example.lagallens.presentation.feature.ocr.editor.contract.OcrEditorUiState
 import com.example.lagallens.presentation.feature.ocr.editor.viewmodel.OcrEditorViewModel
 import kotlinx.coroutines.launch
 
+@OptIn(FlowPreview::class)
 class OcrEditorActivity : com.example.lagallens.presentation.feature.ocr.OcrSessionActivity() {
     private lateinit var binding: ActivityOcrEditorBinding
     private val viewModel by viewModels<OcrEditorViewModel>()
+    private val drafts by lazy { OcrEditDraftStore(applicationContext) }
+    private val documentId get() = intent.getStringExtra(EXTRA_DOCUMENT_ID).orEmpty()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (isFinishing || !isOcrSessionValid()) { finish(); return }
+        // The text is kept in memory (see OcrTextHandoff) and is gone after process death. The edit in progress was
+        // kept in the session cache, so editing resumes from it; with neither there is nothing to open.
+        val handedOver = OcrTextHandoff.peek(intent.getStringExtra(EXTRA_INITIAL_TEXT_TOKEN))
+        val resumed = if (handedOver == null && documentId.isNotBlank()) {
+            drafts.load(OcrEditDraftStore.PURPOSE_EDITOR, ownerSession, documentId)
+        } else null
+        val initial = when {
+            handedOver != null -> OcrEditDraftStore.Draft(handedOver, handedOver)
+            resumed != null -> resumed
+            else -> { finish(); return }
+        }
         WindowCompat.setDecorFitsSystemWindows(window, false)
         window.statusBarColor = Color.TRANSPARENT
         window.navigationBarColor = Color.TRANSPARENT
@@ -40,7 +59,7 @@ class OcrEditorActivity : com.example.lagallens.presentation.feature.ocr.OcrSess
         }
         binding = ActivityOcrEditorBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        viewModel.onEvent(OcrEditorUiEvent.Initialize(intent.getStringExtra(EXTRA_INITIAL_TEXT).orEmpty()))
+        viewModel.onEvent(OcrEditorUiEvent.Initialize(initial.original, initial.edited))
         ViewCompat.setOnApplyWindowInsetsListener(binding.ocrEditorRoot) { view, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             val ime = insets.getInsets(WindowInsetsCompat.Type.ime())
@@ -53,6 +72,9 @@ class OcrEditorActivity : com.example.lagallens.presentation.feature.ocr.OcrSess
             insets
         }
         ViewCompat.requestApplyInsets(binding.ocrEditorRoot)
+        onBackPressedDispatcher.addCallback(this, object : androidx.activity.OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() = viewModel.onEvent(OcrEditorUiEvent.BackClicked)
+        })
         bindEvents()
         observeViewModel()
     }
@@ -84,8 +106,26 @@ class OcrEditorActivity : com.example.lagallens.presentation.feature.ocr.OcrSess
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch { viewModel.uiState.collect(::render) }
                 launch { viewModel.uiEffect.collect(::handleEffect) }
+                launch { viewModel.uiState.debounce(DRAFT_SAVE_DELAY_MILLIS).collect(::persistDraft) }
             }
         }
+    }
+
+    /** Keeps the edit in progress, or removes the draft when the text is back to the original. */
+    private fun persistDraft(state: OcrEditorUiState) {
+        val session = ownerSession
+        val document = documentId
+        if (isFinishing || document.isBlank() || !isOcrSessionValid()) return
+        lifecycleScope.launch(Dispatchers.IO) {
+            if (state.text == state.originalText) drafts.clear(OcrEditDraftStore.PURPOSE_EDITOR, session, document)
+            else drafts.save(OcrEditDraftStore.PURPOSE_EDITOR, session, document, OcrEditDraftStore.Draft(state.originalText, state.text))
+        }
+    }
+
+    // The debounce above stops with the screen; the last characters typed must not wait for it.
+    override fun onStop() {
+        if (::binding.isInitialized) persistDraft(viewModel.uiState.value)
+        super.onStop()
     }
 
     private fun render(state: OcrEditorUiState) = with(binding) {
@@ -107,11 +147,28 @@ class OcrEditorActivity : com.example.lagallens.presentation.feature.ocr.OcrSess
         if (!isOcrSessionValid()) return
         when (effect) {
             OcrEditorUiEffect.NavigateBack -> finish()
+            OcrEditorUiEffect.ConfirmDiscard -> androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle(R.string.ocr_editor_discard_title)
+                .setMessage(R.string.ocr_editor_discard_body)
+                .setPositiveButton(R.string.ocr_editor_discard_action) { _, _ ->
+                    viewModel.onEvent(OcrEditorUiEvent.DiscardConfirmed)
+                }
+                .setNegativeButton(R.string.ocr_editor_discard_keep_editing, null)
+                .show()
             is OcrEditorUiEffect.FinishWithSavedText -> {
-                setResult(RESULT_OK, Intent().putExtra(EXTRA_EDITED_TEXT, effect.text))
+                setResult(RESULT_OK, Intent().putExtra(EXTRA_EDITED_TEXT_TOKEN, OcrTextHandoff.put(effect.text)))
                 finish()
             }
         }
+    }
+
+    override fun onDestroy() {
+        if (isFinishing) {
+            OcrTextHandoff.release(intent.getStringExtra(EXTRA_INITIAL_TEXT_TOKEN))
+            // Saved, discarded or closed: the edit is no longer in progress.
+            if (documentId.isNotBlank()) drafts.clear(OcrEditDraftStore.PURPOSE_EDITOR, ownerSession, documentId)
+        }
+        super.onDestroy()
     }
 
     private fun insertBullet() = with(binding.ocrEditorText) {
@@ -120,12 +177,16 @@ class OcrEditorActivity : com.example.lagallens.presentation.feature.ocr.OcrSess
 
     companion object {
         private const val BULLET_PREFIX = "• "
-        const val EXTRA_EDITED_TEXT = "extra_edited_text"
-        private const val EXTRA_INITIAL_TEXT = "extra_initial_text"
+        const val EXTRA_EDITED_TEXT_TOKEN = "extra_edited_text_token"
+        private const val EXTRA_INITIAL_TEXT_TOKEN = "extra_initial_text_token"
+        private const val EXTRA_DOCUMENT_ID = "extra_document_id"
+        private const val DRAFT_SAVE_DELAY_MILLIS = 400L
 
-        fun createIntent(context: Context, originalText: String): Intent {
+        /** [documentId] names the edit in the session cache; without it the edit is not kept across process death. */
+        fun createIntent(context: Context, originalText: String, documentId: String = ""): Intent {
             return com.example.lagallens.presentation.feature.ocr.OcrSession.stamp(context, Intent(context, OcrEditorActivity::class.java)
-                .putExtra(EXTRA_INITIAL_TEXT, originalText))
+                .putExtra(EXTRA_INITIAL_TEXT_TOKEN, OcrTextHandoff.put(originalText))
+                .putExtra(EXTRA_DOCUMENT_ID, documentId))
         }
     }
 }

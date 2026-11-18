@@ -27,7 +27,8 @@ class SessionCacheCleaner(private val cacheDir: File) {
             "scan-session",
             "draft-pdfs",
             DocumentSessionCache.DIRECTORY,
-            ProfileAvatarFiles.DIRECTORY
+            ProfileAvatarFiles.DIRECTORY,
+            OcrEditDraftStore.DIRECTORY
         )
     }
 }

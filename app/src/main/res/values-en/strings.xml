@@ -789,6 +789,10 @@
     <string name="ocr_review_bold_content_description">Bold selected text</string>
     <string name="ocr_review_italic_content_description">Italicise selected text</string>
     <string name="ocr_review_list_content_description">Add bullet list</string>
+    <string name="ocr_editor_discard_title">Discard your edits?</string>
+    <string name="ocr_editor_discard_body">Unsaved changes to the OCR text will be lost.</string>
+    <string name="ocr_editor_discard_action">Discard edits</string>
+    <string name="ocr_editor_discard_keep_editing">Keep editing</string>
     <string name="ocr_review_saved">Edited OCR text saved.</string>
     <string name="ocr_result_title">OCR results</string>
     <string name="ocr_result_confidence_label">Very high OCR confidence</string>
