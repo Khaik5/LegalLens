@@ -111,6 +111,18 @@
                             android:textColor="@color/legal_lens_primary"
                             android:textSize="@dimen/credit_hub_balance_text_size"
                             android:textStyle="bold" />
+            <Button
+                android:id="@+id/creditHubRetry"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_credit_secondary_action"
+                android:backgroundTint="@null"
+                android:paddingStart="@dimen/dp_16"
+                android:paddingEnd="@dimen/dp_16"
+                android:text="@string/credit_load_retry"
+                android:textAllCaps="false"
+                android:textColor="@color/legal_lens_auth_accent"
+                android:visibility="gone" />
                     </LinearLayout>
                 </LinearLayout>
 

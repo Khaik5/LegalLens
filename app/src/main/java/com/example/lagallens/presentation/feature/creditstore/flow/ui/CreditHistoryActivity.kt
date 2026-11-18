@@ -8,8 +8,8 @@ import com.example.lagallens.R
 import com.example.lagallens.domain.model.credit.CreditTransactionKind
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.CancellationException
 import android.widget.LinearLayout
-import android.widget.ScrollView
 import android.widget.TextView
 import android.view.ViewGroup
 import android.graphics.Color
@@ -56,10 +56,14 @@ class CreditHistoryActivity : CreditFlowActivity() {
                 repository.balance.collect { if (isOwner()) binding.creditHistoryBalance.text = getString(R.string.credit_store_balance_credits, it) else { window.decorView.alpha = 0f; finish() } }
             }
             lifecycleScope.launch {
-                val transactions = runCatching {
+                val transactions = try {
                     repository.refresh()
                     repository.getTransactions()
-                }.getOrNull()
+                } catch (cancelled: CancellationException) {
+                    throw cancelled
+                } catch (_: Exception) {
+                    null
+                }
                 if (!isOwner() || isFinishing || isDestroyed) return@launch
                 if (transactions == null) renderTransactions(emptyList(), failed = true)
                 else renderTransactions(transactions)
@@ -127,13 +131,10 @@ class CreditHistoryActivity : CreditFlowActivity() {
         shownLoading = loading
         shownFailed = failed
         val transactions = allTransactions.filter(selectedFilter::matches)
-        val scrollView = (0 until binding.creditHistoryRoot.childCount)
-            .mapNotNull { binding.creditHistoryRoot.getChildAt(it) as? ScrollView }.firstOrNull() ?: return
-        val content = scrollView.getChildAt(0) as? LinearLayout ?: return
-        val header = content.getChildAt(3) as? LinearLayout
-        (header?.getChildAt(0) as? TextView)?.text = getString(R.string.credit_flow_history_count, transactions.size)
-        (header?.getChildAt(1) as? TextView)?.visibility = android.view.View.GONE
-        while (content.childCount > 4) content.removeViewAt(4)
+        binding.creditHistoryCount.text = getString(R.string.credit_flow_history_count, transactions.size)
+        binding.creditHistoryPeriod.visibility = android.view.View.GONE
+        val content = binding.creditHistoryTransactions
+        content.removeAllViews()
         val rows = transactions.sortedByDescending { it.createdAtEpochMillis }
         if (loading) {
             content.addView(row(getString(R.string.credit_history_loading)))

@@ -23,6 +23,8 @@ import com.example.lagallens.LegalLensApplication
 import com.example.lagallens.databinding.ActivityPaymentPendingBinding
 import com.example.lagallens.presentation.feature.creditstore.flow.contract.CreditFlowUiEffect
 import com.example.lagallens.presentation.feature.creditstore.flow.contract.CreditFlowUiEvent
+import com.example.lagallens.presentation.feature.creditstore.flow.utils.paymentFailureMessage
+import kotlinx.coroutines.CancellationException
 
 class PaymentPendingActivity : CreditFlowActivity() {
     private val binding by lazy { ActivityPaymentPendingBinding.inflate(layoutInflater) }
@@ -65,7 +67,7 @@ class PaymentPendingActivity : CreditFlowActivity() {
         }
     }
 
-    private fun showBankTransfer(transfer: BankTransfer) {
+    private suspend fun showBankTransfer(transfer: BankTransfer) {
         Glide.with(binding.pendingQrImage).load(transfer.qrUrl).into(binding.pendingQrImage)
         binding.pendingQrCode.text = transfer.paymentCode
         binding.pendingQrAmount.text = getString(R.string.credit_flow_qr_amount_value, NumberFormat.getInstance(Locale("vi", "VN")).format(transfer.amountVnd))
@@ -78,7 +80,7 @@ class PaymentPendingActivity : CreditFlowActivity() {
         binding.pendingQrExpiryRow.isVisible = expiresAt != null
         if (expiresAt == null) return
         // The timer is cancelled with the collector, so it does not run in the background.
-        lifecycleScope.launch {
+        kotlinx.coroutines.coroutineScope {
             while (true) {
                 val remainingSeconds = ((expiresAt - System.currentTimeMillis()) / 1000).coerceAtLeast(0)
                 binding.pendingQrCountdown.text = if (remainingSeconds == 0L) getString(R.string.credit_flow_qr_expired)
@@ -97,8 +99,20 @@ class PaymentPendingActivity : CreditFlowActivity() {
                 finish()
             }
             CreditFlowUiEffect.PaymentFailed -> {
-                android.widget.Toast.makeText(this, R.string.auth_backend_not_configured, android.widget.Toast.LENGTH_LONG).show()
-                finish()
+                lifecycleScope.launch {
+                    val payment = try {
+                        (application as LegalLensApplication).paymentRepository.get(selection.purchaseId)
+                    } catch (cancelled: CancellationException) {
+                        throw cancelled
+                    } catch (_: Exception) {
+                        null
+                    }
+                    val message = paymentFailureMessage(
+                        payment?.status, viewModel.uiState.value.bankTransfer?.expiresAtEpochMillis, System.currentTimeMillis()
+                    )
+                    Toast.makeText(this@PaymentPendingActivity, message, Toast.LENGTH_LONG).show()
+                    finish()
+                }
             }
             else -> Unit
         }

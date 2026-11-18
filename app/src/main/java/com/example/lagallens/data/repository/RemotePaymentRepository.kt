@@ -56,7 +56,14 @@ class RemotePaymentRepository(
         val offerId = requireNotNull(packageId.toLongOrNull()) { "Invalid package" }
         val created = payments.initiate(scope, paymentId, offerId)
         backendIds[paymentId] = created.paymentId
-        val offer = getPackages().firstOrNull { it.id == packageId }
+        // The payment exists on the backend now; a failed package lookup must not turn it into a reported failure.
+        val offer = try {
+            getPackages().firstOrNull { it.id == packageId }
+        } catch (cancelled: CancellationException) {
+            throw cancelled
+        } catch (_: Exception) {
+            null
+        }
         PaymentRecord(
             paymentId = paymentId,
             packageId = packageId,
@@ -102,8 +109,14 @@ class RemotePaymentRepository(
                 if (++networkFailures > MAX_NETWORK_FAILURES) throw error
                 delay(pollIntervalMillis)
                 continue
+            } catch (error: HttpException) {
+                // A gateway or rate-limit answer says nothing about the payment; it may already be paid.
+                if (!error.isTransient() || ++networkFailures > MAX_NETWORK_FAILURES) throw error
+                delay(pollIntervalMillis)
+                continue
             }
-            val record = (records[paymentId] ?: error("Unknown payment")).copy(status = status, updatedAtEpochMillis = now())
+            var record = (records[paymentId] ?: error("Unknown payment")).copy(status = status, updatedAtEpochMillis = now())
+            if (status == PaymentStatus.SUCCESS && record.credits == 0) record = withPurchaseDetails(scope, backendId, record)
             records[paymentId] = record
             emit(record)
             if (status != PaymentStatus.PENDING) return@flow
@@ -144,6 +157,19 @@ class RemotePaymentRepository(
         "CANCELLED", "REFUNDED" -> PaymentStatus.CANCELLED
         else -> PaymentStatus.PENDING
     }
+
+    /** Credits and price are unknown when the package lookup failed at creation; the history has them for a paid payment. */
+    private suspend fun withPurchaseDetails(scope: AuthSessionScope, backendId: Long, record: PaymentRecord): PaymentRecord = try {
+        payments.history(scope).firstOrNull { it.id == backendId }
+            ?.let { record.copy(credits = it.creditAmount, amountVnd = it.amountVnd) }
+            ?: record
+    } catch (cancelled: CancellationException) {
+        throw cancelled
+    } catch (_: Exception) {
+        record
+    }
+
+    private fun HttpException.isTransient(): Boolean = code() == 408 || code() == 429 || code() >= 500
 
     private companion object {
         const val POLL_INTERVAL_MILLIS = 4_000L

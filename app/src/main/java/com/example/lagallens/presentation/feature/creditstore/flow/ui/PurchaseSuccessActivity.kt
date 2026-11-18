@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import com.example.lagallens.presentation.common.utils.bindPressFeedback
 import com.example.lagallens.R
@@ -14,6 +15,7 @@ import com.example.lagallens.domain.model.credit.PurchaseBalance
 import com.example.lagallens.domain.model.credit.purchaseBalance
 import com.example.lagallens.presentation.feature.creditstore.flow.contract.CreditFlowUiEffect
 import com.example.lagallens.presentation.feature.creditstore.flow.contract.CreditFlowUiEvent
+import com.example.lagallens.presentation.feature.creditstore.flow.utils.paymentRecoveryMessage
 import com.example.lagallens.presentation.feature.creditstore.hub.ui.CreditHubActivity
 
 class PurchaseSuccessActivity : CreditFlowActivity() {
@@ -27,12 +29,18 @@ class PurchaseSuccessActivity : CreditFlowActivity() {
         setContentView(binding.root)
         lifecycleScope.launch {
             val app = application as LegalLensApplication
-            val payment = runCatching { app.paymentRepository.get(selection.purchaseId) }.getOrNull()
+            val payment = runCatching { app.paymentRepository.get(selection.purchaseId) }
+                .onFailure { if (it is kotlinx.coroutines.CancellationException) throw it }
+                .getOrNull() ?: recoverPayment(app)
             if (payment == null || payment.status != com.example.lagallens.domain.model.payment.PaymentStatus.SUCCESS) {
-                android.widget.Toast.makeText(this@PurchaseSuccessActivity, R.string.auth_backend_not_configured, android.widget.Toast.LENGTH_LONG).show()
+                val message = paymentRecoveryMessage(payment?.status)
+                android.widget.Toast.makeText(this@PurchaseSuccessActivity, message, android.widget.Toast.LENGTH_LONG).show()
                 finish()
                 return@launch
             }
+            // The payment poll does not touch the wallet, so the cached balance is from before the purchase.
+            runCatching { app.creditRepository.refresh() }
+                .onFailure { if (it is kotlinx.coroutines.CancellationException) throw it }
             val balance = app.creditRepository.balance.value
             val transactions = runCatching { app.creditRepository.getTransactions() }
                 .onFailure { if (it is kotlinx.coroutines.CancellationException) throw it }
@@ -60,6 +68,20 @@ class PurchaseSuccessActivity : CreditFlowActivity() {
         applySystemBarInsets(binding.purchaseSuccessRoot)
         bindSystemBack()
         collectEffects(::handleEffect)
+    }
+
+    /**
+     * The payment records live in memory, so after the process was killed on this screen the payment is unknown
+     * here although it was paid. The backend returns the same payment for the same purchase ID, so asking for it
+     * again finds it; its status then says whether it was paid. Null when it cannot be confirmed as paid.
+     */
+    private suspend fun recoverPayment(app: LegalLensApplication): com.example.lagallens.domain.model.payment.PaymentRecord? = try {
+        app.paymentRepository.createPayment(selection.purchaseId, selection.creditPackage.id)
+        app.paymentRepository.observePayment(selection.purchaseId).first()
+    } catch (cancelled: kotlinx.coroutines.CancellationException) {
+        throw cancelled
+    } catch (_: Exception) {
+        null
     }
 
     private fun handleEffect(effect: CreditFlowUiEffect) {
