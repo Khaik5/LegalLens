@@ -7,6 +7,21 @@ require(legalLensDataMode in setOf("DEMO", "REAL")) {
     "legalLensDataMode must be DEMO or REAL"
 }
 val legalLensApiBaseUrl = providers.gradleProperty("legalLensApiBaseUrl").orElse("").get()
+// DEMO is the default for day-to-day work, but a release build in DEMO mode ships fake sign-in (any password
+// registers), a fake wallet and fake OTP codes. Refuse it unless the build is explicitly meant as a demo.
+val legalLensAllowDemoRelease = providers.gradleProperty("legalLensAllowDemoRelease").orElse("false").get().toBoolean()
+val buildsReleaseArtifact = gradle.startParameter.taskNames.any { requested ->
+    Regex("^(assemble|bundle|package)\\w*Release$").matches(requested.substringAfterLast(':'))
+}
+if (buildsReleaseArtifact && legalLensDataMode == "DEMO" && !legalLensAllowDemoRelease) {
+    throw GradleException(
+        "A release build must use the real backend: pass -PlegalLensDataMode=REAL -PlegalLensApiBaseUrl=https://<host>/. " +
+            "For a deliberate demo release pass -PlegalLensAllowDemoRelease=true."
+    )
+}
+if (buildsReleaseArtifact && legalLensDataMode == "REAL" && !legalLensApiBaseUrl.startsWith("https://")) {
+    throw GradleException("A release build in REAL mode needs -PlegalLensApiBaseUrl=https://<host>/ (HTTPS, ending in '/').")
+}
 // Contract drafting is hidden until its backend flow is agreed; -PlegalLensContractDrafting=true shows it.
 val legalLensContractDrafting = providers.gradleProperty("legalLensContractDrafting").orElse("false").get().toBoolean()
 
@@ -45,6 +60,7 @@ android {
             buildConfigField("String", "API_BASE_URL", "\"$debugApiBaseUrl\"")
         }
         release {
+            proguardFiles("proguard-rules.pro")
             optimization {
                 enable = false
             }

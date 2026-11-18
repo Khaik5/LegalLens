@@ -247,8 +247,15 @@ object RepositoryModule {
         return context.createConfigurationContext(configuration)
     }
 
+    private var transferRetrofitInstance: Retrofit? = null
+
+    @Synchronized
+    private fun transferRetrofit(context: Context): Retrofit =
+        transferRetrofitInstance ?: NetworkModule.provideTransferRetrofit(authenticatedRetrofit(context))
+            .also { transferRetrofitInstance = it }
+
     private fun documentRemote(context: Context) =
-        DocumentRemoteDataSource(lazy { authenticatedRetrofit(context).create(DocumentApi::class.java) })
+        DocumentRemoteDataSource(lazy { transferRetrofit(context).create(DocumentApi::class.java) })
 
     fun provideDocumentUploadRepository(context: Context, contracts: ContractRepository): DocumentUploadRepository =
         when (DataModeConfig.current) {
