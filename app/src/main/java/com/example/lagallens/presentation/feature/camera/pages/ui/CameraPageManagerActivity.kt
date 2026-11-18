@@ -108,6 +108,7 @@ class CameraPageManagerActivity : com.example.lagallens.presentation.feature.ocr
 
     private fun handleEffect(effect: CameraPageManagerUiEffect) {
         when (effect) {
+            is CameraPageManagerUiEffect.DeletePageFile -> File(effect.path).delete()
             is CameraPageManagerUiEffect.ReturnToCapture -> {
                 effect.deletedPaths.forEach { File(it).delete() }
                 setResult(

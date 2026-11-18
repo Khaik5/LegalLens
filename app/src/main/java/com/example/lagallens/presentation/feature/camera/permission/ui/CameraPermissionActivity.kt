@@ -6,6 +6,8 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Bundle
+import android.net.Uri
+import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -73,7 +75,14 @@ class CameraPermissionActivity : com.example.lagallens.presentation.feature.ocr.
             viewModel.onEvent(CameraPermissionUiEvent.LaterClicked)
         }
         binding.cameraPermissionAllow.setOnClickListener {
-            viewModel.onEvent(CameraPermissionUiEvent.AllowClicked)
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                viewModel.onEvent(CameraPermissionUiEvent.PermissionResult(true))
+            } else if (getPreferences(Context.MODE_PRIVATE).getBoolean(CAMERA_PERMISSION_REQUESTED, false) &&
+                !shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
+                startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:$packageName")))
+            } else {
+                viewModel.onEvent(CameraPermissionUiEvent.AllowClicked)
+            }
         }
         binding.cameraPermissionLater.setOnClickListener {
             viewModel.onEvent(CameraPermissionUiEvent.LaterClicked)
@@ -97,7 +106,10 @@ class CameraPermissionActivity : com.example.lagallens.presentation.feature.ocr.
     private fun handleEffect(effect: CameraPermissionUiEffect) {
         if (!isOcrSessionValid()) return
         when (effect) {
-            CameraPermissionUiEffect.RequestCameraPermission -> permissionLauncher.launch(Manifest.permission.CAMERA)
+            CameraPermissionUiEffect.RequestCameraPermission -> {
+                getPreferences(Context.MODE_PRIVATE).edit().putBoolean(CAMERA_PERMISSION_REQUESTED, true).apply()
+                permissionLauncher.launch(Manifest.permission.CAMERA)
+            }
             CameraPermissionUiEffect.NavigateBack -> finish()
             CameraPermissionUiEffect.NavigateToCameraCapture -> {
                 startActivity(CameraCaptureActivity.createIntent(this))
@@ -110,6 +122,7 @@ class CameraPermissionActivity : com.example.lagallens.presentation.feature.ocr.
     }
 
     companion object {
+        private const val CAMERA_PERMISSION_REQUESTED = "cameraPermissionRequested"
         fun createIntent(context: Context): Intent = com.example.lagallens.presentation.feature.ocr.OcrSession.stamp(context, Intent(context, CameraPermissionActivity::class.java))
     }
 }
