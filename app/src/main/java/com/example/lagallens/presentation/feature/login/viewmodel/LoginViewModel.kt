@@ -1,6 +1,6 @@
 package com.example.lagallens.presentation.feature.login.viewmodel
 
-import android.util.Patterns
+import com.example.lagallens.core.utils.isValidEmail
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.lagallens.presentation.common.utils.toAuthMessage
@@ -60,7 +60,7 @@ class LoginViewModel(
         val password = state.password
         val usernameErrorResId = when {
             username.isEmpty() -> R.string.login_username_required
-            !Patterns.EMAIL_ADDRESS.matcher(username).matches() -> R.string.register_email_invalid
+            !isValidEmail(username) -> R.string.register_email_invalid
             else -> null
         }
         val passwordErrorResId = when {

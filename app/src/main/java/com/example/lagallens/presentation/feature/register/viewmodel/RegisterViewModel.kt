@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.lagallens.R
+import com.example.lagallens.core.utils.isValidEmail
 import com.example.lagallens.domain.model.auth.AuthFailure
 import com.example.lagallens.domain.model.auth.AuthResult
 import com.example.lagallens.domain.model.auth.OtpPurpose
@@ -51,10 +52,11 @@ class RegisterViewModel(
         val state = _uiState.value
         if (state.isLoading) return
         val fullNameErrorResId = if (state.fullName.trim().isEmpty()) R.string.register_full_name_required else null
-        val emailErrorResId = if (!EMAIL_PATTERN.matches(state.email.trim())) R.string.register_email_invalid else null
+        val emailErrorResId = if (!isValidEmail(state.email.trim())) R.string.register_email_invalid else null
         val passwordErrorResId = when {
             state.password.isEmpty() -> R.string.register_password_required
             state.password.length < MINIMUM_PASSWORD_LENGTH -> R.string.register_password_minimum_length
+            state.password.length > MAXIMUM_PASSWORD_LENGTH -> R.string.register_password_maximum_length
             else -> null
         }
         val confirmPasswordErrorResId = when {
@@ -145,6 +147,6 @@ class RegisterViewModel(
 
     private companion object {
         const val MINIMUM_PASSWORD_LENGTH = 8
-        val EMAIL_PATTERN = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")
+        const val MAXIMUM_PASSWORD_LENGTH = 72
     }
 }
