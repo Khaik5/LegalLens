@@ -261,8 +261,18 @@ object RepositoryModule {
     private fun analysisRemote(context: Context) =
         com.example.lagallens.data.datasource.remote.AnalysisRemoteDataSource(lazy { authenticatedRetrofit(context).create(com.example.lagallens.data.datasource.remote.api.AnalysisApi::class.java) })
 
-    private fun ocrRemote(context: Context) =
-        OcrRemoteDataSource(lazy { authenticatedRetrofit(context).create(OcrApi::class.java) })
+    @Volatile private var sharedOcrRemote: OcrRemoteDataSource? = null
+
+    /**
+     * One instance for every repository: it remembers which OCR revision the user is looking at, and the screens
+     * that show the text (OcrRepository) and the ones that save it (DocumentRepository) must see the same memory.
+     * A separate instance per repository made the saved revision always fall back to the newest one, so the
+     * backend never reported an edit conflict.
+     */
+    private fun ocrRemote(context: Context): OcrRemoteDataSource = sharedOcrRemote ?: synchronized(this) {
+        sharedOcrRemote ?: OcrRemoteDataSource(lazy { authenticatedRetrofit(context).create(OcrApi::class.java) })
+            .also { sharedOcrRemote = it }
+    }
 
     fun provideOcrRepository(context: Context): OcrRepository = when (DataModeConfig.current) {
         AppDataMode.DEMO -> FakeOcrRepository()
