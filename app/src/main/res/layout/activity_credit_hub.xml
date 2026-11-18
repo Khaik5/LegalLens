@@ -218,12 +218,13 @@
                     android:background="@drawable/bg_credit_hub_action_icon">
 
                     <ImageView
-                        android:layout_width="@dimen/dp_22"
+                        android:layout_width="19dp"
                         android:layout_height="@dimen/dp_22"
                         android:layout_gravity="center"
                         android:contentDescription="@null"
-                        android:src="@drawable/ic_contract_search_history"
-                        app:tint="@color/legal_lens_auth_accent" />
+                        android:src="@drawable/ic_history_credit"
+                        android:padding="25dp"
+                         />
                 </FrameLayout>
 
                 <LinearLayout

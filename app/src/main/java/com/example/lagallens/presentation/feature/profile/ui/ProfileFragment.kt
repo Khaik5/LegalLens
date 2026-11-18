@@ -60,25 +60,25 @@ class ProfileFragment : Fragment() {
         listOf(binding.btnAvatarEdit, binding.btnSignOut).forEach { it.bindPressFeedback() }
         bindAction(
             binding.actionEditProfile,
-            R.drawable.ic_profile_edit,
+            R.drawable.ic_profile,
             R.string.profile_edit,
             ProfileUiEvent.EditProfileClicked
         )
         bindAction(
             binding.actionChangePassword,
-            R.drawable.ic_profile_lock,
+            R.drawable.ic_password,
             R.string.profile_change_password,
             ProfileUiEvent.ChangePasswordClicked
         )
         bindAction(
             binding.actionNotificationSettings,
-            R.drawable.ic_profile_notification,
+            R.drawable.ic_setting,
             R.string.profile_settings_title,
             ProfileUiEvent.SettingsClicked
         )
-        bindAction(binding.actionPrivacy, R.drawable.ic_profile_shield, R.string.profile_privacy, ProfileUiEvent.PrivacyClicked)
-        bindAction(binding.actionAppearance, R.drawable.ic_profile_language, R.string.profile_appearance, ProfileUiEvent.SettingsClicked)
-        bindAction(binding.actionAbout, R.drawable.ic_profile_info, R.string.profile_about, ProfileUiEvent.AboutClicked)
+        bindAction(binding.actionPrivacy, R.drawable.ic_security, R.string.profile_privacy, ProfileUiEvent.PrivacyClicked)
+        bindAction(binding.actionAppearance, R.drawable.ic_language, R.string.profile_appearance, ProfileUiEvent.SettingsClicked)
+        bindAction(binding.actionAbout, R.drawable.ic_info, R.string.profile_about, ProfileUiEvent.AboutClicked)
         binding.btnAvatarEdit.setOnClickListener {
             viewModel.onEvent(ProfileUiEvent.EditProfileClicked)
         }
