@@ -6,3 +6,8 @@
     <string name="analysis_reference_summary_heading">Tóm tắt tham khảo</string>
     <string name="analysis_risk_finding_summary">Nội dung phát hiện</string>
 </resources>
+    <string name="profile_settings_save_failed">Không lưu được cài đặt. Vui lòng thử lại.</string>
+    <string name="credit_load_retry">Thử lại</string>
+    <string name="credit_packages_loading">Đang tải các gói Credit…</string>
+    <string name="credit_packages_load_failed">Không tải được các gói Credit. Vui lòng thử lại.</string>
+    <string name="credit_packages_empty">Hiện chưa có gói Credit khả dụng. Vui lòng thử lại sau.</string>

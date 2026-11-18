@@ -1,6 +1,7 @@
 package com.example.lagallens.presentation.feature.creditstore.contract
 
 sealed interface CreditStoreUiEffect {
+    data object ShowPackagesUnavailable : CreditStoreUiEffect
     data object ShowBackendUnavailable : CreditStoreUiEffect
     data object ShowPaymentUnavailable : CreditStoreUiEffect
     data object NavigateBack : CreditStoreUiEffect

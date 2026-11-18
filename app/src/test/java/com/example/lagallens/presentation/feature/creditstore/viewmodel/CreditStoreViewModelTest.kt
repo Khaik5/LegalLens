@@ -20,6 +20,82 @@ import org.junit.Test
 class CreditStoreViewModelTest {
     @get:Rule val mainDispatcherRule = MainDispatcherRule()
 
+    @Test fun packageNetworkFailureDoesNotPretendBackendIsUnconfigured() = runTest {
+        val payments = object : com.example.lagallens.TestPaymentRepository() {
+            override suspend fun getPackages(): List<com.example.lagallens.domain.model.credit.CreditOffer> = throw java.io.IOException("offline")
+        }
+        val model = CreditStoreViewModel(CreditDemoLedger(initialBalance = 5), payments)
+        assertEquals(false, model.uiState.value.isLoading)
+        assertEquals(false, model.uiState.value.isBackendUnavailable)
+    }
+
+    @Test fun topUpWithNoPackagesProducesFeedback() = runTest {
+        val payments = object : com.example.lagallens.TestPaymentRepository() {
+            override suspend fun getPackages() = emptyList<com.example.lagallens.domain.model.credit.CreditOffer>()
+        }
+        val model = CreditStoreViewModel(CreditDemoLedger(initialBalance = 5), payments)
+        model.onEvent(CreditStoreUiEvent.TopUpClicked)
+        val effect = kotlinx.coroutines.withTimeoutOrNull(100) { model.uiEffect.first() }
+        org.junit.Assert.assertNotNull(effect)
+    }
+
+    @Test fun retryRecoversBothStoreAndHubFromTransientFailures() = runTest {
+        var offline = true
+        var walletLoads = 0
+        val credit = object : CreditRepository by CreditDemoLedger(initialBalance = 5) {
+            override suspend fun refresh() { walletLoads++; if (offline) throw java.io.IOException("offline") }
+        }
+        val payments = object : com.example.lagallens.TestPaymentRepository() {
+            override suspend fun getPackages(): List<com.example.lagallens.domain.model.credit.CreditOffer> {
+                if (offline) throw java.io.IOException("offline")
+                return offers
+            }
+        }
+        val store = CreditStoreViewModel(credit, payments)
+        val hub = CreditHubViewModel(credit)
+        assertEquals(true, store.uiState.value.isPackageLoadFailed)
+        assertEquals(true, store.uiState.value.isBalanceUnavailable)
+        assertEquals(true, hub.uiState.value.isBalanceUnavailable)
+        assertEquals(false, hub.uiState.value.isBackendUnavailable)
+        offline = false
+        store.onEvent(CreditStoreUiEvent.RetryClicked)
+        hub.onEvent(CreditHubUiEvent.RetryClicked)
+        assertEquals(4, walletLoads)
+        assertEquals(false, store.uiState.value.isPackageLoadFailed)
+        assertEquals(false, store.uiState.value.isBalanceUnavailable)
+        assertEquals(false, hub.uiState.value.isBalanceUnavailable)
+        assertEquals(4, store.uiState.value.packages.size)
+    }
+
+    @Test fun missingConfigurationIsDistinctAndDoesNotAttemptNetworkLoads() = runTest {
+        val credit = object : CreditRepository by CreditDemoLedger(initialBalance = 0) {
+            override val isConfigured = false
+            override suspend fun refresh(): Unit = error("Unconfigured wallet must not load")
+        }
+        val payments = object : com.example.lagallens.TestPaymentRepository() {
+            override val isConfigured = false
+            override suspend fun getPackages(): List<com.example.lagallens.domain.model.credit.CreditOffer> = error("Unconfigured payments must not load")
+        }
+        val store = CreditStoreViewModel(credit, payments)
+        val hub = CreditHubViewModel(credit)
+        assertEquals(true, store.uiState.value.isBackendUnavailable)
+        assertEquals(true, store.uiState.value.isPaymentUnavailable)
+        assertEquals(false, store.uiState.value.isPackageLoadFailed)
+        assertEquals(false, store.uiState.value.isBalanceUnavailable)
+        assertEquals(true, hub.uiState.value.isBackendUnavailable)
+        assertEquals(false, hub.uiState.value.isBalanceUnavailable)
+    }
+
+    @Test fun firstOfferIsSelectedWhenNoneIsRecommended() = runTest {
+        val payments = object : com.example.lagallens.TestPaymentRepository() {
+            override suspend fun getPackages() = offers.map { it.copy(isRecommended = false) }
+        }
+        val model = CreditStoreViewModel(CreditDemoLedger(initialBalance = 5), payments)
+        assertEquals(1, model.uiState.value.packages.count { it.isSelected })
+        model.onEvent(CreditStoreUiEvent.TopUpClicked)
+        assertEquals("credits_5", (model.uiEffect.first() as CreditStoreUiEffect.NavigateToPurchaseConfirmation).creditPackage.id)
+    }
+
     @Test fun topUpUsesSelectedPackageForEveryOption() = runTest {
         val model = CreditStoreViewModel(CreditDemoLedger(initialBalance = 5), com.example.lagallens.TestPaymentRepository())
         listOf("credits_5", "credits_15", "credits_30", "credits_100").forEach { id ->

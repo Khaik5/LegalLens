@@ -28,6 +28,30 @@ class RemoteCreditRepositoryTest {
     private val credits = RemoteCreditRepository(session, remote)
     private val payments = RemotePaymentRepository(session, remote, com.example.lagallens.data.datasource.remote.PaymentRemoteDataSource(lazy { error("Payments are not used here") }))
 
+    @Test fun cacheDistinguishesAnUnloadedWalletFromAKnownZeroBalance() = runTest {
+        assertFalse(credits.hasCachedBalance)
+        api.balance = 0.0
+        credits.refresh()
+        assertTrue(credits.hasCachedBalance)
+        api.walletFailure = HttpException(Response.error<Unit>(503, "".toResponseBody()))
+        runCatching { credits.refresh() }
+        assertTrue(credits.hasCachedBalance)
+        assertEquals(0, credits.balance.value)
+    }
+
+    @Test fun cachedBalanceBelongsOnlyToTheSessionThatLoadedIt() = runTest {
+        val originalSession = session.key
+        credits.refresh()
+        assertTrue(credits.hasCachedBalance)
+        session.key = "other-session"
+        assertFalse(credits.hasCachedBalance)
+        api.walletFailure = HttpException(Response.error<Unit>(503, "".toResponseBody()))
+        runCatching { credits.refresh() }
+        assertFalse(credits.hasCachedBalance)
+        session.key = originalSession
+        assertFalse(credits.hasCachedBalance)
+    }
+
     @Test fun refreshLoadsTheBalanceRoundedDown() = runTest {
         api.balance = 149.75
 
