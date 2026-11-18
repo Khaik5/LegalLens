@@ -11,6 +11,8 @@ interface CreditRepository {
     fun observeSessionKeys(): Flow<String?> = flowOf(activeSessionKey())
     /** False means the REAL wallet API has not been configured; a zero balance is not authoritative. */
     val isConfigured: Boolean get() = true
+    /** Whether [balance] is authoritative for the active session, including a known zero. */
+    val hasCachedBalance: Boolean get() = isConfigured
     val balance: StateFlow<Int>
     /** Reloads [balance] from the data source; a local ledger is always current, so it does nothing. */
     suspend fun refresh() = Unit
