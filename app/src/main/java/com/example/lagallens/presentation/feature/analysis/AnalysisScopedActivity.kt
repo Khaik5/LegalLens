@@ -16,6 +16,8 @@ import kotlinx.coroutines.launch
 /** Keeps an analysis screen hidden until its result and owner session are revalidated. */
 abstract class AnalysisScopedActivity : AppCompatActivity() {
     private var validated = false
+    /** The content of this instance was validated and shown once; a later network error must not close it. */
+    private var validatedOnce = false
     private var validationJob: Job? = null
     /** Paid content stays closed even if a screen is reached without going through the result screen. */
     protected open val requiresUnlock = true
@@ -75,7 +77,12 @@ abstract class AnalysisScopedActivity : AppCompatActivity() {
                     }
                     return@launch
                 }
-                catch (_: Exception) {
+                catch (failure: Exception) {
+                    if (validatedOnce && failure.isTransientFailure() && repository.sessionKey() == session) {
+                        // Coming back from another app on a weak connection: the screen already holds the validated content.
+                        showWithoutRevalidation()
+                        return@launch
+                    }
                     if (!isFinishing && !isDestroyed) {
                         onAnalysisInvalidated()
                         Toast.makeText(this@AnalysisScopedActivity, R.string.analysis_storage_error, Toast.LENGTH_LONG).show()
@@ -87,7 +94,13 @@ abstract class AnalysisScopedActivity : AppCompatActivity() {
             val detail = if (result == null) null else try {
                 app.getAnalysisDetailUseCase(result, if (resources.configuration.locales[0].language == "en") "en" else "vi")
             } catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
-                catch (_: Exception) { null }
+                catch (failure: Exception) {
+                    if (validatedOnce && failure.isTransientFailure() && repository.sessionKey() == session) {
+                        showWithoutRevalidation()
+                        return@launch
+                    }
+                    null
+                }
             if (result == null || detail == null || repository.sessionKey() != session) {
                 onAnalysisInvalidated()
                 Toast.makeText(this@AnalysisScopedActivity, R.string.analysis_result_unavailable, Toast.LENGTH_LONG).show()
@@ -95,7 +108,8 @@ abstract class AnalysisScopedActivity : AppCompatActivity() {
             } else {
                 validatedUnlockStatus = if (requiresUnlock || observesUnlock) try { app.analysisUnlockRepository.status(session, resultId) }
                     catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
-                    catch (_: Exception) { null } else null
+                    // An unlock is never taken back, so the status read before still holds when this call only failed.
+                    catch (failure: Exception) { if (validatedOnce && failure.isTransientFailure()) validatedUnlockStatus else null } else null
                 if (requiresUnlock && validatedUnlockStatus?.isUnlocked != true) {
                     onAnalysisInvalidated()
                     Toast.makeText(this@AnalysisScopedActivity, R.string.analysis_result_unavailable, Toast.LENGTH_LONG).show()
@@ -107,12 +121,25 @@ abstract class AnalysisScopedActivity : AppCompatActivity() {
                     onAnalysisValidated(result, detail)
                     if (!isFinishing) {
                         validated = true
+                        validatedOnce = true
                         window.decorView.alpha = 1f
                     }
                 }
             }
         }
     }
+
+    private suspend fun showWithoutRevalidation() {
+        lifecycle.withResumed {
+            if (!isFinishing) {
+                validated = true
+                window.decorView.alpha = 1f
+            }
+        }
+    }
+
+    private fun Throwable.isTransientFailure(): Boolean = this is java.io.IOException ||
+        (this is retrofit2.HttpException && (code() == 408 || code() == 429 || code() >= 500))
     protected open fun onAnalysisValidated(identity: com.example.lagallens.domain.model.analysis.AnalysisIdentity, detail: com.example.lagallens.domain.model.analysis.AnalysisDetail) = Unit
     protected open fun onAnalysisInvalidated() = Unit
 

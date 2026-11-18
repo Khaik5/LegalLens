@@ -98,8 +98,11 @@ class RemoteDocumentRepository(
 
     /** False when the document has no finished OCR result to correct. Unchanged text adds no revision. */
     private suspend fun saveRecognizedText(scope: AuthSessionScope, documentId: String, text: String): Boolean {
+        // The revision the user edited from. When the server has a newer one, the correction is rejected with a
+        // conflict rather than overwriting it. Only without a shown revision (new process) is the newest used.
+        val viewed = ocr.viewedRevision(scope, documentId)
         val latest = ocr.latest(scope, documentId)
-        val revision = latest?.revision
+        val revision = viewed ?: latest?.revision
         if (latest?.status != OCR_COMPLETED || revision == null) return false
         if (latest.text == text) return true
         ocr.correct(scope, documentId, revision, text)

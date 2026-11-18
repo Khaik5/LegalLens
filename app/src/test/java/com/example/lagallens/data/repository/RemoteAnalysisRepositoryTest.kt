@@ -80,6 +80,34 @@ class RemoteAnalysisRepositoryTest {
         assertEquals("rev-1", analysisApi.created.single().second.ocrRevisionId)
     }
 
+    @Test fun theRevisionTheUserReviewedIsTheOneConfirmed() = runTest {
+        val sharedOcr = OcrRemoteDataSource(lazyOf(ocrApi))
+        val reviewing = RemoteAnalysisRepository(
+            session, analysisRemote, sharedOcr, { labels }, pollIntervalMillis = 10, maxPolls = 5
+        )
+        ocrApi.latest = ocr("PENDING")
+        sharedOcr.latestForView(com.example.lagallens.core.network.AuthSessionScope(session.key), "41")
+        // Someone saved a newer revision after this user looked at revision 3.
+        ocrApi.latest = ocr("PENDING").copy(revision = 4)
+        analysisApi.jobs = mutableListOf(job("COMPLETED"))
+
+        reviewing.process("op-1", "27", "41", "session").toList()
+
+        assertEquals(listOf(3), ocrApi.confirmed)
+    }
+
+    @Test fun startingANewRecognitionForgetsTheRevisionShownBefore() = runTest {
+        val sharedOcr = OcrRemoteDataSource(lazyOf(ocrApi))
+        ocrApi.latest = ocr("PENDING")
+        val scope = com.example.lagallens.core.network.AuthSessionScope("session")
+
+        sharedOcr.latestForView(scope, "41")
+        assertEquals(3, sharedOcr.viewedRevision(scope, "41"))
+        sharedOcr.create(scope, "41", "key-1")
+
+        assertNull(sharedOcr.viewedRevision(scope, "41"))
+    }
+
     @Test fun theOperationIdIsTheIdempotencyKey() = runTest {
         ocrApi.latest = ocr("APPROVED")
         analysisApi.jobs = mutableListOf(job("COMPLETED"))
@@ -174,6 +202,16 @@ class RemoteAnalysisRepositoryTest {
         analysisApi.jobs = MutableList(10) { job("PROCESSING") }
 
         assertEquals(AnalysisJobState.Failed, repository.process("op-1", "27", "41", "session").toList().last())
+        // The backend allows one active job per contract, so a job left running would block the next analysis.
+        assertEquals(listOf("job-1"), analysisApi.cancelled)
+    }
+
+    @Test fun aJobTheServerReportsAsFailedIsNotCancelledByTheClient() = runTest {
+        ocrApi.latest = ocr("APPROVED")
+        analysisApi.jobs = mutableListOf(job("PROCESSING"), job("FAILED"))
+
+        assertEquals(AnalysisJobState.Failed, repository.process("op-1", "27", "41", "session").toList().last())
+        assertTrue(analysisApi.cancelled.isEmpty())
     }
 
     @Test fun aLockedResultKeepsItsRealSizeSoTheScreensCountTheHiddenItems() = runTest {
