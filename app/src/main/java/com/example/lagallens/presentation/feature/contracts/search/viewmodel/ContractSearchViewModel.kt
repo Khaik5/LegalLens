@@ -43,16 +43,25 @@ class ContractSearchViewModel(application: Application) : AndroidViewModel(appli
 
     private var contracts: List<EmploymentContract> = emptyList()
 
+    /** True after loading failed; the subscription has ended, so the next search starts a new one. */
+    private var loadFailed = false
+
     init {
+        observeContracts()
+    }
+
+    private fun observeContracts() {
+        loadFailed = false
         viewModelScope.launch {
             try {
-                (application as LegalLensApplication).contractRepository.observeContracts().collect { observed ->
+                (getApplication<Application>() as LegalLensApplication).contractRepository.observeContracts().collect { observed ->
                     contracts = observed
                     updateQuery(_uiState.value.query)
                 }
             } catch (cancellationException: CancellationException) {
                 throw cancellationException
             } catch (_: Exception) {
+                loadFailed = true
                 contracts = emptyList()
                 updateQuery(_uiState.value.query)
             }
@@ -60,6 +69,7 @@ class ContractSearchViewModel(application: Application) : AndroidViewModel(appli
     }
 
     fun onEvent(event: ContractSearchUiEvent) {
+        if (loadFailed && (event is ContractSearchUiEvent.QueryChanged || event == ContractSearchUiEvent.ClearClicked)) observeContracts()
         when (event) {
             is ContractSearchUiEvent.QueryChanged -> updateQuery(event.query)
             ContractSearchUiEvent.ClearClicked -> updateQuery("")
