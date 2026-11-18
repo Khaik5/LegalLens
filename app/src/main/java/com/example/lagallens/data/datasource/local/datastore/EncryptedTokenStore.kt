@@ -83,24 +83,48 @@ class EncryptedTokenStore(context: Context) : AuthSessionStore {
         }
 
     private fun readAccessSession(): AccessSession? {
-        val token = readToken(KEY_ACCESS_TOKEN)
-        if (token == null) {
-            if (preferences.contains(KEY_ACCESS_TOKEN)) clearSession()
-            return null
+        val token = when (val read = readTokenResult(KEY_ACCESS_TOKEN)) {
+            is TokenRead.Value -> read.token
+            TokenRead.Absent -> null
+            // The stored token can never be decrypted again (key lost or data damaged): the session is over.
+            TokenRead.Corrupt -> { clearSession(); null }
+            // A busy or restarting Keystore says nothing about the token; keep it for the next read.
+            TokenRead.Unavailable -> null
         }
+        if (token == null) return null
         // Older installs derived session identity from the access token.
         val key = preferences.getString(KEY_SESSION_ID, null) ?: MessageDigest.getInstance("SHA-256")
             .digest(token.toByteArray(Charsets.UTF_8)).joinToString("") { "%02x".format(it.toInt() and 0xff) }
         return AccessSession(key, token)
     }
 
-    private fun readToken(preference: String): String? = runCatching {
-        val packed = preferences.getString(preference, null)?.let { Base64.decode(it, Base64.NO_WRAP) } ?: return null
-        require(packed.size > GCM_IV_LENGTH)
-        val cipher = Cipher.getInstance(TRANSFORMATION)
-        cipher.init(Cipher.DECRYPT_MODE, key(), GCMParameterSpec(GCM_TAG_BITS, packed.copyOfRange(0, GCM_IV_LENGTH)))
-        cipher.doFinal(packed.copyOfRange(GCM_IV_LENGTH, packed.size)).toString(Charsets.UTF_8)
-    }.getOrNull()
+    private fun readToken(preference: String): String? = (readTokenResult(preference) as? TokenRead.Value)?.token
+
+    private fun readTokenResult(preference: String): TokenRead {
+        val encoded = preferences.getString(preference, null) ?: return TokenRead.Absent
+        return try {
+            val packed = Base64.decode(encoded, Base64.NO_WRAP)
+            require(packed.size > GCM_IV_LENGTH)
+            val cipher = Cipher.getInstance(TRANSFORMATION)
+            cipher.init(Cipher.DECRYPT_MODE, key(), GCMParameterSpec(GCM_TAG_BITS, packed.copyOfRange(0, GCM_IV_LENGTH)))
+            TokenRead.Value(cipher.doFinal(packed.copyOfRange(GCM_IV_LENGTH, packed.size)).toString(Charsets.UTF_8))
+        } catch (error: Exception) {
+            if (error.isPermanentDecryptFailure()) TokenRead.Corrupt else TokenRead.Unavailable
+        }
+    }
+
+    private sealed interface TokenRead {
+        data class Value(val token: String) : TokenRead
+        data object Absent : TokenRead
+        data object Corrupt : TokenRead
+        data object Unavailable : TokenRead
+    }
+
+    /** Wrong key, damaged data or an invalidated key never heal; anything else (Keystore busy, provider error) may. */
+    private fun Exception.isPermanentDecryptFailure(): Boolean =
+        this is javax.crypto.AEADBadTagException || this is javax.crypto.BadPaddingException ||
+            this is javax.crypto.IllegalBlockSizeException || this is java.security.InvalidKeyException ||
+            this is java.security.UnrecoverableKeyException || this is IllegalArgumentException
 
     override fun clearIfSessionMatches(sessionKey: String): Boolean = synchronized(sessionLock) {
         readAccessSession()?.key == sessionKey && clearSession()

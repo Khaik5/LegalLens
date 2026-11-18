@@ -11,8 +11,8 @@ internal fun ContractResponse.toContract() = EmploymentContract(
     documentId = "",
     title = title,
     content = "",
-    createdAtMillis = Instant.parse(createdAt).toEpochMilli(),
-    updatedAtMillis = Instant.parse(updatedAt).toEpochMilli(),
+    createdAtMillis = runCatching { Instant.parse(createdAt).toEpochMilli() }.getOrNull() ?: 0L,
+    updatedAtMillis = runCatching { Instant.parse(updatedAt).toEpochMilli() }.getOrNull() ?: 0L,
     status = when (latestAnalysisStatus) {
         "PENDING", "PROCESSING" -> EmploymentContractStatus.PROCESSING
         "COMPLETED" -> EmploymentContractStatus.COMPLETE
