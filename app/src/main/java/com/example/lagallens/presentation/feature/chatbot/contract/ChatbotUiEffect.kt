@@ -13,4 +13,6 @@ sealed interface ChatbotUiEffect {
     data object OpenAttachmentSheet : ChatbotUiEffect
     data object OpenCamera : ChatbotUiEffect
     data class ShowMessage(@StringRes val messageRes: Int) : ChatbotUiEffect
+    /** Opening the conversation or loading its history failed; the screen offers a retry that sends ScreenOpened again. */
+    data class ShowOpenFailed(@StringRes val messageRes: Int) : ChatbotUiEffect
 }
