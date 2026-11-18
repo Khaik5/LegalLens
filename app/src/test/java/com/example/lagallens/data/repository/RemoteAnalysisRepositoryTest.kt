@@ -293,7 +293,7 @@ class RemoteAnalysisRepositoryTest {
 
     @Test fun unlockOutcomesFollowTheBackend() = runTest {
         val unlocks = RemoteAnalysisUnlockRepository(session, analysisRemote)
-        analysisApi.unlockStatus = AnalysisUnlockStatusResponse(false, 2, 1)
+        analysisApi.unlockStatus = AnalysisUnlockStatusResponse(false, 2.0, 1.0)
 
         analysisApi.unlockFailure = httpError(402)
         assertEquals(AnalysisUnlockOutcome.Insufficient(1), unlocks.unlock("session", "job-1"))
@@ -312,6 +312,16 @@ class RemoteAnalysisRepositoryTest {
         assertEquals(false, status.isUnlocked)
     }
 
+    @Test fun decimalCreditsFromTheBackendRoundTheSafeWay() = runTest {
+        val unlocks = RemoteAnalysisUnlockRepository(session, analysisRemote)
+        // The backend keeps two decimal places: a 1.5 Credit price must not read as 1, a 7.5 balance must not read as 8.
+        analysisApi.unlockStatus = AnalysisUnlockStatusResponse(false, 1.5, 7.5)
+
+        assertEquals(2, unlocks.status("session", "job-1").cost)
+        analysisApi.unlockFailure = httpError(402)
+        assertEquals(AnalysisUnlockOutcome.Insufficient(7), unlocks.unlock("session", "job-1"))
+    }
+
     private fun httpError(code: Int, body: String = "{}") = HttpException(Response.error<Any>(code, body.toResponseBody()))
 
     private class AnalysisFixture : AnalysisApi {
@@ -321,7 +331,7 @@ class RemoteAnalysisRepositoryTest {
         var result: AnalysisResultResponse? = null
         var resultFailure: Exception? = null
         var latest: AnalysisLatestResponse? = null
-        var unlockStatus = AnalysisUnlockStatusResponse(false, 2, 10)
+        var unlockStatus = AnalysisUnlockStatusResponse(false, 2.0, 10.0)
         var unlockFailure: Exception? = null
         var createdStatus = "PENDING"
         var retryable = true
@@ -347,7 +357,7 @@ class RemoteAnalysisRepositoryTest {
 
         override suspend fun unlock(scope: AuthSessionScope, jobId: String): ApiEnvelope<AnalysisUnlockResponse> {
             unlockFailure?.let { throw it }
-            return ApiEnvelope(true, AnalysisUnlockResponse(true, 8))
+            return ApiEnvelope(true, AnalysisUnlockResponse(true, 8.0))
         }
 
         override suspend fun cancel(scope: AuthSessionScope, jobId: String): Response<Unit> {

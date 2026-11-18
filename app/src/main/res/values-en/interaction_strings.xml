@@ -6,3 +6,8 @@
     <string name="analysis_reference_summary_heading">Reference summary</string>
     <string name="analysis_risk_finding_summary">Finding summary</string>
 </resources>
+    <string name="profile_settings_save_failed">Could not save settings. Please try again.</string>
+    <string name="credit_load_retry">Try again</string>
+    <string name="credit_packages_loading">Loading Credit packages…</string>
+    <string name="credit_packages_load_failed">Could not load Credit packages. Please try again.</string>
+    <string name="credit_packages_empty">No Credit packages are available. Please try again later.</string>

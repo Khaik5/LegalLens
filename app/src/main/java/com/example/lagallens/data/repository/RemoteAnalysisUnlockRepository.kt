@@ -5,6 +5,7 @@ import com.example.lagallens.core.network.AuthSessionScope
 import com.example.lagallens.data.datasource.local.datastore.AuthSessionStore
 import com.example.lagallens.data.datasource.local.datastore.currentSessionScope
 import com.example.lagallens.data.datasource.remote.AnalysisRemoteDataSource
+import com.example.lagallens.data.mapper.creditBalance
 import com.example.lagallens.domain.repository.AnalysisUnlockOutcome
 import com.example.lagallens.domain.repository.AnalysisUnlockRepository
 import com.example.lagallens.domain.repository.AnalysisUnlockStatus
@@ -19,14 +20,15 @@ class RemoteAnalysisUnlockRepository(
 ) : AnalysisUnlockRepository {
     override suspend fun status(sessionKey: String, resultId: String): AnalysisUnlockStatus {
         val state = remote.unlockStatus(scope(sessionKey), resultId)
-        return AnalysisUnlockStatus(isUnlocked = state.isUnlocked, cost = state.costCredits)
+        // A price of 1.5 Credits must not show as 1: the cost is rounded up, balances down (see creditBalance).
+        return AnalysisUnlockStatus(isUnlocked = state.isUnlocked, cost = kotlin.math.ceil(state.costCredits).toInt())
     }
 
     override suspend fun unlock(sessionKey: String, resultId: String): AnalysisUnlockOutcome {
         val scope = scope(sessionKey)
         return try {
             val result = remote.unlock(scope, resultId)
-            AnalysisUnlockOutcome.Unlocked(result.balanceAfter ?: remote.unlockStatus(scope, resultId).balance)
+            AnalysisUnlockOutcome.Unlocked(creditBalance(result.balanceAfter ?: remote.unlockStatus(scope, resultId).balance))
         } catch (cancelled: CancellationException) {
             throw cancelled
         } catch (error: HttpException) {
@@ -42,7 +44,7 @@ class RemoteAnalysisUnlockRepository(
         }
     }
 
-    private suspend fun balance(scope: AuthSessionScope, resultId: String): Int = remote.unlockStatus(scope, resultId).balance
+    private suspend fun balance(scope: AuthSessionScope, resultId: String): Int = creditBalance(remote.unlockStatus(scope, resultId).balance)
 
     private fun scope(sessionKey: String): AuthSessionScope {
         val current = checkNotNull(tokens.currentSessionScope()) { "No active session" }

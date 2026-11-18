@@ -19,9 +19,10 @@ data class AnalysisLatestResponse(
     val isUnlocked: Boolean?
 )
 
-data class AnalysisUnlockStatusResponse(val isUnlocked: Boolean, val costCredits: Int, val balance: Int)
+/** Credits are decimals with up to two places on the backend. */
+data class AnalysisUnlockStatusResponse(val isUnlocked: Boolean, val costCredits: Double, val balance: Double)
 
-data class AnalysisUnlockResponse(val isUnlocked: Boolean, val balanceAfter: Int?)
+data class AnalysisUnlockResponse(val isUnlocked: Boolean, val balanceAfter: Double?)
 
 /** Preview results hold only the first part of each list; [access] tells how many items stay hidden. */
 data class AnalysisResultResponse(

@@ -3,6 +3,8 @@ package com.example.lagallens.presentation.feature.creditstore.contract
 data class CreditStoreUiState(
     val balanceCredits: Int = 5,
     val isBackendUnavailable: Boolean = false,
+    val isPaymentUnavailable: Boolean = false,
+    val isPackageLoadFailed: Boolean = false,
     val isBalanceUnavailable: Boolean = false,
     val isLoading: Boolean = true,
     val packages: List<CreditPackage> = emptyList()
