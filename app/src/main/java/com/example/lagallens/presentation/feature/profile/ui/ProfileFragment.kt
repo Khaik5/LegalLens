@@ -51,6 +51,11 @@ class ProfileFragment : Fragment() {
         collectUiEffect()
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.reloadIfUnavailable()
+    }
+
     private fun bindView() {
         listOf(binding.btnAvatarEdit, binding.btnSignOut).forEach { it.bindPressFeedback() }
         bindAction(

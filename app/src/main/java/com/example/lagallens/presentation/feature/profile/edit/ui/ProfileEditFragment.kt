@@ -110,6 +110,11 @@ class ProfileEditFragment : Fragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        profileViewModel.reloadIfUnavailable()
+    }
+
     private fun collectProfileState() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
