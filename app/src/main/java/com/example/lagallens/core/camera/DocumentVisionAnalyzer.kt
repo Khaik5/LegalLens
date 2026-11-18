@@ -24,11 +24,15 @@ import kotlin.math.max
 
 object DocumentVisionAnalyzer {
     fun detect(image: ImageProxy): DocumentDetection {
-        val gray = image.toGrayMat()
+        var gray: Mat? = null
         return try {
-            detect(gray)
+            val converted = image.toGrayMat()
+            gray = converted
+            detect(converted)
+        } catch (_: Exception) {
+            DocumentDetection.Unavailable
         } finally {
-            gray.release()
+            gray?.release()
         }
     }
 
@@ -337,6 +341,13 @@ object DocumentVisionAnalyzer {
             buffer.position((crop.top + row) * plane.rowStride + crop.left * plane.pixelStride)
             buffer.get(data, row * cropWidth, cropWidth)
         }
-        return Mat(cropHeight, cropWidth, CvType.CV_8UC1).apply { put(0, 0, data) }
+        val gray = Mat(cropHeight, cropWidth, CvType.CV_8UC1)
+        return try {
+            gray.put(0, 0, data)
+            gray
+        } catch (failure: Throwable) {
+            gray.release()
+            throw failure
+        }
     }
 }

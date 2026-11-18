@@ -14,6 +14,7 @@ import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
+import androidx.camera.core.ImageProxy
 import androidx.camera.core.UseCaseGroup
 import androidx.camera.view.PreviewView
 import androidx.core.view.doOnLayout
@@ -55,6 +56,7 @@ class CameraCaptureActivity : com.example.lagallens.presentation.feature.ocr.Ocr
     private val cameraExecutor: ExecutorService = Executors.newSingleThreadExecutor()
     private var imageCapture: ImageCapture? = null
     private var camera: Camera? = null
+    private var appliedFlashState: Boolean? = null
     private var qualityDialog: AlertDialog? = null
     private var shownQualityPath: String? = null
     private var openCvAvailable = false
@@ -153,8 +155,9 @@ class CameraCaptureActivity : com.example.lagallens.presentation.feature.ocr.Ocr
                 )
                 .build()
             analysis.setAnalyzer(cameraExecutor) { image ->
-                val detection = if (openCvAvailable) DocumentVisionAnalyzer.detect(image) else DocumentDetection.Unavailable
-                image.close()
+                val detection = analyzeAndCloseCameraFrame(image) { frame ->
+                    if (openCvAvailable) DocumentVisionAnalyzer.detect(frame) else DocumentDetection.Unavailable
+                }
                 updateDetection(detection)
             }
             // The preview crops the sensor image to fill the screen. Sharing its ViewPort makes the saved photo and
@@ -171,6 +174,8 @@ class CameraCaptureActivity : com.example.lagallens.presentation.feature.ocr.Ocr
                     provider.unbindAll()
                     provider.bindToLifecycle(this, CameraSelector.DEFAULT_BACK_CAMERA, useCases)
                 }.getOrNull()
+                appliedFlashState = null
+                updateTorch(viewModel.uiState.value.isFlashEnabled)
                 if (camera == null) viewModel.onEvent(CameraCaptureUiEvent.DetectionUpdated(DocumentDetection.Unavailable))
             }
         }, ContextCompat.getMainExecutor(this))
@@ -183,8 +188,15 @@ class CameraCaptureActivity : com.example.lagallens.presentation.feature.ocr.Ocr
         runOnUiThread { viewModel.onEvent(CameraCaptureUiEvent.DetectionUpdated(visibleDetection)) }
     }
 
+    private fun updateTorch(enabled: Boolean) {
+        val activeCamera = camera ?: return
+        if (appliedFlashState == enabled) return
+        activeCamera.cameraControl.enableTorch(enabled)
+        appliedFlashState = enabled
+    }
+
     private fun render(state: CameraCaptureUiState) {
-        camera?.cameraControl?.enableTorch(state.isFlashEnabled)
+        updateTorch(state.isFlashEnabled)
         binding.cameraCaptureFlash.isSelected = state.isFlashEnabled
         binding.cameraCaptureCount.text = state.pages.size.toString()
         showNextQualityCheck(state.pendingQualityChecks.firstOrNull())
@@ -312,3 +324,11 @@ class CameraCaptureActivity : com.example.lagallens.presentation.feature.ocr.Ocr
         fun createIntent(context: Context): Intent = com.example.lagallens.presentation.feature.ocr.OcrSession.stamp(context, Intent(context, CameraCaptureActivity::class.java))
     }
 }
+
+/** The capture analyzer owns the frame, including when conversion or detection fails. */
+internal fun analyzeAndCloseCameraFrame(image: ImageProxy, detect: (ImageProxy) -> DocumentDetection): DocumentDetection =
+    try {
+        detect(image)
+    } finally {
+        image.close()
+    }

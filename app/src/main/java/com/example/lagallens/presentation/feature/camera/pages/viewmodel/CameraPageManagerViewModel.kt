@@ -44,7 +44,9 @@ class CameraPageManagerViewModel : ViewModel() {
                 emitReturn(paths)
             }
             is CameraPageManagerUiEvent.DeletePageClicked -> {
+                if (_uiState.value.pages.none { it.path == event.path }) return
                 _uiState.update { state -> state.copy(pages = state.pages.filterNot { it.path == event.path }) }
+                emitEffect(CameraPageManagerUiEffect.DeletePageFile(event.path))
             }
             CameraPageManagerUiEvent.CompleteClicked -> {
                 emitEffect(CameraPageManagerUiEffect.NavigateToOcrProcessing(_uiState.value.pages))
