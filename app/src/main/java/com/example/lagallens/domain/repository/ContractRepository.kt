@@ -10,6 +10,9 @@ interface ContractRepository {
     fun activeSessionKey(): String? = null
     fun observeSessionKeys(): Flow<String?> = flowOf(activeSessionKey())
     fun observeContracts(): Flow<List<EmploymentContract>>
+
+    /** Marks the cached list as outdated, e.g. after an analysis finished; the next observer reloads it. */
+    fun invalidate() = Unit
     suspend fun getContract(contractId: String): EmploymentContract?
     suspend fun createContract(contract: EmploymentContract): EmploymentContract
     suspend fun updateContract(contract: EmploymentContract): Boolean

@@ -86,6 +86,12 @@ class ContractDetailFragment : Fragment() {
         viewModel.loadContract(arguments?.getString(ARG_CONTRACT_ID))
     }
 
+    override fun onResume() {
+        super.onResume()
+        // After the first load, coming back (e.g. from an analysis) shows the current status.
+        viewModel.loadContract(arguments?.getString(ARG_CONTRACT_ID), refresh = true)
+    }
+
     private fun collectUiState() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
