@@ -1,6 +1,7 @@
 <resources>
     <string name="chatbot_history_search_hint">Tìm kiếm hội thoại</string>
     <string name="chatbot_history_empty">Không tìm thấy hội thoại phù hợp.</string>
+    <string name="profile_settings_save_failed">Không lưu được cài đặt. Vui lòng thử lại.</string>
     <string name="chatbot_attachment_selected">Tệp đã chọn (chưa gửi): %1$s  ×</string>
     <string name="chatbot_attachment_remove">Bỏ tệp đính kèm %1$s</string>
     <string name="analysis_reference_summary_heading">Tóm tắt tham khảo</string>

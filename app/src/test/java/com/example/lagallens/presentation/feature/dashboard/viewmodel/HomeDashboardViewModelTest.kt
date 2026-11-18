@@ -80,6 +80,28 @@ class HomeDashboardViewModelTest {
         assertEquals(1, vm.uiState.value.totalContracts)
     }
 
+    @Test fun failedProfileRefreshKeepsNameAndPhotoAndLaterSuccessReplacesThem() = runTest {
+        var fail = false
+        var profile = Profiles.getProfile().copy(photoUri = "content://profile/old-photo")
+        val profiles = object : ProfileRepository by Profiles {
+            override suspend fun getProfile(): UserProfile {
+                if (fail) throw java.io.IOException("offline")
+                return profile
+            }
+        }
+        val vm = HomeDashboardViewModel(Contracts { MutableStateFlow(emptyList()) }, profiles)
+        vm.onEvent(HomeDashboardUiEvent.ScreenResumed)
+        fail = true
+        vm.onEvent(HomeDashboardUiEvent.ScreenResumed)
+        assertEquals(profile.name, vm.uiState.value.userName)
+        assertEquals(profile.photoUri, vm.uiState.value.photoUri)
+        fail = false
+        profile = profile.copy(name = "Updated", photoUri = null)
+        vm.onEvent(HomeDashboardUiEvent.ScreenResumed)
+        assertEquals("Updated", vm.uiState.value.userName)
+        assertNull(vm.uiState.value.photoUri)
+    }
+
     @Test fun userNameAndPhotoRefreshFromTheProfileWhenHomeResumes() = runTest {
         var profile = Profiles.getProfile()
         val profiles = object : ProfileRepository by Profiles {

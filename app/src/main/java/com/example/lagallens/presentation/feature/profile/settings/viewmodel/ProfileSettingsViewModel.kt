@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.io.IOException
 
 class ProfileSettingsViewModel(
     observeProfileSettingsUseCase: ObserveProfileSettingsUseCase,
@@ -25,6 +26,7 @@ class ProfileSettingsViewModel(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ProfileSettingsUiState())
     val uiState = _uiState.asStateFlow()
+    private var persistedState = _uiState.value
 
     private val _uiEffect = Channel<ProfileSettingsUiEffect>(Channel.BUFFERED)
     val uiEffect = _uiEffect.receiveAsFlow()
@@ -41,6 +43,7 @@ class ProfileSettingsViewModel(
                         isInAppEnabled = settings.isInAppEnabled
                     )
                 }
+                persistedState = _uiState.value
             }
         }
     }
@@ -54,7 +57,7 @@ class ProfileSettingsViewModel(
             ProfileSettingsUiEvent.LanguageClicked -> emitEffect(
                 ProfileSettingsUiEffect.ShowLanguagePicker(_uiState.value.language)
             )
-            is ProfileSettingsUiEvent.LanguageSelected -> viewModelScope.launch {
+            is ProfileSettingsUiEvent.LanguageSelected -> saveSetting {
                 updateProfileLanguageUseCase(
                     com.example.lagallens.domain.model.ProfileLanguage.valueOf(event.language.name)
                 )
@@ -68,8 +71,19 @@ class ProfileSettingsViewModel(
         val updated = change(previous)
         if (updated == previous) return
         _uiState.value = updated
-        viewModelScope.launch {
+        saveSetting {
             updateNotificationPreferencesUseCase(updated.isPushEnabled, updated.isEmailEnabled, updated.isInAppEnabled)
+        }
+    }
+
+    private fun saveSetting(write: suspend () -> Unit) {
+        viewModelScope.launch {
+            try {
+                write()
+            } catch (_: IOException) {
+                _uiState.value = persistedState
+                _uiEffect.send(ProfileSettingsUiEffect.ShowSaveFailed)
+            }
         }
     }
 
@@ -81,7 +95,7 @@ class ProfileSettingsViewModel(
 
     private fun updateAppearance(appearance: ProfileAppearance) {
         _uiState.update { it.copy(appearance = appearance) }
-        viewModelScope.launch {
+        saveSetting {
             updateProfileAppearanceUseCase(
                 com.example.lagallens.domain.model.ProfileAppearance.valueOf(appearance.name)
             )

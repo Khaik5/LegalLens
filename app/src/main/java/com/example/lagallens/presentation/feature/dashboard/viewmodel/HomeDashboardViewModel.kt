@@ -93,9 +93,9 @@ class HomeDashboardViewModel(
             } catch (cancellation: CancellationException) {
                 throw cancellation
             } catch (_: Exception) {
-                null
+                return@launch
             }
-            _uiState.update { it.copy(userName = profile?.name.orEmpty(), photoUri = profile?.photoUri) }
+            _uiState.update { it.copy(userName = profile.name, photoUri = profile.photoUri) }
         }
     }
 
