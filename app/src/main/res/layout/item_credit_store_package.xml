@@ -20,7 +20,7 @@
         <ImageView
             android:id="@+id/creditStorePackageCheck"
             android:layout_width="@dimen/dp_14"
-            android:layout_height="@dimen/dp_14"
+            android:layout_height="9dp"
             android:layout_gravity="center"
             android:contentDescription="@null"
             android:src="@drawable/ic_credit_store_check" />
