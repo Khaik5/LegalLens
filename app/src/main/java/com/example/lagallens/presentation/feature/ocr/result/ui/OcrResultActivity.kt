@@ -23,6 +23,7 @@ import com.example.lagallens.presentation.feature.ocr.result.contract.OcrResultU
 import com.example.lagallens.presentation.feature.ocr.result.contract.OcrResultUiEvent
 import com.example.lagallens.presentation.feature.ocr.result.contract.OcrResultUiState
 import com.example.lagallens.presentation.feature.ocr.result.viewmodel.OcrResultViewModel
+import com.example.lagallens.presentation.feature.ocr.OcrTextHandoff
 import com.example.lagallens.presentation.feature.ocr.editor.ui.OcrEditorActivity
 import com.example.lagallens.presentation.feature.ocr.saved.ui.OcrSavedActivity
 import com.example.lagallens.presentation.feature.ocr.ui.OcrReviewActivity
@@ -46,7 +47,7 @@ class OcrResultActivity : com.example.lagallens.presentation.feature.ocr.OcrSess
         if (isOcrSessionValid() && result.resultCode == RESULT_OK) {
             if (result.data?.getBooleanExtra(OcrReviewActivity.EXTRA_REVIEW_CONFIRMED, false) == true) {
                 viewModel.onEvent(OcrResultUiEvent.ReviewConfirmed(
-                    result.data?.getStringExtra(OcrReviewActivity.EXTRA_DOCUMENT_TEXT),
+                    OcrTextHandoff.take(result.data?.getStringExtra(OcrReviewActivity.EXTRA_DOCUMENT_TEXT_TOKEN)),
                     result.data?.getStringExtra(OcrReviewActivity.EXTRA_DOCUMENT_ID),
                     result.data?.getStringExtra(OcrReviewActivity.EXTRA_CONTRACT_ID)
                 ))
@@ -57,7 +58,7 @@ class OcrResultActivity : com.example.lagallens.presentation.feature.ocr.OcrSess
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (isOcrSessionValid() && result.resultCode == RESULT_OK) {
-            result.data?.getStringExtra(OcrEditorActivity.EXTRA_EDITED_TEXT)?.let {
+            OcrTextHandoff.take(result.data?.getStringExtra(OcrEditorActivity.EXTRA_EDITED_TEXT_TOKEN))?.let {
                 viewModel.onEvent(OcrResultUiEvent.DocumentUpdated(it))
             }
         }
@@ -84,7 +85,8 @@ class OcrResultActivity : com.example.lagallens.presentation.feature.ocr.OcrSess
                 documentDetails = intent.getStringExtra(EXTRA_DOCUMENT_DETAILS).orEmpty(),
                 documentId = intent.getStringExtra(EXTRA_DOCUMENT_ID).orEmpty(),
                 contractId = intent.getStringExtra(EXTRA_CONTRACT_ID),
-                initialContent = intent.getStringExtra(EXTRA_INITIAL_CONTENT).orEmpty(),
+                // Blank after process death makes the ViewModel reload the text from the backend.
+                initialContent = OcrTextHandoff.peek(intent.getStringExtra(EXTRA_INITIAL_CONTENT_TOKEN)).orEmpty(),
                 documentUri = intent.getStringExtra(EXTRA_DOCUMENT_URI),
                 mimeType = intent.getStringExtra(EXTRA_MIME_TYPE).orEmpty()
             )
@@ -129,12 +131,17 @@ class OcrResultActivity : com.example.lagallens.presentation.feature.ocr.OcrSess
         }
     }
 
+    override fun onDestroy() {
+        if (isFinishing) OcrTextHandoff.release(intent.getStringExtra(EXTRA_INITIAL_CONTENT_TOKEN))
+        super.onDestroy()
+    }
+
     private fun handleEffect(effect: OcrResultUiEffect) {
         if (!isOcrSessionValid()) return
         when (effect) {
             OcrResultUiEffect.NavigateBack -> finish()
             is OcrResultUiEffect.NavigateToEdit -> {
-                ocrEditorLauncher.launch(OcrEditorActivity.createIntent(this, effect.documentText))
+                ocrEditorLauncher.launch(OcrEditorActivity.createIntent(this, effect.documentText, viewModel.uiState.value.documentId))
             }
             OcrResultUiEffect.NavigateToReview -> {
                 val state = viewModel.uiState.value
@@ -177,7 +184,7 @@ class OcrResultActivity : com.example.lagallens.presentation.feature.ocr.OcrSess
         private const val EXTRA_DOCUMENT_URI = "ocr_result_document_uri"
         private const val EXTRA_DOCUMENT_ID = "ocr_result_document_id"
         private const val EXTRA_CONTRACT_ID = "ocr_result_contract_id"
-        private const val EXTRA_INITIAL_CONTENT = "ocr_result_initial_content"
+        private const val EXTRA_INITIAL_CONTENT_TOKEN = "ocr_result_initial_content_token"
         private const val EXTRA_MIME_TYPE = "ocr_result_mime_type"
 
         fun createIntent(
@@ -195,7 +202,7 @@ class OcrResultActivity : com.example.lagallens.presentation.feature.ocr.OcrSess
             .putExtra(EXTRA_DOCUMENT_URI, documentUri)
             .putExtra(EXTRA_DOCUMENT_ID, documentId)
             .putExtra(EXTRA_CONTRACT_ID, contractId)
-            .putExtra(EXTRA_INITIAL_CONTENT, initialContent)
+            .putExtra(EXTRA_INITIAL_CONTENT_TOKEN, OcrTextHandoff.put(initialContent))
             .putExtra(EXTRA_MIME_TYPE, mimeType))
     }
 }
