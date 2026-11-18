@@ -7,6 +7,7 @@ import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.Lifecycle
@@ -48,6 +49,7 @@ class CreditStoreActivity : AppCompatActivity() {
 
     private fun bindView() = with(binding) {
         listOf(creditStoreBack, creditStoreTopUpAction, creditStoreViewAllHistory).forEach { it.bindPressFeedback() }
+        creditStoreRetry.setOnClickListener { viewModel.onEvent(CreditStoreUiEvent.RetryClicked) }
         creditStoreBack.setOnClickListener {
             viewModel.onEvent(CreditStoreUiEvent.BackClicked)
         }
@@ -77,12 +79,27 @@ class CreditStoreActivity : AppCompatActivity() {
         creditStoreBalance.text = if (state.isBackendUnavailable) getString(R.string.credit_backend_not_configured)
         else if (state.isBalanceUnavailable) getString(R.string.credit_balance_load_failed)
         else getString(R.string.credit_store_balance_credits, if (viewModel.isOwnerSession()) state.balanceCredits else 0)
+        creditStoreTopUpAction.isEnabled = !state.isLoading
+        val packageMessage = when {
+            state.isPaymentUnavailable -> R.string.credit_payment_not_connected
+            state.isLoading -> R.string.credit_packages_loading
+            state.isPackageLoadFailed -> R.string.credit_packages_load_failed
+            state.packages.isEmpty() -> R.string.credit_packages_empty
+            else -> null
+        }
+        creditStoreLoadError.isVisible = packageMessage != null
+        packageMessage?.let(creditStoreLoadError::setText)
+        creditStoreRetry.isVisible = (state.isBalanceUnavailable && !state.isBackendUnavailable) ||
+            (!state.isPaymentUnavailable && !state.isLoading && (state.isPackageLoadFailed || state.packages.isEmpty()))
         creditPackageAdapter.submitList(if (viewModel.isOwnerSession()) state.packages else CreditStoreUiState(balanceCredits = 0).packages)
     }
 
     private fun handleEffect(effect: CreditStoreUiEffect) {
         if (!viewModel.isOwnerSession()) return
         when (effect) {
+            CreditStoreUiEffect.ShowPackagesUnavailable -> Toast.makeText(this,
+                if (viewModel.uiState.value.isPackageLoadFailed) R.string.credit_packages_load_failed else R.string.credit_packages_empty,
+                Toast.LENGTH_LONG).show()
             CreditStoreUiEffect.ShowBackendUnavailable -> Toast.makeText(this, R.string.credit_backend_not_configured, Toast.LENGTH_SHORT).show()
             CreditStoreUiEffect.ShowPaymentUnavailable -> Toast.makeText(this, R.string.credit_payment_not_connected, Toast.LENGTH_SHORT).show()
             CreditStoreUiEffect.NavigateBack -> finish()

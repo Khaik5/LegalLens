@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Job
 
 class CreditStoreViewModel(
     private val creditRepository: CreditRepository,
@@ -25,32 +26,70 @@ class CreditStoreViewModel(
     fun isOwnerSession() = ownerSession == creditRepository.activeSessionKey()
     private val _uiState = MutableStateFlow(CreditStoreUiState(
         balanceCredits = creditRepository.balance.value,
-        isBackendUnavailable = !creditRepository.isConfigured
+        isBackendUnavailable = !creditRepository.isConfigured,
+        isPaymentUnavailable = !paymentRepository.isConfigured
     ))
     val uiState = _uiState.asStateFlow()
 
     private val _uiEffect = Channel<CreditStoreUiEffect>(Channel.BUFFERED)
     val uiEffect = _uiEffect.receiveAsFlow()
 
+    private var balanceJob: Job? = null
+    private var packagesJob: Job? = null
+
     init {
         viewModelScope.launch {
+            creditRepository.balance.collect { balance ->
+                _uiState.update { it.copy(balanceCredits = if (isOwnerSession()) balance else 0) }
+            }
+        }
+        viewModelScope.launch {
+            creditRepository.observeSessionKeys().collect {
+                if (it != ownerSession) _uiState.value = CreditStoreUiState(
+                    balanceCredits = 0,
+                    isBackendUnavailable = !creditRepository.isConfigured,
+                    isPaymentUnavailable = !paymentRepository.isConfigured
+                )
+            }
+        }
+        refreshBalance()
+        loadPackages()
+    }
+
+    private fun refreshBalance() {
+        balanceJob?.cancel()
+        if (!creditRepository.isConfigured || !isOwnerSession()) return
+        balanceJob = viewModelScope.launch {
             try {
                 creditRepository.refresh()
+                if (isOwnerSession()) _uiState.update { it.copy(isBalanceUnavailable = false) }
             } catch (cancellation: CancellationException) {
                 throw cancellation
             } catch (_: Exception) {
                 if (isOwnerSession()) _uiState.update { it.copy(isBalanceUnavailable = true) }
             }
         }
-        viewModelScope.launch {
+    }
+
+    private fun loadPackages() {
+        packagesJob?.cancel()
+        if (!isOwnerSession()) return
+        if (!paymentRepository.isConfigured) {
+            _uiState.update { it.copy(isLoading = false, isPaymentUnavailable = true) }
+            return
+        }
+        _uiState.update { it.copy(isLoading = true, isPackageLoadFailed = false) }
+        packagesJob = viewModelScope.launch {
             try {
                 val offers = paymentRepository.getPackages()
                 if (isOwnerSession()) _uiState.update { state ->
-                    state.copy(isLoading = false, packages = offers.map { offer ->
+                    val selectedId = state.packages.firstOrNull { it.isSelected }?.id
+                        ?.takeIf { id -> offers.any { it.id == id } }
+                        ?: offers.firstOrNull { it.isRecommended }?.id ?: offers.firstOrNull()?.id
+                    state.copy(isLoading = false, isPackageLoadFailed = false, packages = offers.map { offer ->
                         CreditPackage(
                             offer.id, offer.credits, offer.priceVnd, offer.title, offer.description,
-                            // The recommended package starts selected, so Top up works without an extra tap.
-                            isSelected = offer.isRecommended,
+                            isSelected = offer.id == selectedId,
                             isRecommended = offer.isRecommended
                         )
                     })
@@ -58,23 +97,25 @@ class CreditStoreViewModel(
             } catch (cancellation: CancellationException) {
                 throw cancellation
             } catch (_: Exception) {
-                _uiState.update { it.copy(isLoading = false, isBackendUnavailable = true) }
+                if (isOwnerSession()) _uiState.update { it.copy(isLoading = false, isPackageLoadFailed = true) }
             }
         }
     }
-    init { viewModelScope.launch { creditRepository.balance.collect { balance -> _uiState.update { it.copy(balanceCredits = if (isOwnerSession()) balance else 0) } } } }
-    init { viewModelScope.launch { creditRepository.observeSessionKeys().collect { if (it != ownerSession) _uiState.value = CreditStoreUiState(balanceCredits = 0, isBackendUnavailable = !creditRepository.isConfigured) } } }
 
     fun onEvent(event: CreditStoreUiEvent) {
         if (!isOwnerSession()) return
         when (event) {
+            CreditStoreUiEvent.RetryClicked -> { refreshBalance(); loadPackages() }
             CreditStoreUiEvent.BackClicked -> emitEffect(CreditStoreUiEffect.NavigateBack)
             CreditStoreUiEvent.TopUpClicked -> if (!creditRepository.isConfigured) {
                 emitEffect(CreditStoreUiEffect.ShowBackendUnavailable)
             } else if (!paymentRepository.isConfigured) {
                 emitEffect(CreditStoreUiEffect.ShowPaymentUnavailable)
             } else _uiState.value.let { state ->
-                state.packages.firstOrNull { it.isSelected }?.let { selected ->
+                val selected = state.packages.firstOrNull { it.isSelected }
+                if (selected == null || state.isLoading || state.isPackageLoadFailed) {
+                    emitEffect(CreditStoreUiEffect.ShowPackagesUnavailable)
+                } else {
                     emitEffect(CreditStoreUiEffect.NavigateToPurchaseConfirmation(selected, state.balanceCredits))
                 }
             }

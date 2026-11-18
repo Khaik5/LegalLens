@@ -24,20 +24,28 @@ class RemoteCreditRepository(
 ) : CreditRepository {
     private val mutableBalance = MutableStateFlow(0)
     private val balanceLock = Mutex()
-    private var balanceSession: String? = null
+    @Volatile private var balanceSession: String? = null
 
     override val balance = mutableBalance.asStateFlow()
+    override val hasCachedBalance: Boolean
+        get() {
+            val session = activeSessionKey()
+            return session != null && balanceSession == session
+        }
 
     override fun activeSessionKey(): String? = tokens.currentSessionScope()?.key
 
     override suspend fun refresh() = inSession { scope ->
         balanceLock.withLock {
             // Never show the previous account's balance while the new one loads.
-            if (balanceSession != scope.key) mutableBalance.value = 0
+            if (balanceSession != scope.key) {
+                balanceSession = null
+                mutableBalance.value = 0
+            }
             val wallet = remote.wallet(scope)
             check(tokens.currentSessionScope()?.key == scope.key) { "Session changed" }
-            balanceSession = scope.key
             mutableBalance.value = creditBalance(wallet.balance)
+            balanceSession = scope.key
         }
     }
 
