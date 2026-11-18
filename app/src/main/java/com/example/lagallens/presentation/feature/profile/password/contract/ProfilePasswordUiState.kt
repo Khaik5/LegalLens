@@ -14,16 +14,14 @@ data class ProfilePasswordUiState(
     val hasMinimumLength: Boolean
         get() = newPassword.length >= MINIMUM_PASSWORD_LENGTH
 
-    val hasMixedCase: Boolean
-        get() = newPassword.any { it.isUpperCase() } && newPassword.any { it.isLowerCase() }
-
-    val hasNumberOrSpecial: Boolean
-        get() = newPassword.any { it.isDigit() } || newPassword.any { !it.isLetterOrDigit() }
+    val hasMaximumLength: Boolean
+        get() = newPassword.length <= MAXIMUM_PASSWORD_LENGTH
 
     val meetsSecurityRequirements: Boolean
-        get() = hasMinimumLength && hasMixedCase && hasNumberOrSpecial
+        get() = hasMinimumLength && hasMaximumLength
 
     private companion object {
         const val MINIMUM_PASSWORD_LENGTH = 8
+        const val MAXIMUM_PASSWORD_LENGTH = 72
     }
 }
