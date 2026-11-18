@@ -64,7 +64,7 @@ class RemoteOcrRepository(
 
     override suspend fun getResult(documentId: String): OcrResult = withContext(Dispatchers.IO) {
         val scope = AuthSessionScope(checkNotNull(tokens.currentSessionScope()) { "No active session" }.key)
-        val result = remote.latest(scope, documentId)
+        val result = remote.latestForView(scope, documentId)
         if (result?.status != COMPLETED) throw OcrResultNotReadyException()
         check(tokens.currentSessionScope()?.key == scope.key) { "Session changed" }
         // Edited text keeps the confidence of the recognition it started from.
