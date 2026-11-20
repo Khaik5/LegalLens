@@ -5,7 +5,7 @@
     <string name="chatbot_draft_back">Back</string>
     <string name="chatbot_draft_more">More options</string>
     <string name="chatbot_draft_document_name">Demo employment contract · %1$s</string>
-    <string name="chatbot_draft_version_metadata">DEMO · AI illustration · Draft not saved</string>
+    <string name="chatbot_draft_version_metadata">AI-drafted · Not saved</string>
     <string name="chatbot_draft_regenerated_version_metadata">DEMO · Regenerated AI illustration · Not saved</string>
     <string name="chatbot_draft_missing_warning">Information in [square brackets] is still missing. Complete it and review the draft before signing.</string>
     <string name="chatbot_draft_page_count">Content · %1$d / %2$d</string>
@@ -242,7 +242,7 @@ This is a proposal in a new D2 copy; D1 and the original contract remain unchang
     <string name="draft_save_selected_version">Selected version: %1$s</string>
     <string name="draft_save_name_label">Contract name</string>
     <string name="draft_save_default_name">Employment contract — draft</string>
-    <string name="draft_save_copy_notice">Create a new copy in My Contracts. The original document and D1 will not be overwritten.</string>
+    <string name="draft_save_copy_notice">Save as a new copy in your drafts. The original document and D1 will not be overwritten.</string>
     <string name="draft_save_legal_warning">Party, job, salary, and working-hours details in [brackets] still need to be filled in. The saved copy remains a draft and is not ready to sign.</string>
     <string name="draft_save_acknowledge">I understand this saved copy needs completion and legal review.</string>
     <string name="draft_save_action">Save new copy</string>
@@ -255,14 +255,14 @@ This is a proposal in a new D2 copy; D1 and the original contract remain unchang
     <string name="draft_save_retry">Retry</string>
     <string name="draft_save_back_unsaved">Return to unsaved draft</string>
     <string name="draft_save_success_title">Copy saved</string>
-    <string name="draft_save_success_body">The draft was saved to My Contracts using the name you entered. It remains a draft that needs completion.</string>
-    <string name="draft_save_view_saved">View saved contract</string>
+    <string name="draft_save_success_body">The draft was saved using the name you entered. It remains a draft that needs completion.</string>
+    <string name="draft_save_view_saved">View saved draft</string>
     <string name="draft_save_export_pdf">Export PDF</string>
     <string name="draft_saved_detail_title">Contract details</string>
     <string name="draft_saved_badge">Copy saved</string>
     <string name="draft_saved_metadata">AI-assisted draft · Unsigned</string>
     <string name="draft_saved_location_label">Saved in</string>
-    <string name="draft_saved_location">My Contracts</string>
+    <string name="draft_saved_location">Your drafts</string>
     <string name="draft_saved_detail_note">Saved as a new copy. It is unsigned and has no confirmed legal effect.</string>
     <string name="draft_saved_export_button">Export draft PDF</string>
     <string name="draft_pdf_title">Export document</string>

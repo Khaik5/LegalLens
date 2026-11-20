@@ -479,9 +479,9 @@
     <string name="chatbot_generation_retry">Try again</string>
     <string name="chatbot_generation_error_note">Retry the same 24-month request; no draft has been created or saved.</string>
     <string name="chatbot_generation_success">The sample D1 draft is ready. The original contract is unchanged.</string>
-    <string name="chatbot_generation_result_name">Demo employment contract · D1</string>
-    <string name="chatbot_generation_result_metadata">Sample · 24-month term</string>
-    <string name="chatbot_generation_result_badge">Sample draft · Not saved</string>
+    <string name="chatbot_generation_result_name">Employment contract · D1</string>
+    <string name="chatbot_generation_result_metadata">AI-drafted</string>
+    <string name="chatbot_generation_result_badge">Draft · Not saved</string>
     <string name="chatbot_generation_result_warning">Information is still missing. Review the content before saving or exporting.</string>
     <string name="chatbot_generation_view_draft">View draft</string>
     <string name="chatbot_generation_preview_title">D1 draft · Sample</string>
