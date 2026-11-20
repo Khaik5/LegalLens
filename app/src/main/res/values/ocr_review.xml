@@ -80,6 +80,7 @@
 
     <string name="ocr_review_title">Cần xem lại kết quả OCR</string>
     <string name="ocr_review_alert_confidence">Cần xem lại — Độ tin cậy OCR: %1$s</string>
+    <string name="ocr_review_alert_confidence_high">Độ tin cậy OCR: %1$s — bạn vẫn có thể xem lại nội dung</string>
     <string name="ocr_review_alert_generic">Cần xem lại kết quả OCR trước khi tiếp tục</string>
     <string name="ocr_review_section_title">CÁC ĐOẠN VĂN BẢN ĐƯỢC CẢNH BÁO</string>
     <string name="ocr_review_warning_one_section" translatable="false">Mục: Bên thuê (Bên B)</string>

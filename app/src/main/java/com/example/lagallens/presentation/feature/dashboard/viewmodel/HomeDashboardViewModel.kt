@@ -10,6 +10,9 @@ import com.example.lagallens.domain.repository.ContractRepository
 import com.example.lagallens.domain.repository.ProfileRepository
 import com.example.lagallens.presentation.feature.contracts.contract.toContractListItem
 import com.example.lagallens.presentation.feature.dashboard.contract.DashboardRecentContract
+import com.example.lagallens.presentation.feature.dashboard.contract.DashboardUpcomingDate
+import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 import com.example.lagallens.presentation.feature.dashboard.contract.HomeDashboardUiEffect
 import com.example.lagallens.presentation.feature.dashboard.contract.HomeDashboardUiEvent
 import com.example.lagallens.presentation.feature.dashboard.contract.HomeDashboardUiState
@@ -24,7 +27,8 @@ import kotlinx.coroutines.launch
 
 class HomeDashboardViewModel(
     private val contracts: ContractRepository,
-    private val profiles: ProfileRepository
+    private val profiles: ProfileRepository,
+    private val today: () -> LocalDate = LocalDate::now
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(HomeDashboardUiState())
     val uiState = _uiState.asStateFlow()
@@ -70,6 +74,16 @@ class HomeDashboardViewModel(
         }
     }
 
+    private fun upcomingDates(items: List<EmploymentContract>): List<DashboardUpcomingDate> {
+        val now = today()
+        return items.mapNotNull { contract ->
+            val end = contract.endDate ?: return@mapNotNull null
+            val daysLeft = ChronoUnit.DAYS.between(now, end).toInt()
+            if (daysLeft !in 0..UPCOMING_WINDOW_DAYS) null
+            else DashboardUpcomingDate(contract.id, contract.title, end, daysLeft)
+        }.sortedBy { it.daysLeft }.take(UPCOMING_DATE_COUNT)
+    }
+
     private fun showContracts(items: List<EmploymentContract>) {
         _uiState.update { state ->
             state.copy(
@@ -78,6 +92,7 @@ class HomeDashboardViewModel(
                 totalContracts = items.size,
                 analyzedContracts = items.count { it.risk != EmploymentContractRisk.NOT_ANALYZED },
                 reviewContracts = items.count { it.risk == EmploymentContractRisk.HIGH || it.risk == EmploymentContractRisk.CRITICAL },
+                upcomingDates = upcomingDates(items),
                 recentContracts = items.sortedByDescending { it.updatedAtMillis }.take(RECENT_CONTRACT_COUNT).map { contract ->
                     DashboardRecentContract(contract.toContractListItem(""), contract.updatedAtMillis)
                 }
@@ -113,5 +128,7 @@ class HomeDashboardViewModel(
 
     private companion object {
         const val RECENT_CONTRACT_COUNT = 2
+        const val UPCOMING_DATE_COUNT = 3
+        const val UPCOMING_WINDOW_DAYS = 90
     }
 }

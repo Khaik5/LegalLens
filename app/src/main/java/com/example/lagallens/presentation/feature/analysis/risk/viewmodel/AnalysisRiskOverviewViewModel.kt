@@ -22,16 +22,25 @@ class AnalysisRiskOverviewViewModel : ViewModel() {
 
     fun clearResult() { _uiState.value = AnalysisRiskOverviewUiState() }
 
-    fun setResult(identity: com.example.lagallens.domain.model.analysis.AnalysisIdentity, detail: com.example.lagallens.domain.model.analysis.AnalysisDetail) {
+    fun setResult(
+        identity: com.example.lagallens.domain.model.analysis.AnalysisIdentity,
+        detail: com.example.lagallens.domain.model.analysis.AnalysisDetail,
+        isUnlocked: Boolean = false
+    ) {
         // Locked findings are empty placeholders (see AnalysisResultMapper). They are not real findings, so they are
-        // neither counted nor used to work out the highest level; the server level covers every finding.
-        val findings = detail.findings.filterNot { it.id.startsWith("locked-finding-") }.map { AnalysisRiskSeverity.valueOf(it.severity.name) }
+        // neither counted nor used to work out the highest level; the server level covers every finding. The severity
+        // counts cover the same share as the findings list shows, and the total says how many findings exist.
+        val visibleCount = com.example.lagallens.domain.model.analysis.AnalysisPreview.visibleCount(detail.findings.size, isUnlocked)
+        val findings = detail.findings.take(visibleCount).filterNot { it.id.startsWith("locked-finding-") }
+            .map { AnalysisRiskSeverity.valueOf(it.severity.name) }
         val serverSeverity = identity.overview?.severity?.let { AnalysisRiskSeverity.valueOf(it.name) }
         _uiState.update { it.copy(score = identity.overview?.score?.takeIf { score -> score in 0..100 },
             highestSeverity = serverSeverity ?: AnalysisRiskSeverity.entries.firstOrNull { level -> level in findings },
             highRiskCount = findings.count { it == AnalysisRiskSeverity.HIGH },
             mediumRiskCount = findings.count { it == AnalysisRiskSeverity.MEDIUM },
-            lowRiskCount = findings.count { it == AnalysisRiskSeverity.LOW }) }
+            lowRiskCount = findings.count { it == AnalysisRiskSeverity.LOW },
+            totalRiskCount = detail.findings.size,
+            lockedRiskCount = detail.findings.size - visibleCount) }
     }
 
     fun onEvent(event: AnalysisRiskOverviewUiEvent) {

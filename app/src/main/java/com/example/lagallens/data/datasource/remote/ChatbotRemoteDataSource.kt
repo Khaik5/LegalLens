@@ -16,6 +16,10 @@ class ChatbotRemoteDataSource(private val api: Lazy<ChatbotApi>) {
     suspend fun conversations(scope: AuthSessionScope): List<ConversationResponse> =
         readAll { page -> api.value.list(scope, page).requireData("Conversations") }.distinctBy { it.id }
 
+    /** Only the first page, which holds the most recently updated conversations. */
+    suspend fun recentConversations(scope: AuthSessionScope): List<ConversationResponse> =
+        api.value.list(scope, 1).requireData("Conversations")
+
     /** Reads every page, oldest message first. */
     suspend fun messages(scope: AuthSessionScope, conversationId: Long): List<ChatMessageResponse> =
         readAll { page -> api.value.messages(scope, conversationId, page).requireData("Chat messages") }.distinctBy { it.id }

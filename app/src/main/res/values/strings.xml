@@ -2,10 +2,11 @@
 <resources>
     <string name="credit_backend_not_configured">Ví Credit chưa thể tải hoặc thay đổi vì Backend chưa được cấu hình.</string>
     <string name="credit_balance_load_failed">Không tải được số dư Credit. Vui lòng thử lại.</string>
+    <string name="credit_balance_loading">Đang tải số dư…</string>
     <string name="credit_payment_not_connected">Nạp Credit chưa được kết nối. Vui lòng thử lại sau.</string>
     <string name="credit_history_backend_not_configured">Lịch sử Credit chưa thể tải vì Backend chưa được cấu hình.</string>
     <string name="credit_history_loading">Đang tải lịch sử Credit…</string>
-    <string name="credit_history_error">Không thể tải lịch sử Credit. Vui lòng thử lại.</string>
+    <string name="credit_history_error">Không thể tải lịch sử Credit. Chạm để thử lại.</string>
     <string name="profile_backend_not_configured">Không thể tải hoặc lưu hồ sơ. Vui lòng thử lại.</string>
     <string name="profile_demo_default_name">Người dùng DEMO</string>
     <string name="app_name">LegalLens</string>
@@ -140,7 +141,7 @@
     <string name="notification_two_days_ago" translatable="false">2 ngày trước</string>
     <string name="notification_all_marked_read">Đã đánh dấu tất cả là đã đọc.</string>
     <string name="menu_profile">Hồ sơ</string>
-+    <string name="profile_avatar_description">Ảnh đại diện của Nguyễn Văn A</string>
+    <string name="profile_avatar_description">Ảnh đại diện</string>
     <string name="profile_camera_description">Cập nhật ảnh đại diện</string>
     <string name="profile_initials" translatable="false">NA</string>
     <string name="profile_active">Đang hoạt động</string>
@@ -221,7 +222,7 @@
     <string name="profile_settings_language_french">Français</string>
     <string name="profile_settings_language_chinese">中文</string>
     <string name="profile_settings_language_korean">한국어</string>
-    <string name="profile_settings_version">LegalLens App v2.4.0 (Bảo mật cao)</string>
+    <string name="profile_settings_version">LegalLens App v%1$s</string>
     <string name="profile_password_title">Đổi mật khẩu</string>
     <string name="profile_password_back_description">Quay lại hồ sơ</string>
     <string name="profile_password_current_label">Mật khẩu hiện tại</string>
@@ -364,6 +365,8 @@
     <string name="ocr_processing_review_step_number" translatable="false">4</string>
     <string name="ocr_processing_notice">VUI LÒNG KHÔNG ĐÓNG ỨNG DỤNG</string>
     <string name="ocr_result_confidence_high">Độ tin cậy OCR cao</string>
+    <string name="ocr_result_confidence_unavailable">Chưa có độ tin cậy nhận dạng</string>
+    <string name="ocr_result_extraction_text_layer">Văn bản lấy trực tiếp từ tệp</string>
     <string name="ocr_result_confidence_medium">Độ tin cậy OCR trung bình, nên xem lại</string>
     <string name="ocr_result_confidence_low">Độ tin cậy OCR thấp, cần xem lại kỹ</string>
     <string name="ocr_failure_title">Lỗi xử lý OCR</string>
@@ -425,7 +428,12 @@
     <string name="contract_detail_page_count_value" translatable="false">12 trang</string>
     <string name="contract_detail_file_format">Định dạng</string>
     <string name="contract_detail_file_format_value" translatable="false">PDF (Scan)</string>
-    <string name="contract_detail_rename">Đổi tên tệp</string>
+    <string name="contract_detail_rename">Đổi tên hợp đồng</string>
+    <string name="contract_detail_load_failed">Không tải được hợp đồng. Vui lòng thử lại.</string>
+    <string name="analysis_finding_legal_basis_unverified">Chưa có căn cứ pháp lý xác minh</string>
+    <string name="upload_duplicate_notice">Tệp này đã được tải lên trước đây trong hợp đồng “%1$s”. Bạn có thể xóa bản trùng nếu không cần.</string>
+    <string name="contract_detail_delete_paid_title">Xóa cả kết quả đã mở khóa?</string>
+    <string name="contract_detail_delete_paid_message">Hợp đồng này có kết quả phân tích bạn đã mở khóa bằng Credit. Xóa hợp đồng sẽ xóa luôn các kết quả đó và Credit đã dùng không được hoàn lại.</string>
     <string name="contract_detail_delete">Xóa hợp đồng</string>
     <string name="contract_detail_cancel">Hủy</string>
     <string name="contract_detail_feature_unavailable">Chức năng này sẽ được kết nối khi luồng tương ứng hoàn tất.</string>
@@ -474,6 +482,7 @@
     <string name="analysis_start_risk_description">Cảnh báo điều khoản bất lợi, chồng chéo hoặc thiếu minh bạch</string>
     <string name="analysis_start_legal_title">Đối chiếu cơ sở pháp lý</string>
     <string name="analysis_start_legal_description">Minh họa phân tích hợp đồng lao động; chưa xác minh căn cứ pháp lý.</string>
+    <string name="analysis_start_legal_description_real">Đối chiếu nội dung hợp đồng với quy định pháp luật lao động; kết quả chỉ mang tính tham khảo.</string>
     <string name="analysis_start_disclaimer_title">Khuyến cáo pháp lý</string>
     <string name="analysis_start_disclaimer_body">Kết quả do LegalLens tạo ra chỉ nhằm mục đích tham khảo, không thay thế tư vấn của luật sư hoặc kết luận của cơ quan có thẩm quyền.</string>
     <string name="analysis_start_action">Bắt đầu phân tích</string>
@@ -512,7 +521,6 @@
     <string name="analysis_result_rights_title">Quyền và nghĩa vụ</string>
     <string name="analysis_result_rights_description">Phân định trách nhiệm chi tiết</string>
     <string name="analysis_result_risk_title">Rủi ro</string>
-    <string name="analysis_result_risk_badge" translatable="false">3</string>
     <string name="analysis_result_risk_description">Các điểm cần xem lại &amp; chỉnh sửa</string>
     <string name="analysis_result_legal_basis_title">Cơ sở pháp lý</string>
     <string name="analysis_result_legal_basis_description">Các quy định pháp luật liên quan</string>
@@ -520,7 +528,12 @@
     <string name="analysis_risk_overview_back_content_description">Quay lại</string>
     <string name="analysis_risk_overview_more_content_description">Thêm tùy chọn</string>
     <string name="analysis_risk_overview_description">Hợp đồng này chứa một số điều khoản bất lợi về phạt vi phạm và bồi thường thiệt hại. Cần đàm phán lại.</string>
-    <string name="analysis_risk_overview_summary_title">Tổng hợp phát hiện (3 rủi ro)</string>
+    <plurals name="analysis_risk_overview_summary_title">
+        <item quantity="other">Tổng hợp phát hiện (%1$d rủi ro)</item>
+    </plurals>
+    <plurals name="analysis_risk_overview_locked_note">
+        <item quantity="other">Các số trên chỉ tính %1$d trong %2$d phát hiện được xem trước miễn phí. Mở khóa kết quả để xem đủ.</item>
+    </plurals>
     <string name="analysis_risk_overview_high_risk">Rủi ro cao</string>
     <string name="analysis_risk_overview_low_risk">Rủi ro thấp</string>
     <string name="analysis_risk_overview_disclaimer"><b>DEMO:</b> Nội dung là dữ liệu minh họa, chưa do AI phân tích và không phải tư vấn pháp lý.</string>
@@ -528,10 +541,10 @@
     <string name="analysis_risk_findings_title">Các phát hiện rủi ro</string>
     <string name="analysis_risk_findings_back_content_description">Quay lại</string>
     <string name="analysis_risk_findings_more_content_description">Thêm tùy chọn</string>
-    <string name="analysis_risk_findings_filter_all">Tất cả (3)</string>
-    <string name="analysis_risk_findings_filter_high">Cao (1)</string>
-    <string name="analysis_risk_findings_filter_medium">Trung bình (1)</string>
-    <string name="analysis_risk_findings_filter_low">Thấp (1)</string>
+    <string name="analysis_risk_findings_filter_all">Tất cả (%1$d)</string>
+    <string name="analysis_risk_findings_filter_high">Cao (%1$d)</string>
+    <string name="analysis_risk_findings_filter_medium">Trung bình (%1$d)</string>
+    <string name="analysis_risk_findings_filter_low">Thấp (%1$d)</string>
     <string name="analysis_risk_findings_high">Cao</string>
     <string name="analysis_risk_findings_medium">Trung bình</string>
     <string name="analysis_risk_findings_low">Thấp</string>
@@ -753,12 +766,13 @@
     <string name="chatbot_drawer_history">Lịch sử trò chuyện</string>
     <string name="chatbot_drawer_help">Trợ giúp</string>
     <string name="chatbot_drawer_profile" translatable="false">LL   Local workspace</string>
+    <string name="chatbot_drawer_profile_real">Đã đồng bộ với tài khoản LegalLens</string>
     <string name="chatbot_help_unavailable">Trợ giúp sẽ khả dụng khi trung tâm hỗ trợ được kết nối.</string>
     <string name="chatbot_history_title">Lịch sử trò chuyện</string>
     <string name="chatbot_history_back_content_description">Quay lại trò chuyện</string>
     <string name="chatbot_history_search_content_description">Tìm kiếm lịch sử trò chuyện</string>
     <string name="chatbot_history_search_unavailable">Tìm kiếm sẽ khả dụng khi đồng bộ hội thoại được kết nối.</string>
-    <string name="chatbot_document_uploaded_read_only">PDF đã tải lên · Chỉ đọc</string>
+    <string name="chatbot_document_uploaded_read_only">Tài liệu đã tải lên · Chỉ đọc</string>
     <string name="chatbot_document_original">Hợp đồng gốc</string>
     <string name="chatbot_new_chat_title">Bắt đầu cuộc trò chuyện mới</string>
     <string name="chatbot_new_chat_description">Hỏi về hợp đồng gốc hoặc tạo một bản nháp độc lập.</string>
@@ -914,7 +928,7 @@
     <string name="unlock_confirmation_heading">Mở khóa kết quả AI</string>
     <string name="unlock_confirmation_description">Bạn đã xem 40% miễn phí. Xác nhận để mở toàn bộ 100% kết quả phân tích rủi ro hợp đồng này.</string>
     <string name="unlock_confirmation_result_title">Kết quả phân tích rủi ro hợp đồng</string>
-    <string name="unlock_confirmation_result_meta">Mã %1$s · Đã xem 40%% miễn phí</string>
+    <string name="unlock_confirmation_result_meta" formatted="false">Đã xem 40% miễn phí</string>
     <string name="unlock_confirmation_contract_label">Hợp đồng</string>
     <string name="unlock_confirmation_current_label">Hiện tại</string>
     <string name="unlock_confirmation_current_value" formatted="false">40% nội dung đã mở</string>
@@ -1043,6 +1057,11 @@
     <string name="credit_hub_history_description">Xem lịch sử mua và sử dụng Credit</string>
     <string name="credit_hub_unlock_title">Mở khóa kết quả</string>
     <string name="credit_hub_unlock_description">Xem các kết quả phân tích chưa mở khóa</string>
+    <string name="locked_results_title">Kết quả chưa mở khóa</string>
+    <string name="locked_results_hint">Chọn một kết quả để xem phần miễn phí và mở khóa bằng Credit.</string>
+    <string name="locked_results_empty">Không còn kết quả phân tích nào cần mở khóa.</string>
+    <string name="locked_results_error">Không tải được danh sách kết quả. Vui lòng thử lại.</string>
+    <string name="locked_results_cost">%1$d Credit</string>
     <string name="credit_hub_info">Bạn được xem miễn phí 40% kết quả phân tích AI. Sử dụng Credit để mở khóa 100% nội dung. Kết quả đã mở khóa có thể xem lại mà không cần trả thêm Credit.</string>
     <string name="credit_hub_payments_title">Lịch sử thanh toán</string>
     <string name="credit_hub_payments_description">Xem các lần mua Credit, kể cả đang chờ hoặc đã hủy</string>

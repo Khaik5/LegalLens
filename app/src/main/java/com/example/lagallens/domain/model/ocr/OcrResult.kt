@@ -8,8 +8,12 @@ data class OcrResult(
     /** True when the text did not come from the user's file. */
     val isSampleContent: Boolean = false,
     /** Average recognition confidence from 0 to 1, when the recognizer reports one. */
-    val confidence: Double? = null
+    val confidence: Double? = null,
+    /** How the text was obtained, when the backend says. */
+    val extraction: OcrExtraction? = null
 )
+
+enum class OcrExtraction { TEXT_LAYER, RECOGNIZED, MIXED }
 
 data class OcrWarning(
     val section: String,

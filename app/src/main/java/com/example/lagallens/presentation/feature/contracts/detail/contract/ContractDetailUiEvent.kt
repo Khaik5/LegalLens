@@ -6,5 +6,6 @@ sealed interface ContractDetailUiEvent {
     data object RenameClicked : ContractDetailUiEvent
     data class RenameConfirmed(val name: String) : ContractDetailUiEvent
     data object DeleteClicked : ContractDetailUiEvent
-    data object DeleteConfirmed : ContractDetailUiEvent
+    /** [confirmPaidResults] is true once the user accepted losing results unlocked with Credit. */
+    data class DeleteConfirmed(val confirmPaidResults: Boolean = false) : ContractDetailUiEvent
 }

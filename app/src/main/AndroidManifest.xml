@@ -48,6 +48,7 @@
         <activity android:name=".presentation.feature.creditstore.flow.ui.PaymentPendingActivity" android:exported="false" />
         <activity android:name=".presentation.feature.creditstore.flow.ui.CreditHistoryActivity" android:exported="false" />
         <activity android:name=".presentation.feature.creditstore.payments.ui.PaymentHistoryActivity" android:exported="false" />
+        <activity android:name=".presentation.feature.creditstore.locked.ui.LockedResultsActivity" android:exported="false" />
         <activity android:name=".presentation.feature.creditstore.flow.ui.PurchaseConfirmationActivity" android:exported="false" />
         <activity android:name=".presentation.feature.creditstore.flow.ui.UnlockedAnalysisResultActivity" android:exported="false" />
         <activity android:name=".presentation.feature.creditstore.flow.ui.InsufficientCreditsActivity" android:exported="false" />

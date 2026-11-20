@@ -1,5 +1,7 @@
 package com.example.lagallens.presentation.feature.compare.select.viewmodel
 
+import com.example.lagallens.core.utils.matchesSearch
+
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -34,7 +36,7 @@ class CompareSelectViewModel(application: Application) : AndroidViewModel(applic
                     allContracts = contracts.map(::toCompareContract)
                     state.update { current ->
                         current.copy(
-                            contracts = allContracts.filter { it.title.contains(current.query.trim(), true) },
+                            contracts = allContracts.filter { it.title.matchesSearch(current.query) },
                             selectedIds = current.selectedIds.filter { id -> allContracts.any { it.id == id } },
                             isInitialized = true
                         ).withInitialSelection(allContracts)
@@ -58,7 +60,7 @@ class CompareSelectViewModel(application: Application) : AndroidViewModel(applic
     fun onEvent(event: CompareSelectUiEvent) {
         when (event) {
             is CompareSelectUiEvent.Initialize -> state.update { it.copy(initialContractId = event.initialId).withInitialSelection(allContracts) }
-            is CompareSelectUiEvent.QueryChanged -> state.update { current -> current.copy(query = event.query, contracts = allContracts.filter { it.title.contains(event.query.trim(), true) }) }
+            is CompareSelectUiEvent.QueryChanged -> state.update { current -> current.copy(query = event.query, contracts = allContracts.filter { it.title.matchesSearch(event.query) }) }
             is CompareSelectUiEvent.ContractClicked -> state.update { current ->
                 val selected = current.selectedIds
                 val updated = when {

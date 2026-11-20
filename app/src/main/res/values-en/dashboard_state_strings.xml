@@ -5,4 +5,6 @@
     <string name="dashboard_retry">Try again</string>
     <string name="dashboard_upcoming_empty">No important dates yet.</string>
     <string name="dashboard_contract_subtitle">%1$s · %2$s</string>
+    <string name="dashboard_upcoming_ends_today">%1$s · ends today</string>
+    <string name="dashboard_upcoming_ends_in">%1$s · ends %2$s (%3$d days left)</string>
 </resources>

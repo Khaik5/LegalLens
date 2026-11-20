@@ -35,5 +35,7 @@ data class CreditPackageResponse(
     val credits: Int,
     val bonusCredits: Int?,
     val priceVnd: Long,
-    val displayOrder: Int?
+    val displayOrder: Int?,
+    /** Marks the package the store selects first; absent on backends that predate the flag. */
+    val isRecommended: Boolean? = null
 )

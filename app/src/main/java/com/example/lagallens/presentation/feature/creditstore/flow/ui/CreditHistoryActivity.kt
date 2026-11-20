@@ -24,6 +24,7 @@ import com.example.lagallens.presentation.feature.creditstore.flow.contract.Cred
 import com.example.lagallens.presentation.feature.creditstore.flow.contract.CreditFlowUiEffect
 import com.example.lagallens.presentation.feature.creditstore.flow.contract.CreditFlowUiEvent
 import com.example.lagallens.presentation.feature.creditstore.ui.CreditStoreActivity
+import com.example.lagallens.presentation.feature.creditstore.utils.showCreditBalance
 
 class CreditHistoryActivity : CreditFlowActivity() {
     private val binding by lazy { ActivityCreditHistoryBinding.inflate(layoutInflater) }
@@ -33,6 +34,8 @@ class CreditHistoryActivity : CreditFlowActivity() {
     private var shownBackendUnavailable = false
     private var shownLoading = false
     private var shownFailed = false
+    /** The repository holds 0 until the server answers, so the balance is shown only after a successful load. */
+    private var balanceLoaded = false
 
     private fun isOwner(): Boolean = owner.isNotBlank() && (application as LegalLensApplication).creditRepository.activeSessionKey() == owner
 
@@ -43,31 +46,21 @@ class CreditHistoryActivity : CreditFlowActivity() {
         enableEdgeToEdge()
         setContentView(binding.root)
         val repository = (application as LegalLensApplication).creditRepository
-        binding.creditHistoryBalance.setText(R.string.credit_backend_not_configured)
+        binding.creditHistoryBalance.showCreditBalance(getString(R.string.credit_balance_loading), isMessage = true, balanceTextSize = R.dimen.sp_24)
         renderTransactions(emptyList(), loading = true)
         lifecycleScope.launch {
             repository.observeSessionKeys().collect { if (!isOwner()) { window.decorView.alpha = 0f; finish() } }
         }
         if (!repository.isConfigured) {
-            binding.creditHistoryBalance.setText(R.string.credit_backend_not_configured)
+            binding.creditHistoryBalance.showCreditBalance(getString(R.string.credit_backend_not_configured), isMessage = true, balanceTextSize = R.dimen.sp_24)
             renderTransactions(emptyList(), backendUnavailable = true)
         } else {
             lifecycleScope.launch {
-                repository.balance.collect { if (isOwner()) binding.creditHistoryBalance.text = getString(R.string.credit_store_balance_credits, it) else { window.decorView.alpha = 0f; finish() } }
-            }
-            lifecycleScope.launch {
-                val transactions = try {
-                    repository.refresh()
-                    repository.getTransactions()
-                } catch (cancelled: CancellationException) {
-                    throw cancelled
-                } catch (_: Exception) {
-                    null
+                repository.balance.collect {
+                    if (!isOwner()) { window.decorView.alpha = 0f; finish() } else if (balanceLoaded) showBalance(it)
                 }
-                if (!isOwner() || isFinishing || isDestroyed) return@launch
-                if (transactions == null) renderTransactions(emptyList(), failed = true)
-                else renderTransactions(transactions)
             }
+            loadHistory()
         }
         selectedFilter = savedInstanceState?.getString(STATE_FILTER)?.let { CreditHistoryFilter.valueOf(it) } ?: CreditHistoryFilter.ALL
         styleTabs()
@@ -93,6 +86,34 @@ class CreditHistoryActivity : CreditFlowActivity() {
         applySystemBarInsets(binding.creditHistoryRoot)
         bindSystemBack()
         collectEffects(::handleEffect)
+    }
+
+    private fun loadHistory() {
+        val repository = (application as LegalLensApplication).creditRepository
+        renderTransactions(emptyList(), loading = true)
+        lifecycleScope.launch {
+            val transactions = try {
+                repository.refresh()
+                repository.getTransactions()
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (_: Exception) {
+                null
+            }
+            if (!isOwner() || isFinishing || isDestroyed) return@launch
+            balanceLoaded = transactions != null
+            if (transactions == null) {
+                binding.creditHistoryBalance.showCreditBalance(getString(R.string.credit_balance_load_failed), isMessage = true, balanceTextSize = R.dimen.sp_24)
+                renderTransactions(emptyList(), failed = true)
+            } else {
+                showBalance(repository.balance.value)
+                renderTransactions(transactions)
+            }
+        }
+    }
+
+    private fun showBalance(credits: Int) {
+        binding.creditHistoryBalance.showCreditBalance(getString(R.string.credit_store_balance_credits, credits), isMessage = false, balanceTextSize = R.dimen.sp_24)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -141,7 +162,11 @@ class CreditHistoryActivity : CreditFlowActivity() {
             return
         }
         if (failed) {
-            content.addView(row(getString(R.string.credit_history_error)))
+            content.addView(row(getString(R.string.credit_history_error)).apply {
+                isClickable = true
+                isFocusable = true
+                setOnClickListener { loadHistory() }
+            })
             return
         }
         if (backendUnavailable) {

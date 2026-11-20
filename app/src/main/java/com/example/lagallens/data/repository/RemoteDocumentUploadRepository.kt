@@ -96,7 +96,8 @@ class RemoteDocumentUploadRepository(
             // The file is safely stored; a session switch only means this screen no longer belongs to that user.
             if (tokens.currentSessionScope()?.key != scope.key) return@channelFlow
             send(ProcessingState.Running(progressPercent = 100))
-            send(ProcessingState.Uploaded(contractId, document.id.toString()))
+            val duplicateTitle = document.duplicateOf?.takeIf { it.contractId?.toString() != contractId }?.contractTitle?.takeIf(String::isNotBlank)
+            send(ProcessingState.Uploaded(contractId, document.id.toString(), duplicateTitle))
         } catch (cancelled: CancellationException) {
             throw cancelled
         } catch (error: Exception) {

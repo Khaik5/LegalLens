@@ -104,6 +104,10 @@ class AnalysisRiskFindingsActivity : com.example.lagallens.presentation.feature.
         analysisContentEmpty.visibility = if (state.status == com.example.lagallens.presentation.feature.analysis.SnapshotContentStatus.EMPTY) android.view.View.VISIBLE else android.view.View.GONE
         findingsAdapter.submitList(state.findings)
         lockedAdapter.update(state.lockedCount, validatedUnlockStatus?.cost)
+        analysisRiskFindingsFilterAll.text = getString(R.string.analysis_risk_findings_filter_all, state.allCount)
+        analysisRiskFindingsFilterHigh.text = getString(R.string.analysis_risk_findings_filter_high, state.highCount)
+        analysisRiskFindingsFilterMedium.text = getString(R.string.analysis_risk_findings_filter_medium, state.mediumCount)
+        analysisRiskFindingsFilterLow.text = getString(R.string.analysis_risk_findings_filter_low, state.lowCount)
         setFilterAppearance(analysisRiskFindingsFilterAll, state.selectedFilter == AnalysisRiskFilter.ALL)
         setFilterAppearance(analysisRiskFindingsFilterHigh, state.selectedFilter == AnalysisRiskFilter.HIGH)
         setFilterAppearance(analysisRiskFindingsFilterMedium, state.selectedFilter == AnalysisRiskFilter.MEDIUM)

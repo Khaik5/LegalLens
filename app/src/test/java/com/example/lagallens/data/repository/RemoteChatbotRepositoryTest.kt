@@ -14,6 +14,7 @@ import com.example.lagallens.domain.model.chatbot.ChatbotReply
 import com.google.gson.JsonParser
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -44,13 +45,102 @@ class RemoteChatbotRepositoryTest {
         newClientMessageId = { "client-${++nextClientId}" }
     )
 
-    @Test fun opensANewConversationForTheContract() = runTest {
+    @Test fun openingANewChatStoresNothingUntilTheFirstQuestion() = runTest {
         val conversation = repository.openConversation("HĐ lao động", "Employment", contractId = "12")
 
-        assertEquals("5", conversation.id)
-        assertEquals(CreateConversationRequest(12, "HĐ lao động"), api.created.single())
+        assertTrue(api.created.isEmpty())
+        assertTrue(repository.getMessages(conversation.id).isEmpty())
         assertEquals("greeting", conversation.greeting)
         assertEquals(listOf("initial"), conversation.initialSuggestions)
+    }
+
+    @Test fun theFirstQuestionCreatesTheConversationOnceAndLaterQuestionsReuseIt() = runTest {
+        val conversation = repository.openConversation("HĐ lao động", "Employment", contractId = "12")
+
+        repository.sendMessage(conversation.id, "Lương?")
+        repository.sendMessage(conversation.id, "Thử việc?")
+
+        assertEquals(CreateConversationRequest(12, "HĐ lao động"), api.created.single())
+        assertEquals(listOf(5L, 5L), api.sentTo)
+    }
+
+    @Test fun draftingStoresANewChatAndGetsItsServerId() = runTest {
+        val conversation = repository.openConversation("HĐ", "Employment", contractId = "12")
+
+        val stored = repository.persistConversationForSession(repository.currentSessionKey(), conversation.id)
+
+        assertEquals("5", stored)
+        assertEquals(1, api.created.size)
+        assertEquals("5", repository.persistConversationForSession(repository.currentSessionKey(), conversation.id))
+        assertEquals(1, api.created.size)
+    }
+
+    @Test fun reusesAnUnusedConversationOfTheSameContractInsteadOfCreatingAnother() = runTest {
+        api.conversations = listOf(ConversationResponse(9, 12, "HĐ", null, null, messageCount = 0))
+
+        val conversation = repository.openConversation("HĐ", "Employment", contractId = "12")
+
+        assertEquals("9", conversation.id)
+        assertTrue(api.created.isEmpty())
+    }
+
+    @Test fun aContractWhoseChatsAlreadyHaveQuestionsStartsANewLocalChat() = runTest {
+        api.conversations = listOf(ConversationResponse(9, 12, "HĐ", null, null, messageCount = 2))
+
+        assertNotEquals("9", repository.openConversation("HĐ", "Employment", contractId = "12").id)
+        assertTrue(api.created.isEmpty())
+    }
+
+    @Test fun doesNotReuseAnUnusedConversationOfAnotherContract() = runTest {
+        api.conversations = listOf(ConversationResponse(9, 13, "Khác", null, null, messageCount = 0))
+
+        assertNotEquals("9", repository.openConversation("HĐ", "Employment", contractId = "12").id)
+        assertTrue(api.created.isEmpty())
+    }
+
+    @Test fun withoutASummaryOrAListTheChatStillStartsLocally() = runTest {
+        api.conversations = listOf(ConversationResponse(9, 12, "HĐ", null, null))
+        val withoutSummary = repository.openConversation("HĐ", "Employment", contractId = "12")
+        api.listFailure = IllegalStateException("offline")
+        val withoutList = repository.openConversation("HĐ", "Employment", contractId = "12")
+
+        assertNotEquals("9", withoutSummary.id)
+        assertNotEquals(withoutSummary.id, withoutList.id)
+        assertTrue(api.created.isEmpty())
+    }
+
+    @Test fun aGeneralConversationWithoutAContractIsStoredWithItsFirstQuestion() = runTest {
+        api.conversations = listOf(ConversationResponse(9, null, "Chung", null, null, messageCount = 0))
+
+        val conversation = repository.openConversation("Chung", "", contractId = null)
+        repository.sendMessage(conversation.id, "Xin chào")
+
+        assertEquals(CreateConversationRequest(null, "Chung"), api.created.single())
+    }
+
+    @Test fun anAnswerThatArrivesAfterTheQuickPollsIsStillReturned() = runTest {
+        val subject = RemoteChatbotRepository(
+            RemoteRepositorySession(), ChatbotRemoteDataSource(lazyOf(api)), labels = { labels },
+            contractInfo = { id -> RemoteChatbotContractInfo("Contract $id", "Employment") },
+            pollIntervalMillis = 1,
+            maxPolls = 14,
+            newClientMessageId = { "client-1" }
+        )
+        api.onSend = { content ->
+            api.messages = listOf(question(10, content, "WAITING_PROVIDER"))
+            ChatRequestResponse(100, 10, "WAITING_PROVIDER", null)
+        }
+        api.onMessagesRead = { reads ->
+            if (reads == 13) api.messages = listOf(
+                question(10, "Lương?", "COMPLETED", """{"answer":"10 triệu.","noEvidence":false,"citations":[]}"""),
+                answer(11, "10 triệu.")
+            )
+        }
+
+        val reply = subject.sendMessage("5", "Lương?") as ChatbotReply.Answer
+
+        assertEquals("10 triệu.", reply.content)
+        assertEquals(13, api.messageReads)
     }
 
     @Test fun reopensAnExistingConversationWithoutCreatingOne() = runTest {
@@ -233,12 +323,15 @@ class RemoteChatbotRepositoryTest {
 private class ChatbotFixture : ChatbotApi {
     val created = mutableListOf<CreateConversationRequest>()
     val sent = mutableListOf<SendChatMessageRequest>()
+    val sentTo = mutableListOf<Long>()
     val retried = mutableListOf<Long>()
     var conversations = emptyList<ConversationResponse>()
     var messages = emptyList<ChatMessageResponse>()
     var messagesByConversation: Map<Long, List<ChatMessageResponse>>? = null
     var messageReads = 0
     var missingArticles = false
+    var listFailure: Exception? = null
+    var onMessagesRead: (Int) -> Unit = {}
     var onSend: (String) -> ChatRequestResponse = { ChatRequestResponse(1, 1, "WAITING_PROVIDER", null) }
     var onRetry: (Long) -> ChatRequestResponse = { ChatRequestResponse(it, null, "WAITING_PROVIDER", null) }
 
@@ -247,16 +340,21 @@ private class ChatbotFixture : ChatbotApi {
         return ApiEnvelope(true, ConversationResponse(5, request.contractId, request.title, null, null))
     }
 
-    override suspend fun list(scope: AuthSessionScope, page: Int, limit: Int) = ApiEnvelope(true, if (page == 1) conversations else emptyList())
+    override suspend fun list(scope: AuthSessionScope, page: Int, limit: Int): ApiEnvelope<List<ConversationResponse>> {
+        listFailure?.let { throw it }
+        return ApiEnvelope(true, if (page == 1) conversations else emptyList())
+    }
 
     override suspend fun messages(scope: AuthSessionScope, conversationId: Long, page: Int, limit: Int): ApiEnvelope<List<ChatMessageResponse>> {
         if (page > 1) return ApiEnvelope(true, emptyList())
         messageReads++
+        onMessagesRead(messageReads)
         return ApiEnvelope(true, messagesByConversation?.get(conversationId).orEmpty().takeIf { messagesByConversation != null } ?: messages)
     }
 
     override suspend fun send(scope: AuthSessionScope, conversationId: Long, request: SendChatMessageRequest): ApiEnvelope<ChatRequestResponse> {
         sent += request
+        sentTo += conversationId
         return ApiEnvelope(true, onSend(request.content))
     }
 

@@ -36,5 +36,6 @@ internal fun CreditPackageResponse.toCreditOffer() = CreditOffer(
     credits = credits + (bonusCredits ?: 0),
     priceVnd = priceVnd,
     title = name,
-    description = description.orEmpty()
+    description = description.orEmpty(),
+    isRecommended = isRecommended == true
 )

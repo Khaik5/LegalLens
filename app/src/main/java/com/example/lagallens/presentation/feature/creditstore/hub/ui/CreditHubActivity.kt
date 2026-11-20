@@ -25,6 +25,8 @@ import com.example.lagallens.presentation.feature.creditstore.hub.contract.Credi
 import com.example.lagallens.presentation.feature.creditstore.hub.viewmodel.CreditHubViewModel
 import com.example.lagallens.presentation.feature.creditstore.ui.CreditStoreActivity
 import com.example.lagallens.presentation.feature.creditstore.unlock.ui.UnlockConfirmationActivity
+import com.example.lagallens.presentation.feature.creditstore.utils.showCreditBalance
+import com.example.lagallens.presentation.feature.creditstore.locked.ui.LockedResultsActivity
 import com.example.lagallens.LegalLensApplication
 import kotlinx.coroutines.launch
 
@@ -85,9 +87,13 @@ class CreditHubActivity : AppCompatActivity() {
 
     private fun render(state: CreditHubUiState) {
         binding.creditHubRetry.isVisible = state.isBalanceUnavailable && !state.isBackendUnavailable
-        binding.creditHubBalance.text = if (state.isBackendUnavailable) getString(R.string.credit_backend_not_configured)
-        else if (state.isBalanceUnavailable) getString(R.string.credit_balance_load_failed)
-        else getString(R.string.credit_hub_balance, if (viewModel.isOwnerSession()) state.balanceCredits else 0)
+        binding.creditHubBalance.showCreditBalance(
+            text = if (state.isBackendUnavailable) getString(R.string.credit_backend_not_configured)
+            else if (state.isBalanceUnavailable) getString(R.string.credit_balance_load_failed)
+            else getString(R.string.credit_hub_balance, if (viewModel.isOwnerSession()) state.balanceCredits else 0),
+            isMessage = state.isBackendUnavailable || state.isBalanceUnavailable,
+            balanceTextSize = R.dimen.credit_hub_balance_text_size
+        )
     }
 
     private fun handleEffect(effect: CreditHubUiEffect) {
@@ -101,7 +107,8 @@ class CreditHubActivity : AppCompatActivity() {
             CreditHubUiEffect.NavigateToUnlockConfirmation -> {
                 val resultId = intent.getStringExtra(EXTRA_RESULT_ID).orEmpty()
                 val cost = intent.getIntExtra(EXTRA_UNLOCK_COST, 0)
-                if (resultId.isBlank() || cost <= 0) Toast.makeText(this, R.string.credit_hub_unlock_hint, Toast.LENGTH_LONG).show()
+                // Opened from the hub itself there is no result yet, so the user picks one from the locked results.
+                if (resultId.isBlank() || cost <= 0) startActivity(LockedResultsActivity.createIntent(this))
                 else startActivity(UnlockConfirmationActivity.createIntent(this, resultId, viewModel.uiState.value.balanceCredits, cost))
             }
         }

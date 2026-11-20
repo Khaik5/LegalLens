@@ -11,7 +11,16 @@ data class HomeDashboardUiState(
     val analyzedContracts: Int = 0,
     val reviewContracts: Int = 0,
     val recentContracts: List<DashboardRecentContract> = emptyList(),
+    val upcomingDates: List<DashboardUpcomingDate> = emptyList(),
     @param:StringRes val errorMessageRes: Int? = null
+)
+
+/** A contract ending within the coming weeks; [daysLeft] is 0 on the day it ends. */
+data class DashboardUpcomingDate(
+    val contractId: String,
+    val title: String,
+    val endDate: java.time.LocalDate,
+    val daysLeft: Int
 )
 
 data class DashboardRecentContract(

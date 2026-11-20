@@ -45,7 +45,9 @@ data class AnalysisFinding(
     val description: String,
     val consequence: String,
     val explanation: String? = null,
-    val recommendation: String? = null
+    val recommendation: String? = null,
+    /** False when no legal source backs the finding; null when the source does not say (older backend, DEMO). */
+    val isLegalBasisVerified: Boolean? = null
 )
 
 /** One legal article an analysis relies on. Fields the backend has not stored are null. */

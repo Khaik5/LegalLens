@@ -11,6 +11,7 @@ import android.view.Window
 import android.view.WindowManager
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
+import com.example.lagallens.R
 import com.example.lagallens.databinding.DialogContractDeleteBinding
 import com.example.lagallens.presentation.common.utils.bindPressFeedback
 
@@ -35,6 +36,11 @@ class ContractDeleteDialog : DialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val paidResults = arguments?.getBoolean(ARG_PAID_RESULTS) == true
+        if (paidResults) {
+            binding.tvDeleteTitle.setText(R.string.contract_detail_delete_paid_title)
+            binding.tvDeleteMessage.setText(R.string.contract_detail_delete_paid_message)
+        }
         listOf(binding.btnCancel, binding.btnDeleteForever).forEach { it.bindPressFeedback() }
         binding.root.setOnClickListener { dismiss() }
         binding.deleteCard.setOnClickListener { }
@@ -42,7 +48,7 @@ class ContractDeleteDialog : DialogFragment() {
         binding.btnDeleteForever.setOnClickListener {
             parentFragmentManager.setFragmentResult(
                 RESULT_KEY,
-                bundleOf(KEY_DELETE_CONFIRMED to true)
+                bundleOf(KEY_DELETE_CONFIRMED to true, KEY_PAID_RESULTS_CONFIRMED to paidResults)
             )
             dismiss()
         }
@@ -66,5 +72,12 @@ class ContractDeleteDialog : DialogFragment() {
         const val TAG = "ContractDeleteDialog"
         const val RESULT_KEY = "contractDeleteDialog"
         const val KEY_DELETE_CONFIRMED = "deleteConfirmed"
+        const val KEY_PAID_RESULTS_CONFIRMED = "paidResultsConfirmed"
+        private const val ARG_PAID_RESULTS = "paidResults"
+
+        /** [paidResults] asks again because deleting also discards results unlocked with Credit, without a refund. */
+        fun newInstance(paidResults: Boolean = false) = ContractDeleteDialog().apply {
+            arguments = bundleOf(ARG_PAID_RESULTS to paidResults)
+        }
     }
 }

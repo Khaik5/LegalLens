@@ -376,14 +376,17 @@ class ChatbotViewModel(
         if (_uiState.value.draftGenerationStatus == DraftGenerationStatus.LOADING) return
         draftGeneration?.cancel()
         _uiState.update { it.copy(isDraftReviewVisible = false, draftGenerationStatus = DraftGenerationStatus.LOADING, isReplyPending = true) }
-        val request = com.example.lagallens.domain.repository.DraftGenerationRequest(
-            conversationId,
-            activeContractId,
-            _uiState.value.messages.filter { it.author == ChatbotMessageAuthor.USER }.map { it.content }
-        )
+        val pendingConversationId = conversationId
+        val contractId = activeContractId
+        val questions = _uiState.value.messages.filter { it.author == ChatbotMessageAuthor.USER }.map { it.content }
         draftGeneration = launchForSession {
             val draft = try {
-                if (previewDraftError) { delay(DRAFT_ERROR_PREVIEW_DELAY_MS); null } else draftAi().generateDraft(request)
+                if (previewDraftError) { delay(DRAFT_ERROR_PREVIEW_DELAY_MS); null } else {
+                    // Drafting needs a stored conversation, which a new chat only gets with its first question.
+                    val storedConversationId = pendingConversationId?.let { openConversation.persistForSession(ownerSession, it) }
+                    if (storedConversationId != null && conversationId == pendingConversationId) conversationId = storedConversationId
+                    draftAi().generateDraft(com.example.lagallens.domain.repository.DraftGenerationRequest(storedConversationId, contractId, questions))
+                }
             } catch (cancellationException: CancellationException) {
                 throw cancellationException
             } catch (failure: Exception) {
