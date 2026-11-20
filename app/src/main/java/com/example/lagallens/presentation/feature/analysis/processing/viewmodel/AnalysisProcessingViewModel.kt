@@ -13,7 +13,9 @@ import kotlinx.coroutines.launch
 
 class AnalysisProcessingViewModel(
     private val repository: AnalysisIdentityRepository,
-    private val analysis: AnalysisRepository
+    private val analysis: AnalysisRepository,
+    /** Called once the job ended, so contract lists and details drop their stale analysis status. */
+    private val onFinished: () -> Unit = {}
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(AnalysisProcessingUiState())
     val uiState = _uiState.asStateFlow()
@@ -46,6 +48,7 @@ class AnalysisProcessingViewModel(
                             }
                         }
                     } catch (failure: CancellationException) { throw failure } catch (_: Exception) { resultId = null }
+                    onFinished()
                     if (generation != current || owner != event.sessionKey || repository.sessionKey() != event.sessionKey) return@launch
                     val completion = resultId?.let { AnalysisProcessingUiEffect.NavigateToAnalysisResult(event.documentName, event.documentMetadata, it, event.sessionKey) }
                         ?: AnalysisProcessingUiEffect.NavigateToAnalysisFailure(event.documentName, event.documentMetadata)
@@ -54,8 +57,12 @@ class AnalysisProcessingViewModel(
             }
         }
     }
-    class Factory(private val repository: AnalysisIdentityRepository, private val analysis: AnalysisRepository) : ViewModelProvider.Factory {
+    class Factory(
+        private val repository: AnalysisIdentityRepository,
+        private val analysis: AnalysisRepository,
+        private val onFinished: () -> Unit = {}
+    ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T = AnalysisProcessingViewModel(repository, analysis) as T
+        override fun <T : ViewModel> create(modelClass: Class<T>): T = AnalysisProcessingViewModel(repository, analysis, onFinished) as T
     }
 }
