@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.lagallens.R
+import com.example.lagallens.core.utils.isValidEmail
 import com.example.lagallens.domain.model.auth.AuthFailure
 import com.example.lagallens.domain.model.auth.AuthResult
 import com.example.lagallens.presentation.common.utils.toAuthMessage
@@ -39,7 +40,7 @@ class ForgotPasswordViewModel(private val requestPasswordReset: RequestPasswordR
     private fun sendOtp() {
         if (_uiState.value.isLoading) return
         val email = _uiState.value.email.trim()
-        if (!EMAIL_PATTERN.matches(email)) {
+        if (!isValidEmail(email)) {
             _uiState.update {
                 it.copy(
                     email = email,
@@ -77,7 +78,4 @@ class ForgotPasswordViewModel(private val requestPasswordReset: RequestPasswordR
         override fun <T : ViewModel> create(modelClass: Class<T>): T = ForgotPasswordViewModel(requestPasswordReset) as T
     }
 
-    private companion object {
-        val EMAIL_PATTERN = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")
-    }
 }

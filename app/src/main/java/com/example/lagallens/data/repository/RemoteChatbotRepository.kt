@@ -19,6 +19,7 @@ import com.example.lagallens.domain.model.chatbot.ChatbotTranscriptMessage
 import com.example.lagallens.domain.repository.ChatbotRepository
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -111,7 +112,15 @@ class RemoteChatbotRepository(
     override suspend fun getConversations(): List<ChatbotTranscript> = inSession { scope ->
         val conversations = remote.conversations(scope)
         val contracts = conversations.mapNotNull { it.contractId?.toString() }.distinct()
-            .associateWith { runCatching { contractInfo(it) }.getOrNull() }
+            .associateWith {
+                try {
+                    contractInfo(it)
+                } catch (cancelled: CancellationException) {
+                    throw cancelled
+                } catch (_: Exception) {
+                    null
+                }
+            }
         // The server summary (count and last message) avoids reading every transcript.
         if (conversations.all { it.messageCount != null }) {
             return@inSession conversations.filter { (it.messageCount ?: 0) > 0 }.map { conversation ->

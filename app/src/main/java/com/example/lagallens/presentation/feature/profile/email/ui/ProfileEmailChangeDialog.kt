@@ -94,6 +94,9 @@ class ProfileEmailChangeDialog : DialogFragment() {
         )
         binding.btnEmailChangeSubmit.isEnabled = !state.isSubmitting
         binding.btnEmailChangeSubmit.alpha = if (state.isSubmitting) DISABLED_ALPHA else 1f
+        // Confirming ends this session on the backend. Without this the main screen reacts to the signed-out
+        // session first, opens Login by itself and closes the dialog before it can show the success message.
+        (activity as? com.example.lagallens.presentation.feature.main.ui.MainActivity)?.setPasswordChangePending(state.isSubmitting)
         updateInput(binding.etEmailChangeNewEmail, state.newEmail)
         updateInput(binding.etEmailChangePassword, state.currentPassword)
         updateInput(binding.etEmailChangeCode, state.code)
@@ -129,6 +132,7 @@ class ProfileEmailChangeDialog : DialogFragment() {
     }
 
     override fun onDestroyView() {
+        (activity as? com.example.lagallens.presentation.feature.main.ui.MainActivity)?.setPasswordChangePending(false)
         _binding = null
         super.onDestroyView()
     }

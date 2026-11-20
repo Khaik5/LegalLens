@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.io.IOException
 
 class OnboardingViewModel(
     private val completeOnboardingUseCase: CompleteOnboardingUseCase
@@ -51,8 +52,13 @@ class OnboardingViewModel(
         if (isCompleting) return
         isCompleting = true
         viewModelScope.launch {
-            completeOnboardingUseCase()
-            _uiEffect.send(OnboardingUiEffect.NavigateToHome)
+            try {
+                completeOnboardingUseCase()
+                _uiEffect.send(OnboardingUiEffect.NavigateToHome)
+            } catch (_: IOException) {
+                isCompleting = false
+                _uiEffect.send(OnboardingUiEffect.ShowSaveFailed)
+            }
         }
     }
 

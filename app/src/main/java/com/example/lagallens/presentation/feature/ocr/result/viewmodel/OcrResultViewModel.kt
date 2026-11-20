@@ -1,8 +1,11 @@
 package com.example.lagallens.presentation.feature.ocr.result.viewmodel
 
-import android.app.Application
+import android.content.res.Configuration
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
+import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewModelScope
 import com.example.lagallens.R
 import com.example.lagallens.core.network.ApiFailureKind
@@ -32,6 +35,7 @@ class OcrResultViewModel(
     private val getOcrResult: GetOcrResultUseCase,
     private val documentRepository: DocumentRepository,
     private val contractRepository: ContractRepository,
+    private val defaultContractTitle: String = "",
     private val isOwner: () -> Boolean = { true }
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(OcrResultUiState())
@@ -159,7 +163,7 @@ class OcrResultViewModel(
                         EmploymentContract(
                             id = contractId,
                             documentId = current.documentId,
-                            title = current.documentName.ifBlank { "Hợp đồng lao động mới" },
+                            title = current.documentName.ifBlank { defaultContractTitle },
                             content = content,
                             createdAtMillis = timestamp,
                             updatedAtMillis = timestamp,
@@ -211,9 +215,16 @@ class OcrResultViewModel(
         private val isOwner: () -> Boolean = { true }
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
             require(modelClass.isAssignableFrom(OcrResultViewModel::class.java))
-            return OcrResultViewModel(getOcrResult, documentRepository, contractRepository, isOwner) as T
+            val application = requireNotNull(extras[APPLICATION_KEY])
+            val context = AppCompatDelegate.getApplicationLocales()[0]?.let { locale ->
+                application.createConfigurationContext(Configuration(application.resources.configuration).apply { setLocale(locale) })
+            } ?: application
+            return OcrResultViewModel(
+                getOcrResult, documentRepository, contractRepository,
+                context.getString(R.string.ocr_result_default_contract_name), isOwner
+            ) as T
         }
     }
 
