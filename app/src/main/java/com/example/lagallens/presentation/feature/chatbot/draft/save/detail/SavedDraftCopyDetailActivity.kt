@@ -39,7 +39,7 @@ class SavedDraftCopyDetailActivity : DraftSessionActivity() {
         val version = intent.getStringExtra(EXTRA_VERSION) ?: ChatbotDraftUiState.APPROVED_AI_VERSION
         val contractId = intent.getStringExtra(EXTRA_CONTRACT_ID)
         draftId = intent.getStringExtra(EXTRA_DRAFT_ID)
-        binding.savedDraftTitle.text = getString(R.string.chatbot_draft_document_name, version)
+        binding.savedDraftTitle.text = getString(R.string.draft_default_document_name, version)
         lifecycleScope.launch {
             val app = application as LegalLensApplication
             val draft = try {
@@ -69,7 +69,10 @@ class SavedDraftCopyDetailActivity : DraftSessionActivity() {
 
     private fun showExportSheet() {
         if (supportFragmentManager.findFragmentByTag(DraftPdfExportBottomSheet.TAG) == null) {
-            DraftPdfExportBottomSheet.newInstance(draftId ?: intent.getStringExtra(EXTRA_VERSION) ?: ChatbotDraftUiState.APPROVED_AI_VERSION).show(supportFragmentManager, DraftPdfExportBottomSheet.TAG)
+            DraftPdfExportBottomSheet.newInstance(
+                draftId ?: intent.getStringExtra(EXTRA_VERSION) ?: ChatbotDraftUiState.APPROVED_AI_VERSION,
+                binding.savedDraftTitle.text.toString()
+            ).show(supportFragmentManager, DraftPdfExportBottomSheet.TAG)
         }
     }
 

@@ -52,7 +52,7 @@ class SaveDraftCopyViewModel(application: Application) : AndroidViewModel(applic
         content = savedContent
         contractId = linkedContractId
         sourceDraftId = parentDraftId
-        state.update { it.copy(name = getApplication<Application>().getString(R.string.chatbot_draft_document_name, value)) }
+        state.update { it.copy(name = getApplication<Application>().getString(R.string.draft_default_document_name, value)) }
     }
 
     fun setName(value: String) { if (ownerSession == app.currentSessionKey()) state.update { it.copy(name = value) } }

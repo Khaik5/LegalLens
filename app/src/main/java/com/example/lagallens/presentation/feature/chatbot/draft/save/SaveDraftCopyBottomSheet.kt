@@ -52,6 +52,7 @@ class SaveDraftCopyBottomSheet : BottomSheetDialogFragment() {
             arguments?.getString(KEY_CONTRACT_ID),
             arguments?.getString(KEY_SOURCE_DRAFT_ID)
         )
+        binding.saveDraftSelectedVersion.text = getString(R.string.draft_save_selected_version, version)
         binding.saveDraftName.setText(viewModel.uiState.value.name)
         binding.saveDraftAcknowledge.isChecked = viewModel.uiState.value.acknowledged
         binding.saveDraftName.doAfterTextChangedCompat { viewModel.setName(it) }
