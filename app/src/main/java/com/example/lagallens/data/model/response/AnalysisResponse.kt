@@ -85,7 +85,9 @@ data class AnalysisFindingResponse(
     val description: String?,
     val consequence: String?,
     val explanation: String?,
-    val recommendation: String?
+    val recommendation: String?,
+    /** False when no verbatim legal source backs the finding; absent on older backends. */
+    val legalBasisVerified: Boolean? = null
 )
 
 data class AnalysisCitationResponse(

@@ -4,9 +4,12 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.util.TypedValue
+import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -34,6 +37,8 @@ import com.example.lagallens.presentation.feature.dashboard.contract.HomeDashboa
 import com.example.lagallens.presentation.feature.dashboard.viewmodel.HomeDashboardViewModel
 import com.example.lagallens.presentation.feature.upload.ui.UploadSourceActivity
 import java.text.DateFormat
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 import java.util.Date
 import kotlinx.coroutines.launch
 
@@ -93,6 +98,36 @@ class HomeDashboardFragment : Fragment() {
         tvDashboardRecentMessage.isVisible = hasError || isEmpty
         tvDashboardRecentMessage.setText(state.errorMessageRes ?: R.string.dashboard_recent_empty)
         btnDashboardRetry.isVisible = hasError
+        bindUpcomingDates(state)
+    }
+
+    private fun bindUpcomingDates(state: HomeDashboardUiState) = with(binding) {
+        val rows = llDashboardUpcoming
+        rows.removeAllViews()
+        rows.isVisible = state.upcomingDates.isNotEmpty()
+        tvDashboardUpcomingEmpty.isVisible = state.upcomingDates.isEmpty()
+        val gap = resources.getDimensionPixelSize(R.dimen.dp_14)
+        state.upcomingDates.forEachIndexed { index, upcoming ->
+            val row = TextView(requireContext()).apply {
+                layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+                    .apply { topMargin = if (index == 0) gap else gap / 2 }
+                setBackgroundResource(R.drawable.bg_dashboard_date)
+                gravity = Gravity.CENTER_VERTICAL
+                minHeight = resources.getDimensionPixelSize(R.dimen.dp_76)
+                resources.getDimensionPixelSize(R.dimen.dp_16).let { setPadding(it, it, it, it) }
+                setTextColor(ContextCompat.getColor(requireContext(), R.color.dashboard_primary_text))
+                setTextSize(TypedValue.COMPLEX_UNIT_PX, resources.getDimension(R.dimen.sp_14))
+                text = if (upcoming.daysLeft == 0) getString(R.string.dashboard_upcoming_ends_today, upcoming.title)
+                else getString(
+                    R.string.dashboard_upcoming_ends_in,
+                    upcoming.title,
+                    upcoming.endDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(resources.configuration.locales[0])),
+                    upcoming.daysLeft
+                )
+                setOnClickListener { viewModel.onEvent(HomeDashboardUiEvent.ContractClicked(upcoming.contractId)) }
+            }
+            rows.addView(row)
+        }
     }
 
     /** Both card layouts share view IDs, so one binding path covers either position. */

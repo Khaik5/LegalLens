@@ -85,6 +85,10 @@ class ChatbotActivity : AppCompatActivity() {
         }
         binding = ActivityChatbotBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        // Conversations live on the server with real data, so the drawer does not call them a local workspace.
+        if (!com.example.lagallens.presentation.common.utils.isDemoData()) {
+            binding.chatbotDrawerProfile.setText(R.string.chatbot_drawer_profile_real)
+        }
         ViewCompat.setOnApplyWindowInsetsListener(binding.chatbotRoot) { view, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
             keyboardVisible = insets.isVisible(WindowInsetsCompat.Type.ime())

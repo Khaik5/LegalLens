@@ -17,5 +17,6 @@ data class AnalysisResultItem(
     @StringRes val titleRes: Int,
     @StringRes val descriptionRes: Int,
     val isRisk: Boolean = false,
+    val badgeCount: Int = 0,
     val destination: AnalysisResultDestination? = null
 )

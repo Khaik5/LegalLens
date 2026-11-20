@@ -44,5 +44,9 @@ interface ContractApi {
     ): ApiEnvelope<ContractResponse>
 
     @DELETE("contracts/{id}")
-    suspend fun delete(@Tag scope: AuthSessionScope, @Path("id") id: String): ApiEnvelope<Unit>
+    suspend fun delete(
+        @Tag scope: AuthSessionScope,
+        @Path("id") id: String,
+        @Query("confirmPaidResults") confirmPaidResults: Boolean? = null
+    ): ApiEnvelope<Unit>
 }

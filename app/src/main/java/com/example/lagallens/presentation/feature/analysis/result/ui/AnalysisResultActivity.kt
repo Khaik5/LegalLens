@@ -117,19 +117,28 @@ class AnalysisResultActivity : com.example.lagallens.presentation.feature.analys
         val unavailable = state.errorMessageRes != null
         fun metric(value: Int) = when { state.isLoading -> "…"; unavailable -> "—"; else -> value.toString() }
         analysisResultScore.text = metric(state.score)
+        analysisResultScoreRing.progress = if (state.isLoading || unavailable) 0 else state.score
         analysisResultSeverity.visibility = if (!state.isLoading && !unavailable && state.severity != null) android.view.View.VISIBLE else android.view.View.GONE
+        analysisResultScoreRing.progressTintList = null
         state.severity?.let { severity ->
             analysisResultSeverity.setText(when (severity) {
                 com.example.lagallens.domain.model.analysis.AnalysisSeverity.HIGH -> R.string.freeze_severity_high
                 com.example.lagallens.domain.model.analysis.AnalysisSeverity.MEDIUM -> R.string.freeze_severity_medium
                 com.example.lagallens.domain.model.analysis.AnalysisSeverity.LOW -> R.string.freeze_severity_low
             })
-            analysisResultSeverity.setTextColor(androidx.core.content.ContextCompat.getColor(this@AnalysisResultActivity,
+            val severityColor = androidx.core.content.ContextCompat.getColor(this@AnalysisResultActivity,
                 when (severity) {
                     com.example.lagallens.domain.model.analysis.AnalysisSeverity.HIGH -> R.color.analysis_result_risk
                     com.example.lagallens.domain.model.analysis.AnalysisSeverity.MEDIUM -> R.color.contract_pending
                     com.example.lagallens.domain.model.analysis.AnalysisSeverity.LOW -> R.color.contract_complete
-                }))
+                })
+            analysisResultSeverity.setTextColor(severityColor)
+            analysisResultSeverity.setBackgroundResource(when (severity) {
+                com.example.lagallens.domain.model.analysis.AnalysisSeverity.HIGH -> R.drawable.bg_analysis_result_high_badge
+                com.example.lagallens.domain.model.analysis.AnalysisSeverity.MEDIUM -> R.drawable.bg_analysis_result_medium_badge
+                com.example.lagallens.domain.model.analysis.AnalysisSeverity.LOW -> R.drawable.bg_analysis_result_low_badge
+            })
+            analysisResultScoreRing.progressTintList = android.content.res.ColorStateList.valueOf(severityColor)
         }
         analysisResultKeyFactsValue.text = metric(state.keyFactsCount)
         analysisResultRiskValue.text = metric(state.riskCount)

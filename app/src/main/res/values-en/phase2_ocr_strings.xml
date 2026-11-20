@@ -4,5 +4,6 @@
     <string name="ocr_result_contract_title">EMPLOYMENT CONTRACT</string>
     <string name="ocr_result_default_contract_name">New employment contract</string>
     <string name="ocr_review_alert_confidence">Needs review — OCR confidence: %1$s</string>
+    <string name="ocr_review_alert_confidence_high">OCR confidence: %1$s — you can still review the text</string>
     <string name="ocr_review_alert_generic">Review the OCR result before continuing</string>
 </resources>

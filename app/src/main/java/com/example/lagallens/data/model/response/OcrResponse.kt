@@ -21,11 +21,13 @@ data class OcrResultResponse(
     /** Identifies the latest revision; analysis jobs are created from it. Null on older backends. */
     val revisionId: String? = null,
     /** PENDING until the owner confirms the revision, then APPROVED. */
-    val reviewStatus: String? = null
+    val reviewStatus: String? = null,
+    /** TEXT_LAYER (copied from the file), OCR (recognised from an image), MIXED, or null on older results. */
+    val extractionMethod: String? = null
 )
 
 data class OcrConfirmResponse(val revisionId: String, val revision: Int, val reviewStatus: String?)
 
-data class OcrPageResponse(val page: Int, val text: String?, val confidence: Double?)
+data class OcrPageResponse(val page: Int, val text: String?, val confidence: Double?, val source: String? = null)
 
 data class OcrCorrectionResponse(val jobId: String, val revision: Int, val text: String)

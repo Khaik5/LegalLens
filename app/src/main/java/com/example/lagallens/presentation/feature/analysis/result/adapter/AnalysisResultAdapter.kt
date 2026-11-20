@@ -43,7 +43,9 @@ class AnalysisResultAdapter(
             )
             analysisResultItemTitle.setText(item.titleRes)
             analysisResultItemDescription.setText(item.descriptionRes)
-            analysisResultItemRiskBadge.visibility = if (item.isRisk) android.view.View.VISIBLE else android.view.View.GONE
+            analysisResultItemRiskBadge.text = item.badgeCount.toString()
+            analysisResultItemRiskBadge.visibility =
+                if (item.isRisk && item.badgeCount > 0) android.view.View.VISIBLE else android.view.View.GONE
             root.setOnClickListener { item.destination?.let(onItemClicked) }
         }
     }

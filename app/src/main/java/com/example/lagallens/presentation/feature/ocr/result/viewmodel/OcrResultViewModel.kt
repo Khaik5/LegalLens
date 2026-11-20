@@ -14,6 +14,7 @@ import com.example.lagallens.domain.model.EmploymentContract
 import com.example.lagallens.domain.model.EmploymentContractRisk
 import com.example.lagallens.domain.model.EmploymentContractStatus
 import com.example.lagallens.domain.model.EmploymentDocument
+import com.example.lagallens.domain.model.ocr.OcrExtraction
 import com.example.lagallens.domain.model.ocr.OcrResultNotReadyException
 import com.example.lagallens.domain.usecase.GetOcrResultUseCase
 import com.example.lagallens.domain.repository.ContractRepository
@@ -103,9 +104,13 @@ class OcrResultViewModel(
                         warnings = ocrResult?.warnings.orEmpty(),
                         isSampleContent = ocrResult?.isSampleContent == true,
                         confidenceLabel = ocrResult?.confidenceLabel.orEmpty(),
+                        // A text-layer PDF has no recognition confidence; the banner then says so instead of
+                        // showing an empty label next to "—".
                         confidenceLabelRes = if (ocrResult == null) R.string.ocr_result_saved_content_label
-                            else ocrResult.confidence?.let(::confidenceLabelRes),
-                        confidencePercentage = ocrResult?.confidencePercentage ?: "—",
+                            else if (ocrResult.extraction == OcrExtraction.TEXT_LAYER) R.string.ocr_result_extraction_text_layer
+                            else ocrResult.confidence?.let(::confidenceLabelRes)
+                                ?: R.string.ocr_result_confidence_unavailable.takeIf { ocrResult.confidenceLabel.isNullOrBlank() },
+                        confidencePercentage = if (ocrResult?.extraction == OcrExtraction.TEXT_LAYER) "—" else ocrResult?.confidencePercentage ?: "—",
                         errorMessageRes = null
                     )
                 }

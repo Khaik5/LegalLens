@@ -23,6 +23,7 @@ import com.example.lagallens.domain.model.ContractComparisonBlocker
 import com.example.lagallens.domain.model.ContractComparisonSummary
 import com.example.lagallens.domain.model.ContractComparisonUnavailableException
 import com.example.lagallens.domain.model.ContractFieldValue
+import com.example.lagallens.domain.model.ContractPartyValue
 import com.example.lagallens.domain.model.EmploymentContractRisk
 import com.example.lagallens.domain.model.EmploymentContractStatus
 import kotlinx.coroutines.channels.Channel
@@ -113,6 +114,24 @@ class RemoteContractRepositoryTest {
         assertEquals("1", api.deletedId)
     }
 
+    @Test fun aContractWithPaidResultsNeedsConfirmationBeforeItIsDeleted() = runTest {
+        api.deleteFailure = HttpException(Response.error<Unit>(
+            409, """{"success":false,"code":"CONTRACT_HAS_PAID_RESULTS","message":"paid"}""".toResponseBody()
+        ))
+        assertTrue(runCatching { repository.deleteContract("1") }.exceptionOrNull()
+            is com.example.lagallens.domain.model.ContractHasPaidResultsException)
+
+        api.deleteFailure = null
+        assertTrue(repository.deleteContract("1", confirmPaidResults = true))
+        assertEquals(listOf(null, true), api.deleteConfirmations)
+    }
+
+    @Test fun anotherDeleteConflictIsNotMistakenForPaidResults() = runTest {
+        api.deleteFailure = HttpException(Response.error<Unit>(409, """{"code":"CONFLICT"}""".toResponseBody()))
+
+        assertTrue(runCatching { repository.deleteContract("1") }.exceptionOrNull() is HttpException)
+    }
+
     @Test fun deletingAnAlreadyRemovedContractRefreshesCollectors() = runTest {
         val lists = Channel<List<String>>(Channel.UNLIMITED)
         val collector = launch {
@@ -174,8 +193,11 @@ class RemoteContractRepositoryTest {
             return ApiEnvelope(true, current)
         }
 
-        override suspend fun delete(scope: AuthSessionScope, id: String): ApiEnvelope<Unit> {
+        val deleteConfirmations = mutableListOf<Boolean?>()
+
+        override suspend fun delete(scope: AuthSessionScope, id: String, confirmPaidResults: Boolean?): ApiEnvelope<Unit> {
             deletedId = id
+            deleteConfirmations += confirmPaidResults
             deleteFailure?.let { throw it }
             return ApiEnvelope(true, null)
         }
@@ -224,11 +246,28 @@ class RemoteContractRepositoryTest {
             result.differences.map { it.changeType }
         )
         assertEquals("", result.differences[1].firstText)
-        assertEquals(68.5, checkNotNull(result.riskComparison).scoreDelta, 0.0)
+        assertEquals(68.5, checkNotNull(checkNotNull(result.riskComparison).scoreDelta), 0.0)
         assertEquals(EmploymentContractRisk.CRITICAL, result.riskComparison?.second?.risk)
         // Whole numbers lose ".0"; booleans stay flags for the screen to word.
         assertEquals(listOf(ContractFieldValue.Text("15000000.00"), null, ContractFieldValue.Flag(true)), result.fieldDifferences.map { it.firstValue })
         assertEquals(listOf(ContractFieldValue.Text("18000000.00"), ContractFieldValue.Text("12"), ContractFieldValue.Flag(false)), result.fieldDifferences.map { it.secondValue })
+    }
+
+    @Test fun theBackendPartiesListBecomesPartyValues() = runTest {
+        val employer = mapOf("name" to "Công ty A", "type" to "ORGANIZATION", "role" to "EMPLOYER")
+        val unnamed = mapOf("name" to "  ", "role" to "EMPLOYEE")
+        val employeeWithoutRole = mapOf("name" to "Nguyễn B")
+        api.comparison = comparisonResponse().copy(overview = ComparisonOverviewResponse(listOf(
+            FieldDifferenceResponse("parties", "Các bên tham gia", listOf(employer, unnamed, employeeWithoutRole), emptyList<Any>(), "MODIFIED")
+        )))
+
+        val parties = checkNotNull(repository.compareContracts("1", "2")).fieldDifferences.single()
+
+        assertEquals(
+            ContractFieldValue.Parties(listOf(ContractPartyValue("Công ty A", "EMPLOYER"), ContractPartyValue("Nguyễn B", null))),
+            parties.firstValue
+        )
+        assertNull(parties.secondValue)
     }
 
     @Test fun aComparisonWithoutRiskScoresHasNoRiskComparison() = runTest {
@@ -250,7 +289,8 @@ class RemoteContractRepositoryTest {
             409 to "CONTRACT_OCR_NOT_READY" to ContractComparisonBlocker.OCR_NOT_READY,
             409 to "CONTRACT_DOCUMENT_UNAVAILABLE" to ContractComparisonBlocker.DOCUMENT_UNAVAILABLE,
             413 to "COMPARISON_CONTENT_TOO_LARGE" to ContractComparisonBlocker.TOO_LARGE,
-            404 to "CONTRACT_NOT_FOUND" to ContractComparisonBlocker.NOT_FOUND
+            404 to "CONTRACT_NOT_FOUND" to ContractComparisonBlocker.NOT_FOUND,
+            403 to "CONTRACT_ACCESS_DENIED" to ContractComparisonBlocker.ACCESS_DENIED
         )
         expected.forEach { (statusAndCode, blocker) ->
             api.compareFailure = errorWithCode(statusAndCode.first, statusAndCode.second)

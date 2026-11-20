@@ -40,6 +40,8 @@ class AnalysisRiskFindingsAdapter(
             )
             analysisRiskFindingClause.text = item.clause
             analysisRiskFindingTitle.text = item.title
+            analysisRiskFindingUnverified.visibility =
+                if (item.isLegalBasisUnverified) android.view.View.VISIBLE else android.view.View.GONE
             analysisRiskFindingDescription.text = item.description
             analysisRiskFindingConsequence.text = item.consequence
             root.setOnClickListener { onFindingClicked(item.id) }

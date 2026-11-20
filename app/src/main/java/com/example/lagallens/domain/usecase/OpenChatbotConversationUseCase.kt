@@ -13,6 +13,8 @@ class OpenChatbotConversationUseCase(
     suspend fun messagesForSession(session: String?, conversationId: String) = repository.messagesForSession(session, conversationId)
     suspend fun openForSession(session: String?, contractName: String, contractType: String, contractId: String?, conversationId: String? = null) =
         repository.openForSession(session, contractName, contractType, contractId, conversationId)
+    suspend fun persistForSession(session: String?, conversationId: String) =
+        repository.persistConversationForSession(session, conversationId)
     suspend fun saveForSession(session: String?, conversationId: String, contractId: String?, contractName: String, contractType: String, messages: List<ChatbotTranscriptMessage>) =
         repository.saveForSession(session, conversationId, contractId, contractName, contractType, messages)
     suspend operator fun invoke(contractName: String, contractType: String, contractId: String? = null, conversationId: String? = null): ChatbotConversation =

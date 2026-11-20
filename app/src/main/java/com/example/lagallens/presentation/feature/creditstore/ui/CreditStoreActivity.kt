@@ -24,6 +24,7 @@ import com.example.lagallens.presentation.feature.creditstore.contract.CreditSto
 import com.example.lagallens.presentation.feature.creditstore.flow.ui.PurchaseConfirmationActivity
 import com.example.lagallens.presentation.feature.creditstore.flow.ui.CreditHistoryActivity
 import com.example.lagallens.presentation.feature.creditstore.viewmodel.CreditStoreViewModel
+import com.example.lagallens.presentation.feature.creditstore.utils.showCreditBalance
 import com.example.lagallens.LegalLensApplication
 import kotlinx.coroutines.launch
 
@@ -76,9 +77,13 @@ class CreditStoreActivity : AppCompatActivity() {
     }
 
     private fun render(state: CreditStoreUiState) = with(binding) {
-        creditStoreBalance.text = if (state.isBackendUnavailable) getString(R.string.credit_backend_not_configured)
-        else if (state.isBalanceUnavailable) getString(R.string.credit_balance_load_failed)
-        else getString(R.string.credit_store_balance_credits, if (viewModel.isOwnerSession()) state.balanceCredits else 0)
+        creditStoreBalance.showCreditBalance(
+            text = if (state.isBackendUnavailable) getString(R.string.credit_backend_not_configured)
+            else if (state.isBalanceUnavailable) getString(R.string.credit_balance_load_failed)
+            else getString(R.string.credit_store_balance_credits, if (viewModel.isOwnerSession()) state.balanceCredits else 0),
+            isMessage = state.isBackendUnavailable || state.isBalanceUnavailable,
+            balanceTextSize = R.dimen.sp_18
+        )
         creditStoreTopUpAction.isEnabled = !state.isLoading
         val packageMessage = when {
             state.isPaymentUnavailable -> R.string.credit_payment_not_connected

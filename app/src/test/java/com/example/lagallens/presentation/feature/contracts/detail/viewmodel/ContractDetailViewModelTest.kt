@@ -33,19 +33,51 @@ class ContractDetailViewModelTest {
         val base = repository()
         var attempts = 0
         val failing = object : ContractRepository by base {
-            override suspend fun deleteContract(contractId: String): Boolean {
+            override suspend fun deleteContract(contractId: String, confirmPaidResults: Boolean): Boolean {
                 if (++attempts == 1) throw IOException("offline")
                 return base.deleteContract(contractId)
             }
         }
         val vm = ContractDetailViewModel(failing)
         vm.loadContract("collaborator")
-        vm.onEvent(ContractDetailUiEvent.DeleteConfirmed)
+        vm.onEvent(ContractDetailUiEvent.DeleteConfirmed())
         assertEquals(ContractDetailUiEffect.ShowMessage(R.string.contract_action_failed), vm.uiEffect.first())
 
-        vm.onEvent(ContractDetailUiEvent.DeleteConfirmed)
+        vm.onEvent(ContractDetailUiEvent.DeleteConfirmed())
         assertEquals(ContractDetailUiEffect.NavigateBack, vm.uiEffect.first())
         assertEquals(2, attempts)
+    }
+
+    @Test fun deletingAContractWithPaidResultsAsksAgainAndThenConfirms() = runTest {
+        val base = repository()
+        val confirmations = mutableListOf<Boolean>()
+        val vm = ContractDetailViewModel(object : ContractRepository by base {
+            override suspend fun deleteContract(contractId: String, confirmPaidResults: Boolean): Boolean {
+                confirmations += confirmPaidResults
+                if (!confirmPaidResults) throw com.example.lagallens.domain.model.ContractHasPaidResultsException()
+                return true
+            }
+        })
+        vm.loadContract("collaborator")
+
+        vm.onEvent(ContractDetailUiEvent.DeleteConfirmed())
+        assertEquals(ContractDetailUiEffect.ShowPaidResultsDeleteConfirmation, vm.uiEffect.first())
+
+        vm.onEvent(ContractDetailUiEvent.DeleteConfirmed(confirmPaidResults = true))
+        assertEquals(ContractDetailUiEffect.NavigateBack, vm.uiEffect.first())
+        assertEquals(listOf(false, true), confirmations)
+    }
+
+    @Test fun aContractThatCannotBeLoadedIsNotShownAsAnEmptyDraft() = runTest {
+        val base = repository()
+        val vm = ContractDetailViewModel(object : ContractRepository by base {
+            override suspend fun getContract(contractId: String) = throw IOException("offline")
+        })
+
+        vm.loadContract("collaborator")
+
+        assertEquals(ContractDetailUiEffect.ShowMessage(R.string.contract_detail_load_failed), vm.uiEffect.first())
+        assertEquals(ContractDetailUiEffect.NavigateBack, vm.uiEffect.first())
     }
 
     @Test fun failedRenameKeepsTheIdForRetry() = runTest {
@@ -77,7 +109,8 @@ class ContractDetailViewModelTest {
             }
         })
         vm.loadContract("collaborator")
-        assertEquals(ContractDetailUiEffect.ShowMessage(R.string.contract_action_failed), vm.uiEffect.first())
+        assertEquals(ContractDetailUiEffect.ShowMessage(R.string.contract_detail_load_failed), vm.uiEffect.first())
+        assertEquals(ContractDetailUiEffect.NavigateBack, vm.uiEffect.first())
 
         vm.loadContract("collaborator")
         testScheduler.runCurrent()

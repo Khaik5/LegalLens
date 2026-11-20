@@ -117,6 +117,7 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_credit_secondary_action"
                 android:backgroundTint="@null"
+                app:backgroundTint="@null"
                 android:paddingStart="@dimen/dp_16"
                 android:paddingEnd="@dimen/dp_16"
                 android:text="@string/credit_load_retry"

@@ -60,6 +60,7 @@ class UploadProgressViewModel(private val uploadRepository: DocumentUploadReposi
                 sessionKey = event.sessionKey
             )
             var destination: UploadProgressEffect = UploadProgressEffect.NavigateToUploadError(UploadFailure.UNKNOWN)
+            var duplicateOfTitle: String? = null
             try {
                 uploadRepository.upload(request).collect { state ->
                     when (state) {
@@ -67,7 +68,10 @@ class UploadProgressViewModel(private val uploadRepository: DocumentUploadReposi
                         ProcessingState.Completed -> destination = UploadProgressEffect.NavigateToOcrProcessing(
                             event.fileName, event.fileDetails, event.documentUri, event.documentId, event.mimeType
                         )
-                        is ProcessingState.Uploaded -> destination = uploadedDestination(event, state)
+                        is ProcessingState.Uploaded -> {
+                            destination = uploadedDestination(event, state)
+                            duplicateOfTitle = state.duplicateOfTitle
+                        }
                         is ProcessingState.Failed -> destination = UploadProgressEffect.NavigateToUploadError(state.reason)
                     }
                 }
@@ -77,6 +81,7 @@ class UploadProgressViewModel(private val uploadRepository: DocumentUploadReposi
                 destination = UploadProgressEffect.NavigateToUploadError(UploadFailure.UNKNOWN)
             }
             finishedDocumentId = event.documentId
+            duplicateOfTitle?.let { _effects.send(UploadProgressEffect.ShowDuplicateNotice(it)) }
             _effects.send(destination)
         }
     }

@@ -35,6 +35,15 @@ interface ChatbotRepository {
         check(currentSessionKey() == sessionKey) { "Session changed" }
         saveMessages(conversationId, contractId, contractName, contractType, messages)
     }
+    /**
+     * The stored id of [conversationId]. A repository may open a new chat as a local placeholder that is only
+     * stored with its first question; work that needs a stored conversation before that, such as drafting,
+     * calls this first. Repositories that store conversations at once return the id unchanged.
+     */
+    suspend fun persistConversationForSession(sessionKey: String?, conversationId: String): String {
+        check(currentSessionKey() == sessionKey) { "Session changed" }
+        return conversationId
+    }
     suspend fun openConversation(contractName: String, contractType: String, contractId: String? = null, conversationId: String? = null): ChatbotConversation
 
     suspend fun sendMessage(conversationId: String, message: String): ChatbotReply

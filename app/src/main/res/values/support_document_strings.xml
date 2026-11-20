@@ -50,7 +50,7 @@
     <string name="contract_rename_description">Đặt tên để dễ tìm lại hợp đồng của bạn.</string>
     <string name="contract_rename_label">Tên hợp đồng</string>
     <string name="contract_rename_hint">Nhập tên hợp đồng</string>
-    <string name="contract_rename_helper">Tên mới được cập nhật trên màn hình này trong phiên hiện tại.</string>
+    <string name="contract_rename_helper">Tên mới sẽ được lưu cho hợp đồng này.</string>
     <string name="contract_rename_empty">Tên hợp đồng không được để trống. Vui lòng nhập tên trước khi lưu.</string>
     <string name="contract_rename_saving">Đang lưu tên hợp đồng. Vui lòng chờ; các thao tác tạm thời bị vô hiệu hóa.</string>
     <string name="contract_rename_save">Lưu</string>

@@ -75,7 +75,7 @@ class ContractDetailFragment : Fragment() {
             viewLifecycleOwner
         ) { _, result ->
             if (result.getBoolean(ContractDeleteDialog.KEY_DELETE_CONFIRMED)) {
-                viewModel.onEvent(ContractDetailUiEvent.DeleteConfirmed)
+                viewModel.onEvent(ContractDetailUiEvent.DeleteConfirmed(result.getBoolean(ContractDeleteDialog.KEY_PAID_RESULTS_CONFIRMED)))
             }
         }
         parentFragmentManager.setFragmentResultListener(ContractRenameDialog.RESULT_KEY, viewLifecycleOwner) { _, result ->
@@ -131,6 +131,7 @@ class ContractDetailFragment : Fragment() {
                             )
                         )
                         ContractDetailUiEffect.ShowDeleteConfirmation -> showDeleteConfirmation()
+                        ContractDetailUiEffect.ShowPaidResultsDeleteConfirmation -> showDeleteConfirmation(paidResults = true)
                         ContractDetailUiEffect.ShowRenameDialog -> {
                             if (parentFragmentManager.findFragmentByTag(ContractRenameDialog.TAG) == null) {
                                 ContractRenameDialog.newInstance(binding.tvContractTitle.text.toString()).show(parentFragmentManager, ContractRenameDialog.TAG)
@@ -212,9 +213,9 @@ class ContractDetailFragment : Fragment() {
         assistantAdapter.submitList(state.assistantActions)
     }
 
-    private fun showDeleteConfirmation() {
+    private fun showDeleteConfirmation(paidResults: Boolean = false) {
         if (parentFragmentManager.findFragmentByTag(ContractDeleteDialog.TAG) == null) {
-            ContractDeleteDialog().show(parentFragmentManager, ContractDeleteDialog.TAG)
+            ContractDeleteDialog.newInstance(paidResults).show(parentFragmentManager, ContractDeleteDialog.TAG)
         }
     }
 

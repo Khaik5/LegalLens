@@ -1,5 +1,7 @@
 package com.example.lagallens.presentation.feature.contracts.viewmodel
 
+import com.example.lagallens.core.utils.matchesSearch
+
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -97,7 +99,9 @@ class ContractListViewModel(application: Application) : AndroidViewModel(applica
     private fun ContractListItem.matches(filter: ContractFilter): Boolean = when (filter) {
         ContractFilter.ALL -> true
         ContractFilter.ANALYZED -> processingStatus == ContractProcessingStatus.COMPLETE
-        ContractFilter.PROCESSING -> processingStatus == ContractProcessingStatus.PROCESSING
+        // "Chờ xử lý" means not analysed yet, so it also lists drafts that have no analysis.
+        ContractFilter.PROCESSING -> processingStatus == ContractProcessingStatus.PROCESSING ||
+            processingStatus == ContractProcessingStatus.DRAFT
         ContractFilter.HIGH_RISK -> riskLevel == ContractRiskLevel.HIGH || riskLevel == ContractRiskLevel.CRITICAL
     }
 
@@ -115,9 +119,9 @@ class ContractListViewModel(application: Application) : AndroidViewModel(applica
     }
 
     private fun ContractListItem.matches(query: String): Boolean {
-        val normalizedQuery = query.trim().lowercase()
+        if (query.isBlank()) return true
         val title = titleOverride ?: getApplication<Application>().getString(titleRes)
-        return normalizedQuery.isBlank() || title.lowercase().contains(normalizedQuery)
+        return title.matchesSearch(query)
     }
 
     private fun navigateToDetail(contractId: String) {
