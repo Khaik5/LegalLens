@@ -1,5 +1,5 @@
 <resources>
-    <string name="viewer_title">View PDF</string><string name="viewer_preview">Illustrative preview</string><string name="viewer_loading">Loading document…</string><string name="viewer_loading_message">Preparing the document preview. Please wait.</string><string name="viewer_error">Unable to open document</string><string name="viewer_error_message">No PDF is attached to this sample contract. Choose a PDF file from your device to view it.</string><string name="viewer_retry">Choose PDF</string><string name="viewer_choose_pdf">Choose PDF</string><string name="viewer_page_count">%1$d / %2$d</string><string name="viewer_zoom_level">%1$d%%</string><string name="viewer_previous_page">Previous page</string><string name="viewer_next_page">Next page</string><string name="viewer_zoom_out">Zoom out</string><string name="viewer_zoom_in">Zoom in</string><string name="viewer_share">Share document</string><string name="viewer_metadata">%1$s · %2$s</string>
+    <string name="viewer_title">View document</string><string name="viewer_preview">Illustrative preview</string><string name="viewer_loading">Loading document…</string><string name="viewer_loading_message">Preparing the document preview. Please wait.</string><string name="viewer_error">Unable to open document</string><string name="viewer_error_message">No PDF is attached to this sample contract. Choose a PDF file from your device to view it.</string><string name="viewer_retry">Choose PDF</string><string name="viewer_choose_pdf">Choose PDF</string><string name="viewer_page_count">%1$d / %2$d</string><string name="viewer_zoom_level">%1$d%%</string><string name="viewer_previous_page">Previous page</string><string name="viewer_next_page">Next page</string><string name="viewer_zoom_out">Zoom out</string><string name="viewer_zoom_in">Zoom in</string><string name="viewer_share">Share document</string><string name="viewer_metadata">%1$s · %2$s</string>
     <string name="compare_title">Compare contracts</string>
     <string name="compare_no_text_difference_any">The two contracts have no differing clauses.</string>
     <string name="compare_overview_empty">The two contracts have no differences in key information.</string>
@@ -11,8 +11,38 @@
     <string name="compare_value_yes">Yes</string>
     <string name="compare_value_no">No</string>
     <string name="compare_clause_text_b">B · %1$s</string>
-    <string name="compare_risk_not_analyzed">Both contracts must be analyzed to compare risk scores.</string>
+    <string name="compare_risk_not_analyzed">Risk data is not available to compare these two contracts yet.</string>
     <string name="compare_risk_not_analyzed_short">Not analyzed</string>
+    <string name="compare_overview_no_data">There is no key information on the two contracts to compare yet.</string>
+    <string name="compare_key_facts_heading">Key facts from the analyses</string>
+    <string name="compare_key_facts_preview_note">One contract\'s analysis is not unlocked, so only its free preview is shown.</string>
+    <string name="compare_risk_source_mismatch">At least one risk score comes from an analysis of another version of the document. Analyse it again for an exact score.</string>
+    <string name="compare_section_preamble">Preamble</string>
+    <string name="compare_change_similarity">%1$d%% alike</string>
+    <string name="compare_change_renumbered">renumbered</string>
+    <string name="compare_error_access_denied">You do not have access to one of the two contracts.</string>
+    <string name="compare_field_contract_type">Contract type</string>
+    <string name="compare_field_start_date">Effective date</string>
+    <string name="compare_field_end_date">End date</string>
+    <string name="compare_field_parties">Parties</string>
+    <string name="compare_field_job_title">Job title</string>
+    <string name="compare_field_work_location">Work location</string>
+    <string name="compare_field_basic_salary">Basic salary</string>
+    <string name="compare_field_salary_currency">Salary currency</string>
+    <string name="compare_field_allowances">Allowances</string>
+    <string name="compare_field_working_hours_per_week">Working hours per week</string>
+    <string name="compare_field_probation_period_days">Probation period (days)</string>
+    <string name="compare_field_probation_salary">Probation salary</string>
+    <string name="compare_field_social_insurance">Social insurance</string>
+    <string name="compare_field_annual_leave_days">Annual leave (days)</string>
+    <string name="compare_field_termination_notice_days">Termination notice (days)</string>
+    <string name="compare_contract_type_fixed_term">Fixed-term contract</string>
+    <string name="compare_contract_type_indefinite">Indefinite-term contract</string>
+    <string name="compare_contract_type_seasonal">Seasonal contract</string>
+    <string name="compare_contract_type_probation">Probation contract</string>
+    <string name="compare_contract_type_other">Other</string>
+    <string name="compare_party_role_employer">Employer</string>
+    <string name="compare_party_role_employee">Employee</string>
     <string name="compare_risk_score_value">%1$s/100</string>
     <string name="compare_risk_delta">Score difference (B − A): %1$s</string>
     <string name="compare_error_document_missing">One of the contracts has no document to compare.</string>

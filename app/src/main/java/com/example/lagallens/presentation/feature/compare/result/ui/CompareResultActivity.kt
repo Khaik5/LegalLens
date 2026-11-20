@@ -21,7 +21,11 @@ import com.example.lagallens.databinding.ActivityCompareResultBinding
 import com.example.lagallens.databinding.ItemCompareClauseBinding
 import com.example.lagallens.databinding.ItemCompareOverviewBinding
 import com.example.lagallens.domain.model.ContractChangeType
+import com.example.lagallens.domain.model.ContractFieldDifference
 import com.example.lagallens.domain.model.ContractFieldValue
+import com.example.lagallens.domain.model.ContractSectionKind
+import com.example.lagallens.presentation.feature.compare.result.utils.pairKeyFacts
+import kotlin.math.roundToInt
 import com.example.lagallens.domain.model.EmploymentContractComparison
 import com.example.lagallens.domain.model.EmploymentContractRisk
 import com.example.lagallens.presentation.common.utils.applySystemBarInsets
@@ -32,6 +36,7 @@ import com.example.lagallens.presentation.feature.compare.result.contract.Compar
 import com.example.lagallens.presentation.feature.compare.result.contract.CompareResultUiEffect
 import com.example.lagallens.presentation.feature.compare.result.contract.CompareResultUiEvent
 import com.example.lagallens.presentation.feature.compare.result.contract.CompareResultUiState
+import com.example.lagallens.presentation.feature.compare.result.utils.CompareFieldFormatter
 import com.example.lagallens.presentation.feature.compare.result.viewmodel.CompareResultViewModel
 import com.example.lagallens.presentation.feature.compare.select.contract.CompareContract
 import kotlinx.coroutines.launch
@@ -42,6 +47,7 @@ class CompareResultActivity : AppCompatActivity() {
     private val viewModel by viewModels<CompareResultViewModel>()
     private var visibleTab: CompareResultTab? = null
     private var renderedComparison: EmploymentContractComparison? = null
+    private val fieldFormatter by lazy { CompareFieldFormatter(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -114,45 +120,79 @@ class CompareResultActivity : AppCompatActivity() {
 
     private fun renderOverview(comparison: EmploymentContractComparison) = with(binding.compareOverviewContent) {
         removeAllViews()
-        // Backend comparisons list labelled fields; DEMO ones only have text sections.
-        val rows = comparison.fieldDifferences
-            .filter { it.changeType != ContractChangeType.UNCHANGED }
-            .map { Triple(it.label, it.firstValue?.let(::valueText), it.secondValue?.let(::valueText)) }
-            .ifEmpty {
-                comparison.differences.filter { it.changeType != ContractChangeType.UNCHANGED }
-                    .take(OVERVIEW_SAMPLE_ROWS).map { Triple(it.section, it.firstText, it.secondText) }
+        // The backend also lists key facts as "keyFact:<label>" fields paired by exact label, which splits the same
+        // topic named differently into a removed and an added row; they are shown once below, paired by topic.
+        val changedFields = comparison.fieldDifferences.filter {
+            it.changeType != ContractChangeType.UNCHANGED && it.isInformative() &&
+                !(it.field.startsWith(KEY_FACT_FIELD_PREFIX) && (comparison.firstKeyFacts.isNotEmpty() || comparison.secondKeyFacts.isNotEmpty()))
+        }
+        // Backend comparisons list labelled fields; only DEMO ones fall back to their text sections.
+        val rows = when {
+            changedFields.isNotEmpty() -> changedFields.map { difference ->
+                Triple(
+                    fieldFormatter.label(difference.field, difference.label),
+                    difference.firstValue?.let { fieldFormatter.value(difference.field, it) },
+                    difference.secondValue?.let { fieldFormatter.value(difference.field, it) }
+                )
             }
-        if (rows.isEmpty()) {
-            addView(messageView(R.string.compare_overview_empty))
+            comparison.isSample -> comparison.differences.filter { it.changeType != ContractChangeType.UNCHANGED }
+                .take(OVERVIEW_SAMPLE_ROWS).map { Triple(it.section, it.firstText, it.secondText) }
+            else -> emptyList()
+        }
+        val keyFactRows = keyFactRows(comparison)
+        if (rows.isEmpty() && keyFactRows.isEmpty()) {
+            val message = if (comparison.fieldDifferences.any { it.isInformative() }) R.string.compare_overview_empty else R.string.compare_overview_no_data
+            addView(messageView(message))
             return@with
         }
-        rows.forEach { (label, first, second) ->
-            val row = ItemCompareOverviewBinding.inflate(LayoutInflater.from(context), this, false)
-            row.compareOverviewTitle.text = label
-            row.compareOverviewA.text = first?.takeIf { it.isNotBlank() } ?: getString(R.string.compare_value_missing)
-            row.compareOverviewB.text = second?.takeIf { it.isNotBlank() } ?: getString(R.string.compare_value_missing)
-            addView(row.root)
+        rows.forEach { (label, first, second) -> addOverviewRow(label, first, second) }
+        if (keyFactRows.isNotEmpty()) {
+            addView(sectionTitleView(R.string.compare_key_facts_heading))
+            keyFactRows.forEach { (label, first, second) -> addOverviewRow(label, first, second) }
+            if (comparison.isKeyFactsPreview) addView(messageView(R.string.compare_key_facts_preview_note))
         }
     }
 
-    private fun valueText(value: ContractFieldValue): String = when (value) {
-        is ContractFieldValue.Text -> value.value
-        is ContractFieldValue.Flag -> getString(if (value.isYes) R.string.compare_value_yes else R.string.compare_value_no)
+    private fun android.widget.LinearLayout.addOverviewRow(label: String, first: String?, second: String?) {
+        val row = ItemCompareOverviewBinding.inflate(LayoutInflater.from(context), this, false)
+        row.compareOverviewTitle.text = label
+        row.compareOverviewA.text = first?.takeIf { it.isNotBlank() } ?: getString(R.string.compare_value_missing)
+        row.compareOverviewB.text = second?.takeIf { it.isNotBlank() } ?: getString(R.string.compare_value_missing)
+        addView(row.root)
+    }
+
+    private fun keyFactRows(comparison: EmploymentContractComparison): List<Triple<String, String?, String?>> =
+        pairKeyFacts(comparison.firstKeyFacts, comparison.secondKeyFacts).map { Triple(it.label, it.first, it.second) }
+
+    private fun sectionTitleView(@StringRes text: Int) = TextView(this).apply {
+        layoutParams = android.widget.LinearLayout.LayoutParams(
+            android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+        ).apply { topMargin = resources.getDimensionPixelSize(R.dimen.dp_20) }
+        setText(text)
+        setTextColor(ContextCompat.getColor(context, R.color.legal_lens_primary))
+        setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX, resources.getDimension(R.dimen.sp_15))
+        setTypeface(typeface, android.graphics.Typeface.BOLD)
     }
 
     private fun renderRisk(comparison: EmploymentContractComparison) = with(binding) {
         val risk = comparison.riskComparison
-        compareRiskEmpty.isVisible = risk == null
+        // The note explains a missing comparison, or warns that a score belongs to another version of the document.
+        val staleSource = risk != null && (risk.first.matchesSource == false || risk.second.matchesSource == false)
+        compareRiskEmpty.isVisible = risk == null || staleSource
+        compareRiskEmpty.setText(if (risk == null) R.string.compare_risk_not_analyzed else R.string.compare_risk_source_mismatch)
         compareRiskScores.isVisible = risk != null
-        compareRiskDelta.isVisible = risk != null
+        compareRiskDelta.isVisible = risk?.scoreDelta != null
         if (risk == null) return@with
         bindScore(compareRiskScoreA, compareRiskLevelA, risk.first.score, risk.first.risk)
         bindScore(compareRiskScoreB, compareRiskLevelB, risk.second.score, risk.second.risk)
-        compareRiskDelta.text = getString(R.string.compare_risk_delta, String.format(Locale.getDefault(), "%+.1f", risk.scoreDelta))
+        risk.scoreDelta?.let { delta ->
+            compareRiskDelta.text = getString(R.string.compare_risk_delta, String.format(Locale.getDefault(), "%+.1f", delta))
+        }
     }
 
-    private fun bindScore(scoreView: TextView, levelView: TextView, score: Double, risk: EmploymentContractRisk) {
-        scoreView.text = getString(R.string.compare_risk_score_value, String.format(Locale.getDefault(), "%.0f", score))
+    private fun bindScore(scoreView: TextView, levelView: TextView, score: Double?, risk: EmploymentContractRisk) {
+        scoreView.text = score?.let { getString(R.string.compare_risk_score_value, String.format(Locale.getDefault(), "%.0f", it)) }
+            ?: getString(R.string.compare_value_missing)
         scoreView.setTextColor(ContextCompat.getColor(this, riskColor(risk)))
         levelView.setText(riskLabel(risk))
     }
@@ -169,8 +209,9 @@ class CompareResultActivity : AppCompatActivity() {
         changed.forEachIndexed { index, difference ->
             val key = "clause:$index"
             val item = ItemCompareClauseBinding.inflate(LayoutInflater.from(this@CompareResultActivity), compareClausesList, false)
-            item.compareClauseTitle.text = difference.section
-            item.compareClauseChange.setText(changeLabel(difference.changeType))
+            item.compareClauseTitle.text =
+                if (difference.kind == ContractSectionKind.PREAMBLE) getString(R.string.compare_section_preamble) else difference.section
+            item.compareClauseChange.text = changeText(difference)
             item.compareClauseChange.setTextColor(ContextCompat.getColor(this@CompareResultActivity, changeColor(difference.changeType)))
             item.compareClauseDetails.isVisible = key in expanded
             item.compareClauseTextA.text = getString(R.string.compare_clause_text_a, difference.firstText.ifBlank { getString(R.string.compare_value_missing) })
@@ -181,12 +222,29 @@ class CompareResultActivity : AppCompatActivity() {
         }
     }
 
+    /** The backend reports contract type KHAC while it does not know the type, so two of them say nothing about the contracts. */
+    private fun ContractFieldDifference.isInformative() =
+        !(field == "contractType" && changeType == ContractChangeType.UNCHANGED && firstValue == ContractFieldValue.Text("KHAC"))
+
     private fun messageView(@StringRes text: Int) = TextView(this).apply {
+        layoutParams = android.widget.LinearLayout.LayoutParams(
+            android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+        ).apply { topMargin = resources.getDimensionPixelSize(R.dimen.dp_16) }
         setText(text)
         setTextColor(ContextCompat.getColor(context, R.color.legal_lens_secondary_text))
         val padding = resources.getDimensionPixelSize(R.dimen.dp_16)
         setPadding(padding, padding, padding, padding)
         setBackgroundResource(R.drawable.bg_compare_notice)
+    }
+
+    /** The change, plus how alike both sides are and whether the clause was renumbered, when the backend says so. */
+    private fun changeText(difference: com.example.lagallens.domain.model.ContractTextDifference): String {
+        val parts = mutableListOf(getString(changeLabel(difference.changeType)))
+        if (difference.changeType == ContractChangeType.MODIFIED) {
+            difference.similarity?.let { parts += getString(R.string.compare_change_similarity, (it * 100).roundToInt()) }
+        }
+        if (difference.isRenumbered) parts += getString(R.string.compare_change_renumbered)
+        return parts.joinToString(" · ")
     }
 
     @StringRes private fun changeLabel(type: ContractChangeType) = when (type) {
@@ -223,6 +281,7 @@ class CompareResultActivity : AppCompatActivity() {
 
     companion object {
         private const val OVERVIEW_SAMPLE_ROWS = 6
+        private const val KEY_FACT_FIELD_PREFIX = "keyFact:"
         private const val EXTRA_FIRST_ID = "compare_first_id"
         private const val EXTRA_SECOND_ID = "compare_second_id"
         private const val EXTRA_FIRST_NAME = "compare_first_name"

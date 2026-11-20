@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+import com.example.lagallens.presentation.feature.analysis.risk.findings.model.AnalysisRiskSeverity
 import com.example.lagallens.presentation.feature.analysis.risk.findings.model.toRiskFinding
 
 class AnalysisRiskFindingsViewModel : ViewModel() {
@@ -40,6 +41,10 @@ class AnalysisRiskFindingsViewModel : ViewModel() {
         scopedFindings = entries
         val filtered = entries.filter { filter.severity == null || it.severity == filter.severity }
         _uiState.update { it.copy(selectedFilter = filter, findings = filtered, lockedCount = detail.findings.size - count,
+            allCount = entries.size,
+            highCount = entries.count { finding -> finding.severity == AnalysisRiskSeverity.HIGH },
+            mediumCount = entries.count { finding -> finding.severity == AnalysisRiskSeverity.MEDIUM },
+            lowCount = entries.count { finding -> finding.severity == AnalysisRiskSeverity.LOW },
             status = if (filtered.isEmpty()) com.example.lagallens.presentation.feature.analysis.SnapshotContentStatus.EMPTY else com.example.lagallens.presentation.feature.analysis.SnapshotContentStatus.READY) }
     }
 

@@ -8,7 +8,10 @@ data class ContractResponse(
     val createdAt: String,
     val updatedAt: String,
     val latestRiskLevel: String? = null,
-    val latestAnalysisStatus: String? = null
+    val latestAnalysisStatus: String? = null,
+    /** ISO dates (yyyy-MM-dd) the backend fills in from the analysis; null until then. */
+    val startDate: String? = null,
+    val endDate: String? = null
 )
 
 data class ContractPageResponse(

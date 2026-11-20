@@ -13,10 +13,10 @@
     <string name="analysis_result_medium">Medium</string>
     <string name="analysis_risk_overview_high_risk">High risk</string>
     <string name="analysis_risk_overview_low_risk">Low risk</string>
-    <string name="analysis_risk_findings_filter_all">All</string>
-    <string name="analysis_risk_findings_filter_high">High</string>
-    <string name="analysis_risk_findings_filter_medium">Medium</string>
-    <string name="analysis_risk_findings_filter_low">Low</string>
+    <string name="analysis_risk_findings_filter_all">All (%1$d)</string>
+    <string name="analysis_risk_findings_filter_high">High (%1$d)</string>
+    <string name="analysis_risk_findings_filter_medium">Medium (%1$d)</string>
+    <string name="analysis_risk_findings_filter_low">Low (%1$d)</string>
     <string name="analysis_risk_findings_high">High</string>
     <string name="analysis_risk_findings_medium">Medium</string>
     <string name="analysis_risk_findings_low">Low</string>

@@ -5,6 +5,7 @@ import com.example.lagallens.data.datasource.local.datastore.AuthSessionStore
 import com.example.lagallens.data.datasource.local.datastore.currentSessionScope
 import com.example.lagallens.data.datasource.remote.OcrRemoteDataSource
 import com.example.lagallens.data.model.response.OcrResultResponse
+import com.example.lagallens.domain.model.ocr.OcrExtraction
 import com.example.lagallens.domain.model.ocr.OcrResult
 import com.example.lagallens.domain.model.ocr.OcrResultNotReadyException
 import com.example.lagallens.domain.model.processing.ProcessingState
@@ -73,7 +74,13 @@ class RemoteOcrRepository(
             confidenceLabel = "",
             confidencePercentage = confidence?.let { "${(it * 100).roundToInt()}%" } ?: "—",
             documentText = result.text.orEmpty(),
-            confidence = confidence
+            confidence = confidence,
+            extraction = when (result.extractionMethod) {
+                "TEXT_LAYER" -> OcrExtraction.TEXT_LAYER
+                "OCR" -> OcrExtraction.RECOGNIZED
+                "MIXED" -> OcrExtraction.MIXED
+                else -> null
+            }
         )
     }
 

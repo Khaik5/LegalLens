@@ -8,6 +8,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
+import androidx.core.view.isVisible
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.Lifecycle
@@ -26,6 +27,7 @@ import kotlinx.coroutines.launch
 
 class AnalysisRiskOverviewActivity : com.example.lagallens.presentation.feature.analysis.AnalysisScopedActivity() {
     override val requiresUnlock = false
+    override val observesUnlock = true
     private lateinit var binding: ActivityAnalysisRiskOverviewBinding
     private val viewModel by viewModels<AnalysisRiskOverviewViewModel>()
 
@@ -62,7 +64,7 @@ class AnalysisRiskOverviewActivity : com.example.lagallens.presentation.feature.
         )
     }
 
-    override fun onAnalysisValidated(identity: com.example.lagallens.domain.model.analysis.AnalysisIdentity, detail: com.example.lagallens.domain.model.analysis.AnalysisDetail) { viewModel.setResult(identity, detail) }
+    override fun onAnalysisValidated(identity: com.example.lagallens.domain.model.analysis.AnalysisIdentity, detail: com.example.lagallens.domain.model.analysis.AnalysisDetail) { viewModel.setResult(identity, detail, validatedUnlockStatus?.isUnlocked == true) }
     override fun onAnalysisInvalidated() { viewModel.clearResult() }
 
     private fun observeViewModel() {
@@ -76,12 +78,21 @@ class AnalysisRiskOverviewActivity : com.example.lagallens.presentation.feature.
 
     private fun render(state: AnalysisRiskOverviewUiState) = with(binding) {
         analysisRiskOverviewScore.text = state.score?.toString() ?: getString(R.string.analysis_result_unavailable)
+        analysisRiskOverviewScoreRing.progress = state.score ?: 0
+        analysisRiskOverviewScoreRing.progressTintList = null
         analysisRiskOverviewSeverity.visibility = if (state.highestSeverity == null) android.view.View.GONE else android.view.View.VISIBLE
         state.highestSeverity?.let { level ->
             analysisRiskOverviewSeverity.setText(level.labelRes)
             analysisRiskOverviewSeverity.setTextColor(getColor(level.labelColorRes))
+            analysisRiskOverviewScoreRing.progressTintList =
+                android.content.res.ColorStateList.valueOf(getColor(level.labelColorRes))
             analysisRiskOverviewSeverity.setBackgroundResource(level.badgeBackgroundRes)
         }
+        analysisRiskOverviewSummaryTitle.text = getString(R.string.analysis_risk_overview_summary_title, state.totalRiskCount)
+        analysisRiskOverviewLockedNote.isVisible = state.lockedRiskCount > 0
+        analysisRiskOverviewLockedNote.text = getString(
+            R.string.analysis_risk_overview_locked_note, state.totalRiskCount - state.lockedRiskCount, state.totalRiskCount
+        )
         analysisRiskOverviewHighRiskCount.text = state.highRiskCount.toString()
         analysisRiskOverviewMediumRiskCount.text = state.mediumRiskCount.toString()
         analysisRiskOverviewLowRiskCount.text = state.lowRiskCount.toString()

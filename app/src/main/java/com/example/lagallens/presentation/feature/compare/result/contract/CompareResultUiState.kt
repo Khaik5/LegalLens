@@ -10,7 +10,7 @@ data class CompareResultUiState(
     val documentA: String = "",
     val documentB: String = "",
     val status: CompareResultStatus = CompareResultStatus.LOADING,
-    val selectedTab: CompareResultTab = CompareResultTab.CLAUSES,
+    val selectedTab: CompareResultTab = CompareResultTab.OVERVIEW,
     val expandedSections: Set<String> = emptySet(),
     val isInitialized: Boolean = false,
     val hasExample: Boolean = false,

@@ -5,7 +5,8 @@ sealed interface ProcessingState {
     /** [progressPercent] and [stage] are optional because not every job reports both. */
     data class Running(val progressPercent: Int? = null, val stage: Int? = null) : ProcessingState
     data object Completed : ProcessingState
-    data class Uploaded(val contractId: String, val documentId: String) : ProcessingState
+    /** [duplicateOfTitle] names the contract that already holds the same file, when the backend found one. */
+    data class Uploaded(val contractId: String, val documentId: String, val duplicateOfTitle: String? = null) : ProcessingState
     data class Failed(
         val isRetryable: Boolean = true,
         val reason: UploadFailure = UploadFailure.UNKNOWN

@@ -1,5 +1,7 @@
 package com.example.lagallens.presentation.feature.chatbot.history.viewmodel
 
+import com.example.lagallens.core.utils.matchesSearch
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.lagallens.presentation.feature.chatbot.history.contract.ChatbotHistoryConversation
@@ -89,9 +91,8 @@ class ChatbotHistoryViewModel(private val repository: ChatbotRepository? = null)
     }
 
     private fun filter(query: String) {
-        val value = query.trim()
         _uiState.update { state -> state.copy(query = query, conversations = allConversations.filter {
-            it.contractName.contains(value, ignoreCase = true) || it.preview.contains(value, ignoreCase = true)
+            it.contractName.matchesSearch(query) || it.preview.matchesSearch(query)
         }) }
     }
 

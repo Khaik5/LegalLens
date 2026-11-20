@@ -11,8 +11,10 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import com.example.lagallens.BuildConfig
 import com.example.lagallens.LegalLensApplication
 import com.example.lagallens.R
+import com.example.lagallens.presentation.common.utils.isDemoData
 import com.example.lagallens.databinding.FragmentProfileSettingsBinding
 import com.example.lagallens.databinding.ItemProfileSettingToggleBinding
 import com.example.lagallens.presentation.feature.profile.settings.contract.ProfileAppearance
@@ -78,6 +80,14 @@ class ProfileSettingsFragment : Fragment() {
         // No biometric lock exists yet, so the control is not offered.
         (binding.toggleBiometric.root.parent as View).visibility = View.GONE
         binding.tvAccountSecurityTitle.visibility = View.GONE
+        // With real data only the in-app switch does something: the backend skips in-app notifications when it is
+        // off. There is no push or weekly email delivery yet, so those switches are not offered. DEMO keeps all three.
+        if (!isDemoData()) {
+            val rows = binding.togglePush.root.parent as ViewGroup
+            val inAppIndex = rows.indexOfChild(binding.toggleInApp.root)
+            for (index in 0 until inAppIndex) rows.getChildAt(index).visibility = View.GONE
+        }
+        binding.tvSettingsVersion.text = getString(R.string.profile_settings_version, BuildConfig.VERSION_NAME)
         binding.btnSystemAppearance.setOnClickListener {
             viewModel.onEvent(ProfileSettingsUiEvent.AppearanceSelected(ProfileAppearance.SYSTEM))
         }

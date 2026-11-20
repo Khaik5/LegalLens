@@ -21,6 +21,7 @@ sealed interface ContractDetailUiEffect {
         val contractId: String
     ) : ContractDetailUiEffect
     data object ShowDeleteConfirmation : ContractDetailUiEffect
+    data object ShowPaidResultsDeleteConfirmation : ContractDetailUiEffect
     data object ShowRenameDialog : ContractDetailUiEffect
     data object ShowExportSheet : ContractDetailUiEffect
     data class ShowMessage(@param:StringRes val messageRes: Int) : ContractDetailUiEffect

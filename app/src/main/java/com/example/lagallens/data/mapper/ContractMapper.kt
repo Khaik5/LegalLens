@@ -5,6 +5,7 @@ import com.example.lagallens.domain.model.EmploymentContractRisk
 import com.example.lagallens.domain.model.EmploymentContractStatus
 import com.example.lagallens.data.model.response.ContractResponse
 import java.time.Instant
+import java.time.LocalDate
 
 internal fun ContractResponse.toContract() = EmploymentContract(
     id = id.toString(),
@@ -30,5 +31,6 @@ internal fun ContractResponse.toContract() = EmploymentContract(
         "CRITICAL" -> EmploymentContractRisk.CRITICAL
         else -> EmploymentContractRisk.NOT_ANALYZED
     },
-    description = description
+    description = description,
+    endDate = endDate?.let { runCatching { LocalDate.parse(it) }.getOrNull() }
 )

@@ -103,6 +103,10 @@ class UploadProgressActivity : com.example.lagallens.presentation.feature.ocr.Oc
         if (!isOcrSessionValid()) return
         when (effect) {
             UploadProgressEffect.NavigateBack -> finish()
+            // An application toast outlives this screen, which closes right after for the next step.
+            is UploadProgressEffect.ShowDuplicateNotice -> android.widget.Toast.makeText(
+                applicationContext, getString(R.string.upload_duplicate_notice, effect.contractTitle), android.widget.Toast.LENGTH_LONG
+            ).show()
             is UploadProgressEffect.NavigateToContract -> {
                 startActivity(MainActivity.contractDetailIntent(this, effect.contractId, ownerSession))
                 finish()

@@ -84,11 +84,17 @@
                     android:layout_width="@dimen/analysis_risk_overview_score_size"
                     android:layout_height="@dimen/analysis_risk_overview_score_size">
 
-                    <ImageView
+                    <ProgressBar
+                        android:id="@+id/analysisRiskOverviewScoreRing"
+                        style="?android:attr/progressBarStyleHorizontal"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:contentDescription="@null"
-                        android:src="@drawable/ic_analysis_result_score_ring" />
+                        android:importantForAccessibility="no"
+                        android:indeterminate="false"
+                        android:max="100"
+                        android:minWidth="0dp"
+                        android:minHeight="0dp"
+                        android:progressDrawable="@drawable/progress_analysis_score_ring" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -131,8 +137,9 @@
                         android:orientation="horizontal">
 
                         <TextView
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
+                            android:layout_weight="1"
                             android:fontFamily="sans-serif"
                             android:includeFontPadding="false"
                             android:text="@string/analysis_result_risk_heading"
@@ -149,6 +156,7 @@
                             android:fontFamily="sans-serif"
                             android:gravity="center"
                             android:includeFontPadding="false"
+                            android:maxLines="1"
                             android:paddingStart="@dimen/analysis_risk_overview_badge_padding_horizontal"
                             android:paddingEnd="@dimen/analysis_risk_overview_badge_padding_horizontal"
                             android:visibility="gone"
@@ -180,11 +188,11 @@
                 android:padding="@dimen/analysis_risk_overview_summary_padding">
 
                 <TextView
+                    android:id="@+id/analysisRiskOverviewSummaryTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif"
                     android:includeFontPadding="false"
-                    android:text="@string/analysis_risk_overview_summary_title"
                     android:textColor="@color/legal_lens_primary"
                     android:textSize="@dimen/analysis_risk_overview_summary_title_text_size"
                     android:textStyle="bold" />
@@ -291,6 +299,18 @@
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
+
+            <TextView
+                android:id="@+id/analysisRiskOverviewLockedNote"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_12"
+                android:fontFamily="sans-serif"
+                android:includeFontPadding="false"
+                android:lineSpacingExtra="@dimen/analysis_risk_overview_disclaimer_line_spacing"
+                android:textColor="@color/legal_lens_secondary_text"
+                android:textSize="@dimen/analysis_risk_overview_disclaimer_text_size"
+                android:visibility="gone" />
 
             <LinearLayout
                 android:layout_width="match_parent"
