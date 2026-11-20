@@ -139,8 +139,10 @@ class RemoteContractRepository private constructor(
         true
     }
 
-    override suspend fun deleteContract(contractId: String): Boolean = inSession { scope ->
-        remote.delete(scope, contractId)
+    override suspend fun deleteContract(contractId: String): Boolean = deleteContract(contractId, confirmPaidResults = false)
+
+    override suspend fun deleteContract(contractId: String, confirmPaidResults: Boolean): Boolean = inSession { scope ->
+        remote.delete(scope, contractId, confirmPaidResults)
         listState.update { state ->
             val id = contractId.toLongOrNull()
             val summaries = if (state.sessionKey == scope.key && id != null) state.summaries - id else state.summaries
@@ -172,6 +174,7 @@ class RemoteContractRepository private constructor(
             "CONTRACT_DOCUMENT_UNAVAILABLE" -> ContractComparisonBlocker.DOCUMENT_UNAVAILABLE
             "COMPARISON_CONTENT_TOO_LARGE" -> ContractComparisonBlocker.TOO_LARGE
             "CONTRACT_NOT_FOUND" -> ContractComparisonBlocker.NOT_FOUND
+            "CONTRACT_ACCESS_DENIED" -> ContractComparisonBlocker.ACCESS_DENIED
             else -> null
         }
 

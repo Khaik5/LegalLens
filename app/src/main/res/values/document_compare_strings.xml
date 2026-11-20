@@ -1,5 +1,5 @@
 <resources>
-    <string name="viewer_title">Xem tài liệu PDF</string>
+    <string name="viewer_title">Xem tài liệu</string>
     <string name="viewer_preview">Bản xem minh họa</string>
     <string name="viewer_loading">Đang tải tài liệu…</string>
     <string name="viewer_loading_message">Đang chuẩn bị bản xem tài liệu. Vui lòng chờ trong giây lát.</string>
@@ -62,8 +62,38 @@
     <string name="compare_value_no">Không</string>
     <string name="compare_value_missing" translatable="false">—</string>
     <string name="compare_clause_text_b">B · %1$s</string>
-    <string name="compare_risk_not_analyzed">Cần phân tích cả hai hợp đồng để so sánh điểm rủi ro.</string>
+    <string name="compare_risk_not_analyzed">Chưa có dữ liệu rủi ro để so sánh hai hợp đồng này.</string>
     <string name="compare_risk_not_analyzed_short">Chưa phân tích</string>
+    <string name="compare_overview_no_data">Chưa có thông tin chính của hai hợp đồng để so sánh.</string>
+    <string name="compare_key_facts_heading">Thông tin quan trọng từ phân tích</string>
+    <string name="compare_key_facts_preview_note">Một hợp đồng chưa mở khóa kết quả phân tích, nên chỉ hiện phần xem trước miễn phí.</string>
+    <string name="compare_risk_source_mismatch">Điểm rủi ro của ít nhất một hợp đồng được phân tích trên phiên bản tài liệu khác với bản đang so sánh. Hãy phân tích lại để có điểm chính xác.</string>
+    <string name="compare_section_preamble">Phần mở đầu</string>
+    <string name="compare_change_similarity">giống %1$d%%</string>
+    <string name="compare_change_renumbered">đổi số điều</string>
+    <string name="compare_error_access_denied">Bạn không có quyền truy cập một trong hai hợp đồng.</string>
+    <string name="compare_field_contract_type">Loại hợp đồng</string>
+    <string name="compare_field_start_date">Ngày hiệu lực</string>
+    <string name="compare_field_end_date">Ngày kết thúc</string>
+    <string name="compare_field_parties">Các bên tham gia</string>
+    <string name="compare_field_job_title">Chức danh công việc</string>
+    <string name="compare_field_work_location">Nơi làm việc</string>
+    <string name="compare_field_basic_salary">Mức lương cơ bản</string>
+    <string name="compare_field_salary_currency">Đơn vị tiền lương</string>
+    <string name="compare_field_allowances">Phụ cấp</string>
+    <string name="compare_field_working_hours_per_week">Giờ làm việc mỗi tuần</string>
+    <string name="compare_field_probation_period_days">Thời gian thử việc (ngày)</string>
+    <string name="compare_field_probation_salary">Lương thử việc</string>
+    <string name="compare_field_social_insurance">Bảo hiểm xã hội</string>
+    <string name="compare_field_annual_leave_days">Ngày nghỉ phép năm</string>
+    <string name="compare_field_termination_notice_days">Thời hạn báo trước khi chấm dứt (ngày)</string>
+    <string name="compare_contract_type_fixed_term">Hợp đồng xác định thời hạn</string>
+    <string name="compare_contract_type_indefinite">Hợp đồng không xác định thời hạn</string>
+    <string name="compare_contract_type_seasonal">Hợp đồng thời vụ</string>
+    <string name="compare_contract_type_probation">Hợp đồng thử việc</string>
+    <string name="compare_contract_type_other">Khác</string>
+    <string name="compare_party_role_employer">Bên sử dụng lao động</string>
+    <string name="compare_party_role_employee">Người lao động</string>
     <string name="compare_risk_score_value">%1$s/100</string>
     <string name="compare_risk_delta">Chênh lệch điểm (B − A): %1$s</string>
     <string name="compare_error_document_missing">Một trong hai hợp đồng chưa có tài liệu để so sánh.</string>

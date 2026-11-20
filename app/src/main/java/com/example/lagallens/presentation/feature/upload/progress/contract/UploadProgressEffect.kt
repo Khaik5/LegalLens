@@ -6,6 +6,8 @@ sealed interface UploadProgressEffect {
     data object NavigateBack : UploadProgressEffect
     data class NavigateToUploadError(val reason: UploadFailure) : UploadProgressEffect
     data class NavigateToContract(val contractId: String) : UploadProgressEffect
+    /** The same file was uploaded before into the contract [contractTitle]; the new upload still continues. */
+    data class ShowDuplicateNotice(val contractTitle: String) : UploadProgressEffect
 
     data class NavigateToOcrProcessing(
         val fileName: String,

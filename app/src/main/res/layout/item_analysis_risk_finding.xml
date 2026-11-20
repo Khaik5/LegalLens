@@ -48,6 +48,23 @@
         android:textStyle="bold" />
 
     <TextView
+        android:id="@+id/analysisRiskFindingUnverified"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dp_8"
+        android:background="@drawable/bg_analysis_result_medium_badge"
+        android:includeFontPadding="false"
+        android:paddingStart="@dimen/dp_8"
+        android:paddingTop="@dimen/dp_4"
+        android:paddingEnd="@dimen/dp_8"
+        android:paddingBottom="@dimen/dp_4"
+        android:text="@string/analysis_finding_legal_basis_unverified"
+        android:textColor="@color/credit_warning"
+        android:textSize="@dimen/sp_12"
+        android:textStyle="bold"
+        android:visibility="gone" />
+
+    <TextView
         android:id="@+id/analysisRiskFindingDescription"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

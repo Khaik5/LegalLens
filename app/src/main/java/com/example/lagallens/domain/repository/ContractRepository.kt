@@ -18,5 +18,12 @@ interface ContractRepository {
     suspend fun updateContract(contract: EmploymentContract): Boolean
     suspend fun renameContract(contractId: String, title: String): Boolean
     suspend fun deleteContract(contractId: String): Boolean
+
+    /**
+     * Deletes the contract; without [confirmPaidResults] a contract with Credit-unlocked results throws
+     * [com.example.lagallens.domain.model.ContractHasPaidResultsException] instead. Sources without paid results
+     * simply delete.
+     */
+    suspend fun deleteContract(contractId: String, confirmPaidResults: Boolean): Boolean = deleteContract(contractId)
     suspend fun compareContracts(firstId: String, secondId: String): EmploymentContractComparison?
 }

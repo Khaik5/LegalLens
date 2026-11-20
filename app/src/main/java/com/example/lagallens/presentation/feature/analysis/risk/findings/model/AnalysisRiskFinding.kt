@@ -11,7 +11,9 @@ data class AnalysisRiskFinding(
     val clause: String,
     val title: String,
     val description: String,
-    val consequence: String
+    val consequence: String,
+    /** Shown as "legal basis not verified" when the backend found no legal source for the finding. */
+    val isLegalBasisUnverified: Boolean = false
 )
 
 enum class AnalysisRiskSeverity(
@@ -37,5 +39,6 @@ enum class AnalysisRiskSeverity(
 }
 
 internal fun com.example.lagallens.domain.model.analysis.AnalysisFinding.toRiskFinding() = AnalysisRiskFinding(
-    id, AnalysisRiskSeverity.valueOf(severity.name), clause, title, description, consequence
+    id, AnalysisRiskSeverity.valueOf(severity.name), clause, title, description, consequence,
+    isLegalBasisUnverified = isLegalBasisVerified == false
 )

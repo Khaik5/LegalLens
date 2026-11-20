@@ -10,6 +10,7 @@ import com.example.lagallens.R
 import com.example.lagallens.databinding.ItemCreditStorePackageBinding
 import com.example.lagallens.presentation.common.utils.bindPressFeedback
 import com.example.lagallens.presentation.feature.creditstore.contract.CreditPackage
+import com.example.lagallens.presentation.feature.creditstore.utils.formatVnd
 
 class CreditPackageAdapter(
     private val onPackageClicked: (CreditPackage) -> Unit
@@ -47,7 +48,8 @@ class CreditPackageAdapter(
             creditStorePackageCheck.isVisible = item.isSelected
             creditStorePackageTitle.text = item.title
             creditStorePackageDescription.text = item.description
-            creditStorePackageCredits.text = item.credits.toString()
+            // The title already names the credits, so the trailing value is the price the user will pay.
+            creditStorePackageCredits.text = formatVnd(item.priceVnd)
             root.isSelected = item.isSelected
             (root.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin = if (isLastItem) {
                 0

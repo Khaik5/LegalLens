@@ -29,6 +29,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 
 /** Text the remote chatbot shows; resolved on each use so it follows the app language. */
@@ -49,8 +51,8 @@ data class RemoteChatbotContractInfo(val name: String, val typeLabel: String)
 
 /**
  * Backend conversations. A question is queued on the server and answered by a worker, so sending
- * waits a bounded time for the answer; an unanswered question becomes a "check again" card whose
- * Retry polls again, and a failed one asks the server to retry it.
+ * waits a bounded time (about two minutes) for the answer; an unanswered question becomes a "check
+ * again" card whose Retry polls again, and a failed one asks the server to retry it.
  */
 class RemoteChatbotRepository(
     private val tokens: AuthSessionStore,
@@ -64,6 +66,12 @@ class RemoteChatbotRepository(
     /** Fallback for backends whose message list has no request ID: questions sent in this process. */
     private val requestIds = ConcurrentHashMap<Long, Long>()
     private val articleTitles = ConcurrentHashMap<Long, String>()
+    /** New chats not yet on the server, by their placeholder id, and the server id each one got when created. */
+    private val pendingConversations = ConcurrentHashMap<String, PendingConversation>()
+    private val createdConversations = ConcurrentHashMap<String, Long>()
+    private val creationLock = Mutex()
+
+    private data class PendingConversation(val sessionKey: String, val contractId: Long?, val title: String?)
 
     override fun currentSessionKey(): String? = tokens.currentSessionScope()?.key
 
@@ -78,19 +86,64 @@ class RemoteChatbotRepository(
         contractId: String?,
         conversationId: String?
     ): ChatbotConversation = inSession { scope ->
+        // A new chat is only a local placeholder until its first question, so merely opening the screen never
+        // leaves an empty conversation on the server. An empty one left by older app versions is reused first.
         val id = conversationId?.takeIf(String::isNotBlank)
-            ?: remote.create(scope, contractId?.toLongOrNull(), contractName.trim().take(TITLE_MAX_LENGTH).ifBlank { null }).id
-                .also { check(it > 0) { "Invalid conversation" } }.toString()
+            ?: unusedConversation(scope, contractId)
+            ?: (PENDING_PREFIX + UUID.randomUUID()).also { key ->
+                pendingConversations[key] = PendingConversation(
+                    scope.key, contractId?.toLongOrNull(), contractName.trim().take(TITLE_MAX_LENGTH).ifBlank { null }
+                )
+            }
         val text = labels()
         ChatbotConversation(id, text.greeting, text.initialSuggestions, text.newConversationSuggestions)
     }
 
+    override suspend fun persistConversationForSession(sessionKey: String?, conversationId: String): String = inSession { scope ->
+        check(scope.key == sessionKey) { "Session changed" }
+        serverConversationId(scope, conversationId).toString()
+    }
+
+    /** The server id of [conversationId]; a placeholder is created on the server the first time it is needed. */
+    private suspend fun serverConversationId(scope: AuthSessionScope, conversationId: String): Long {
+        conversationId.toLongOrNull()?.let { return it }
+        createdConversations[conversationId]?.let { return it }
+        return creationLock.withLock {
+            createdConversations[conversationId]?.let { return@withLock it }
+            val pending = requireNotNull(pendingConversations[conversationId]) { "Unknown conversation" }
+            check(pending.sessionKey == scope.key) { "Session changed" }
+            val id = remote.create(scope, pending.contractId, pending.title).id
+            check(id > 0) { "Invalid conversation" }
+            createdConversations[conversationId] = id
+            pendingConversations.remove(conversationId)
+            id
+        }
+    }
+
+    /**
+     * An unused conversation of the same contract, left by app versions that created one on every visit, is
+     * reused instead of starting another. Without a summary (older backends) or when the lookup fails, the chat
+     * starts as a local placeholder.
+     */
+    private suspend fun unusedConversation(scope: AuthSessionScope, contractId: String?): String? {
+        val contract = contractId?.toLongOrNull() ?: return null
+        return try {
+            remote.recentConversations(scope)
+                .firstOrNull { it.contractId == contract && it.messageCount == 0 }
+                ?.id?.toString()
+        } catch (cancelled: CancellationException) {
+            throw cancelled
+        } catch (_: Exception) {
+            null
+        }
+    }
+
     override suspend fun sendMessage(conversationId: String, message: String): ChatbotReply = inSession { scope ->
-        send(scope, conversationId.toConversationId(), message)
+        send(scope, serverConversationId(scope, conversationId), message)
     }
 
     override suspend fun retryMessage(conversationId: String, message: String): ChatbotReply = inSession { scope ->
-        val id = conversationId.toConversationId()
+        val id = serverConversationId(scope, conversationId)
         val messages = remote.messages(scope, id)
         val question = messages.lastOrNull { it.isUserMessage && it.content == message }
         when (question?.requestStatus) {
@@ -106,7 +159,8 @@ class RemoteChatbotRepository(
     }
 
     override suspend fun getMessages(conversationId: String): List<ChatbotTranscriptMessage> = inSession { scope ->
-        transcript(scope, remote.messages(scope, conversationId.toConversationId()))
+        val id = conversationId.toLongOrNull() ?: createdConversations[conversationId] ?: return@inSession emptyList()
+        transcript(scope, remote.messages(scope, id))
     }
 
     override suspend fun getConversations(): List<ChatbotTranscript> = inSession { scope ->
@@ -174,6 +228,8 @@ class RemoteChatbotRepository(
     override fun clearSessionData() {
         requestIds.clear()
         articleTitles.clear()
+        pendingConversations.clear()
+        createdConversations.clear()
     }
 
     private suspend fun send(scope: AuthSessionScope, conversationId: Long, message: String): ChatbotReply {
@@ -192,7 +248,7 @@ class RemoteChatbotRepository(
         firstPollImmediately: Boolean = false
     ): ChatbotReply {
         repeat(maxPolls) { attempt ->
-            if (attempt > 0 || !firstPollImmediately) delay(pollIntervalMillis)
+            if (attempt > 0 || !firstPollImmediately) delay(pollDelayMillis(attempt))
             val messages = remote.messages(scope, conversationId)
             val question = messages.firstOrNull { it.id == questionId } ?: return failed()
             when (question.requestStatus) {
@@ -202,6 +258,10 @@ class RemoteChatbotRepository(
         }
         return pending()
     }
+
+    /** The first polls are quick for a fast answer; later ones are spaced out because the provider can take over a minute. */
+    private fun pollDelayMillis(attempt: Int): Long =
+        if (attempt < QUICK_POLLS) pollIntervalMillis else pollIntervalMillis * SLOW_POLL_FACTOR
 
     private suspend fun replyFor(scope: AuthSessionScope, question: ChatMessageResponse, messages: List<ChatMessageResponse>): ChatbotReply {
         val answerText = answerTextAfter(question, messages)
@@ -280,8 +340,6 @@ class RemoteChatbotRepository(
 
     private fun failed(): ChatbotReply = labels().let { ChatbotReply.RetryableError(it.failedTitle, it.retryLabel) }
 
-    private fun String.toConversationId(): Long = requireNotNull(toLongOrNull()) { "Unknown conversation" }
-
     /** Runs in the current session and fails if the account changes meanwhile. */
     private suspend fun <T> inSession(action: suspend (AuthSessionScope) -> T): T = withContext(Dispatchers.IO) {
         val scope = checkNotNull(tokens.currentSessionScope()) { "No active session" }
@@ -292,8 +350,13 @@ class RemoteChatbotRepository(
 
     companion object {
         const val POLL_INTERVAL_MILLIS = 2_000L
-        const val MAX_POLLS = 10
+
+        /** 10 quick polls of 2 s, then 25 of 4 s: about two minutes, longer than the slowest answer measured (89 s). */
+        const val MAX_POLLS = 35
+        private const val QUICK_POLLS = 10
+        private const val SLOW_POLL_FACTOR = 2L
         private const val TITLE_MAX_LENGTH = 255
+        private const val PENDING_PREFIX = "new-"
         private const val PARALLEL_LOADS = 4
     }
 }

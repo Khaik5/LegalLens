@@ -90,7 +90,8 @@ object AnalysisResultMapper {
         description = item.description.orEmpty(),
         consequence = item.consequence.orEmpty(),
         explanation = item.explanation,
-        recommendation = item.recommendation
+        recommendation = item.recommendation,
+        isLegalBasisVerified = item.legalBasisVerified
     )
 
     private fun source(source: AnalysisSourceResponse) =

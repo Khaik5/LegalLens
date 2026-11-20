@@ -35,7 +35,7 @@
     <string name="upload_error_title">Lỗi tải lên</string>
     <string name="upload_error_back_content_description">Quay lại chọn tệp</string>
     <string name="upload_error_heading">Tải lên thất bại</string>
-    <string name="upload_error_detail_message">Tệp PDF quét (Scan) có chất lượng hình ảnh quá thấp, mờ hoặc bị mất góc chữ không thể chuyển đổi số.</string>
+    <string name="upload_error_detail_message">Hãy kiểm tra tệp (định dạng, dung lượng) và kết nối mạng rồi thử lại. Nếu lỗi vẫn xảy ra, hãy chọn một tệp khác.</string>
     <string name="upload_error_code">MÃ LỖI: %1$s</string>
     <string name="upload_error_retry">Thử lại</string>
     <string name="upload_error_back_to_list">Quay lại danh sách</string>

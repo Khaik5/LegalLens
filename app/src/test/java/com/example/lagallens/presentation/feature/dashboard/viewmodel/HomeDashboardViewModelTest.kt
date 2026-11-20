@@ -61,6 +61,23 @@ class HomeDashboardViewModelTest {
         assertEquals(listOf("middle", "old"), vm.uiState.value.recentContracts.map { it.contract.id })
     }
 
+    @Test fun contractsEndingSoonAreListedNearestFirstAndOthersAreLeftOut() = runTest {
+        val today = java.time.LocalDate.of(2026, 11, 19)
+        fun ending(id: String, end: java.time.LocalDate?) = contract(id, 1, EmploymentContractRisk.LOW).copy(endDate = end)
+        val source = MutableStateFlow(listOf(
+            ending("far", today.plusDays(91)),
+            ending("later", today.plusDays(40)),
+            ending("today", today),
+            ending("past", today.minusDays(1)),
+            ending("unknown", null),
+            ending("soon", today.plusDays(5))
+        ))
+        val vm = HomeDashboardViewModel(Contracts { source }, Profiles) { today }
+
+        assertEquals(listOf("today", "soon", "later"), vm.uiState.value.upcomingDates.map { it.contractId })
+        assertEquals(listOf(0, 5, 40), vm.uiState.value.upcomingDates.map { it.daysLeft })
+    }
+
     @Test fun noContractsIsAnEmptyStateNotAnError() = runTest {
         val vm = HomeDashboardViewModel(Contracts { MutableStateFlow(emptyList()) }, Profiles)
         assertFalse(vm.uiState.value.isLoading)

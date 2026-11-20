@@ -111,7 +111,7 @@ class RemoteContractDocumentDetailsTest {
             ApiEnvelope(true, ContractPageResponse(listOf(contract), 1, limit))
         override suspend fun create(scope: AuthSessionScope, request: CreateContractRequest) = ApiEnvelope(true, contract)
         override suspend fun update(scope: AuthSessionScope, id: String, request: UpdateContractRequest) = ApiEnvelope(true, contract)
-        override suspend fun delete(scope: AuthSessionScope, id: String): ApiEnvelope<Unit> = ApiEnvelope(true, null)
+        override suspend fun delete(scope: AuthSessionScope, id: String, confirmPaidResults: Boolean?): ApiEnvelope<Unit> = ApiEnvelope(true, null)
         override suspend fun compare(scope: AuthSessionScope, request: CompareContractsRequest): ApiEnvelope<ContractComparisonResponse> =
             error("Unexpected compare")
     }

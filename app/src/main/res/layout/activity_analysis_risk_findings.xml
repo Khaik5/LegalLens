@@ -80,7 +80,6 @@
                 android:includeFontPadding="false"
                 android:paddingStart="@dimen/dp_14"
                 android:paddingEnd="@dimen/dp_14"
-                android:text="@string/analysis_risk_findings_filter_all"
                 android:textSize="@dimen/sp_13"
                 android:textStyle="bold" />
 
@@ -93,7 +92,6 @@
                 android:includeFontPadding="false"
                 android:paddingStart="@dimen/dp_14"
                 android:paddingEnd="@dimen/dp_14"
-                android:text="@string/analysis_risk_findings_filter_high"
                 android:textSize="@dimen/sp_13"
                 android:textStyle="bold" />
 
@@ -106,7 +104,6 @@
                 android:includeFontPadding="false"
                 android:paddingStart="@dimen/dp_14"
                 android:paddingEnd="@dimen/dp_14"
-                android:text="@string/analysis_risk_findings_filter_medium"
                 android:textSize="@dimen/sp_13"
                 android:textStyle="bold" />
 
@@ -119,7 +116,6 @@
                 android:includeFontPadding="false"
                 android:paddingStart="@dimen/dp_14"
                 android:paddingEnd="@dimen/dp_14"
-                android:text="@string/analysis_risk_findings_filter_low"
                 android:textSize="@dimen/sp_13"
                 android:textStyle="bold" />
         </LinearLayout>

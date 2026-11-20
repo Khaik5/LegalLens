@@ -1,5 +1,7 @@
 package com.example.lagallens.presentation.feature.contracts.search.viewmodel
 
+import com.example.lagallens.core.utils.matchesSearch
+
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -18,11 +20,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.CancellationException
 
-internal fun ContractSearchResult.matchesQuery(query: String): Boolean {
-    val normalizedQuery = query.trim().lowercase()
-    return normalizedQuery.isBlank() || titleOverride?.lowercase()?.contains(normalizedQuery) == true ||
-        searchKeywords.any { it.lowercase().contains(normalizedQuery) }
-}
+internal fun ContractSearchResult.matchesQuery(query: String): Boolean =
+    query.isBlank() || titleOverride?.matchesSearch(query) == true || searchKeywords.any { it.matchesSearch(query) }
 
 /** Matches only what belongs to this contract: its title, text, file name and type. */
 internal fun EmploymentContract.toSearchResult(typeLabel: String) = ContractSearchResult(

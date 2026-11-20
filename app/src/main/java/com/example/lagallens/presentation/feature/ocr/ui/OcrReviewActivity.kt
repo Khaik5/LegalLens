@@ -74,7 +74,13 @@ class OcrReviewActivity : com.example.lagallens.presentation.feature.ocr.OcrSess
         ViewCompat.requestApplyInsets(binding.ocrReviewRoot)
         // The percentage is the real recognition confidence of this document, or "—" when the backend sent none.
         val confidence = intent.getStringExtra(EXTRA_CONFIDENCE).orEmpty()
-        binding.ocrReviewAlertText.text = if (confidence.any(Char::isDigit)) getString(R.string.ocr_review_alert_confidence, confidence) else getString(R.string.ocr_review_alert_generic)
+        // A review the user asked for on a confidently read document is not worded as a warning about the confidence.
+        val confidencePercent = Regex("\\d+").find(confidence)?.value?.toIntOrNull()
+        binding.ocrReviewAlertText.text = when {
+            confidencePercent == null -> getString(R.string.ocr_review_alert_generic)
+            confidencePercent >= HIGH_CONFIDENCE_PERCENT -> getString(R.string.ocr_review_alert_confidence_high, confidence)
+            else -> getString(R.string.ocr_review_alert_confidence, confidence)
+        }
         viewModel.onEvent(OcrReviewEvent.ScreenOpened(
             intent.getStringExtra(EXTRA_DOCUMENT_ID).orEmpty(),
             intent.getStringExtra(EXTRA_CONTRACT_ID),
@@ -194,6 +200,7 @@ class OcrReviewActivity : com.example.lagallens.presentation.feature.ocr.OcrSess
         const val EXTRA_CONTRACT_ID = "ocr_review_contract_id"
         const val EXTRA_DOCUMENT_TEXT_TOKEN = "ocr_review_document_text_token"
         private const val EXTRA_CONFIDENCE = "ocr_review_confidence"
+        private const val HIGH_CONFIDENCE_PERCENT = 90
 
         private const val EXTRA_WARNING_SECTIONS = "ocr_review_warning_sections"
         private const val EXTRA_WARNING_CONFIDENCES = "ocr_review_warning_confidences"

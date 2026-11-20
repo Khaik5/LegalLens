@@ -1,6 +1,7 @@
 package com.example.lagallens.presentation.feature.analysis.start.contract
 
 import com.example.lagallens.R
+import com.example.lagallens.presentation.common.utils.isDemoData
 
 data class AnalysisStartUiState(
     val documentName: String = "",
@@ -22,7 +23,7 @@ data class AnalysisStartUiState(
             id = 3,
             stepRes = R.string.analysis_start_step_three,
             titleRes = R.string.analysis_start_legal_title,
-            descriptionRes = R.string.analysis_start_legal_description
+            descriptionRes = if (isDemoData()) R.string.analysis_start_legal_description else R.string.analysis_start_legal_description_real
         )
     )
 )

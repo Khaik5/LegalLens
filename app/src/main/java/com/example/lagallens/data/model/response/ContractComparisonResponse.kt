@@ -29,15 +29,40 @@ data class ComparisonSummaryResponse(
     val unchangedSections: Int
 )
 
-data class TextDifferenceResponse(val section: String, val firstText: String?, val secondText: String?, val changeType: String)
+/**
+ * [kind] is PREAMBLE, ARTICLE, SECTION or CHAPTER; [matchedBy] is NUMBER or TITLE (a renumbered clause) and
+ * [similarity] the word overlap 0..1, both null for an added or removed clause and on older backends.
+ */
+data class TextDifferenceResponse(
+    val section: String,
+    val firstText: String?,
+    val secondText: String?,
+    val changeType: String,
+    val kind: String? = null,
+    val matchedBy: String? = null,
+    val similarity: Double? = null
+)
 
-data class RiskSnapshotResponse(val score: Double, val riskLevel: String)
+/** [score] can be null for a result without a score; [matchesSource] is false when the analysis read another OCR revision. */
+data class RiskSnapshotResponse(val score: Double?, val riskLevel: String, val matchesSource: Boolean? = null)
 
-data class RiskComparisonResponse(val first: RiskSnapshotResponse, val second: RiskSnapshotResponse, val scoreDelta: Double)
+data class RiskComparisonResponse(val first: RiskSnapshotResponse, val second: RiskSnapshotResponse, val scoreDelta: Double?)
 
-data class ComparisonOverviewResponse(val differences: List<FieldDifferenceResponse>)
+data class ComparisonOverviewResponse(
+    val differences: List<FieldDifferenceResponse>,
+    val first: ComparisonOverviewSideResponse? = null,
+    val second: ComparisonOverviewSideResponse? = null
+)
 
-/** Values are strings, numbers or booleans on the wire. */
+/** [analysisAccess] is PREVIEW when the key facts are only the free part of a locked analysis. */
+data class ComparisonOverviewSideResponse(
+    val keyFacts: List<ComparisonKeyFactResponse>? = null,
+    val analysisAccess: String? = null
+)
+
+data class ComparisonKeyFactResponse(val label: String?, val value: String?, val reference: String?)
+
+/** Values are strings, numbers, booleans or, for the parties, a list of objects on the wire. */
 data class FieldDifferenceResponse(
     val field: String,
     val label: String,

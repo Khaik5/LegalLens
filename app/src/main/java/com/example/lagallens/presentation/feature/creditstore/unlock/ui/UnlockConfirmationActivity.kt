@@ -108,10 +108,7 @@ class UnlockConfirmationActivity : AppCompatActivity() {
         unlockConfirmationContractName.text = contractName
         unlockConfirmationContractLabel.isVisible = contractName.isNotBlank()
         unlockConfirmationContractName.isVisible = contractName.isNotBlank()
-        unlockConfirmationResultMeta.text = getString(
-            R.string.unlock_confirmation_result_meta,
-            state.analysisResultId
-        )
+        unlockConfirmationResultMeta.text = getString(R.string.unlock_confirmation_result_meta)
         unlockConfirmationBalanceBefore.text = getString(
             R.string.unlock_confirmation_credit_value,
             state.availableCredits

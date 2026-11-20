@@ -51,7 +51,6 @@
                 android:layout_marginStart="@dimen/analysis_result_risk_badge_margin_start"
                 android:background="@drawable/bg_analysis_result_risk_badge"
                 android:gravity="center"
-                android:text="@string/analysis_result_risk_badge"
                 android:textColor="@color/analysis_result_risk"
                 android:textSize="@dimen/analysis_result_risk_badge_text_size"
                 android:textStyle="bold"

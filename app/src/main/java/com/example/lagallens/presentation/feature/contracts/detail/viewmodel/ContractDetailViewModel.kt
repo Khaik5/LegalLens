@@ -126,14 +126,19 @@ class ContractDetailViewModel(
                 }
             }
             ContractDetailUiEvent.DeleteClicked -> emitEffect(ContractDetailUiEffect.ShowDeleteConfirmation)
-            ContractDetailUiEvent.DeleteConfirmed -> {
+            is ContractDetailUiEvent.DeleteConfirmed -> {
                 val id = currentContractId ?: return
                 val session = activeSession
                 viewModelScope.launch {
                     val deleted = try {
-                        repository.deleteContract(id)
+                        repository.deleteContract(id, event.confirmPaidResults)
                     } catch (cancellationException: CancellationException) {
                         throw cancellationException
+                    } catch (_: com.example.lagallens.domain.model.ContractHasPaidResultsException) {
+                        if (session == repository.activeSessionKey() && currentContractId == id) {
+                            emitEffect(ContractDetailUiEffect.ShowPaidResultsDeleteConfirmation)
+                        }
+                        return@launch
                     } catch (failure: Exception) {
                         handleFailure(session, id, failure)
                         return@launch
@@ -156,7 +161,15 @@ class ContractDetailViewModel(
                 clearContract()
                 emitEffect(ContractDetailUiEffect.NavigateBack)
             }
-            else -> emitEffect(ContractDetailUiEffect.ShowMessage(R.string.contract_action_failed))
+            // Without a loaded contract the screen would show empty placeholders as if they were the contract
+            // (no title, "Nháp", not analysed), so it explains the failure and closes instead.
+            else -> if (currentContract == null) {
+                clearContract()
+                emitEffect(ContractDetailUiEffect.ShowMessage(R.string.contract_detail_load_failed))
+                emitEffect(ContractDetailUiEffect.NavigateBack)
+            } else {
+                emitEffect(ContractDetailUiEffect.ShowMessage(R.string.contract_action_failed))
+            }
         }
     }
 

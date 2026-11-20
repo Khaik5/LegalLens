@@ -2,13 +2,13 @@ package com.example.lagallens.presentation.feature.creditstore.flow.ui
 
 import android.content.Intent
 import com.example.lagallens.presentation.feature.creditstore.contract.CreditPackage
-import java.text.NumberFormat
+import com.example.lagallens.presentation.feature.creditstore.utils.formatVnd
 import java.util.Locale
 import java.util.UUID
 
 /** Display data for the screens of one purchase; the amount charged is decided by PaymentRepository from the package id. */
 internal data class CreditPurchaseSelection(val creditPackage: CreditPackage, val balanceCredits: Int, val purchaseId: String = UUID.randomUUID().toString(), val returnsToUnlockOrigin: Boolean = false) {
-    val priceText: String get() = NumberFormat.getNumberInstance(Locale("vi", "VN")).format(creditPackage.priceVnd) + "\u0111"
+    val priceText: String get() = formatVnd(creditPackage.priceVnd)
 
     val transactionReference: String get() = purchaseId.take(8).uppercase(Locale.ROOT)
 

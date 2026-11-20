@@ -66,7 +66,9 @@ class AnalysisResultViewModel(
                         keyFactsCount = overview.keyFactsCount,
                         riskCount = overview.riskCount,
                         referenceCount = overview.referenceCount,
-                        items = AnalysisResultUiState().items,
+                        items = AnalysisResultUiState().items.map { item ->
+                            if (item.isRisk) item.copy(badgeCount = overview.riskCount) else item
+                        },
                         errorMessageRes = null, isLoading = false,
                         resultId = resultId, isUnlocked = entitlement.isUnlocked, unlockCost = entitlement.cost
                     )
