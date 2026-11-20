@@ -528,8 +528,12 @@
     <string name="analysis_risk_overview_back_content_description">Quay lại</string>
     <string name="analysis_risk_overview_more_content_description">Thêm tùy chọn</string>
     <string name="analysis_risk_overview_description">Hợp đồng này chứa một số điều khoản bất lợi về phạt vi phạm và bồi thường thiệt hại. Cần đàm phán lại.</string>
-    <string name="analysis_risk_overview_summary_title">Tổng hợp phát hiện (%1$d rủi ro)</string>
-    <string name="analysis_risk_overview_locked_note">Các số trên chỉ tính %1$d trong %2$d phát hiện được xem trước miễn phí. Mở khóa kết quả để xem đủ.</string>
+    <plurals name="analysis_risk_overview_summary_title">
+        <item quantity="other">Tổng hợp phát hiện (%1$d rủi ro)</item>
+    </plurals>
+    <plurals name="analysis_risk_overview_locked_note">
+        <item quantity="other">Các số trên chỉ tính %1$d trong %2$d phát hiện được xem trước miễn phí. Mở khóa kết quả để xem đủ.</item>
+    </plurals>
     <string name="analysis_risk_overview_high_risk">Rủi ro cao</string>
     <string name="analysis_risk_overview_low_risk">Rủi ro thấp</string>
     <string name="analysis_risk_overview_disclaimer"><b>DEMO:</b> Nội dung là dữ liệu minh họa, chưa do AI phân tích và không phải tư vấn pháp lý.</string>
