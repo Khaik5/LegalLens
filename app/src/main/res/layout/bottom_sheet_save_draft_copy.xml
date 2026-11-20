@@ -28,11 +28,11 @@
             android:textSize="@dimen/sp_20"
             android:textStyle="bold" />
         <TextView
+            android:id="@+id/saveDraftSelectedVersion"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/dp_16"
             android:fontFamily="@font/manrope"
-            android:text="@string/draft_save_selected_version"
             android:textColor="@color/legal_lens_primary"
             android:textSize="@dimen/sp_13"
             android:textStyle="bold" />
