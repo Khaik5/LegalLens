@@ -50,6 +50,7 @@ class ResetPasswordViewModel(private val confirmPasswordReset: ConfirmPasswordRe
             challengeId.isBlank() || verificationToken.isBlank() -> R.string.otp_invalid
             state.password.isEmpty() -> R.string.register_password_required
             state.password.length < MINIMUM_PASSWORD_LENGTH -> R.string.register_password_minimum_length
+            state.password.length > MAXIMUM_PASSWORD_LENGTH -> R.string.register_password_maximum_length
             else -> null
         }
         val confirmationError = when {
@@ -86,5 +87,6 @@ class ResetPasswordViewModel(private val confirmPasswordReset: ConfirmPasswordRe
 
     private companion object {
         const val MINIMUM_PASSWORD_LENGTH = 8
+        const val MAXIMUM_PASSWORD_LENGTH = 72
     }
 }

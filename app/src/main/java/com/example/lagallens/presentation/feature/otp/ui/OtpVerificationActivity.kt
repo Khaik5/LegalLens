@@ -31,6 +31,7 @@ import com.example.lagallens.presentation.common.utils.bindPressFeedback
 import kotlinx.coroutines.launch
 
 class OtpVerificationActivity : AppCompatActivity() {
+    private var isRenderingOtpInputs = false
     private val binding by lazy { ActivityOtpVerificationBinding.inflate(layoutInflater) }
     private val viewModel by viewModels<OtpVerificationViewModel> {
         val app = application as com.example.lagallens.LegalLensApplication
@@ -105,11 +106,16 @@ class OtpVerificationActivity : AppCompatActivity() {
     }
 
     private fun bindOtpInput(index: Int, input: EditText) {
+        // SavedStateHandle owns the digits; hierarchy restoration must not emit edits.
+        input.isSaveEnabled = false
         input.doAfterTextChanged { text ->
+            if (isRenderingOtpInputs) return@doAfterTextChanged
             val digit = text?.toString().orEmpty()
             viewModel.onEvent(OtpVerificationUiEvent.DigitChanged(index, digit))
-            if (digit.isNotEmpty() && index < otpInputs.lastIndex) {
-                otpInputs[index + 1].requestFocus()
+            renderOtpInputs(viewModel.uiState.value)
+            val enteredCount = digit.count { it in '0'..'9' }
+            if (enteredCount > 0) {
+                otpInputs[(index + enteredCount).coerceAtMost(otpInputs.lastIndex)].requestFocus()
             }
         }
         input.setOnFocusChangeListener { _, _ -> updateOtpInputBackgrounds() }
@@ -149,11 +155,16 @@ class OtpVerificationActivity : AppCompatActivity() {
     }
 
     private fun renderOtpInputs(state: OtpVerificationUiState) {
-        otpInputs.forEachIndexed { index, input ->
-            if (input.text?.toString() != state.digits[index]) {
-                input.setText(state.digits[index])
-                input.setSelection(state.digits[index].length)
+        isRenderingOtpInputs = true
+        try {
+            otpInputs.forEachIndexed { index, input ->
+                if (input.text?.toString() != state.digits[index]) {
+                    input.setText(state.digits[index])
+                    input.setSelection(state.digits[index].length)
+                }
             }
+        } finally {
+            isRenderingOtpInputs = false
         }
         updateOtpInputBackgrounds()
     }

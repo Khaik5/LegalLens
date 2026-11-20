@@ -35,6 +35,7 @@
     <string name="register_email_invalid">Please enter a valid email address.</string>
     <string name="register_password_required">Please enter your password.</string>
     <string name="register_password_minimum_length">Password must be at least 8 characters.</string>
+    <string name="register_password_maximum_length">Password must not exceed 72 characters.</string>
     <string name="register_confirm_password_required">Please confirm your password.</string>
     <string name="register_password_mismatch">Password confirmation does not match.</string>
     <string name="email_address">Email address</string>
@@ -189,15 +190,17 @@
     <string name="profile_password_confirm_hint">Re-enter your new password</string>
     <string name="profile_password_requirements">SECURE PASSWORD REQUIREMENTS</string>
     <string name="profile_password_minimum_requirement">At least 8 characters</string>
+    <string name="profile_password_maximum_requirement">At most 72 characters</string>
     <string name="profile_password_case_requirement">Include at least 1 uppercase and 1 lowercase letter</string>
     <string name="profile_password_number_requirement">Include at least 1 number or special character</string>
     <string name="profile_password_submit">Update password</string>
     <string name="profile_password_current_required">Please enter your current password.</string>
+    <string name="profile_password_current_length_invalid">Your current password must be between 8 and 72 characters.</string>
     <string name="profile_password_confirmation_mismatch">Password confirmation does not match.</string>
     <string name="profile_password_backend_unavailable">Could not change your password. Please try again.</string>
     <string name="profile_password_sign_in_again">Password changed. Please sign in again.</string>
     <string name="profile_password_rate_limited">Too many requests. Please try again later.</string>
-    <string name="profile_password_requirements_not_met">The new password does not meet the security requirements.</string>
+    <string name="profile_password_requirements_not_met">Password must be between 8 and 72 characters.</string>
     <string name="profile_password_current_incorrect">The current password is incorrect.</string>
     <string name="profile_password_updated">Password updated.</string>
     <string name="profile_password_same_as_current">New password must be different from the current password.</string>

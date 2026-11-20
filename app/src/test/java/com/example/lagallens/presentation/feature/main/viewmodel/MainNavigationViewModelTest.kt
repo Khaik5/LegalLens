@@ -48,6 +48,15 @@ class MainNavigationViewModelTest {
         assertEquals(listOf("a", "b"), repository.refreshedFor)
     }
 
+    @Test fun aRecreatedScreenKeepsTheCountTheRepositoryAlreadyHolds() = runTest {
+        repository.serverCount = 3
+        model()
+        // The activity is recreated: the app-wide repository still says 3 and the refresh answers 3 again.
+        val recreated = model()
+
+        assertEquals(3, recreated.uiState.value.unreadNotifications)
+    }
+
     @Test fun aFailedRefreshKeepsTheLastValue() = runTest {
         repository.serverCount = 4
         val model = model()

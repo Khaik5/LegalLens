@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.io.IOException
 
 class SplashViewModel(
     private val isOnboardingCompleted: IsOnboardingCompletedUseCase,
@@ -39,7 +40,12 @@ class SplashViewModel(
         started = true
         viewModelScope.launch {
             delay(SPLASH_DURATION_MILLIS)
-            if (isOnboardingCompleted()) restore()
+            val onboarded = try {
+                isOnboardingCompleted()
+            } catch (_: IOException) {
+                false
+            }
+            if (onboarded) restore()
             else _uiEffect.send(SplashUiEffect.NavigateToOnboarding)
         }
     }

@@ -16,6 +16,7 @@
     <dimen name="ocr_result_footer_vertical_padding">24dp</dimen>
 
     <string name="ocr_result_title">Kết quả OCR</string>
+    <string name="ocr_result_default_contract_name">Hợp đồng lao động mới</string>
     <string name="ocr_result_confidence_label">Độ tin cậy OCR rất cao</string>
     <string name="ocr_result_review_confirmed">Đã xác nhận kết quả OCR</string>
     <string name="ocr_result_back_content_description">Quay lại</string>

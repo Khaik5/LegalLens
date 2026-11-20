@@ -5,8 +5,9 @@ data class ChatbotHistoryConversation(
     val contractName: String,
     val contractType: String = "",
     val timestamp: String,
-    val messageCount: String,
+    val messageCount: String = "",
     val preview: String,
     val isDraftRequest: Boolean = false,
-    val contractId: String? = null
+    val contractId: String? = null,
+    val messageCountQuantity: Int? = null
 )

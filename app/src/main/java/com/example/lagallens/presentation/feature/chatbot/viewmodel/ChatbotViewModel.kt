@@ -54,6 +54,7 @@ class ChatbotViewModel(
     private var activeContractId: String? = null
     private var nextMessageId = INITIAL_MESSAGE_ID
     private var hasOpened = false
+    private var openJob: Job? = null
     private val failedQuestions = mutableMapOf<Long, String>()
     private val failedAttachments = mutableMapOf<Long, ChatbotAttachment>()
     private var newChatSuggestions: List<String> = emptyList()
@@ -130,11 +131,10 @@ class ChatbotViewModel(
     }
 
     private fun openScreen(event: ChatbotUiEvent.ScreenOpened) {
-        if (hasOpened) return
-        hasOpened = true
+        if (hasOpened || openJob?.isActive == true) return
         previewDraftError = event.previewDraftError
         _uiState.update { it.copy(sourceContractId = event.contractId?.takeIf(String::isNotBlank)) }
-        launchForSession {
+        openJob = launchForSession {
             val conversation = try {
                 openConversation.openForSession(ownerSession, event.contractName, event.contractType, event.contractId, event.conversationId)
             } catch (cancellationException: CancellationException) {
@@ -144,7 +144,7 @@ class ChatbotViewModel(
                 _uiState.update {
                     it.copy(contractName = event.contractName, contractType = event.contractType, isConversationReady = false, isReplyPending = false, isNewConversation = true)
                 }
-                emitEffect(ChatbotUiEffect.ShowMessage(failure.toFailureMessage()))
+                emitEffect(ChatbotUiEffect.ShowOpenFailed(failure.toFailureMessage()))
                 return@launchForSession
             }
             if (openConversation.currentSessionKey() != ownerSession) return@launchForSession
@@ -158,12 +158,13 @@ class ChatbotViewModel(
             } catch (failure: Exception) {
                 if (openConversation.currentSessionKey() != ownerSession) return@launchForSession
                 _uiState.update { it.copy(contractName = event.contractName, contractType = event.contractType, isConversationReady = false, isReplyPending = false) }
-                emitEffect(ChatbotUiEffect.ShowMessage(R.string.chatbot_history_load_failed))
+                emitEffect(ChatbotUiEffect.ShowOpenFailed(R.string.chatbot_history_load_failed))
                 return@launchForSession
             }
             if (openConversation.currentSessionKey() != ownerSession) return@launchForSession
             val restoredMessages = storedMessages.mapNotNull { it.toMessage() }
             nextMessageId = (restoredMessages.maxOfOrNull(ChatbotMessage::id) ?: 0L) + 1L
+            hasOpened = true
             _uiState.update {
                 it.copy(
                     contractName = event.contractName,
