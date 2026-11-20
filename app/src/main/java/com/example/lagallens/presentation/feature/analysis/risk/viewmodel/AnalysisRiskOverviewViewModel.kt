@@ -23,9 +23,12 @@ class AnalysisRiskOverviewViewModel : ViewModel() {
     fun clearResult() { _uiState.value = AnalysisRiskOverviewUiState() }
 
     fun setResult(identity: com.example.lagallens.domain.model.analysis.AnalysisIdentity, detail: com.example.lagallens.domain.model.analysis.AnalysisDetail) {
-        val findings = detail.findings.map { AnalysisRiskSeverity.valueOf(it.severity.name) }
+        // Locked findings are empty placeholders (see AnalysisResultMapper). They are not real findings, so they are
+        // neither counted nor used to work out the highest level; the server level covers every finding.
+        val findings = detail.findings.filterNot { it.id.startsWith("locked-finding-") }.map { AnalysisRiskSeverity.valueOf(it.severity.name) }
+        val serverSeverity = identity.overview?.severity?.let { AnalysisRiskSeverity.valueOf(it.name) }
         _uiState.update { it.copy(score = identity.overview?.score?.takeIf { score -> score in 0..100 },
-            highestSeverity = AnalysisRiskSeverity.entries.firstOrNull { level -> level in findings },
+            highestSeverity = serverSeverity ?: AnalysisRiskSeverity.entries.firstOrNull { level -> level in findings },
             highRiskCount = findings.count { it == AnalysisRiskSeverity.HIGH },
             mediumRiskCount = findings.count { it == AnalysisRiskSeverity.MEDIUM },
             lowRiskCount = findings.count { it == AnalysisRiskSeverity.LOW }) }

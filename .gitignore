@@ -14,3 +14,11 @@
 .cxx
 local.properties
 /.kotlin
+
+# JVM crash and replay logs
+hs_err_pid*.log
+replay_pid*.log
+
+# Local design references and test reports
+/.figma-reference/
+/test-reports/

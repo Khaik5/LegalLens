@@ -40,7 +40,12 @@ class AnalysisObligationsViewModel : ViewModel() {
             }
         }
         val total = inTab.count { it is com.example.lagallens.domain.model.analysis.AnalysisObligationEntry.Item }
-        val visible = com.example.lagallens.domain.model.analysis.AnalysisPreview.visibleCount(total, unlocked)
+        // A backend preview is already cut on one shared list and ends in placeholders. Cutting it again per tab
+        // would show empty rows, so only the items that arrived with text are shown.
+        val fromServerPreview = entries.any { it is com.example.lagallens.domain.model.analysis.AnalysisObligationEntry.Item && it.id.startsWith("locked-obligation-") }
+        val received = inTab.count { it is com.example.lagallens.domain.model.analysis.AnalysisObligationEntry.Item && !it.id.startsWith("locked-obligation-") }
+        val visible = if (fromServerPreview && !unlocked) received
+        else com.example.lagallens.domain.model.analysis.AnalysisPreview.visibleCount(total, unlocked)
         var used = 0
         val items = inTab.mapNotNull { entry ->
             when (entry) {

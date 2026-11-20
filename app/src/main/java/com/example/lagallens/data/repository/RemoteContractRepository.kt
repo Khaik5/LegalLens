@@ -118,6 +118,10 @@ class RemoteContractRepository private constructor(
         )
     }
 
+    override fun invalidate() {
+        listState.update { it.copy(revision = it.revision + 1) }
+    }
+
     override suspend fun createContract(contract: EmploymentContract): EmploymentContract = inSession { scope ->
         val created = remote.create(scope, contract.title.trim(), contract.description)
         listState.update { it.copy(revision = it.revision + 1) }

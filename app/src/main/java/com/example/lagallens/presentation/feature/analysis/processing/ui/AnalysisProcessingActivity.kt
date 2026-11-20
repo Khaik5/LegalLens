@@ -32,7 +32,7 @@ class AnalysisProcessingActivity : AppCompatActivity() {
     private lateinit var binding: ActivityAnalysisProcessingBinding
     private val viewModel by viewModels<AnalysisProcessingViewModel> {
         val app = application as com.example.lagallens.LegalLensApplication
-        AnalysisProcessingViewModel.Factory(app.analysisIdentityRepository, app.analysisRepository)
+        AnalysisProcessingViewModel.Factory(app.analysisIdentityRepository, app.analysisRepository) { app.contractRepository.invalidate() }
     }
     private val stepAdapter = ProcessingTimelineStepAdapter()
 

@@ -61,7 +61,7 @@ class RemoteChatbotRepository(
     private val maxPolls: Int = MAX_POLLS,
     private val newClientMessageId: () -> String = { UUID.randomUUID().toString() }
 ) : ChatbotRepository {
-    /** Request IDs of questions sent in this process; the message list does not return them. */
+    /** Fallback for backends whose message list has no request ID: questions sent in this process. */
     private val requestIds = ConcurrentHashMap<Long, Long>()
     private val articleTitles = ConcurrentHashMap<Long, String>()
 
@@ -97,7 +97,7 @@ class RemoteChatbotRepository(
             null -> send(scope, id, message)
             CHAT_REQUEST_COMPLETED -> replyFor(scope, question, messages)
             CHAT_REQUEST_FAILED -> {
-                val requestId = requestIds[question.id] ?: return@inSession send(scope, id, message)
+                val requestId = question.requestId ?: requestIds[question.id] ?: return@inSession send(scope, id, message)
                 remote.retry(scope, id, requestId)
                 awaitReply(scope, id, question.id)
             }

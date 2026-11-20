@@ -30,6 +30,7 @@ import com.example.lagallens.presentation.feature.home.ui.HomeActivity
 import kotlinx.coroutines.launch
 import com.example.lagallens.databinding.ActivityMainBinding
 import com.example.lagallens.presentation.common.view.FloatingPremiumSticker
+import com.example.lagallens.presentation.common.utils.applySystemBarAndKeyboardInsets
 import com.example.lagallens.presentation.common.utils.applySystemBarInsets
 import com.example.lagallens.presentation.common.utils.bindPressFeedback
 import com.example.lagallens.presentation.common.utils.MotionTokens
@@ -61,7 +62,8 @@ class MainActivity : AppCompatActivity() {
                 if (session == null && !passwordChangePending) openAuthentication()
             }
         }
-        binding.mainNavHost.applySystemBarInsets(top = true, bottom = false)
+        binding.mainNavHost.applySystemBarAndKeyboardInsets(bottomReserved = { if (binding.bottomNavigationContainer.isVisible) binding.bottomNavigationContainer.height else 0 })
+        binding.bottomNavigationContainer.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ -> ViewCompat.requestApplyInsets(binding.mainNavHost) }
         binding.bottomNavigationContainer.applySystemBarInsets(
             top = false,
             bottom = true,
@@ -169,6 +171,7 @@ class MainActivity : AppCompatActivity() {
                 destination.id == R.id.profilePasswordFragment
             binding.bottomNavigationContainer.isVisible = !hidesBottomNavigation
             binding.btnAddContract.isVisible = !hidesBottomNavigation
+            ViewCompat.requestApplyInsets(binding.mainNavHost)
             updateTab(binding.navHome, destination.id == R.id.homeDashboardFragment)
             updateTab(binding.navContracts, destination.id == R.id.contractListFragment ||
                 destination.id == R.id.contractSearchFragment || isContractDetail)

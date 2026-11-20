@@ -64,7 +64,7 @@ class AnalysisResultViewModel(
                         score = overview.score,
                         severity = overview.severity,
                         keyFactsCount = overview.keyFactsCount,
-                        riskCount = identity.findingIds.size,
+                        riskCount = overview.riskCount,
                         referenceCount = overview.referenceCount,
                         items = AnalysisResultUiState().items,
                         errorMessageRes = null, isLoading = false,

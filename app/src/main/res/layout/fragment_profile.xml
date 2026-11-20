@@ -15,13 +15,13 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minHeight="@dimen/dp_56"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
             android:gravity="center_vertical"
             android:includeFontPadding="false"
+            android:minHeight="@dimen/dp_56"
             android:paddingStart="@dimen/dp_16"
+            android:paddingTop="8dp"
             android:paddingEnd="@dimen/dp_16"
+            android:paddingBottom="8dp"
             android:text="@string/menu_profile"
             android:textColor="@color/legal_lens_primary"
             android:textSize="@dimen/sp_20"
@@ -77,12 +77,12 @@
             <TextView
                 android:id="@+id/tvProfileName"
                 android:layout_width="match_parent"
-                android:gravity="center"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/dp_16"
+                android:gravity="center"
                 android:includeFontPadding="false"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
                 android:textColor="@color/legal_lens_primary"
                 android:textSize="@dimen/sp_20"
                 android:textStyle="bold" />
@@ -90,12 +90,12 @@
             <TextView
                 android:id="@+id/tvProfileEmail"
                 android:layout_width="match_parent"
-                android:gravity="center"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/dp_4"
+                android:gravity="center"
                 android:includeFontPadding="false"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
                 android:textColor="@color/legal_lens_secondary_text"
                 android:textSize="@dimen/sp_13" />
 
@@ -126,13 +126,13 @@
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:minHeight="@dimen/dp_66"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp"
                 android:layout_weight="1"
                 android:background="@drawable/bg_profile_stat"
                 android:gravity="center"
-                android:orientation="vertical">
+                android:minHeight="@dimen/dp_66"
+                android:orientation="vertical"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp">
 
                 <TextView
                     android:id="@+id/tvProfileContractCount"
@@ -161,13 +161,13 @@
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:minHeight="@dimen/dp_66"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp"
                 android:layout_weight="1"
                 android:background="@drawable/bg_profile_stat"
                 android:gravity="center"
-                android:orientation="vertical">
+                android:minHeight="@dimen/dp_66"
+                android:orientation="vertical"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp">
 
                 <TextView
                     android:id="@+id/tvProfileAnalysisCount"
@@ -196,13 +196,13 @@
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:minHeight="@dimen/dp_66"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp"
                 android:layout_weight="1"
                 android:background="@drawable/bg_profile_stat"
                 android:gravity="center"
-                android:orientation="vertical">
+                android:minHeight="@dimen/dp_66"
+                android:orientation="vertical"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp">
 
                 <TextView
                     android:id="@+id/tvProfileChatCount"
@@ -235,27 +235,54 @@
             android:clipToOutline="true"
             android:orientation="vertical">
 
-            <include android:id="@+id/actionEditProfile" layout="@layout/item_profile_action" />
+            <include
+                android:id="@+id/actionEditProfile"
+                layout="@layout/item_profile_action" />
 
-            <View android:layout_width="match_parent" android:layout_height="@dimen/dp_1" android:background="@color/legal_lens_input_stroke" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp_1"
+                android:background="@color/legal_lens_input_stroke" />
 
-            <include android:id="@+id/actionChangePassword" layout="@layout/item_profile_action" />
+            <include
+                android:id="@+id/actionChangePassword"
+                layout="@layout/item_profile_action" />
 
-            <View android:layout_width="match_parent" android:layout_height="@dimen/dp_1" android:background="@color/legal_lens_input_stroke" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp_1"
+                android:background="@color/legal_lens_input_stroke" />
 
-            <include android:id="@+id/actionNotificationSettings" layout="@layout/item_profile_action" />
+            <include
+                android:id="@+id/actionNotificationSettings"
+                layout="@layout/item_profile_action" />
 
-            <View android:layout_width="match_parent" android:layout_height="@dimen/dp_1" android:background="@color/legal_lens_input_stroke" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp_1"
+                android:background="@color/legal_lens_input_stroke" />
 
-            <include android:id="@+id/actionPrivacy" layout="@layout/item_profile_action" />
+            <include
+                android:id="@+id/actionPrivacy"
+                layout="@layout/item_profile_action" />
 
-            <View android:layout_width="match_parent" android:layout_height="@dimen/dp_1" android:background="@color/legal_lens_input_stroke" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp_1"
+                android:background="@color/legal_lens_input_stroke" />
 
-            <include android:id="@+id/actionAppearance" layout="@layout/item_profile_action" />
+            <include
+                android:id="@+id/actionAppearance"
+                layout="@layout/item_profile_action" />
 
-            <View android:layout_width="match_parent" android:layout_height="@dimen/dp_1" android:background="@color/legal_lens_input_stroke" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp_1"
+                android:background="@color/legal_lens_input_stroke" />
 
-            <include android:id="@+id/actionAbout" layout="@layout/item_profile_action" />
+            <include
+                android:id="@+id/actionAbout"
+                layout="@layout/item_profile_action" />
         </LinearLayout>
 
         <LinearLayout
