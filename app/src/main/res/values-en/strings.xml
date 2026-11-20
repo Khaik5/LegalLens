@@ -829,8 +829,14 @@
     <string name="contract_detail_office_page_count">12 pages</string>
     <string name="analysis_result_risk_assessment_description">Some contract terms may need negotiation to protect your interests.</string>
     <string name="analysis_risk_overview_description">This contract contains potentially unfavourable penalty and compensation clauses. Consider renegotiation.</string>
-    <string name="analysis_risk_overview_summary_title">Findings summary (%1$d risks)</string>
-    <string name="analysis_risk_overview_locked_note">The counts above cover only the %1$d of %2$d findings in the free preview. Unlock the result to see them all.</string>
+    <plurals name="analysis_risk_overview_summary_title">
+        <item quantity="one">Findings summary (%1$d risk)</item>
+        <item quantity="other">Findings summary (%1$d risks)</item>
+    </plurals>
+    <plurals name="analysis_risk_overview_locked_note">
+        <item quantity="one">The counts above cover only the %1$d of %2$d finding in the free preview. Unlock the result to see it.</item>
+        <item quantity="other">The counts above cover only the %1$d of %2$d findings in the free preview. Unlock the result to see them all.</item>
+    </plurals>
     <string name="credit_store_package_5_description">Sample price: 29.000đ</string>
     <string name="credit_store_package_15_description">Sample price: 79.000đ · Most popular</string>
     <string name="credit_store_package_30_description">Sample price: 149.000đ</string>

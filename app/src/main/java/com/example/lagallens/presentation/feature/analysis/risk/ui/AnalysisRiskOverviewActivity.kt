@@ -88,10 +88,15 @@ class AnalysisRiskOverviewActivity : com.example.lagallens.presentation.feature.
                 android.content.res.ColorStateList.valueOf(getColor(level.labelColorRes))
             analysisRiskOverviewSeverity.setBackgroundResource(level.badgeBackgroundRes)
         }
-        analysisRiskOverviewSummaryTitle.text = getString(R.string.analysis_risk_overview_summary_title, state.totalRiskCount)
+        analysisRiskOverviewSummaryTitle.text = resources.getQuantityString(
+            R.plurals.analysis_risk_overview_summary_title, state.totalRiskCount, state.totalRiskCount
+        )
         analysisRiskOverviewLockedNote.isVisible = state.lockedRiskCount > 0
-        analysisRiskOverviewLockedNote.text = getString(
-            R.string.analysis_risk_overview_locked_note, state.totalRiskCount - state.lockedRiskCount, state.totalRiskCount
+        analysisRiskOverviewLockedNote.text = resources.getQuantityString(
+            R.plurals.analysis_risk_overview_locked_note,
+            state.totalRiskCount,
+            state.totalRiskCount - state.lockedRiskCount,
+            state.totalRiskCount
         )
         analysisRiskOverviewHighRiskCount.text = state.highRiskCount.toString()
         analysisRiskOverviewMediumRiskCount.text = state.mediumRiskCount.toString()
