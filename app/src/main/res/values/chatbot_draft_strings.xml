@@ -5,7 +5,7 @@
     <string name="chatbot_draft_back">Quay lại</string>
     <string name="chatbot_draft_more">Tùy chọn khác</string>
     <string name="chatbot_draft_document_name">Hợp đồng lao động DEMO · %1$s</string>
-    <string name="chatbot_draft_version_metadata">DEMO · Đề xuất AI minh họa · Bản nháp chưa lưu</string>
+    <string name="chatbot_draft_version_metadata">Bản nháp do AI soạn · Chưa lưu</string>
     <string name="chatbot_draft_regenerated_version_metadata">DEMO · Đề xuất AI tạo lại · Chưa lưu</string>
     <string name="chatbot_draft_missing_warning">Còn thông tin trong [ngoặc vuông]. Cần bổ sung và rà soát pháp lý trước khi ký.</string>
     <string name="chatbot_draft_page_count">Nội dung · %1$d / %2$d</string>
@@ -242,7 +242,7 @@ Các điều khoản còn lại và thông tin trong [ngoặc vuông] không đ�
     <string name="draft_save_selected_version">Phiên bản được chọn: %1$s</string>
     <string name="draft_save_name_label">Tên hợp đồng</string>
     <string name="draft_save_default_name">Hợp đồng lao động — bản nháp</string>
-    <string name="draft_save_copy_notice">Tạo bản sao mới trong Hợp đồng của tôi. Không ghi đè tài liệu gốc hoặc D1.</string>
+    <string name="draft_save_copy_notice">Lưu thành bản sao mới trong bản nháp của bạn. Không ghi đè tài liệu gốc hoặc D1.</string>
     <string name="draft_save_legal_warning">Còn thông tin các bên, công việc, tiền lương và thời giờ làm việc trong [ngoặc vuông]. Bản lưu vẫn là bản nháp, chưa sẵn sàng ký.</string>
     <string name="draft_save_acknowledge">Tôi hiểu bản lưu cần được bổ sung và rà soát pháp lý.</string>
     <string name="draft_save_action">Lưu bản sao mới</string>
@@ -255,14 +255,14 @@ Các điều khoản còn lại và thông tin trong [ngoặc vuông] không đ�
     <string name="draft_save_retry">Thử lại</string>
     <string name="draft_save_back_unsaved">Quay lại bản nháp chưa lưu</string>
     <string name="draft_save_success_title">Đã lưu bản sao</string>
-    <string name="draft_save_success_body">Bản nháp đã được lưu vào Hợp đồng của tôi dưới tên bạn đã nhập. Đây vẫn là bản nháp cần hoàn thiện.</string>
-    <string name="draft_save_view_saved">Xem hợp đồng đã lưu</string>
+    <string name="draft_save_success_body">Bản nháp đã được lưu dưới tên bạn đã nhập. Đây vẫn là bản nháp cần hoàn thiện.</string>
+    <string name="draft_save_view_saved">Xem bản nháp đã lưu</string>
     <string name="draft_save_export_pdf">Xuất PDF</string>
     <string name="draft_saved_detail_title">Chi tiết hợp đồng</string>
     <string name="draft_saved_badge">Đã lưu bản sao</string>
     <string name="draft_saved_metadata">Bản nháp có hỗ trợ AI · Chưa ký</string>
     <string name="draft_saved_location_label">Nơi lưu</string>
-    <string name="draft_saved_location">Hợp đồng của tôi</string>
+    <string name="draft_saved_location">Bản nháp của bạn</string>
     <string name="draft_saved_detail_note">Đã lưu như bản sao mới. Chưa có chữ ký; chưa xác nhận hiệu lực pháp lý.</string>
     <string name="draft_saved_export_button">Xuất PDF bản nháp</string>
     <string name="draft_pdf_title">Xuất tài liệu</string>

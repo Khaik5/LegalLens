@@ -814,9 +814,9 @@
     <string name="chatbot_generation_retry">Thử lại</string>
     <string name="chatbot_generation_error_note">Thử lại với cùng yêu cầu 24 tháng; chưa có bản nháp nào được tạo hoặc lưu.</string>
     <string name="chatbot_generation_success">Bản nháp mẫu D1 đã sẵn sàng. Hợp đồng gốc không thay đổi.</string>
-    <string name="chatbot_generation_result_name">Hợp đồng lao động DEMO · D1</string>
-    <string name="chatbot_generation_result_metadata">Mẫu minh họa · Thời hạn 24 tháng</string>
-    <string name="chatbot_generation_result_badge">Bản nháp mẫu · Chưa lưu</string>
+    <string name="chatbot_generation_result_name">Hợp đồng lao động · D1</string>
+    <string name="chatbot_generation_result_metadata">Bản nháp do AI soạn</string>
+    <string name="chatbot_generation_result_badge">Bản nháp · Chưa lưu</string>
     <string name="chatbot_generation_result_warning">Còn thông tin cần bổ sung. Rà soát nội dung trước khi lưu hoặc xuất.</string>
     <string name="chatbot_generation_view_draft">Xem bản nháp</string>
     <string name="chatbot_generation_preview_title">Bản nháp D1 · Minh họa</string>
