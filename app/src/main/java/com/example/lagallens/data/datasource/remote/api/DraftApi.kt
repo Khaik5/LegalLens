@@ -8,6 +8,7 @@ import com.example.lagallens.data.model.response.ApiEnvelope
 import com.example.lagallens.data.model.response.DraftAiJobCreatedResponse
 import com.example.lagallens.data.model.response.DraftAiJobResponse
 import com.example.lagallens.data.model.response.DraftDetailResponse
+import com.example.lagallens.data.model.response.DraftSavedAsContractResponse
 import com.example.lagallens.data.model.response.DraftPageResponse
 import com.example.lagallens.data.model.response.DraftSavedResponse
 import com.example.lagallens.data.model.response.DraftVersionListResponse
@@ -39,6 +40,14 @@ interface DraftApi {
     /** 204 without a body. */
     @DELETE("drafts/{id}")
     suspend fun delete(@Tag scope: AuthSessionScope, @Path("id") draftId: Long): Response<Unit>
+
+    /** Saves the current version as a PDF contract; asking again with the same key returns the same contract. */
+    @POST("drafts/{id}/save-as-contract")
+    suspend fun saveAsContract(
+        @Tag scope: AuthSessionScope,
+        @Path("id") draftId: Long,
+        @Header("Idempotency-Key") idempotencyKey: String
+    ): ApiEnvelope<DraftSavedAsContractResponse>
 
     @POST("drafts/{id}/copy")
     suspend fun copy(@Tag scope: AuthSessionScope, @Path("id") draftId: Long): ApiEnvelope<DraftSavedResponse>

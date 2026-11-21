@@ -45,7 +45,7 @@ import kotlinx.coroutines.ensureActive
 import java.io.File
 
 internal enum class DraftPdfStatus { OPTIONS, LOADING, ERROR, READY }
-internal data class DraftPdfState(val status: DraftPdfStatus = DraftPdfStatus.OPTIONS, val filePath: String? = null, val saving: Boolean = false, val title: String = "")
+internal data class DraftPdfState(val status: DraftPdfStatus = DraftPdfStatus.OPTIONS, val filePath: String? = null, val saving: Boolean = false, val title: String = "", val savedToDevice: Boolean = false)
 internal sealed interface DraftPdfEffect {
     data class Share(val filePath: String) : DraftPdfEffect
     data object Saved : DraftPdfEffect
@@ -127,7 +127,7 @@ internal class DraftPdfExportViewModel(application: Application) : AndroidViewMo
                 false
             }
             if (isOwnerSession()) {
-                state.update { it.copy(saving = false) }
+                state.update { it.copy(saving = false, savedToDevice = it.savedToDevice || saved) }
                 effectChannel.send(if (saved) DraftPdfEffect.Saved else DraftPdfEffect.SaveFailed)
             }
         }
@@ -188,6 +188,7 @@ class DraftPdfExportBottomSheet : BottomSheetDialogFragment() {
         pdfLoading.isVisible = state.status == DraftPdfStatus.LOADING
         pdfError.isVisible = state.status == DraftPdfStatus.ERROR
         pdfReady.isVisible = state.status == DraftPdfStatus.READY
+        pdfReadyBody.setText(if (state.savedToDevice) R.string.draft_pdf_ready_body_saved else R.string.draft_pdf_ready_body)
         pdfSaveFileReady.isEnabled = !state.saving
         pdfSaveFileReady.text = getString(if (state.saving) R.string.draft_pdf_saving_file else R.string.draft_pdf_save_file)
     }
