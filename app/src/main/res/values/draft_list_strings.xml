@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="profile_my_drafts">Bản nháp của tôi</string>
+    <string name="draft_list_title">Bản nháp của tôi</string>
+    <string name="draft_list_empty_title">Chưa có bản nháp nào</string>
+    <string name="draft_list_empty_body">Bản nháp tạo từ trò chuyện AI sẽ hiện ở đây để bạn xem lại.</string>
+    <string name="draft_list_error">Không thể tải bản nháp. Vui lòng thử lại.</string>
+    <string name="draft_list_retry">Thử lại</string>
+    <string name="draft_list_untitled">Bản nháp hợp đồng</string>
+    <string name="draft_saved_contract_button">Lưu thành hợp đồng PDF</string>
+    <string name="draft_saved_contract_saving">Đang lưu…</string>
+    <string name="draft_saved_contract_done">Đã lưu vào Hợp đồng của tôi</string>
+    <string name="draft_saved_contract_success">Đã lưu thành hợp đồng PDF. Xem trong tab Hợp đồng.</string>
+    <string name="draft_saved_contract_failed">Chưa lưu được thành hợp đồng. Vui lòng thử lại.</string>
+    <string name="draft_list_item_updated">Cập nhật %1$s</string>
+    <string name="draft_list_item_meta">%1$s · %2$s</string>
+    <string name="draft_list_saved">Đã lưu</string>
+    <string name="draft_list_unsaved">Chưa lưu</string>
+    <plurals name="draft_list_version_count">
+        <item quantity="other">%1$d phiên bản</item>
+    </plurals>
+</resources>

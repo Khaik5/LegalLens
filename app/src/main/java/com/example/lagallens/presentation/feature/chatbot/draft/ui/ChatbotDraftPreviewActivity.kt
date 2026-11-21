@@ -8,7 +8,6 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.Gravity
 import android.view.WindowManager
-import android.widget.Toast
 import android.view.LayoutInflater
 import android.widget.EditText
 import androidx.activity.viewModels
@@ -93,7 +92,7 @@ class ChatbotDraftPreviewActivity : DraftSessionActivity() {
 
     private fun bindActions() = with(binding) {
         draftBack.setOnClickListener { finish() }
-        draftMore.setOnClickListener { showUnavailableMessage(R.string.chatbot_draft_more_unavailable) }
+        draftMore.setOnClickListener { showMoreMenu(it) }
         draftPrevious.setOnClickListener { viewModel.onEvent(ChatbotDraftUiEvent.PreviousClicked) }
         draftNext.setOnClickListener { viewModel.onEvent(ChatbotDraftUiEvent.NextClicked) }
         draftZoomOut.setOnClickListener { viewModel.onEvent(ChatbotDraftUiEvent.ZoomOutClicked) }
@@ -140,7 +139,9 @@ class ChatbotDraftPreviewActivity : DraftSessionActivity() {
         listOf(draftEdit, draftRegenerate, draftExport, draftAskAi, draftSave).forEach { it.isEnabled = hasContent }
         draftContractName.text = state.title ?: getString(R.string.chatbot_draft_document_name, state.version)
         draftVersion.setText(
-            if (state.version == ChatbotDraftUiState.REGENERATED_VERSION) {
+            if (state.isSaved) {
+                R.string.chatbot_draft_saved_metadata
+            } else if (state.version == ChatbotDraftUiState.REGENERATED_VERSION) {
                 R.string.chatbot_draft_regenerated_version_metadata
             } else if (state.version == ChatbotDraftUiState.MANUAL_VERSION) {
                 R.string.chatbot_draft_manual_version_metadata
@@ -199,8 +200,20 @@ class ChatbotDraftPreviewActivity : DraftSessionActivity() {
         )
     }
 
-    private fun showUnavailableMessage(messageRes: Int) {
-        Toast.makeText(this, messageRes, Toast.LENGTH_SHORT).show()
+    private fun showMoreMenu(anchor: android.view.View) {
+        if (!isDraftSessionValid()) return
+        val contractId = viewModel.uiState.value.contractId
+        androidx.appcompat.widget.PopupMenu(this, anchor).apply {
+            menu.add(0, MENU_VERSIONS, 0, R.string.chatbot_draft_versions_title)
+            menu.add(0, MENU_MY_DRAFTS, 1, R.string.draft_list_title)
+            setOnMenuItemClickListener { item ->
+                when (item.itemId) {
+                    MENU_VERSIONS -> startActivity(ChatbotDraftVersionsActivity.createIntent(this@ChatbotDraftPreviewActivity, contractId = contractId))
+                    MENU_MY_DRAFTS -> startActivity(ChatbotDraftListActivity.createIntent(this@ChatbotDraftPreviewActivity))
+                }
+                true
+            }
+        }.show()
     }
 
     private fun showAiEditSheet(scope: String = com.example.lagallens.presentation.feature.chatbot.draft.contract.ChatbotDraftAiEditUiState.SELECTED_CLAUSE_SCOPE, request: String? = null) {
@@ -310,6 +323,8 @@ class ChatbotDraftPreviewActivity : DraftSessionActivity() {
         const val EXTRA_DRAFT_ID = "chatbot_draft_id"
         const val EXTRA_CONTRACT_ID = "chatbot_draft_contract_id"
         private const val RESULT_EDIT_REQUEST = 614
+        private const val MENU_VERSIONS = 1
+        private const val MENU_MY_DRAFTS = 2
         private const val MIN_ZOOM_PERCENT = 75
         private const val MAX_ZOOM_PERCENT = 150
 

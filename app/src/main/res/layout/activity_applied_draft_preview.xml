@@ -133,6 +133,7 @@
                 android:textSize="@dimen/sp_12" />
 
             <LinearLayout
+                android:id="@+id/draftAppliedClauseCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/dp_16"
@@ -194,6 +195,7 @@
                     android:layout_marginTop="@dimen/dp_8"
                     android:fontFamily="@font/manrope"
                     android:lineSpacingExtra="@dimen/dp_4"
+                    android:id="@+id/draftAppliedContractIntroduction"
                     android:text="@string/chatbot_draft_contract_introduction"
                     android:textColor="@color/legal_lens_status_text"
                     android:textSize="@dimen/sp_13" />

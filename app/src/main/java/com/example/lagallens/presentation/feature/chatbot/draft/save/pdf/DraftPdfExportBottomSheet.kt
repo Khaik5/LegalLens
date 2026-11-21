@@ -45,7 +45,7 @@ import kotlinx.coroutines.ensureActive
 import java.io.File
 
 internal enum class DraftPdfStatus { OPTIONS, LOADING, ERROR, READY }
-internal data class DraftPdfState(val status: DraftPdfStatus = DraftPdfStatus.OPTIONS, val filePath: String? = null, val saving: Boolean = false, val title: String = "")
+internal data class DraftPdfState(val status: DraftPdfStatus = DraftPdfStatus.OPTIONS, val filePath: String? = null, val saving: Boolean = false, val title: String = "", val savedToDevice: Boolean = false)
 internal sealed interface DraftPdfEffect {
     data class Share(val filePath: String) : DraftPdfEffect
     data object Saved : DraftPdfEffect
@@ -127,7 +127,7 @@ internal class DraftPdfExportViewModel(application: Application) : AndroidViewMo
                 false
             }
             if (isOwnerSession()) {
-                state.update { it.copy(saving = false) }
+                state.update { it.copy(saving = false, savedToDevice = it.savedToDevice || saved) }
                 effectChannel.send(if (saved) DraftPdfEffect.Saved else DraftPdfEffect.SaveFailed)
             }
         }
@@ -183,21 +183,26 @@ class DraftPdfExportBottomSheet : BottomSheetDialogFragment() {
 
     private fun render(state: DraftPdfState) = with(binding) {
         if (!viewModel.isOwnerSession()) { dismissAllowingStateLoss(); return@with }
-        pdfDocumentTitle.text = state.title.ifBlank { getString(R.string.chatbot_draft_document_name, arguments?.getString(KEY_VERSION) ?: ChatbotDraftUiState.APPROVED_AI_VERSION) }
+        pdfDocumentTitle.text = state.title.ifBlank { fallbackTitle() }
         pdfOptions.isVisible = state.status == DraftPdfStatus.OPTIONS
         pdfLoading.isVisible = state.status == DraftPdfStatus.LOADING
         pdfError.isVisible = state.status == DraftPdfStatus.ERROR
         pdfReady.isVisible = state.status == DraftPdfStatus.READY
+        pdfReadyBody.setText(if (state.savedToDevice) R.string.draft_pdf_ready_body_saved else R.string.draft_pdf_ready_body)
         pdfSaveFileReady.isEnabled = !state.saving
         pdfSaveFileReady.text = getString(if (state.saving) R.string.draft_pdf_saving_file else R.string.draft_pdf_save_file)
     }
+
+    // The generated title only exists after the PDF is built; until then show the title the caller already knows.
+    private fun fallbackTitle(): String =
+        arguments?.getString(KEY_TITLE)?.takeIf { it.isNotBlank() }
+            ?: getString(R.string.draft_default_document_name, arguments?.getString(KEY_VERSION) ?: ChatbotDraftUiState.APPROVED_AI_VERSION)
 
     private fun launchSavePicker() {
         if (!viewModel.isOwnerSession()) return
         val state = viewModel.uiState.value
         if (state.saving || state.filePath == null) return
-        val version = arguments?.getString(KEY_VERSION) ?: ChatbotDraftUiState.APPROVED_AI_VERSION
-        val title = state.title.ifBlank { getString(R.string.chatbot_draft_document_name, version) }
+        val title = state.title.ifBlank { fallbackTitle() }
             .replace(Regex("[^\\p{L}\\p{N} ._-]"), "")
             .trim()
             .take(80)
@@ -253,8 +258,12 @@ class DraftPdfExportBottomSheet : BottomSheetDialogFragment() {
     companion object {
         const val TAG = "DraftPdfExportBottomSheet"
         private const val KEY_VERSION = "draft_pdf_version"
-        fun newInstance(version: String = ChatbotDraftUiState.APPROVED_AI_VERSION) = DraftPdfExportBottomSheet().apply {
-            arguments = Bundle().apply { putString(KEY_VERSION, version) }
+        private const val KEY_TITLE = "draft_pdf_title"
+        fun newInstance(version: String = ChatbotDraftUiState.APPROVED_AI_VERSION, title: String? = null) = DraftPdfExportBottomSheet().apply {
+            arguments = Bundle().apply {
+                putString(KEY_VERSION, version)
+                putString(KEY_TITLE, title)
+            }
         }
     }
 }

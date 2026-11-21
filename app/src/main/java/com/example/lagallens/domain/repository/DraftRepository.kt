@@ -21,6 +21,8 @@ interface DraftRepository {
     suspend fun createCopy(sourceDraftId: String, title: String, stage: DraftStage = DraftStage.COPY, isTitleGenerated: Boolean = false): Draft?
     suspend fun updateDraft(draftId: String, title: String, content: String): Draft?
     suspend fun deleteDraft(draftId: String): Boolean
+    /** Saves the draft as a PDF contract and returns the new contract's id; null when this data source cannot. */
+    suspend fun saveAsContract(draftId: String): String? = null
 }
 
 /** Versions of one contract never mix with another contract's drafts. */
