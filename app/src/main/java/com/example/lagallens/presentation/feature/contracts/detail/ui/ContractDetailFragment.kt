@@ -14,6 +14,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import com.example.lagallens.presentation.feature.contracts.contract.contractTypeLabel
 import com.example.lagallens.R
 import com.example.lagallens.databinding.FragmentContractDetailBinding
 import com.example.lagallens.presentation.common.utils.animateContentEntrance
@@ -198,7 +199,7 @@ class ContractDetailFragment : Fragment() {
 
     private fun render(state: ContractDetailUiState) {
         binding.tvContractTitle.text = state.renamedTitle.orEmpty()
-        binding.tvContractType.setText(state.contractTypeRes)
+        binding.tvContractType.text = contractTypeLabel(requireContext(), state.contractTypeRes, state.isAiGenerated, state.needsReview)
         binding.tvStatus.setText(state.statusRes)
         binding.tvRisk.setText(state.riskRes)
         val dateFormat = java.text.DateFormat.getDateInstance(java.text.DateFormat.MEDIUM)

@@ -27,6 +27,7 @@
         <activity android:name=".presentation.feature.chatbot.draft.ui.ChatbotDraftAiReviewActivity" android:exported="false" />
         <activity android:name=".presentation.feature.chatbot.draft.ui.ChatbotDraftAiApplyActivity" android:exported="false" />
         <activity android:name=".presentation.feature.chatbot.draft.ui.ChatbotDraftVersionsActivity" android:exported="false" />
+        <activity android:name=".presentation.feature.chatbot.draft.ui.ChatbotDraftListActivity" android:exported="false" />
         <activity android:name=".presentation.feature.chatbot.draft.ui.AppliedDraftPreviewActivity" android:exported="false" />
         <activity android:name=".presentation.feature.chatbot.draft.ui.CompareDraftVersionsActivity" android:exported="false" />
         <activity android:name=".presentation.feature.chatbot.draft.ui.CopyDraftVersionActivity" android:exported="false" />

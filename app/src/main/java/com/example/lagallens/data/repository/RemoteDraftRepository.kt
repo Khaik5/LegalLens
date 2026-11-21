@@ -143,6 +143,18 @@ class RemoteDraftRepository(
         }
     }
 
+    /**
+     * One idempotency key per draft version and session, kept for the life of the process: tapping again, or
+     * retrying after a lost response, gets the same contract back instead of a second one.
+     */
+    private val contractKeys = java.util.concurrent.ConcurrentHashMap<String, String>()
+
+    override suspend fun saveAsContract(draftId: String): String? = inSession { scope, _ ->
+        val (id, version) = RemoteDraftId.parse(draftId) ?: return@inSession null
+        val key = contractKeys.getOrPut("${scope.key}|$id:$version") { java.util.UUID.randomUUID().toString() }
+        remote.saveAsContract(scope, id, key).contractId.toString()
+    }
+
     internal suspend fun loadVersion(scope: AuthSessionScope, userId: String, id: Long, version: Int): Draft {
         val draft = remote.get(scope, id)
         val text: DraftVersionResponse? = if (draft.version == version) null else remote.version(scope, id, version)

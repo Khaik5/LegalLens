@@ -3,6 +3,7 @@ package com.example.lagallens.presentation.feature.contracts.contract
 import androidx.annotation.StringRes
 import com.example.lagallens.R
 import com.example.lagallens.domain.model.EmploymentContract
+import com.example.lagallens.domain.model.EmploymentContractSource
 import com.example.lagallens.domain.model.EmploymentContractRisk
 import com.example.lagallens.domain.model.EmploymentContractStatus
 import com.example.lagallens.domain.model.EmploymentContractType
@@ -82,3 +83,14 @@ fun EmploymentContract.toContractListItem(subtitle: String): ContractListItem {
         content = content
     )
 }
+
+/** The type label, plus where the contract came from and whether it still needs the user's review. */
+fun contractTypeLabel(context: android.content.Context, @StringRes typeRes: Int, isAiGenerated: Boolean, needsReview: Boolean): String =
+    buildList {
+        add(context.getString(typeRes))
+        if (isAiGenerated) add(context.getString(R.string.contract_source_ai_generated))
+        if (needsReview) add(context.getString(R.string.contract_needs_review))
+    }.joinToString(" · ")
+
+fun EmploymentContract.typeLabel(context: android.content.Context): String =
+    contractTypeLabel(context, type.labelRes(), source == EmploymentContractSource.AI_GENERATED, reviewRequired == true)

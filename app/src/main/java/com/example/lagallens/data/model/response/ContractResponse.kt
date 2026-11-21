@@ -11,7 +11,11 @@ data class ContractResponse(
     val latestAnalysisStatus: String? = null,
     /** ISO dates (yyyy-MM-dd) the backend fills in from the analysis; null until then. */
     val startDate: String? = null,
-    val endDate: String? = null
+    val endDate: String? = null,
+    /** UPLOADED or AI_GENERATED; absent from older backends. */
+    val source: String? = null,
+    /** The linked draft version still needs the user's review; null when there is no linked draft. */
+    val reviewRequired: Boolean? = null
 )
 
 data class ContractPageResponse(

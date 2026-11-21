@@ -88,6 +88,9 @@ class AppliedDraftPreviewActivity : DraftSessionActivity() {
                 showDraftUnavailable()
                 return@launch
             }
+            // The saved text is the whole document: the sample clause card and the sample introduction would contradict it.
+            binding.draftAppliedClauseCard.isVisible = false
+            binding.draftAppliedContractIntroduction.isVisible = false
             val section = ItemChatbotDraftSectionBinding.inflate(layoutInflater, binding.draftAppliedContractSections, false)
             section.draftSectionTitle.setText(R.string.chatbot_draft_saved_content_title)
             section.draftSectionBody.text = draftContent

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="profile_my_drafts">My drafts</string>
+    <string name="draft_list_title">My drafts</string>
+    <string name="draft_list_empty_title">No drafts yet</string>
+    <string name="draft_list_empty_body">Drafts created from the AI chat will appear here so you can review them again.</string>
+    <string name="draft_list_error">Could not load your drafts. Please try again.</string>
+    <string name="draft_list_retry">Try again</string>
+    <string name="draft_list_untitled">Contract draft</string>
+    <string name="draft_saved_contract_button">Save as PDF contract</string>
+    <string name="draft_saved_contract_saving">Saving…</string>
+    <string name="draft_saved_contract_done">Saved to My contracts</string>
+    <string name="draft_saved_contract_success">Saved as a PDF contract. Find it in the Contracts tab.</string>
+    <string name="draft_saved_contract_failed">Could not save it as a contract. Please try again.</string>
+    <string name="draft_list_item_updated">Updated %1$s</string>
+    <string name="draft_list_item_meta">%1$s · %2$s</string>
+    <string name="draft_list_saved">Saved</string>
+    <string name="draft_list_unsaved">Not saved</string>
+    <plurals name="draft_list_version_count">
+        <item quantity="one">%1$d version</item>
+        <item quantity="other">%1$d versions</item>
+    </plurals>
+</resources>

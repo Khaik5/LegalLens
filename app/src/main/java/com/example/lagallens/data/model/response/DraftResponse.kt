@@ -36,6 +36,9 @@ data class DraftVersionResponse(val version: Int, val title: String?, val conten
 /** Returned by create, update, copy and apply. */
 data class DraftSavedResponse(val id: Long, val version: Int)
 
+/** The contract and PDF document created from a draft. */
+data class DraftSavedAsContractResponse(val contractId: Long, val documentId: Long)
+
 /** [status] is WAITING_PROVIDER, PROCESSING, COMPLETED, APPLIED, FAILED or CANCELLED. */
 data class DraftAiJobCreatedResponse(val jobId: String, val draftId: Long, val status: String)
 

@@ -188,8 +188,21 @@ class ProfileSettingsFragment : Fragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        // Opened from the profile's Language row: show the picker once, not again after a rotation.
+        if (arguments?.getBoolean(ARG_OPEN_LANGUAGE) == true) {
+            arguments?.putBoolean(ARG_OPEN_LANGUAGE, false)
+            viewModel.onEvent(ProfileSettingsUiEvent.LanguageClicked)
+        }
+    }
+
     override fun onDestroyView() {
         _binding = null
         super.onDestroyView()
+    }
+
+    companion object {
+        const val ARG_OPEN_LANGUAGE = "profile_settings_open_language"
     }
 }

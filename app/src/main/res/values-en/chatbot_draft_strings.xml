@@ -4,9 +4,10 @@
     <string name="chatbot_draft_preview_title">Contract draft</string>
     <string name="chatbot_draft_back">Back</string>
     <string name="chatbot_draft_more">More options</string>
-    <string name="chatbot_draft_document_name">Demo employment contract · %1$s</string>
+    <string name="chatbot_draft_document_name">Employment contract · %1$s</string>
     <string name="chatbot_draft_version_metadata">AI-drafted · Not saved</string>
-    <string name="chatbot_draft_regenerated_version_metadata">DEMO · Regenerated AI illustration · Not saved</string>
+    <string name="chatbot_draft_saved_metadata">AI-drafted · Saved</string>
+    <string name="chatbot_draft_regenerated_version_metadata">Regenerated AI proposal · Not saved</string>
     <string name="chatbot_draft_missing_warning">Information in [square brackets] is still missing. Complete it and review the draft before signing.</string>
     <string name="chatbot_draft_page_count">Content · %1$d / %2$d</string>
     <string name="chatbot_draft_zoom_level">%1$d%%</string>
@@ -17,7 +18,6 @@
     <string name="chatbot_draft_export_action">Export PDF</string>
     <string name="chatbot_draft_ask_ai_action">Ask AI to edit</string>
     <string name="chatbot_draft_save_action">Save contract</string>
-    <string name="chatbot_draft_more_unavailable">More options will be available when the draft flow is complete.</string>
     <string name="chatbot_draft_edit_unavailable">AI editing will be available when the contract service is connected.</string>
     <string name="chatbot_draft_export_unavailable">PDF export will be available when the contract service is connected.</string>
     <string name="chatbot_draft_save_unavailable">Saving will be available when the contract library is connected.</string>
@@ -27,7 +27,7 @@
     <string name="chatbot_draft_regeneration_confirm_note">The original contract stays unchanged. The new draft is not saved and does not replace D1.</string>
     <string name="chatbot_draft_regeneration_confirm_action">Confirm regeneration</string>
     <string name="chatbot_draft_regeneration_cancel_action">Go back</string>
-    <string name="chatbot_draft_regeneration_source_metadata">Existing AI draft · 24 months</string>
+    <string name="chatbot_draft_regeneration_source_metadata">Existing AI draft</string>
     <string name="chatbot_draft_preserved_badge">%1$s preserved · Not saved</string>
     <string name="chatbot_draft_regeneration_loading_title">AI is regenerating the draft</string>
     <string name="chatbot_draft_regeneration_loading_body">Preparing a new 24-month draft, checking its clauses, and marking missing information.</string>
@@ -42,7 +42,7 @@
     <string name="chatbot_draft_regeneration_result_name">Demo employment contract · D1-R</string>
     <string name="chatbot_draft_regeneration_result_badge">AI regenerated draft · Not saved</string>
     <string name="chatbot_draft_regeneration_view">View D1-R draft</string>
-    <string name="chatbot_draft_contract_heading">EMPLOYMENT CONTRACT · DEMO</string>
+    <string name="chatbot_draft_contract_heading">EMPLOYMENT CONTRACT</string>
     <string name="chatbot_draft_contract_introduction">UI illustration only. This is not extracted from your file or legal advice. The parties must review and complete it before use.</string>
     <string name="chatbot_draft_section_1_title">Article 1. Parties</string>
     <string name="chatbot_draft_section_1_body">Employer: [NAME, ADDRESS, REPRESENTATIVE AND TITLE].
@@ -71,12 +71,12 @@ The parties follow the process, rights and obligations required by applicable la
     <string name="chatbot_draft_section_9_body">Effective date: [DATE]. The contract is made in [NUMBER] copies after the parties complete and sign it.
 EMPLOYER                                  EMPLOYEE
 [REPRESENTATIVE AND TITLE]               [FULL NAME]
-DEMO · Unsigned · Complete and review all [bracketed] fields.</string>
+Unsigned · Complete and review all [bracketed] fields.</string>
     <string name="chatbot_draft_manual_title">Edit contract</string>
     <string name="chatbot_draft_manual_document_name">Demo employment contract · D1</string>
     <string name="chatbot_draft_manual_unsaved_badge">D1 · Unsaved edits</string>
     <string name="chatbot_draft_manual_default_addition">[ADDITIONAL TERMS AGREED BY THE PARTIES].</string>
-    <string name="chatbot_draft_manual_scope_note">Editing Article 2. Other terms stay unchanged in this illustration.</string>
+    <string name="chatbot_draft_manual_scope_note">You are editing the draft text. The original contract is unchanged.</string>
     <string name="chatbot_draft_manual_select_another">Select another clause to edit</string>
     <string name="chatbot_draft_manual_other_clause_unavailable">Article 2 is the editable clause in this preview.</string>
     <string name="chatbot_draft_manual_preserve_note">Saving creates a separate M1 copy; D1 and the original contract stay unchanged.</string>
@@ -99,13 +99,13 @@ DEMO · Unsigned · Complete and review all [bracketed] fields.</string>
     <string name="chatbot_draft_ai_document_metadata">AI draft · Not saved</string>
     <string name="chatbot_draft_ai_scope_whole">Whole contract</string>
     <string name="chatbot_draft_ai_scope_note_whole">AI will read all of D1 for consistency and propose only changes requested.</string>
-    <string name="chatbot_draft_ai_scope_note_selected">Scope: Article 3 · Term. Other clauses stay unchanged.</string>
+    <string name="chatbot_draft_ai_scope_note_selected">Only the selected clause is proposed for change. Other clauses stay unchanged.</string>
     <string name="chatbot_draft_ai_prompt_label">What would you like to change?</string>
     <string name="chatbot_draft_ai_prompt_hint">Describe the changes you need</string>
-    <string name="chatbot_draft_ai_default_request">Change Article 3 from 24 months to 30 months. Keep all other clauses unchanged.</string>
+    <string name="chatbot_draft_ai_default_request">Review how the contract type and term are written. Keep all other information unchanged.</string>
     <string name="chatbot_draft_ai_suggestion_term">Change the term</string>
     <string name="chatbot_draft_ai_suggestion_payment">Clarify payment</string>
-    <string name="chatbot_draft_ai_suggestion_payment_request">Clarify the payment cycle and due date in Article 4. Keep all other clauses unchanged.</string>
+    <string name="chatbot_draft_ai_suggestion_payment_request">Clarify how the salary and pay date are written. Keep all other information unchanged.</string>
     <string name="chatbot_draft_ai_review_note">AI creates a proposal for your review. D1 and the original contract are not changed automatically.</string>
     <string name="chatbot_draft_ai_submit">Send edit request</string>
     <string name="chatbot_draft_ai_cancel">Go back</string>
@@ -115,9 +115,9 @@ DEMO · Unsigned · Complete and review all [bracketed] fields.</string>
     <string name="chatbot_draft_ai_suggestion_keep_rest_request">Edit only the selected clause. Keep the rest of the contract unchanged.</string>
     <string name="chatbot_draft_ai_prompt_required">Enter an edit request.</string>
     <string name="chatbot_draft_ai_title">Edit with AI</string>
-    <string name="chatbot_draft_ai_source_metadata">AI draft · 24 months</string>
+    <string name="chatbot_draft_ai_source_metadata">AI draft</string>
     <string name="chatbot_draft_ai_source_badge">Source: %1$s · Not saved</string>
-    <string name="chatbot_draft_ai_request_label_selected">Request · Article 3</string>
+    <string name="chatbot_draft_ai_request_label_selected">Request · Selected clause</string>
     <string name="chatbot_draft_ai_request_label_whole">Request · Whole contract</string>
     <string name="chatbot_draft_ai_loading_title">AI is preparing a proposal</string>
     <string name="chatbot_draft_ai_loading_body">Reading D1 and preparing the requested change.</string>
@@ -126,27 +126,28 @@ DEMO · Unsigned · Complete and review all [bracketed] fields.</string>
     <string name="chatbot_draft_ai_retry">Try again</string>
     <string name="chatbot_draft_ai_edit_request">Edit request</string>
     <string name="chatbot_draft_ai_proposal_title">1 edit proposal created</string>
-    <string name="chatbot_draft_ai_proposal_change">Article 3: 24 → 30 months. Other clauses stay unchanged. The proposal has not been applied yet.</string>
+    <string name="chatbot_draft_ai_proposal_change">The proposal has not been applied to the draft yet.</string>
     <string name="chatbot_draft_ai_proposal_note">Select the proposal and confirm it to create a new version.</string>
     <string name="chatbot_draft_ai_review_changes">Review changes</string>
     <string name="chatbot_draft_ai_approval_pending">The proposal is ready for review; it has not been applied to D1.</string>
     <string name="chatbot_draft_ai_approval_title">Apply the selected change?</string>
-    <string name="chatbot_draft_ai_approval_body">1 DEMO proposal: Article 3, change the employment term from 24 to 30 months.
-D1 · AI draft not saved → D2 · New edited copy, not saved.
-The original contract is unchanged. D1 is preserved.
-All other clauses and information in [square brackets] stay unchanged.</string>
+    <string name="chatbot_draft_ai_approval_body">Apply the selected edit proposal.
+D1 · Unsaved AI draft → D2 · New edited version, not saved.
+The original contract is unchanged. D1 is kept.
+The remaining clauses and [bracketed] fields do not change.</string>
     <string name="chatbot_draft_ai_approval_confirm">Confirm and apply</string>
     <string name="chatbot_draft_manual_version_metadata">Manual edit · Not saved</string>
     <string name="chatbot_draft_ai_version_metadata">AI proposal · D2 not saved</string>
     <string name="chatbot_draft_section_3_approved_body">The illustrative employment term is 30 months from the agreed start date. The parties must confirm the actual term under applicable requirements.
 This is a proposal in a new D2 copy; D1 and the original contract remain unchanged.</string>
     <string name="chatbot_draft_ai_review_title">Review changes</string>
-    <string name="chatbot_draft_ai_review_metadata">AI draft not saved · Scope: Article 3</string>
-    <string name="chatbot_draft_ai_review_clause">Article 3 · Employment term</string>
+    <string name="chatbot_draft_ai_review_metadata">AI draft not saved · Edit proposal</string>
+    <string name="chatbot_draft_ai_review_clause">Proposed edit</string>
     <string name="chatbot_draft_ai_review_selected">Selected</string>
     <string name="chatbot_draft_ai_review_rejected">Rejected</string>
     <string name="chatbot_draft_ai_review_before_label">BEFORE · D1 DRAFT</string>
     <string name="chatbot_draft_ai_review_before">The illustrative employment term is 24 months from the agreed start date.</string>
+    <string name="chatbot_draft_ai_review_before_empty">Current draft. The changed passage is not shown separately.</string>
     <string name="chatbot_draft_ai_review_after_label">AFTER · AI PROPOSAL, NOT APPLIED</string>
     <string name="chatbot_draft_ai_review_after">The illustrative employment term is 30 months from the agreed start date.</string>
     <string name="chatbot_draft_ai_review_reason">Reason: applies the request to extend the term by 6 months. The start date and renewal terms stay unchanged.</string>
@@ -154,15 +155,15 @@ This is a proposal in a new D2 copy; D1 and the original contract remain unchang
     <string name="chatbot_draft_ai_review_accept_selected">✓ Accept</string>
     <string name="chatbot_draft_ai_review_reject">Reject</string>
     <string name="chatbot_draft_ai_review_reject_selected">✓ Reject</string>
-    <string name="chatbot_draft_ai_review_note_accepted">Articles 1–2 and 4–9 stay unchanged. Continue to confirm creating D2; D1 has not been changed.</string>
-    <string name="chatbot_draft_ai_review_note_rejected">No proposal is selected. Accept it to continue; D1 remains 24 months.</string>
+    <string name="chatbot_draft_ai_review_note_accepted">Other parts stay unchanged. Continue to confirm creating D2; D1 has not been changed.</string>
+    <string name="chatbot_draft_ai_review_note_rejected">No proposal is selected. Accept it to continue; D1 stays as it is.</string>
     <string name="chatbot_draft_ai_review_count_accepted">1 / 1 proposal selected</string>
     <string name="chatbot_draft_ai_review_count_rejected">0 / 1 proposals selected</string>
     <string name="chatbot_draft_ai_review_not_applied">Not applied</string>
     <string name="chatbot_draft_ai_review_continue">Continue</string>
     <string name="chatbot_draft_ai_apply_title">Apply changes</string>
     <string name="chatbot_draft_ai_apply_selected_count">1 PROPOSAL SELECTED</string>
-    <string name="chatbot_draft_ai_apply_change">Article 3 · 24 → 30 months</string>
+    <string name="chatbot_draft_ai_apply_change">Selected edit proposal</string>
     <string name="chatbot_draft_ai_apply_source">Source: D1 · AI draft not saved</string>
     <string name="chatbot_draft_ai_apply_result">Result: D2 · Separate edited copy, not saved</string>
     <string name="chatbot_draft_ai_apply_summary_note">Other clauses stay unchanged. No changes are applied before confirmation.</string>
@@ -172,9 +173,9 @@ This is a proposal in a new D2 copy; D1 and the original contract remain unchang
     <string name="chatbot_draft_ai_apply_error_body">Could not finish creating D2. D1 and your 1/1 selected proposal are retained. Retry will not apply the change twice.</string>
     <string name="chatbot_draft_ai_apply_error_note">No new D2 exists yet. Retry or return to review with your selection retained.</string>
     <string name="chatbot_draft_ai_apply_success_title">Edited copy D2 created</string>
-    <string name="chatbot_draft_ai_apply_success_body">D2 has a 30-month Article 3, created from D1 and the proposal you confirmed. It is an unsaved draft.</string>
+    <string name="chatbot_draft_ai_apply_success_body">D2 was created from D1 and the proposal you confirmed. It is an unsaved draft.</string>
     <string name="chatbot_draft_ai_apply_document_name">Demo employment contract · D2</string>
-    <string name="chatbot_draft_ai_apply_document_metadata">30 months · Created from D1 after confirmation</string>
+    <string name="chatbot_draft_ai_apply_document_metadata">Created from D1 after confirmation</string>
     <string name="chatbot_draft_ai_apply_document_badge">Edited version · Not saved</string>
     <string name="chatbot_draft_ai_apply_preserve_note">The original contract is unchanged. D1 is preserved.</string>
     <string name="chatbot_draft_ai_apply_pending">Applying…</string>
@@ -186,19 +187,19 @@ This is a proposal in a new D2 copy; D1 and the original contract remain unchang
     <string name="chatbot_draft_versions_contract_name">Demo employment contract</string>
     <string name="chatbot_draft_version_d2_status">EDITED VERSION · UNSAVED</string>
     <string name="chatbot_draft_version_d2_title">D2 · Confirmed AI proposal</string>
-    <string name="chatbot_draft_version_d2_body">Article 3: 30 months · Created from D1</string>
+    <string name="chatbot_draft_version_d2_body">Created from D1</string>
     <string name="chatbot_draft_version_view_d2">View D2</string>
     <string name="chatbot_draft_version_d1_status">AI DRAFT · UNSAVED</string>
     <string name="chatbot_draft_version_d1_title">D1 · Original draft</string>
-    <string name="chatbot_draft_version_d1_body">Article 3: 24 months · Created from the original contract</string>
+    <string name="chatbot_draft_version_d1_body">Created from the original contract</string>
     <string name="chatbot_draft_version_view_d1">View D1</string>
     <string name="chatbot_draft_copy_from_d1">Create a copy from D1</string>
     <string name="chatbot_draft_version_d3_status">COPY · UNSAVED</string>
     <string name="chatbot_draft_version_d3_title">D3 · Copy of D1</string>
     <string name="chatbot_draft_version_view_d3">View D3</string>
     <string name="chatbot_draft_version_original_status">ORIGINAL CONTRACT · READ ONLY</string>
-    <string name="chatbot_draft_version_original_title">Employment contract sample</string>
-    <string name="chatbot_draft_version_original_body">36 months · Original PDF file</string>
+    <string name="chatbot_draft_version_original_title">Original contract</string>
+    <string name="chatbot_draft_version_original_body">Original PDF file</string>
     <string name="chatbot_draft_version_view_original">View original PDF</string>
     <string name="chatbot_draft_versions_optional_note">D1-R and M1 are optional branches. The original contract is always preserved.</string>
     <string name="chatbot_draft_versions_compare">Compare D1 and D2</string>
@@ -208,8 +209,8 @@ This is a proposal in a new D2 copy; D1 and the original contract remain unchang
     <string name="chatbot_draft_compare_title">Compare versions</string>
     <string name="chatbot_draft_compare_d1">D1 · Original draft</string>
     <string name="chatbot_draft_compare_d2">D2 · Confirmed AI proposal</string>
-    <string name="chatbot_draft_compare_metadata">Only Article 3 changed · All other clauses are preserved</string>
-    <string name="chatbot_draft_compare_clause">ARTICLE 3 · EMPLOYMENT TERM</string>
+    <string name="chatbot_draft_compare_metadata">Comparison of two versions of the draft</string>
+    <string name="chatbot_draft_compare_clause">CHANGED CONTENT</string>
     <string name="chatbot_draft_compare_before_label">D1 · BEFORE APPLYING</string>
     <string name="chatbot_draft_compare_after_label">D2 · AFTER APPLYING</string>
     <string name="chatbot_draft_compare_source">Source: AI proposal reviewed and confirmed</string>
@@ -222,7 +223,7 @@ This is a proposal in a new D2 copy; D1 and the original contract remain unchang
     <string name="chatbot_draft_copy_screen_title">Create a version copy</string>
     <string name="chatbot_draft_copy_source_name">Demo employment contract · D1</string>
     <string name="chatbot_draft_copy_source_metadata">AI draft · Unsaved</string>
-    <string name="chatbot_draft_copy_source_badge">Source version · 24 months</string>
+    <string name="chatbot_draft_copy_source_badge">Source version</string>
     <string name="chatbot_draft_copy_loading_title">Creating D3 copy</string>
     <string name="chatbot_draft_copy_loading_body">Copying D1 content into a new version. No existing version will be replaced.</string>
     <string name="chatbot_draft_copy_error_title">Could not create the copy</string>
@@ -280,7 +281,8 @@ This is a proposal in a new D2 copy; D1 and the original contract remain unchang
     <string name="draft_pdf_save_file">Save PDF to device</string>
     <string name="draft_pdf_share_file">Share document</string>
     <string name="draft_pdf_ready_title">Draft PDF is ready</string>
-    <string name="draft_pdf_ready_body">The PDF uses the saved draft content. It has not been saved to your device or shared.</string>
+    <string name="draft_pdf_ready_body">The PDF is made from the selected draft. You can view it, save it to your device or share it.</string>
+    <string name="draft_pdf_ready_body_saved">PDF saved to your device. You can still view or share it.</string>
     <string name="draft_pdf_open_preview">Preview PDF</string>
     <string name="chatbot_draft_save_failed">Could not save the draft. Please try again.</string>
     <string name="draft_pdf_close">Close</string>
@@ -293,7 +295,7 @@ This is a proposal in a new D2 copy; D1 and the original contract remain unchang
     <string name="draft_pdf_page_header">DRAFT · LEGALLENS</string>
     <string name="draft_pdf_page_number">Page %1$d</string>
     <string name="draft_export_unsaved_title">Save draft before exporting</string>
-    <string name="draft_export_unsaved_body">You selected D1 · AI draft, 24 months, unsaved. Save a new copy before exporting. The PDF will use D1, not the original contract. Review all [bracketed] fields.</string>
+    <string name="draft_export_unsaved_body">You selected D1 · AI draft, unsaved. Save a new copy before exporting. The PDF will use D1, not the original contract. Review all [bracketed] fields.</string>
     <string name="draft_export_unsaved_action">Save a copy of D1</string>
     <string name="draft_saved_view_button">View saved draft</string>
     <string name="chatbot_draft_applied_preview_title_saved">Saved D2 details</string>

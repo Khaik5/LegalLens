@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="contract_source_ai_generated">AI soạn</string>
+    <string name="contract_needs_review">Cần rà soát</string>
+</resources>

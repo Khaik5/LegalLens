@@ -76,8 +76,10 @@ class ProfileFragment : Fragment() {
             R.string.profile_settings_title,
             ProfileUiEvent.SettingsClicked
         )
+        bindAction(binding.actionMyDrafts, R.drawable.ic_dashboard_contract, R.string.profile_my_drafts, ProfileUiEvent.MyDraftsClicked)
+        binding.actionMyDraftsGroup.isVisible = com.example.lagallens.core.constants.FeatureFlags.isContractDraftingEnabled
         bindAction(binding.actionPrivacy, R.drawable.ic_security, R.string.profile_privacy, ProfileUiEvent.PrivacyClicked)
-        bindAction(binding.actionAppearance, R.drawable.ic_language, R.string.profile_appearance, ProfileUiEvent.SettingsClicked)
+        bindAction(binding.actionAppearance, R.drawable.ic_language, R.string.profile_appearance, ProfileUiEvent.LanguageClicked)
         bindAction(binding.actionAbout, R.drawable.ic_info, R.string.profile_about, ProfileUiEvent.AboutClicked)
         binding.btnAvatarEdit.setOnClickListener {
             viewModel.onEvent(ProfileUiEvent.EditProfileClicked)
@@ -136,7 +138,17 @@ class ProfileFragment : Fragment() {
                                 navController.navigate(R.id.action_profileFragment_to_profileSettingsFragment)
                             }
                         }
+                        ProfileUiEffect.NavigateToLanguage -> {
+                            val navController = findNavController()
+                            if (navController.currentDestination?.id == R.id.profileFragment) {
+                                navController.navigate(
+                                    R.id.action_profileFragment_to_profileSettingsFragment,
+                                    androidx.core.os.bundleOf(com.example.lagallens.presentation.feature.profile.settings.ui.ProfileSettingsFragment.ARG_OPEN_LANGUAGE to true)
+                                )
+                            }
+                        }
                         ProfileUiEffect.NavigateToPrivacy -> startActivity(ProfileInformationActivity.createIntent(requireContext(), true))
+                        ProfileUiEffect.NavigateToMyDrafts -> startActivity(com.example.lagallens.presentation.feature.chatbot.draft.ui.ChatbotDraftListActivity.createIntent(requireContext()))
                         ProfileUiEffect.NavigateToAbout -> startActivity(ProfileInformationActivity.createIntent(requireContext(), false))
                         ProfileUiEffect.NavigateToChangePassword -> {
                             val navController = findNavController()
