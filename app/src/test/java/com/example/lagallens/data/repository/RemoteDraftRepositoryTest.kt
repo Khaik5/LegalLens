@@ -68,6 +68,24 @@ class RemoteDraftRepositoryTest {
         assertNull(drafts.updateDraft("10:1", "t", "c"))
     }
 
+    @Test fun savingAsAContractReturnsTheContractIdAndReusesItsKeyForTheSameVersion() = runTest {
+        api.versionsOf[10] = mutableListOf(1 to "a", 2 to "b")
+        api.currentVersion[10] = 2
+
+        assertEquals("910", drafts.saveAsContract("10:2"))
+        assertEquals("910", drafts.saveAsContract("10:2"))
+        drafts.saveAsContract("10:1")
+
+        val (first, second, other) = api.contractSaves.map { it.second }
+        assertEquals(first, second)
+        assertTrue(first != other)
+    }
+
+    @Test fun aMalformedDraftIdCannotBeSavedAsAContract() = runTest {
+        assertNull(drafts.saveAsContract("not-a-draft"))
+        assertTrue(api.contractSaves.isEmpty())
+    }
+
     @Test fun aCopyOfTheCurrentVersionIsANewDraftWithTheGivenTitle() = runTest {
         api.versionsOf[10] = mutableListOf(1 to "text")
         api.currentVersion[10] = 1
@@ -201,6 +219,7 @@ class RemoteDraftRepositoryTest {
         val currentVersion = mutableMapOf<Long, Int>()
         val updates = mutableListOf<UpdateDraftRequest>()
         val copied = mutableListOf<Long>()
+        val contractSaves = mutableListOf<Pair<Long, String>>()
         val jobRequests = mutableListOf<DraftAiJobRequest>()
         val applied = mutableListOf<String>()
         val cancelled = mutableListOf<String>()
@@ -237,6 +256,11 @@ class RemoteDraftRepositoryTest {
         }
 
         override suspend fun delete(scope: AuthSessionScope, draftId: Long) = Response.success<Unit>(null)
+
+        override suspend fun saveAsContract(scope: AuthSessionScope, draftId: Long, idempotencyKey: String): ApiEnvelope<com.example.lagallens.data.model.response.DraftSavedAsContractResponse> {
+            contractSaves += draftId to idempotencyKey
+            return ApiEnvelope(true, com.example.lagallens.data.model.response.DraftSavedAsContractResponse(900 + draftId, 1000 + draftId))
+        }
 
         override suspend fun copy(scope: AuthSessionScope, draftId: Long): ApiEnvelope<DraftSavedResponse> {
             copied += draftId

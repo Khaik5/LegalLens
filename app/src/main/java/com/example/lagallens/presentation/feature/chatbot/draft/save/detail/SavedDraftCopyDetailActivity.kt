@@ -4,6 +4,13 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.widget.Toast
+import androidx.activity.viewModels
+import androidx.core.view.isVisible
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.repeatOnLifecycle
+import com.example.lagallens.di.AppDataMode
+import com.example.lagallens.di.DataModeConfig
 import com.example.lagallens.presentation.feature.chatbot.draft.ui.DraftSessionActivity
 import com.example.lagallens.presentation.feature.chatbot.draft.ui.DraftSessionGuard
 import androidx.core.view.WindowCompat
@@ -26,6 +33,11 @@ class SavedDraftCopyDetailActivity : DraftSessionActivity() {
     // The draft this screen shows; the export must use it, because the version label ("D2") alone cannot
     // identify one backend version and would fall back to the newest draft of that stage.
     private var draftId: String? = null
+    private val viewModel by viewModels<SavedDraftCopyDetailViewModel> {
+        val app = application as LegalLensApplication
+        val owner = DraftSessionGuard.owner(intent)
+        SavedDraftCopyDetailViewModel.Factory(owner, app::currentSessionKey) { app.draftRepository.forSession(owner) }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,7 +51,7 @@ class SavedDraftCopyDetailActivity : DraftSessionActivity() {
         val version = intent.getStringExtra(EXTRA_VERSION) ?: ChatbotDraftUiState.APPROVED_AI_VERSION
         val contractId = intent.getStringExtra(EXTRA_CONTRACT_ID)
         draftId = intent.getStringExtra(EXTRA_DRAFT_ID)
-        binding.savedDraftTitle.text = getString(R.string.chatbot_draft_document_name, version)
+        binding.savedDraftTitle.text = getString(R.string.draft_default_document_name, version)
         lifecycleScope.launch {
             val app = application as LegalLensApplication
             val draft = try {
@@ -64,12 +76,42 @@ class SavedDraftCopyDetailActivity : DraftSessionActivity() {
             }
         }
         binding.savedDraftExport.setOnClickListener { showExportSheet() }
+        bindSaveAsContract()
         if (intent.getBooleanExtra(EXTRA_OPEN_EXPORT, false)) binding.root.post { showExportSheet() }
+    }
+
+    /** Only a real backend can make the contract; the offline demo has nowhere to save one. */
+    private fun bindSaveAsContract() {
+        binding.savedDraftSaveContract.isVisible = DataModeConfig.current == AppDataMode.REAL
+        binding.savedDraftSaveContract.setOnClickListener {
+            val id = draftId ?: return@setOnClickListener
+            viewModel.onEvent(SavedDraftCopyDetailUiEvent.SaveAsContractClicked(id))
+        }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch { viewModel.uiState.collect { renderSaveAsContract(it) } }
+                launch { viewModel.uiEffect.collect { effect -> if (effect is SavedDraftCopyDetailUiEffect.ShowMessage) Toast.makeText(this@SavedDraftCopyDetailActivity, effect.messageRes, Toast.LENGTH_LONG).show() } }
+            }
+        }
+    }
+
+    private fun renderSaveAsContract(state: SavedDraftCopyDetailUiState) = with(binding.savedDraftSaveContract) {
+        isEnabled = state.saveAsContractStatus == SaveAsContractStatus.IDLE
+        setText(
+            when (state.saveAsContractStatus) {
+                SaveAsContractStatus.IDLE -> R.string.draft_saved_contract_button
+                SaveAsContractStatus.SAVING -> R.string.draft_saved_contract_saving
+                SaveAsContractStatus.SAVED -> R.string.draft_saved_contract_done
+            }
+        )
     }
 
     private fun showExportSheet() {
         if (supportFragmentManager.findFragmentByTag(DraftPdfExportBottomSheet.TAG) == null) {
-            DraftPdfExportBottomSheet.newInstance(draftId ?: intent.getStringExtra(EXTRA_VERSION) ?: ChatbotDraftUiState.APPROVED_AI_VERSION).show(supportFragmentManager, DraftPdfExportBottomSheet.TAG)
+            DraftPdfExportBottomSheet.newInstance(
+                draftId ?: intent.getStringExtra(EXTRA_VERSION) ?: ChatbotDraftUiState.APPROVED_AI_VERSION,
+                binding.savedDraftTitle.text.toString()
+            ).show(supportFragmentManager, DraftPdfExportBottomSheet.TAG)
         }
     }
 

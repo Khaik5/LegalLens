@@ -6,6 +6,8 @@ enum class EmploymentContractRisk { LOW, MEDIUM, HIGH, CRITICAL, NOT_ANALYZED }
 
 enum class EmploymentContractType { EMPLOYMENT, SERVICE, COMMERCIAL }
 
+enum class EmploymentContractSource { UPLOADED, AI_GENERATED }
+
 data class EmploymentContract(
     val id: String,
     val documentId: String,
@@ -23,7 +25,10 @@ data class EmploymentContract(
     val generatedTitleKey: String? = null,
     val description: String? = null,
     /** The day the contract ends, when the analysis found one. */
-    val endDate: java.time.LocalDate? = null
+    val endDate: java.time.LocalDate? = null,
+    val source: EmploymentContractSource = EmploymentContractSource.UPLOADED,
+    /** The linked draft version still needs the user's review; null when the backend does not say. */
+    val reviewRequired: Boolean? = null
 )
 
 data class EmploymentContractComparison(

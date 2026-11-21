@@ -24,6 +24,8 @@ data class ContractDetailUiState(
     @ColorRes val statusTextColorRes: Int = R.color.contract_complete,
     @DrawableRes val riskBackgroundRes: Int = R.drawable.bg_contract_detail_risk,
     @ColorRes val riskTextColorRes: Int = R.color.contract_complete,
+    val isAiGenerated: Boolean = false,
+    val needsReview: Boolean = false,
     val assistantActions: List<ContractAssistantAction> = ContractAssistantAction.entries
 ) {
     companion object {
@@ -45,7 +47,9 @@ data class ContractDetailUiState(
                 ContractRiskLevel.HIGH, ContractRiskLevel.CRITICAL -> R.drawable.bg_contract_detail_risk_high
                 else -> R.drawable.bg_contract_detail_risk
             },
-            riskTextColorRes = item.riskTextColorRes
+            riskTextColorRes = item.riskTextColorRes,
+            isAiGenerated = contract.source == com.example.lagallens.domain.model.EmploymentContractSource.AI_GENERATED,
+            needsReview = contract.reviewRequired == true
         )
 
         private fun EmploymentContract.displayFileFormat(): String = when {

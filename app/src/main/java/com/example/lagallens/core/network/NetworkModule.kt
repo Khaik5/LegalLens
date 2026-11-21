@@ -39,6 +39,7 @@ object NetworkModule {
         .callTimeout(60, TimeUnit.SECONDS)
         .followRedirects(false)
         // Contract text and credentials are sensitive; request/response body logging is intentionally disabled.
+        .apply { if (BuildConfig.DEBUG) addInterceptor(HttpStatusLogInterceptor()) }
 
     fun provideRetrofit(): Retrofit = retrofit(clientBuilder().retryOnConnectionFailure(false).build())
 

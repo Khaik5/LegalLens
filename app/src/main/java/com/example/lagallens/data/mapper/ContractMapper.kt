@@ -2,6 +2,7 @@ package com.example.lagallens.data.mapper
 
 import com.example.lagallens.domain.model.EmploymentContract
 import com.example.lagallens.domain.model.EmploymentContractRisk
+import com.example.lagallens.domain.model.EmploymentContractSource
 import com.example.lagallens.domain.model.EmploymentContractStatus
 import com.example.lagallens.data.model.response.ContractResponse
 import java.time.Instant
@@ -32,5 +33,7 @@ internal fun ContractResponse.toContract() = EmploymentContract(
         else -> EmploymentContractRisk.NOT_ANALYZED
     },
     description = description,
-    endDate = endDate?.let { runCatching { LocalDate.parse(it) }.getOrNull() }
+    endDate = endDate?.let { runCatching { LocalDate.parse(it) }.getOrNull() },
+    source = if (source == "AI_GENERATED") EmploymentContractSource.AI_GENERATED else EmploymentContractSource.UPLOADED,
+    reviewRequired = reviewRequired
 )

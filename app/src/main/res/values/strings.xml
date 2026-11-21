@@ -803,7 +803,7 @@
     <string name="chatbot_draft_edit_action">Chỉnh sửa yêu cầu</string>
     <string name="chatbot_draft_local_only">Đây là bản xem trước mẫu. Chưa có bản nháp nào được lưu.</string>
     <string name="chatbot_generation_request">Tạo bản nháp hợp đồng lao động 24 tháng từ ngày bắt đầu làm việc. Để thông tin chưa có trong [ngoặc vuông].</string>
-    <string name="chatbot_generation_confirmed">YÊU CẦU MẪU ĐÃ XÁC NHẬN</string>
+    <string name="chatbot_generation_confirmed">YÊU CẦU ĐÃ XÁC NHẬN</string>
     <string name="chatbot_generation_source">Tham chiếu: %1$s · Hợp đồng gốc 36 tháng.</string>
     <string name="chatbot_generation_original_badge">Bản mới · Không ghi đè bản gốc</string>
     <string name="chatbot_generation_loading_title">Đang chuẩn bị bản nháp mẫu</string>
@@ -813,10 +813,10 @@
     <string name="chatbot_generation_error">Chưa tạo được bản nháp do kết nối bị gián đoạn. Yêu cầu và câu trả lời của bạn vẫn được giữ lại.</string>
     <string name="chatbot_generation_retry">Thử lại</string>
     <string name="chatbot_generation_error_note">Thử lại với cùng yêu cầu 24 tháng; chưa có bản nháp nào được tạo hoặc lưu.</string>
-    <string name="chatbot_generation_success">Bản nháp mẫu D1 đã sẵn sàng. Hợp đồng gốc không thay đổi.</string>
-    <string name="chatbot_generation_result_name">Hợp đồng lao động DEMO · D1</string>
-    <string name="chatbot_generation_result_metadata">Mẫu minh họa · Thời hạn 24 tháng</string>
-    <string name="chatbot_generation_result_badge">Bản nháp mẫu · Chưa lưu</string>
+    <string name="chatbot_generation_success">Bản nháp D1 đã sẵn sàng. Hợp đồng gốc không thay đổi.</string>
+    <string name="chatbot_generation_result_name">Hợp đồng lao động · D1</string>
+    <string name="chatbot_generation_result_metadata">Bản nháp do AI soạn</string>
+    <string name="chatbot_generation_result_badge">Bản nháp · Chưa lưu</string>
     <string name="chatbot_generation_result_warning">Còn thông tin cần bổ sung. Rà soát nội dung trước khi lưu hoặc xuất.</string>
     <string name="chatbot_generation_view_draft">Xem bản nháp</string>
     <string name="chatbot_generation_preview_title">Bản nháp D1 · Minh họa</string>

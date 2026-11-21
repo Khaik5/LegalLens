@@ -26,7 +26,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 
-import com.example.lagallens.presentation.feature.contracts.contract.labelRes
+import com.example.lagallens.presentation.feature.contracts.contract.typeLabel
 import com.example.lagallens.presentation.feature.contracts.contract.toContractListItem
 
 class ContractListViewModel(application: Application) : AndroidViewModel(application) {
@@ -62,7 +62,7 @@ class ContractListViewModel(application: Application) : AndroidViewModel(applica
     }
 
     private fun toListItem(contract: EmploymentContract): ContractListItem =
-        contract.toContractListItem(getApplication<Application>().getString(contract.type.labelRes()))
+        contract.toContractListItem(contract.typeLabel(getApplication<Application>()))
 
     fun onEvent(event: ContractListUiEvent) {
         when (event) {

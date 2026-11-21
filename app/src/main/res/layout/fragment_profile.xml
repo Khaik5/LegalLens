@@ -262,6 +262,22 @@
                 android:layout_height="@dimen/dp_1"
                 android:background="@color/legal_lens_input_stroke" />
 
+            <LinearLayout
+                android:id="@+id/actionMyDraftsGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+            <include
+                android:id="@+id/actionMyDrafts"
+                layout="@layout/item_profile_action" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp_1"
+                android:background="@color/legal_lens_input_stroke" />
+            </LinearLayout>
+
             <include
                 android:id="@+id/actionPrivacy"
                 layout="@layout/item_profile_action" />

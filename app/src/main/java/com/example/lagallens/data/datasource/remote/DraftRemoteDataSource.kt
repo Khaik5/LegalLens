@@ -20,6 +20,8 @@ class DraftRemoteDataSource(private val api: Lazy<DraftApi>) {
     }
 
     suspend fun copy(scope: AuthSessionScope, draftId: Long) = api.value.copy(scope, draftId).requireData("Draft copy")
+    suspend fun saveAsContract(scope: AuthSessionScope, draftId: Long, key: String) =
+        api.value.saveAsContract(scope, draftId, key).requireData("Draft contract")
     suspend fun versions(scope: AuthSessionScope, draftId: Long) = api.value.versions(scope, draftId).requireData("Draft versions").data
     suspend fun version(scope: AuthSessionScope, draftId: Long, version: Int) =
         api.value.version(scope, draftId, version).requireData("Draft version")

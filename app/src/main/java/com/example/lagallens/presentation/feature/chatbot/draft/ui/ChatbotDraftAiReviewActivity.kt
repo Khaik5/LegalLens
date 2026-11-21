@@ -67,8 +67,8 @@ class ChatbotDraftAiReviewActivity : DraftSessionActivity() {
     private fun render(state: com.example.lagallens.presentation.feature.chatbot.draft.contract.ChatbotDraftAiReviewUiState) = with(binding) {
         val accepted = state.accepted
         state.proposal?.let { proposal ->
-            draftAiReviewClause.text = proposal.clauseTitle
-            draftAiReviewBefore.text = proposal.originalText
+            draftAiReviewClause.text = proposal.clauseTitle.ifBlank { getString(R.string.chatbot_draft_ai_review_clause) }
+            draftAiReviewBefore.text = proposal.originalText.ifBlank { getString(R.string.chatbot_draft_ai_review_before_empty) }
             draftAiReviewAfter.text = proposal.proposedText
             draftAiReviewReason.text = proposal.reason
         }
