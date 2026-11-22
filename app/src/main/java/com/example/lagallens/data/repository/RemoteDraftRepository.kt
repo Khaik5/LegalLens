@@ -1,6 +1,7 @@
 package com.example.lagallens.data.repository
 
 import android.content.Context
+import com.example.lagallens.core.network.ApiFailureKind
 import com.example.lagallens.core.network.ApiFailureMapper
 import com.example.lagallens.core.network.AuthSessionScope
 import com.example.lagallens.data.datasource.local.datastore.AuthSessionStore
@@ -11,6 +12,7 @@ import com.example.lagallens.data.model.request.UpdateDraftRequest
 import com.example.lagallens.data.model.response.DraftVersionResponse
 import com.example.lagallens.domain.model.Draft
 import com.example.lagallens.domain.model.DraftStage
+import com.example.lagallens.domain.model.SaveDraftAsContractResult
 import com.example.lagallens.domain.repository.DraftRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -62,7 +64,10 @@ class RemoteDraftRepository(
     private val tokens: AuthSessionStore,
     private val remote: DraftRemoteDataSource,
     private val marks: DraftVersionMarks,
-    private val listSize: Int = LIST_SIZE
+    private val listSize: Int = LIST_SIZE,
+    private val contractKeys: DraftContractSaveKeys = InMemoryDraftContractSaveKeys(),
+    /** Called after a draft became a contract, so the contract list can refresh. */
+    private val onContractSaved: () -> Unit = {}
 ) : DraftRepository {
     override suspend fun getDrafts(): List<Draft> = inSession { scope, userId ->
         remote.list(scope).take(listSize).flatMap { summary ->
@@ -144,16 +149,39 @@ class RemoteDraftRepository(
     }
 
     /**
-     * One idempotency key per draft version and session, kept for the life of the process: tapping again, or
-     * retrying after a lost response, gets the same contract back instead of a second one.
+     * One idempotency key per draft version and user, kept across process death: tapping again, retrying after a
+     * lost response, or saving again after the app was killed gets the same contract back instead of a second one.
      */
-    private val contractKeys = java.util.concurrent.ConcurrentHashMap<String, String>()
-
-    override suspend fun saveAsContract(draftId: String): String? = inSession { scope, _ ->
-        val (id, version) = RemoteDraftId.parse(draftId) ?: return@inSession null
-        val key = contractKeys.getOrPut("${scope.key}|$id:$version") { java.util.UUID.randomUUID().toString() }
-        remote.saveAsContract(scope, id, key).contractId.toString()
+    override suspend fun saveAsContract(draftId: String): SaveDraftAsContractResult = inSession { scope, userId ->
+        val (id, version) = RemoteDraftId.parse(draftId) ?: return@inSession SaveDraftAsContractResult.Unsupported
+        val current = try {
+            remote.get(scope, id).version
+        } catch (error: HttpException) {
+            if (ApiFailureMapper.map(error).kind == ApiFailureKind.NOT_FOUND) return@inSession SaveDraftAsContractResult.Unsupported
+            throw error
+        }
+        // The backend saves the newest version whatever version the screen shows, so an older one must not claim a save.
+        if (current != version) return@inSession SaveDraftAsContractResult.NotLatestVersion
+        val created = try {
+            remote.saveAsContract(scope, id, contractKey(userId, id, version))
+        } catch (error: HttpException) {
+            val failure = ApiFailureMapper.map(error)
+            when {
+                // The backend looks the earlier save up by draft and version, not by key, so a new key cannot help.
+                failure.kind == ApiFailureKind.CONFLICT && failure.details?.code == KEY_CONFLICT_CODE ->
+                    return@inSession SaveDraftAsContractResult.ContractDeleted
+                failure.kind == ApiFailureKind.CONFLICT -> return@inSession SaveDraftAsContractResult.Rejected
+                failure.kind == ApiFailureKind.NOT_FOUND -> return@inSession SaveDraftAsContractResult.Unsupported
+                else -> throw error
+            }
+        }
+        onContractSaved()
+        SaveDraftAsContractResult.Saved(created.contractId.toString())
     }
+
+    private fun contractKey(userId: String, draftId: Long, version: Int): String =
+        contractKeys.get(userId, draftId, version)
+            ?: java.util.UUID.randomUUID().toString().also { contractKeys.put(userId, draftId, version, it) }
 
     internal suspend fun loadVersion(scope: AuthSessionScope, userId: String, id: Long, version: Int): Draft {
         val draft = remote.get(scope, id)
@@ -183,7 +211,7 @@ class RemoteDraftRepository(
             stage = stage,
             versionNo = version,
             createdAt = epoch(createdAt),
-            updatedAt = epoch(updatedAt),
+            updatedAt = epoch(updatedAt).takeIf { it > 0L } ?: epoch(createdAt),
             parentDraftId = if (version > FIRST_VERSION) RemoteDraftId.of(id, version - 1) else sourceDraftId?.let { RemoteDraftId.of(it, FIRST_VERSION) },
             lineageId = id.toString(),
             conversationId = conversationId?.toString(),
@@ -205,5 +233,6 @@ class RemoteDraftRepository(
     private companion object {
         const val FIRST_VERSION = 1
         const val LIST_SIZE = 20
+        const val KEY_CONFLICT_CODE = "DRAFT_SAVE_KEY_CONFLICT"
     }
 }

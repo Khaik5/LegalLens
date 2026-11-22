@@ -17,7 +17,10 @@ import com.example.lagallens.data.model.response.DraftSummaryResponse
 import com.example.lagallens.data.model.response.DraftVersionListResponse
 import com.example.lagallens.data.model.response.DraftVersionResponse
 import com.example.lagallens.data.model.response.DraftVersionSummaryResponse
+import com.example.lagallens.domain.model.DraftAiFailedException
+import com.example.lagallens.domain.model.DraftAiFailureReason
 import com.example.lagallens.domain.model.DraftStage
+import com.example.lagallens.domain.model.SaveDraftAsContractResult
 import com.example.lagallens.domain.repository.DraftEditRequest
 import com.example.lagallens.domain.repository.DraftGenerationRequest
 import kotlinx.coroutines.test.runTest
@@ -72,17 +75,18 @@ class RemoteDraftRepositoryTest {
         api.versionsOf[10] = mutableListOf(1 to "a", 2 to "b")
         api.currentVersion[10] = 2
 
-        assertEquals("910", drafts.saveAsContract("10:2"))
-        assertEquals("910", drafts.saveAsContract("10:2"))
-        drafts.saveAsContract("10:1")
+        assertEquals(SaveDraftAsContractResult.Saved("910"), drafts.saveAsContract("10:2"))
+        assertEquals(SaveDraftAsContractResult.Saved("910"), drafts.saveAsContract("10:2"))
+        // The backend saves the newest version only, so an older one is refused without a request.
+        assertEquals(SaveDraftAsContractResult.NotLatestVersion, drafts.saveAsContract("10:1"))
 
-        val (first, second, other) = api.contractSaves.map { it.second }
+        val (first, second) = api.contractSaves.map { it.second }
         assertEquals(first, second)
-        assertTrue(first != other)
+        assertEquals(2, api.contractSaves.size)
     }
 
     @Test fun aMalformedDraftIdCannotBeSavedAsAContract() = runTest {
-        assertNull(drafts.saveAsContract("not-a-draft"))
+        assertEquals(SaveDraftAsContractResult.Unsupported, drafts.saveAsContract("not-a-draft"))
         assertTrue(api.contractSaves.isEmpty())
     }
 
@@ -124,7 +128,7 @@ class RemoteDraftRepositoryTest {
 
         val failure = runCatching { ai.generateDraft(DraftGenerationRequest("16", null, listOf("x"))) }.exceptionOrNull()
 
-        assertEquals(DraftAiJobFailedException::class, failure!!::class)
+        assertEquals(DraftAiFailedException::class, failure!!::class)
         assertTrue(api.applied.isEmpty())
     }
 
@@ -173,7 +177,7 @@ class RemoteDraftRepositoryTest {
     @Test fun aFailedJobIsRetriedOnTheBackendWhenTheSameRequestIsRepeated() = runTest {
         val request = DraftGenerationRequest("16", null, listOf("Soạn hợp đồng"))
         api.jobStatuses = mutableListOf("FAILED")
-        assertTrue(runCatching { ai.generateDraft(request) }.exceptionOrNull() is DraftAiJobFailedException)
+        assertTrue(runCatching { ai.generateDraft(request) }.exceptionOrNull() is DraftAiFailedException)
 
         api.createStatuses = mutableListOf("FAILED")
         api.jobStatuses = mutableListOf("COMPLETED")
@@ -208,6 +212,110 @@ class RemoteDraftRepositoryTest {
         assertEquals(2, api.idempotencyKeys.distinct().size)
     }
 
+    @Test fun aContractKeyOutlivesTheRepositoryThatMadeIt() = runTest {
+        api.versionsOf[10] = mutableListOf(1 to "a", 2 to "b")
+        api.currentVersion[10] = 2
+        val keys = InMemoryDraftContractSaveKeys()
+
+        RemoteDraftRepository(session, remote, marks, contractKeys = keys).saveAsContract("10:2")
+        // The process died and the screen came back: a new repository, the same stored keys.
+        RemoteDraftRepository(session, remote, marks, contractKeys = keys).saveAsContract("10:2")
+
+        assertEquals(2, api.contractSaves.size)
+        assertEquals(1, api.contractSaves.map { it.second }.distinct().size)
+    }
+
+    @Test fun aContractDeletedAfterSavingIsReportedNotSavedAgain() = runTest {
+        api.versionsOf[10] = mutableListOf(1 to "a")
+        api.currentVersion[10] = 1
+        drafts.saveAsContract("10:1")
+        api.contractFailures += HttpException(Response.error<Any>(409, """{"code":"DRAFT_SAVE_KEY_CONFLICT"}""".toResponseBody()))
+
+        assertEquals(SaveDraftAsContractResult.ContractDeleted, drafts.saveAsContract("10:1"))
+        assertEquals(2, api.contractSaves.size)
+    }
+
+    @Test fun aMissingDraftIsUnsupported() = runTest {
+        api.versionsOf[10] = mutableListOf(1 to "a")
+        api.currentVersion[10] = 1
+        api.contractFailures += HttpException(Response.error<Any>(404, """{"code":"DRAFT_NOT_FOUND"}""".toResponseBody()))
+
+        assertEquals(SaveDraftAsContractResult.Unsupported, drafts.saveAsContract("10:1"))
+    }
+
+    @Test fun aRefusedDraftIsRejectedWithoutRetrying() = runTest {
+        api.versionsOf[10] = mutableListOf(1 to "")
+        api.currentVersion[10] = 1
+        api.contractFailures += HttpException(Response.error<Any>(409, """{"code":"DRAFT_CONTENT_EMPTY"}""".toResponseBody()))
+
+        assertEquals(SaveDraftAsContractResult.Rejected, drafts.saveAsContract("10:1"))
+        assertEquals(1, api.contractSaves.size)
+    }
+
+
+    @Test fun aNetworkFailureIsThrownAndTheRetryKeepsTheKey() = runTest {
+        api.versionsOf[10] = mutableListOf(1 to "a")
+        api.currentVersion[10] = 1
+        api.contractFailures += java.io.IOException("offline")
+
+        assertTrue(runCatching { drafts.saveAsContract("10:1") }.exceptionOrNull() is java.io.IOException)
+        assertEquals(SaveDraftAsContractResult.Saved("910"), drafts.saveAsContract("10:1"))
+
+        assertEquals(1, api.contractSaves.map { it.second }.distinct().size)
+    }
+
+    @Test fun onlyASavedContractTellsTheContractListToRefresh() = runTest {
+        api.versionsOf[10] = mutableListOf(1 to "a")
+        api.currentVersion[10] = 1
+        var refreshes = 0
+        val refreshing = RemoteDraftRepository(session, remote, marks, onContractSaved = { refreshes++ })
+        api.contractFailures += java.io.IOException("offline")
+
+        runCatching { refreshing.saveAsContract("10:1") }
+        assertEquals(0, refreshes)
+        refreshing.saveAsContract("10:1")
+
+        assertEquals(1, refreshes)
+    }
+
+    @Test fun aFailedJobExplainsWhyWhenTheBackendSaysSo() = runTest {
+        val expected = mapOf(
+            "AI_TIMEOUT" to DraftAiFailureReason.TIMEOUT,
+            "AI_OVERLOADED" to DraftAiFailureReason.OVERLOADED,
+            "PII_REDACTION_FAILED" to DraftAiFailureReason.PRIVACY_PROTECTION,
+            "PII_RESTORE_FAILED" to DraftAiFailureReason.PRIVACY_PROTECTION,
+            "DRAFT_SOURCE_TEXT_UNAVAILABLE" to DraftAiFailureReason.SOURCE_UNAVAILABLE,
+            "SOMETHING_NEW" to DraftAiFailureReason.OTHER,
+            null to DraftAiFailureReason.OTHER
+        )
+        expected.forEach { (code, reason) ->
+            api.jobStatuses = mutableListOf("FAILED")
+            api.jobErrorCode = code
+
+            val failure = runCatching { ai.generateDraft(DraftGenerationRequest("16", null, listOf("x $code"))) }.exceptionOrNull()
+
+            assertEquals("code $code", reason, (failure as DraftAiFailedException).reason)
+        }
+    }
+
+    @Test fun aJobThatNeverFinishesIsReportedAsATimeout() = runTest {
+        api.jobStatuses = mutableListOf("WAITING_PROVIDER")
+
+        val failure = runCatching { ai.generateDraft(DraftGenerationRequest("16", null, listOf("x"))) }.exceptionOrNull()
+
+        assertEquals(DraftAiFailureReason.TIMEOUT, (failure as DraftAiFailedException).reason)
+    }
+
+    @Test fun aSuggestionForAnOutdatedDraftIsReportedAsOutOfDate() = runTest {
+        api.versionsOf[10] = mutableListOf(1 to "a")
+        api.currentVersion[10] = 1
+        api.createFailure = HttpException(Response.error<Any>(409, "{}".toResponseBody()))
+
+        val failure = runCatching { ai.proposeEdit(DraftEditRequest("16", null, "10:1", "whole_contract", "fix")) }.exceptionOrNull()
+
+        assertEquals(DraftAiFailureReason.OUT_OF_DATE, (failure as DraftAiFailedException).reason)
+    }
+
     private class InMemoryMarks : DraftVersionMarks {
         private val values = mutableMapOf<String, DraftVersionMark>()
         override fun get(userId: String, draftId: Long, version: Int) = values["$userId:$draftId:$version"]
@@ -224,6 +332,9 @@ class RemoteDraftRepositoryTest {
         val applied = mutableListOf<String>()
         val cancelled = mutableListOf<String>()
         var updateFailure: Exception? = null
+        /** Failures the backend answers the next save-as-contract calls with, one per call. */
+        val contractFailures = mutableListOf<Exception>()
+        var jobErrorCode: String? = null
         var jobStatuses = mutableListOf("COMPLETED")
         var changes: List<DraftAiChangeResponse> = emptyList()
         private var polls = 0
@@ -259,6 +370,7 @@ class RemoteDraftRepositoryTest {
 
         override suspend fun saveAsContract(scope: AuthSessionScope, draftId: Long, idempotencyKey: String): ApiEnvelope<com.example.lagallens.data.model.response.DraftSavedAsContractResponse> {
             contractSaves += draftId to idempotencyKey
+            if (contractFailures.isNotEmpty()) throw contractFailures.removeAt(0)
             return ApiEnvelope(true, com.example.lagallens.data.model.response.DraftSavedAsContractResponse(900 + draftId, 1000 + draftId))
         }
 
@@ -302,7 +414,7 @@ class RemoteDraftRepositoryTest {
         override suspend fun job(scope: AuthSessionScope, jobId: String): ApiEnvelope<DraftAiJobResponse> {
             val status = jobStatuses[minOf(polls++, jobStatuses.lastIndex)]
             val draft = jobRequests.last().draftId ?: (nextId - 1)
-            return ApiEnvelope(true, DraftAiJobResponse(jobId, draft, 1, jobRequests.last().action, status, "generated", null, null, changes))
+            return ApiEnvelope(true, DraftAiJobResponse(jobId, draft, 1, jobRequests.last().action, status, "generated", jobErrorCode, null, changes))
         }
 
         override suspend fun apply(scope: AuthSessionScope, jobId: String): ApiEnvelope<DraftSavedResponse> {

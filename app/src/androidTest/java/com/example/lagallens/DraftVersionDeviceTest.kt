@@ -105,11 +105,12 @@ class DraftVersionDeviceTest {
         }
         ActivityScenario.launch<AppliedDraftPreviewActivity>(AppliedDraftPreviewActivity.createIntent(context)).use {
             onView(withId(R.id.draftAppliedSave)).perform(click())
+            onView(withId(R.id.saveDraftAcknowledge)).perform(scrollTo(), click())
             onView(withId(R.id.saveDraftConfirm)).perform(scrollTo(), click())
             SystemClock.sleep(300)
             onView(withId(R.id.saveDraftSuccess)).check(matches(isDisplayed()))
             onView(withId(R.id.saveDraftViewSaved)).perform(scrollTo(), click())
-            onView(withId(R.id.savedDraftTitle)).check(matches(withText(context.getString(R.string.chatbot_draft_document_name, ChatbotDraftUiState.APPROVED_AI_VERSION))))
+            onView(withId(R.id.savedDraftTitle)).check(matches(withText(context.getString(R.string.draft_default_document_name))))
             onView(withId(R.id.savedDraftView)).perform(click())
             onView(withId(R.id.draftAppliedVersionBadge)).check(matches(withText(R.string.chatbot_draft_applied_badge_saved)))
             pressBack()

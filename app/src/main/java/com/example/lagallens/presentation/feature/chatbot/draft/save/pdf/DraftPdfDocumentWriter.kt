@@ -17,13 +17,19 @@ internal object DraftPdfDocumentWriter {
     private const val PAGE_HEIGHT = 842
     private const val PAGE_MARGIN = 48f
 
+    /** A readable file name from the contract name: no path or reserved characters, no accents, never empty. */
+    internal fun fileStem(contractName: String): String =
+        java.text.Normalizer.normalize(contractName, java.text.Normalizer.Form.NFD)
+            .replace(Regex("\\p{M}+"), "").replace('đ', 'd').replace('Đ', 'D')
+            .replace(Regex("[^A-Za-z0-9]+"), "-").trim('-').take(60).ifBlank { "contract" }
+
     fun generate(context: Context, contractName: String, content: String, guard: (() -> Unit) -> Unit = { it() }): File {
         require(content.isNotBlank())
         val fixture = (context.applicationContext as? com.example.lagallens.LegalLensApplication)?.sandboxDraftPdfDirectory
         val directory = File(context.cacheDir, if (fixture == null) "draft-pdfs" else "draft-pdfs/$fixture")
         check(directory.isDirectory || directory.mkdirs())
         val output = File.createTempFile("draft-d2-", ".pending", directory)
-        val published = File(directory, "draft-${java.util.UUID.randomUUID()}.pdf")
+        val published = File(directory, "${fileStem(contractName)}-${java.util.UUID.randomUUID().toString().take(8)}.pdf")
         try {
             val document = PdfDocument()
             try {

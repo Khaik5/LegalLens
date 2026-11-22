@@ -116,7 +116,7 @@ class DocumentViewerActivity : AppCompatActivity() {
             ?: initialUri?.lastPathSegment
             ?: getString(R.string.viewer_title)
         val metadata = if (remoteContractId == null) {
-            getString(R.string.viewer_metadata, "PDF", getString(R.string.viewer_page_count, 1, 1))
+            getString(R.string.viewer_metadata, "PDF", getString(R.string.viewer_page_total, 1))
         } else ""
 
         binding.viewerBack.setOnClickListener { viewModel.onEvent(DocumentViewerUiEvent.BackClicked) }
@@ -214,7 +214,7 @@ class DocumentViewerActivity : AppCompatActivity() {
             }
             val displayName = remoteTitle ?: withContext(Dispatchers.IO) { queryDisplayName(uri) }
                 ?: binding.viewerDocumentTitle.text.toString()
-            val metadata = getString(R.string.viewer_metadata, "PDF", getString(R.string.viewer_page_count, pageCount, pageCount))
+            val metadata = getString(R.string.viewer_metadata, "PDF", getString(R.string.viewer_page_total, pageCount))
             viewModel.onEvent(DocumentViewerUiEvent.PdfLoaded(displayName, metadata, pageCount))
         }
     }
@@ -239,7 +239,7 @@ class DocumentViewerActivity : AppCompatActivity() {
             imageFile = previewUri.path?.let(::File)
             renderedKey = null
             val format = document.mimeType.substringAfter('/').uppercase()
-            val metadata = getString(R.string.viewer_metadata, format, getString(R.string.viewer_page_count, 1, 1))
+            val metadata = getString(R.string.viewer_metadata, format, getString(R.string.viewer_page_total, 1))
             viewModel.onEvent(DocumentViewerUiEvent.PdfLoaded(document.displayName, metadata, 1))
         }
         viewerDocumentTitle.text = state.title

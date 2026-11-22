@@ -18,6 +18,8 @@ data class ChatbotUiState(
     val isDraftReviewReady: Boolean = false,
     val isDraftReviewVisible: Boolean = false,
     val draftGenerationStatus: DraftGenerationStatus = DraftGenerationStatus.NONE,
+    /** What went wrong when the draft could not be made, if the backend said; null keeps the generic text. */
+    val draftGenerationErrorRes: Int? = null,
     val isDrawerVisible: Boolean = false,
     val attachmentUri: String? = null,
     val attachmentName: String? = null,

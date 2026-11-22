@@ -80,6 +80,7 @@ class ChatbotDraftRegenerationActivity : DraftSessionActivity() {
         draftRegenerationSourceBadge.text = getString(R.string.chatbot_draft_preserved_badge, sourceVersion)
         draftRegenerationLoading.isVisible = isLoading
         draftRegenerationError.isVisible = isError
+        if (isError) draftRegenerationErrorBody.setText(state.errorMessageRes ?: R.string.chatbot_draft_regeneration_error_body)
         draftRegenerationSuccess.isVisible = isSuccess
         draftRegenerationRetry.isVisible = isError
         draftRegenerationView.isVisible = isSuccess

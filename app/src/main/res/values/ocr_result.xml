@@ -21,7 +21,7 @@
     <string name="ocr_result_review_confirmed">Đã xác nhận kết quả OCR</string>
     <string name="ocr_result_back_content_description">Quay lại</string>
     <string name="ocr_result_edit">Chỉnh sửa</string>
-    <string name="ocr_result_review">Cần xem lại</string>
+    <string name="ocr_result_review">Xem lại kết quả</string>
     <string name="ocr_result_national_title" translatable="false">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</string>
     <string name="ocr_result_national_subtitle" translatable="false">Độc lập - Tự do - Hạnh phúc</string>
     <string name="ocr_result_contract_title">HỢP ĐỒNG LAO ĐỘNG</string>

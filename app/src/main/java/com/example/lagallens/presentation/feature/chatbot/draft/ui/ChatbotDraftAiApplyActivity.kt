@@ -9,6 +9,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.example.lagallens.R
 import com.example.lagallens.databinding.ActivityChatbotDraftAiApplyBinding
 import com.example.lagallens.presentation.common.utils.applySystemBarInsets
 import com.example.lagallens.presentation.feature.chatbot.draft.contract.ChatbotDraftAiApplyStatus
@@ -49,7 +50,7 @@ class ChatbotDraftAiApplyActivity : DraftSessionActivity() {
             startActivity(AppliedDraftPreviewActivity.createIntent(this@ChatbotDraftAiApplyActivity, draftId = viewModel.uiState.value.draftId, contractId = intent.getStringExtra(EXTRA_CONTRACT_ID)))
         }
         draftAiApplyManage.setOnClickListener {
-            startActivity(ChatbotDraftVersionsActivity.createIntent(this@ChatbotDraftAiApplyActivity, contractId = intent.getStringExtra(EXTRA_CONTRACT_ID)))
+            startActivity(ChatbotDraftVersionsActivity.createIntent(this@ChatbotDraftAiApplyActivity, contractId = intent.getStringExtra(EXTRA_CONTRACT_ID), draftId = viewModel.uiState.value.draftId))
         }
     }
 
@@ -59,6 +60,7 @@ class ChatbotDraftAiApplyActivity : DraftSessionActivity() {
         val success = state.status == ChatbotDraftAiApplyStatus.SUCCESS
         draftAiApplyApplying.isVisible = applying
         draftAiApplyError.isVisible = error
+        if (error) draftAiApplyErrorBody.setText(state.errorMessageRes ?: R.string.chatbot_draft_ai_apply_error_body)
         draftAiApplySuccess.isVisible = success
         draftAiApplyPending.isVisible = applying
         draftAiApplyRetry.isVisible = error

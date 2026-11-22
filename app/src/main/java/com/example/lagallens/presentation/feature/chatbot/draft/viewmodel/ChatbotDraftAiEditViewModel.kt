@@ -1,5 +1,6 @@
 package com.example.lagallens.presentation.feature.chatbot.draft.viewmodel
 
+import com.example.lagallens.presentation.common.utils.toDraftAiFailureMessage
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.ViewModelProvider
@@ -54,17 +55,25 @@ class ChatbotDraftAiEditViewModel(
         val shouldFail = previewFailure
         previewFailure = false
         viewModelScope.launch {
+            var failure: Exception? = null
             val proposal = try {
                 if (shouldFail) null else draftAi().proposeEdit(
                     DraftEditRequest(current.conversationId, current.contractId, current.draftId, current.scope, current.request)
                 )
             } catch (cancellation: CancellationException) {
                 throw cancellation
-            } catch (_: Exception) {
+            } catch (error: Exception) {
+                failure = error
                 null
             }
             if (ownerSession != currentSession()) return@launch
-            state.update { it.copy(proposal = proposal, status = if (proposal != null) ChatbotDraftAiEditStatus.READY else ChatbotDraftAiEditStatus.ERROR) }
+            state.update {
+                it.copy(
+                    proposal = proposal,
+                    status = if (proposal != null) ChatbotDraftAiEditStatus.READY else ChatbotDraftAiEditStatus.ERROR,
+                    errorMessageRes = failure.toDraftAiFailureMessage()
+                )
+            }
         }
     }
 

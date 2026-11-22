@@ -1,5 +1,6 @@
 package com.example.lagallens.presentation.feature.chatbot.viewmodel
 
+import com.example.lagallens.presentation.common.utils.toDraftAiFailureMessage
 import com.example.lagallens.core.constants.FeatureFlags
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -380,6 +381,7 @@ class ChatbotViewModel(
         val contractId = activeContractId
         val questions = _uiState.value.messages.filter { it.author == ChatbotMessageAuthor.USER }.map { it.content }
         draftGeneration = launchForSession {
+            var generationFailure: Exception? = null
             val draft = try {
                 if (previewDraftError) { delay(DRAFT_ERROR_PREVIEW_DELAY_MS); null } else {
                     // Drafting needs a stored conversation, which a new chat only gets with its first question.
@@ -390,13 +392,18 @@ class ChatbotViewModel(
             } catch (cancellationException: CancellationException) {
                 throw cancellationException
             } catch (failure: Exception) {
+                generationFailure = failure
                 null
             }
             if (openConversation.currentSessionKey() != ownerSession) return@launchForSession
             previewDraftError = false
             generatedDraftId = draft?.draftId
             _uiState.update {
-                it.copy(draftGenerationStatus = if (draft == null) DraftGenerationStatus.ERROR else DraftGenerationStatus.SUCCESS, isReplyPending = false)
+                it.copy(
+                    draftGenerationStatus = if (draft == null) DraftGenerationStatus.ERROR else DraftGenerationStatus.SUCCESS,
+                    draftGenerationErrorRes = generationFailure.toDraftAiFailureMessage(),
+                    isReplyPending = false
+                )
             }
         }
     }

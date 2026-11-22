@@ -10,7 +10,9 @@ data class ChatbotDraftAiEditUiState(
     val contractId: String? = null,
     val conversationId: String? = null,
     val proposal: com.example.lagallens.domain.repository.DraftEditProposal? = null,
-    val isInitialized: Boolean = false
+    val isInitialized: Boolean = false,
+    /** What went wrong, when the backend said; null keeps the screen's generic text. */
+    val errorMessageRes: Int? = null
 ) {
     companion object {
         const val SELECTED_CLAUSE_SCOPE = "selected_clause"

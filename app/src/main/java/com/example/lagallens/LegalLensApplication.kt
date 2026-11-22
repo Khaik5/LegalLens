@@ -46,6 +46,8 @@ import kotlinx.coroutines.launch
 class LegalLensApplication : Application() {
     val dataMode get() = DataModeConfig.current
     val usesBackendAuthentication get() = dataMode == AppDataMode.REAL
+    /** Set while the user signs out on purpose, so a session that ends any other way can be explained. */
+    @Volatile var isUserSigningOut = false
     val authRepository: AuthRepository by lazy {
         RepositoryModule.provideAuthRepository(applicationContext, onDemoAccountCreated = ::saveDemoAccountName)
     }
@@ -75,7 +77,9 @@ class LegalLensApplication : Application() {
     val contractRepository: ContractRepository by lazy { RepositoryModule.provideContractRepository(applicationContext) }
     val documentRepository: DocumentRepository by lazy { RepositoryModule.provideDocumentRepository(applicationContext) }
     val getDocumentFileUseCase by lazy { com.example.lagallens.domain.usecase.GetDocumentFileUseCase(documentRepository) }
-    private val defaultDraftRepository: DraftRepository by lazy { RepositoryModule.provideDraftRepository(applicationContext) }
+    private val defaultDraftRepository: DraftRepository by lazy {
+        RepositoryModule.provideDraftRepository(applicationContext) { contractRepository.invalidate() }
+    }
     @Volatile private var sandboxDraftRepository: DraftRepository? = null
     @Volatile internal var sandboxDraftPreferences: String? = null
         private set
