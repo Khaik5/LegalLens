@@ -48,6 +48,7 @@ class OcrFailureActivity : com.example.lagallens.presentation.feature.ocr.OcrSes
             insets
         }
         bindEvents()
+        showFailureReason()
         observeViewModel()
         viewModel.onEvent(
             OcrFailureUiEvent.ScreenOpened(
@@ -67,6 +68,26 @@ class OcrFailureActivity : com.example.lagallens.presentation.feature.ocr.OcrSes
         onBackPressedDispatcher.addCallback(this@OcrFailureActivity, object : androidx.activity.OnBackPressedCallback(true) {
             override fun handleOnBackPressed() = viewModel.onEvent(OcrFailureUiEvent.BackClicked)
         })
+    }
+
+    /** A failure that is not about the document says so; a retry that cannot help is not offered. */
+    private fun showFailureReason() = with(binding) {
+        val reason = intent.getStringExtra(EXTRA_REASON)
+            ?.let { runCatching { com.example.lagallens.domain.model.ocr.OcrFailureReason.valueOf(it) }.getOrNull() }
+            ?: com.example.lagallens.domain.model.ocr.OcrFailureReason.UNREADABLE
+        val messageRes = when (reason) {
+            com.example.lagallens.domain.model.ocr.OcrFailureReason.SERVICE_UNAVAILABLE -> com.example.lagallens.R.string.ocr_failure_message_service
+            com.example.lagallens.domain.model.ocr.OcrFailureReason.TIMEOUT -> com.example.lagallens.R.string.ocr_failure_message_timeout
+            com.example.lagallens.domain.model.ocr.OcrFailureReason.FILE_PROBLEM -> com.example.lagallens.R.string.ocr_failure_message_file
+            com.example.lagallens.domain.model.ocr.OcrFailureReason.UNREADABLE -> null
+        }
+        if (messageRes != null) {
+            ocrFailureMessage.setText(messageRes)
+            ocrFailureReasonsCard.visibility = android.view.View.GONE
+        }
+        val canRetry = intent.getBooleanExtra(EXTRA_RETRYABLE, true) && reason != com.example.lagallens.domain.model.ocr.OcrFailureReason.FILE_PROBLEM
+        ocrFailureRetry.visibility = if (canRetry) android.view.View.VISIBLE else android.view.View.GONE
+        ocrFailureButtonGap.visibility = ocrFailureRetry.visibility
     }
 
     private fun observeViewModel() {
@@ -107,6 +128,8 @@ class OcrFailureActivity : com.example.lagallens.presentation.feature.ocr.OcrSes
         private const val EXTRA_PAGE_PATHS = "ocr_failure_page_paths"
         private const val EXTRA_MIME_TYPE = "ocr_failure_mime_type"
         private const val EXTRA_CONTRACT_ID = "ocr_failure_contract_id"
+        private const val EXTRA_REASON = "ocr_failure_reason"
+        private const val EXTRA_RETRYABLE = "ocr_failure_retryable"
 
         fun createIntent(
             context: Context,
@@ -116,10 +139,14 @@ class OcrFailureActivity : com.example.lagallens.presentation.feature.ocr.OcrSes
             documentUri: String?,
             pagePaths: List<String> = emptyList(),
             mimeType: String = "",
-            contractId: String? = null
+            contractId: String? = null,
+            failureReason: com.example.lagallens.domain.model.ocr.OcrFailureReason = com.example.lagallens.domain.model.ocr.OcrFailureReason.UNREADABLE,
+            isRetryable: Boolean = true
         ): Intent = com.example.lagallens.presentation.feature.ocr.OcrSession.stamp(context, Intent(context, OcrFailureActivity::class.java)
             .putExtra(EXTRA_DOCUMENT_NAME, documentName)
             .putExtra(EXTRA_CONTRACT_ID, contractId)
+            .putExtra(EXTRA_REASON, failureReason.name)
+            .putExtra(EXTRA_RETRYABLE, isRetryable)
             .putExtra(EXTRA_DOCUMENT_DETAILS, documentDetails)
             .putExtra(EXTRA_DOCUMENT_ID, documentId)
             .putExtra(EXTRA_DOCUMENT_URI, documentUri)

@@ -19,7 +19,7 @@
     <string name="login_password_minimum_length">Mật khẩu cần ít nhất 8 ký tự</string>
     <string name="login_invalid_credentials">Email hoặc mật khẩu không đúng</string>
     <string name="login_account_disabled">Tài khoản này đã bị vô hiệu hóa. Vui lòng liên hệ quản trị viên.</string>
-    <string name="session_ended_message">Phiên đăng nhập đã kết thúc. Tài khoản có thể đã bị vô hiệu hóa hoặc đăng nhập đã hết hạn. Vui lòng đăng nhập lại.</string>
+    <string name="session_ended_message">Tài khoản bị vô hiệu hóa hoặc phiên hết hạn. Vui lòng đăng nhập lại.</string>
     <string name="login_account_not_verified">Tài khoản chưa xác thực email. Mã OTP mới đã được gửi tới email của bạn.</string>
     <string name="login_username_hint">ten@example.com</string>
     <string name="login_welcome_back">Chào mừng trở lại</string>
@@ -375,6 +375,9 @@
     <string name="ocr_failure_back_content_description">Quay lại</string>
     <string name="ocr_failure_heading">OCR thất bại</string>
     <string name="ocr_failure_message">Không thể trích xuất thông tin văn bản từ tài liệu của bạn.</string>
+    <string name="ocr_failure_message_service">Dịch vụ nhận dạng văn bản đang gặp sự cố, không phải lỗi do tài liệu của bạn. Vui lòng thử lại sau.</string>
+    <string name="ocr_failure_message_timeout">Nhận dạng mất quá nhiều thời gian. Hãy thử lại hoặc dùng tài liệu ngắn hơn.</string>
+    <string name="ocr_failure_message_file">Tệp không được hỗ trợ, quá lớn, hoặc đã bị thay đổi. Hãy tải lại tệp.</string>
     <string name="ocr_failure_reasons_title">Nguyên nhân có thể xảy ra:</string>
     <string name="ocr_failure_reason_quality">• Chất lượng ảnh chụp quá thấp, bị nhòe hoặc mất góc.</string>
     <string name="ocr_failure_reason_lighting">• Ánh sáng không đều, bị bóng lóa hoặc tối quá mức.</string>

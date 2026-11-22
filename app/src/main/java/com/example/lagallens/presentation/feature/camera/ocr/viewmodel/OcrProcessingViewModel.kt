@@ -3,6 +3,7 @@ package com.example.lagallens.presentation.feature.camera.ocr.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.lagallens.domain.model.ocr.OcrFailureReason
 import com.example.lagallens.domain.model.processing.DocumentUploadRequest
 import com.example.lagallens.domain.model.processing.ProcessingState
 import com.example.lagallens.domain.repository.DocumentUploadRepository
@@ -36,6 +37,7 @@ class OcrProcessingViewModel(
 
     private var hasStarted = false
     private var processingJob: Job? = null
+    private var recognitionFailure: ProcessingState.Failed? = null
     private var contractId: String? = null
 
     fun onEvent(event: OcrProcessingUiEvent) {
@@ -69,7 +71,11 @@ class OcrProcessingViewModel(
             val state = _uiState.value
             _uiEffect.send(
                 if (succeeded) OcrProcessingUiEffect.NavigateToOcrResult(state.documentName, state.documentDetails)
-                else OcrProcessingUiEffect.NavigateToOcrFailure(state.documentName, state.documentDetails)
+                else OcrProcessingUiEffect.NavigateToOcrFailure(
+                    state.documentName, state.documentDetails,
+                    reason = recognitionFailure?.ocrReason ?: OcrFailureReason.UNREADABLE,
+                    isRetryable = recognitionFailure?.isRetryable ?: true
+                )
             )
         }
     }
@@ -103,7 +109,8 @@ class OcrProcessingViewModel(
             when (state) {
                 is ProcessingState.Running -> state.stage?.let { stage -> _uiState.update { it.withActiveStep(stage) } }
                 ProcessingState.Completed -> succeeded = true
-                is ProcessingState.Failed, is ProcessingState.Uploaded -> succeeded = false
+                is ProcessingState.Failed -> { succeeded = false; recognitionFailure = state }
+                is ProcessingState.Uploaded -> succeeded = false
             }
         }
         return succeeded

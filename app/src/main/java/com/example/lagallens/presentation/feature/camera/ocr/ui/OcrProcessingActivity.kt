@@ -142,7 +142,9 @@ class OcrProcessingActivity : com.example.lagallens.presentation.feature.ocr.Ocr
                         documentUri = intent.getStringExtra(EXTRA_DOCUMENT_URI),
                         pagePaths = intent.getStringArrayListExtra(EXTRA_PAGE_PATHS).orEmpty(),
                         mimeType = intent.getStringExtra(EXTRA_MIME_TYPE).orEmpty(),
-                        contractId = intent.getStringExtra(EXTRA_CONTRACT_ID)
+                        contractId = intent.getStringExtra(EXTRA_CONTRACT_ID),
+                        failureReason = effect.reason,
+                        isRetryable = effect.isRetryable
                     )
                 )
                 finish()

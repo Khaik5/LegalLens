@@ -11,6 +11,7 @@ import com.example.lagallens.data.model.response.OcrCorrectionResponse
 import com.example.lagallens.data.model.response.OcrJobResponse
 import com.example.lagallens.data.model.response.OcrResultResponse
 import com.example.lagallens.domain.model.ocr.OcrResultNotReadyException
+import com.example.lagallens.domain.model.ocr.OcrFailureReason
 import com.example.lagallens.domain.model.processing.ProcessingState
 import com.example.lagallens.domain.model.processing.UploadFailure
 import kotlinx.coroutines.flow.take
@@ -28,8 +29,8 @@ class RemoteOcrRepositoryTest {
     private val api = OcrFixture()
     private val repository = RemoteOcrRepository(RemoteRepositorySession(), OcrRemoteDataSource(lazyOf(api)), pollIntervalMillis = 10, maxPolls = 5)
 
-    private fun job(status: String, text: String? = null, confidence: Double? = null, retryable: Boolean = false) =
-        OcrResultResponse("job-1", status, if (status == "COMPLETED") 100 else 0, null, retryable, text?.let { 1 }, text, confidence, null)
+    private fun job(status: String, text: String? = null, confidence: Double? = null, retryable: Boolean = false, errorCode: String? = null) =
+        OcrResultResponse("job-1", status, if (status == "COMPLETED") 100 else 0, errorCode, retryable, text?.let { 1 }, text, confidence, null)
 
     @Test fun leavingTheScreenWhileRecognizingCancelsTheJob() = runTest {
         api.results = mutableListOf(null, job("PROCESSING"))
@@ -94,6 +95,15 @@ class RemoteOcrRepositoryTest {
         api.results = mutableListOf(null, job("PROCESSING"), job("FAILED", retryable = false))
 
         assertEquals(ProcessingState.Failed(isRetryable = false), repository.process("15").toList().last())
+    }
+
+    @Test fun aFailureCarriesTheCauseTheBackendNamed() = runTest {
+        api.results = mutableListOf(null, job("FAILED", retryable = false, errorCode = "OCR_ENGINE_NOT_INSTALLED"))
+
+        val failed = repository.process("15").toList().last() as ProcessingState.Failed
+
+        assertEquals(OcrFailureReason.SERVICE_UNAVAILABLE, failed.ocrReason)
+        assertEquals(false, failed.isRetryable)
     }
 
     @Test fun anUnsupportedFileCannotBeRetried() = runTest {
