@@ -107,6 +107,9 @@ class DeviceInteractionTest {
         ActivityScenario.launch(MainActivity::class.java).use {
             onView(withId(R.id.navProfile)).perform(click())
             onView(withId(R.id.actionAppearance)).perform(scrollTo(), click())
+            // The row opens Settings with the language picker on top; close the picker to see Settings itself.
+            pressBack()
+            android.os.SystemClock.sleep(700)
             onView(withId(R.id.settingsAppBar)).check(matches(isDisplayed()))
             pressBack()
             onView(withId(R.id.tvProfileName)).check(matches(isDisplayed()))

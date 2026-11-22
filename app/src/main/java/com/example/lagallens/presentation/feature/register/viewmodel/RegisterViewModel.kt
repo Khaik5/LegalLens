@@ -94,14 +94,19 @@ class RegisterViewModel(
                         else RegisterUiEffect.NavigateToOtp(email, challenge)
                     )
                 }
-                is AuthResult.Failed -> _uiState.update {
-                    val emailTaken = result.reason == AuthFailure.EMAIL_TAKEN && it.email.trim() == email
-                    it.copy(
-                        isLoading = false,
-                        emailErrorResId = R.string.register_email_taken.takeIf { emailTaken },
-                        passwordErrorResId = result.reason.toAuthMessage().takeUnless { result.reason == AuthFailure.EMAIL_TAKEN },
-                        canResendVerification = emailTaken
-                    )
+                is AuthResult.Failed -> {
+                    _uiState.update {
+                        val emailTaken = result.reason == AuthFailure.EMAIL_TAKEN && it.email.trim() == email
+                        it.copy(
+                            isLoading = false,
+                            emailErrorResId = R.string.register_email_taken.takeIf { emailTaken },
+                            canResendVerification = emailTaken
+                        )
+                    }
+                    // Not a password problem (network, rate limit, ...): a field error would stay invisible unless focused.
+                    if (result.reason != AuthFailure.EMAIL_TAKEN) {
+                        _uiEffect.send(RegisterUiEffect.ShowMessage(result.reason.toAuthMessage()))
+                    }
                 }
             }
         }

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.lagallens.R
+import com.example.lagallens.domain.model.SaveDraftAsContractResult
 import com.example.lagallens.domain.repository.DraftRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -36,7 +37,7 @@ class SavedDraftCopyDetailViewModel(
         if (_uiState.value.saveAsContractStatus != SaveAsContractStatus.IDLE) return
         _uiState.update { it.copy(saveAsContractStatus = SaveAsContractStatus.SAVING) }
         viewModelScope.launch {
-            val contractId = try {
+            val result = try {
                 drafts().saveAsContract(draftId)
             } catch (cancellation: CancellationException) {
                 throw cancellation
@@ -44,14 +45,17 @@ class SavedDraftCopyDetailViewModel(
                 null
             }
             if (ownerSession != currentSession()) return@launch
-            if (contractId != null) {
-                _uiState.update { it.copy(saveAsContractStatus = SaveAsContractStatus.SAVED) }
-                _uiEffect.emit(SavedDraftCopyDetailUiEffect.ShowMessage(R.string.draft_saved_contract_success))
-            } else {
-                // The same request is allowed again: the repository reuses its idempotency key.
-                _uiState.update { it.copy(saveAsContractStatus = SaveAsContractStatus.IDLE) }
-                _uiEffect.emit(SavedDraftCopyDetailUiEffect.ShowMessage(R.string.draft_saved_contract_failed))
+            val (status, message) = when (result) {
+                is SaveDraftAsContractResult.Saved -> SaveAsContractStatus.SAVED to R.string.draft_saved_contract_success
+                SaveDraftAsContractResult.Unsupported -> SaveAsContractStatus.UNAVAILABLE to R.string.draft_saved_contract_unavailable
+                SaveDraftAsContractResult.Rejected -> SaveAsContractStatus.UNAVAILABLE to R.string.draft_saved_contract_rejected
+                SaveDraftAsContractResult.ContractDeleted -> SaveAsContractStatus.UNAVAILABLE to R.string.draft_saved_contract_deleted
+                SaveDraftAsContractResult.NotLatestVersion -> SaveAsContractStatus.UNAVAILABLE to R.string.draft_saved_contract_not_latest
+                // A transient failure: the same request is allowed again, and the repository reuses its idempotency key.
+                null -> SaveAsContractStatus.IDLE to R.string.draft_saved_contract_failed
             }
+            _uiState.update { it.copy(saveAsContractStatus = status) }
+            _uiEffect.emit(SavedDraftCopyDetailUiEffect.ShowMessage(message))
         }
     }
 

@@ -208,7 +208,7 @@ class ChatbotDraftPreviewActivity : DraftSessionActivity() {
             menu.add(0, MENU_MY_DRAFTS, 1, R.string.draft_list_title)
             setOnMenuItemClickListener { item ->
                 when (item.itemId) {
-                    MENU_VERSIONS -> startActivity(ChatbotDraftVersionsActivity.createIntent(this@ChatbotDraftPreviewActivity, contractId = contractId))
+                    MENU_VERSIONS -> startActivity(ChatbotDraftVersionsActivity.createIntent(this@ChatbotDraftPreviewActivity, contractId = contractId, draftId = viewModel.uiState.value.draftId))
                     MENU_MY_DRAFTS -> startActivity(ChatbotDraftListActivity.createIntent(this@ChatbotDraftPreviewActivity))
                 }
                 true

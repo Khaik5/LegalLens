@@ -43,7 +43,7 @@ class CopyDraftVersionActivity : DraftSessionActivity() {
             }
             startActivity(ChatbotDraftPreviewActivity.createIntent(this@CopyDraftVersionActivity, ChatbotDraftUiState.COPY_VERSION, draftId = draftId, contractId = intent.getStringExtra(EXTRA_CONTRACT_ID)))
         }
-        binding.copyDraftManage.setOnClickListener { startActivity(ChatbotDraftVersionsActivity.createIntent(this, hasD3 = true, contractId = intent.getStringExtra(EXTRA_CONTRACT_ID))) }
+        binding.copyDraftManage.setOnClickListener { startActivity(ChatbotDraftVersionsActivity.createIntent(this, hasD3 = true, contractId = intent.getStringExtra(EXTRA_CONTRACT_ID), draftId = viewModel.uiState.value.draftId)) }
         viewModel.onEvent(CopyDraftVersionUiEvent.Opened(intent.getBooleanExtra(EXTRA_PREVIEW_FAILURE, false), intent.getStringExtra(EXTRA_SOURCE_DRAFT_ID), intent.getStringExtra(EXTRA_CONTRACT_ID)))
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) { viewModel.uiState.collect(::render) }

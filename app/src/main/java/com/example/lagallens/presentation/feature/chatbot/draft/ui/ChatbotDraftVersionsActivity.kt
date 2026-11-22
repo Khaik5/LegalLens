@@ -15,6 +15,7 @@ import com.example.lagallens.presentation.common.utils.applySystemBarInsets
 import com.example.lagallens.presentation.feature.chatbot.draft.contract.ChatbotDraftUiState
 import com.example.lagallens.domain.model.Draft
 import com.example.lagallens.domain.model.DraftStage
+import com.example.lagallens.domain.model.relatedTo
 import com.example.lagallens.domain.repository.latestDraft
 import com.example.lagallens.presentation.feature.documentviewer.ui.DocumentViewerActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -30,6 +31,7 @@ class ChatbotDraftVersionsActivity : DraftSessionActivity() {
     private lateinit var binding: ActivityChatbotDraftVersionsBinding
     private val hasD3 by lazy { intent.getBooleanExtra(EXTRA_HAS_D3, false) }
     private val contractId by lazy { intent.getStringExtra(EXTRA_CONTRACT_ID) }
+    private val currentDraftId by lazy { intent.getStringExtra(EXTRA_DRAFT_ID) }
     private var latestByStage: Map<DraftStage, Draft> = emptyMap()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -87,7 +89,12 @@ class ChatbotDraftVersionsActivity : DraftSessionActivity() {
         val repository = try { app.draftRepository.forSession(ownerSession) } catch (_: Exception) { return }
         lifecycleScope.launch {
             val drafts = try {
-                withContext(Dispatchers.IO) { repository.getDrafts() }
+                withContext(Dispatchers.IO) {
+                    val listed = repository.getDrafts()
+                    // The list holds only the newest drafts; an older one being viewed must still anchor its family.
+                    val current = currentDraftId?.takeIf { id -> listed.none { it.draftId == id } }?.let { repository.getDraft(it) }
+                    if (current == null) listed else listed + current
+                }
             } catch (cancellationException: CancellationException) {
                 throw cancellationException
             } catch (_: Exception) {
@@ -95,7 +102,7 @@ class ChatbotDraftVersionsActivity : DraftSessionActivity() {
                 return@launch
             }
             if (!isOwnerSession()) return@launch
-            val owned = drafts.filter { contractId == null || it.contractId == contractId }
+            val owned = drafts.relatedTo(contractId, currentDraftId)
             latestByStage = owned.groupBy { it.stage }.mapValues { (_, versions) -> versions.maxBy { it.versionNo } }
             (binding.draftVersionD2View.parent as android.view.View).isVisible = DraftStage.AI_PROPOSAL in latestByStage
             (binding.draftVersionD1View.parent.parent as android.view.View).isVisible = DraftStage.ORIGINAL in latestByStage
@@ -128,12 +135,14 @@ class ChatbotDraftVersionsActivity : DraftSessionActivity() {
     companion object {
         private const val EXTRA_HAS_D3 = "chatbot_draft_versions_has_d3"
         private const val EXTRA_CONTRACT_ID = "chatbot_draft_versions_contract_id"
+        private const val EXTRA_DRAFT_ID = "chatbot_draft_versions_draft_id"
         const val EXTRA_PREVIEW_COPY_ERROR = "chatbot_draft_versions_copy_error"
-        fun createIntent(context: Context, hasD3: Boolean = false, previewCopyError: Boolean = false, contractId: String? = null) =
+        fun createIntent(context: Context, hasD3: Boolean = false, previewCopyError: Boolean = false, contractId: String? = null, draftId: String? = null) =
             Intent(context, ChatbotDraftVersionsActivity::class.java)
                 .putExtra(EXTRA_HAS_D3, hasD3)
                 .putExtra(EXTRA_PREVIEW_COPY_ERROR, previewCopyError)
                 .putExtra(EXTRA_CONTRACT_ID, contractId)
+                .putExtra(EXTRA_DRAFT_ID, draftId)
                 .also { DraftSessionGuard.stamp(context, it) }
     }
 }

@@ -217,6 +217,7 @@
                 android:fontFamily="@font/manrope"
                 android:gravity="center"
                 android:lineSpacingExtra="@dimen/dp_4"
+                android:id="@+id/draftRegenerationErrorBody"
                 android:text="@string/chatbot_draft_regeneration_error_body"
                 android:textColor="@color/legal_lens_secondary_text"
                 android:textSize="@dimen/sp_14" />

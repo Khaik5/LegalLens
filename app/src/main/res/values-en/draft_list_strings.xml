@@ -12,6 +12,10 @@
     <string name="draft_saved_contract_done">Saved to My contracts</string>
     <string name="draft_saved_contract_success">Saved as a PDF contract. Find it in the Contracts tab.</string>
     <string name="draft_saved_contract_failed">Could not save it as a contract. Please try again.</string>
+    <string name="draft_saved_contract_unavailable">This draft cannot be saved as a PDF contract.</string>
+    <string name="draft_saved_contract_rejected">The server did not accept this draft (for example, its content is empty). Check the draft content.</string>
+    <string name="draft_saved_contract_deleted">This draft was saved as a contract before, but that contract was deleted, so it cannot be saved again for now.</string>
+    <string name="draft_saved_contract_not_latest">Only the latest version of a draft can be saved as a PDF contract. Open the latest version and save it.</string>
     <string name="draft_list_item_updated">Updated %1$s</string>
     <string name="draft_list_item_meta">%1$s · %2$s</string>
     <string name="draft_list_saved">Saved</string>
@@ -20,4 +24,9 @@
         <item quantity="one">%1$d version</item>
         <item quantity="other">%1$d versions</item>
     </plurals>
+    <string name="draft_ai_failure_timeout">The AI took too long to answer. Your request is kept, please try again in a few minutes.</string>
+    <string name="draft_ai_failure_overloaded">The AI service is busy. Your request is kept, please try again in a few minutes.</string>
+    <string name="draft_ai_failure_privacy">Personal details in this content could not be protected safely, so the request was not sent. Edit the content and try again.</string>
+    <string name="draft_ai_failure_source_unavailable">The text of the original contract is not available yet. Finish the OCR step of the original contract and try again.</string>
+    <string name="draft_ai_failure_out_of_date">The draft changed after you sent the request. Open the latest version and send it again.</string>
 </resources>

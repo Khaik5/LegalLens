@@ -5,5 +5,7 @@ enum class ChatbotDraftRegenerationStatus { LOADING, ERROR, SUCCESS }
 data class ChatbotDraftRegenerationUiState(
     val status: ChatbotDraftRegenerationStatus = ChatbotDraftRegenerationStatus.LOADING,
     val isInitialized: Boolean = false,
-    val draftId: String? = null
+    val draftId: String? = null,
+    /** What went wrong, when the backend said; null keeps the screen's generic text. */
+    val errorMessageRes: Int? = null
 )

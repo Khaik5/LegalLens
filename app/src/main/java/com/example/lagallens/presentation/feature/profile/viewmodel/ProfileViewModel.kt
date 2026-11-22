@@ -171,6 +171,7 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
     }
 
     private fun logout() {
+        app.isUserSigningOut = true
         viewModelScope.launch {
             val signedOut = try {
                 app.logoutUseCase()
@@ -179,6 +180,7 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
             } catch (_: Exception) {
                 false
             }
+            if (!signedOut) app.isUserSigningOut = false
             _uiEffect.send(if (signedOut) ProfileUiEffect.NavigateToAuthentication else ProfileUiEffect.ShowLogoutFailed)
         }
     }

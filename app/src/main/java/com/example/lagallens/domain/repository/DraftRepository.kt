@@ -2,6 +2,7 @@ package com.example.lagallens.domain.repository
 
 import com.example.lagallens.domain.model.Draft
 import com.example.lagallens.domain.model.DraftStage
+import com.example.lagallens.domain.model.SaveDraftAsContractResult
 
 interface DraftRepository {
     fun forSession(sessionKey: String?): DraftRepository = this
@@ -21,8 +22,8 @@ interface DraftRepository {
     suspend fun createCopy(sourceDraftId: String, title: String, stage: DraftStage = DraftStage.COPY, isTitleGenerated: Boolean = false): Draft?
     suspend fun updateDraft(draftId: String, title: String, content: String): Draft?
     suspend fun deleteDraft(draftId: String): Boolean
-    /** Saves the draft as a PDF contract and returns the new contract's id; null when this data source cannot. */
-    suspend fun saveAsContract(draftId: String): String? = null
+    /** Saves the draft as a PDF contract. Throws on a transient failure; repeating the call never makes a second contract. */
+    suspend fun saveAsContract(draftId: String): SaveDraftAsContractResult = SaveDraftAsContractResult.Unsupported
 }
 
 /** Versions of one contract never mix with another contract's drafts. */

@@ -206,6 +206,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/dp_8"
                     android:fontFamily="@font/manrope"
+                    android:id="@+id/draftAiErrorBody"
                     android:text="@string/chatbot_draft_ai_error_body"
                     android:textColor="@color/legal_lens_secondary_text"
                     android:textSize="@dimen/sp_13" />

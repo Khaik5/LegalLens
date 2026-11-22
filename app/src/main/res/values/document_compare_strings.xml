@@ -14,6 +14,7 @@
     <string name="viewer_zoom_in">Phóng to</string>
     <string name="viewer_share">Chia sẻ tài liệu</string>
     <string name="viewer_metadata">%1$s · %2$s</string>
+    <string name="viewer_page_total">%1$d trang</string>
     <string name="compare_title">So sánh hợp đồng</string>
     <string name="compare_result_title">So sánh</string>
     <string name="compare_document_a">A    %1$s</string>

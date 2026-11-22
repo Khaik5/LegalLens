@@ -126,6 +126,8 @@ class RegisterActivity : AppCompatActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiEffect.collect { effect ->
                     when (effect) {
+                        is RegisterUiEffect.ShowMessage ->
+                            android.widget.Toast.makeText(this@RegisterActivity, effect.messageRes, android.widget.Toast.LENGTH_LONG).show()
                         RegisterUiEffect.CloseScreen -> finish()
                         RegisterUiEffect.NavigateToLogin -> {
                             startActivity(Intent(this@RegisterActivity, LoginActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP))

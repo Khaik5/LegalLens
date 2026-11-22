@@ -51,7 +51,7 @@ class SavedDraftCopyDetailActivity : DraftSessionActivity() {
         val version = intent.getStringExtra(EXTRA_VERSION) ?: ChatbotDraftUiState.APPROVED_AI_VERSION
         val contractId = intent.getStringExtra(EXTRA_CONTRACT_ID)
         draftId = intent.getStringExtra(EXTRA_DRAFT_ID)
-        binding.savedDraftTitle.text = getString(R.string.draft_default_document_name, version)
+        binding.savedDraftTitle.text = getString(R.string.draft_default_document_name)
         lifecycleScope.launch {
             val app = application as LegalLensApplication
             val draft = try {
@@ -99,7 +99,7 @@ class SavedDraftCopyDetailActivity : DraftSessionActivity() {
         isEnabled = state.saveAsContractStatus == SaveAsContractStatus.IDLE
         setText(
             when (state.saveAsContractStatus) {
-                SaveAsContractStatus.IDLE -> R.string.draft_saved_contract_button
+                SaveAsContractStatus.IDLE, SaveAsContractStatus.UNAVAILABLE -> R.string.draft_saved_contract_button
                 SaveAsContractStatus.SAVING -> R.string.draft_saved_contract_saving
                 SaveAsContractStatus.SAVED -> R.string.draft_saved_contract_done
             }

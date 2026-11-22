@@ -9,6 +9,8 @@ import com.example.lagallens.data.model.response.DraftAiJobCreatedResponse
 import com.example.lagallens.data.model.response.DraftAiJobResponse
 import retrofit2.HttpException
 import com.example.lagallens.domain.model.Draft
+import com.example.lagallens.domain.model.DraftAiFailedException
+import com.example.lagallens.domain.model.DraftAiFailureReason
 import com.example.lagallens.domain.model.DraftStage
 import com.example.lagallens.domain.repository.DraftAiRepository
 import com.example.lagallens.domain.repository.DraftEditProposal
@@ -21,9 +23,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.util.UUID
-
-/** The job could not produce text: the provider failed, was cancelled, or did not answer in time. */
-class DraftAiJobFailedException(val errorCode: String?) : IllegalStateException("Draft AI job failed")
 
 /**
  * Draft generation and edit suggestions from the backend. A generated text or a suggestion only becomes a
@@ -77,7 +76,7 @@ class RemoteDraftAiRepository(
     }
 
     override suspend fun applyEdit(proposalId: String, sourceDraftId: String?, contractId: String?): Draft = inSession { scope, userId ->
-        val saved = remote.apply(scope, proposalId)
+        val saved = outOfDateOnConflict { remote.apply(scope, proposalId) }
         marks.put(userId, saved.id, saved.version, DraftVersionMark(DraftStage.AI_PROPOSAL, isSaved = false))
         drafts.loadVersion(scope, userId, saved.id, saved.version)
     }
@@ -113,12 +112,12 @@ class RemoteDraftAiRepository(
     private suspend fun startJob(scope: AuthSessionScope, request: DraftAiJobRequest): DraftAiJobCreatedResponse {
         val fingerprint = fingerprint(scope, request)
         val key = pendingKeys.getOrPut(fingerprint) { UUID.randomUUID().toString() }
-        val created = remote.createJob(scope, key, request)
+        val created = if (request.action == "GENERATE") remote.createJob(scope, key, request) else outOfDateOnConflict { remote.createJob(scope, key, request) }
         return when (created.status) {
             // A cancelled job can never run again, so the same key would only return the dead job.
             "CANCELLED" -> {
                 val fresh = UUID.randomUUID().toString().also { pendingKeys[fingerprint] = it }
-                remote.createJob(scope, fresh, request)
+                if (request.action == "GENERATE") remote.createJob(scope, fresh, request) else outOfDateOnConflict { remote.createJob(scope, fresh, request) }
             }
             "FAILED" -> {
                 try {
@@ -153,7 +152,7 @@ class RemoteDraftAiRepository(
             }
             when (job.status) {
                 "COMPLETED", "APPLIED" -> return job
-                "FAILED", "CANCELLED" -> throw DraftAiJobFailedException(job.errorCode)
+                "FAILED", "CANCELLED" -> throw DraftAiFailedException(failureReason(job.errorCode))
             }
             delay(pollIntervalMillis)
         }
@@ -165,7 +164,24 @@ class RemoteDraftAiRepository(
         } catch (_: Exception) {
             // The job expires on the backend by itself.
         }
-        throw DraftAiJobFailedException("TIMEOUT")
+        throw DraftAiFailedException(DraftAiFailureReason.TIMEOUT)
+    }
+
+    /** The backend answers 409 when the draft is no longer at the version the request was made for. */
+    private suspend fun <T> outOfDateOnConflict(call: suspend () -> T): T = try {
+        call()
+    } catch (error: HttpException) {
+        if (error.code() != 409) throw error
+        error.response()?.errorBody()?.close()
+        throw DraftAiFailedException(DraftAiFailureReason.OUT_OF_DATE)
+    }
+
+    private fun failureReason(errorCode: String?) = when (errorCode) {
+        "AI_TIMEOUT", "TIMEOUT" -> DraftAiFailureReason.TIMEOUT
+        "AI_OVERLOADED" -> DraftAiFailureReason.OVERLOADED
+        "PII_REDACTION_FAILED", "PII_RESTORE_FAILED" -> DraftAiFailureReason.PRIVACY_PROTECTION
+        "DRAFT_SOURCE_TEXT_UNAVAILABLE" -> DraftAiFailureReason.SOURCE_UNAVAILABLE
+        else -> DraftAiFailureReason.OTHER
     }
 
     private suspend fun <T> inSession(action: suspend (AuthSessionScope, String) -> T): T = withContext(Dispatchers.IO) {

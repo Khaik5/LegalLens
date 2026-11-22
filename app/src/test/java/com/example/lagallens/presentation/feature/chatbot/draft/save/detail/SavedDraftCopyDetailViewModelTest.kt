@@ -4,6 +4,7 @@ import com.example.lagallens.MainDispatcherRule
 import com.example.lagallens.R
 import com.example.lagallens.domain.model.Draft
 import com.example.lagallens.domain.model.DraftStage
+import com.example.lagallens.domain.model.SaveDraftAsContractResult
 import com.example.lagallens.domain.repository.DraftRepository
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.launch
@@ -18,9 +19,9 @@ import org.junit.Test
 class SavedDraftCopyDetailViewModelTest {
     @get:Rule val dispatcher = MainDispatcherRule()
 
-    private class ContractRepository(var result: suspend (String) -> String?) : DraftRepository {
+    private class ContractRepository(var result: suspend (String) -> SaveDraftAsContractResult) : DraftRepository {
         val requested = mutableListOf<String>()
-        override suspend fun saveAsContract(draftId: String): String? {
+        override suspend fun saveAsContract(draftId: String): SaveDraftAsContractResult {
             requested += draftId
             return result(draftId)
         }
@@ -40,7 +41,7 @@ class SavedDraftCopyDetailViewModelTest {
         SavedDraftCopyDetailViewModel("a:1", session) { repository }
 
     @Test fun savingMakesTheContractAndReportsIt() = runTest {
-        val repository = ContractRepository { "42" }
+        val repository = ContractRepository { SaveDraftAsContractResult.Saved("42") }
         val vm = viewModel(repository)
         val effects = mutableListOf<SavedDraftCopyDetailUiEffect>()
         val collector = launch(UnconfinedTestDispatcher(testScheduler)) { vm.uiEffect.collect { effects += it } }
@@ -56,7 +57,7 @@ class SavedDraftCopyDetailViewModelTest {
 
     @Test fun aFailureAllowsTryingAgain() = runTest {
         var failing = true
-        val repository = ContractRepository { if (failing) error("offline") else "42" }
+        val repository = ContractRepository { if (failing) error("offline") else SaveDraftAsContractResult.Saved("42") }
         val vm = viewModel(repository)
         val effects = mutableListOf<SavedDraftCopyDetailUiEffect>()
         val collector = launch(UnconfinedTestDispatcher(testScheduler)) { vm.uiEffect.collect { effects += it } }
@@ -74,15 +75,39 @@ class SavedDraftCopyDetailViewModelTest {
         assertEquals(2, repository.requested.size)
     }
 
-    @Test fun aSourceThatCannotSaveCountsAsAFailure() = runTest {
-        val vm = viewModel(ContractRepository { null })
+
+    @Test fun aSourceThatCannotSaveTurnsTheActionOffInsteadOfInvitingRetries() = runTest {
+        val vm = viewModel(ContractRepository { SaveDraftAsContractResult.Unsupported })
+        val effects = mutableListOf<SavedDraftCopyDetailUiEffect>()
+        val collector = launch(UnconfinedTestDispatcher(testScheduler)) { vm.uiEffect.collect { effects += it } }
+
         vm.onEvent(SavedDraftCopyDetailUiEvent.SaveAsContractClicked("5:3"))
         advanceUntilIdle()
-        assertEquals(SaveAsContractStatus.IDLE, vm.uiState.value.saveAsContractStatus)
+        collector.cancel()
+
+        assertEquals(SaveAsContractStatus.UNAVAILABLE, vm.uiState.value.saveAsContractStatus)
+        assertEquals(listOf<SavedDraftCopyDetailUiEffect>(SavedDraftCopyDetailUiEffect.ShowMessage(R.string.draft_saved_contract_unavailable)), effects)
+    }
+
+    @Test fun aDraftTheBackendRefusesTurnsTheActionOffAndSaysWhy() = runTest {
+        val repository = ContractRepository { SaveDraftAsContractResult.Rejected }
+        val vm = viewModel(repository)
+        val effects = mutableListOf<SavedDraftCopyDetailUiEffect>()
+        val collector = launch(UnconfinedTestDispatcher(testScheduler)) { vm.uiEffect.collect { effects += it } }
+
+        vm.onEvent(SavedDraftCopyDetailUiEvent.SaveAsContractClicked("5:3"))
+        advanceUntilIdle()
+        vm.onEvent(SavedDraftCopyDetailUiEvent.SaveAsContractClicked("5:3"))
+        advanceUntilIdle()
+        collector.cancel()
+
+        assertEquals(SaveAsContractStatus.UNAVAILABLE, vm.uiState.value.saveAsContractStatus)
+        assertEquals(listOf<SavedDraftCopyDetailUiEffect>(SavedDraftCopyDetailUiEffect.ShowMessage(R.string.draft_saved_contract_rejected)), effects)
+        assertEquals(1, repository.requested.size)
     }
 
     @Test fun tappingWhileSavingDoesNotSendASecondRequest() = runTest {
-        val gate = CompletableDeferred<String?>()
+        val gate = CompletableDeferred<SaveDraftAsContractResult>()
         val repository = ContractRepository { gate.await() }
         val vm = viewModel(repository)
 
@@ -92,14 +117,14 @@ class SavedDraftCopyDetailViewModelTest {
         assertEquals(SaveAsContractStatus.SAVING, vm.uiState.value.saveAsContractStatus)
         assertEquals(1, repository.requested.size)
 
-        gate.complete("42")
+        gate.complete(SaveDraftAsContractResult.Saved("42"))
         advanceUntilIdle()
         assertEquals(SaveAsContractStatus.SAVED, vm.uiState.value.saveAsContractStatus)
     }
 
     @Test fun anotherSessionNeitherSavesNorChangesTheState() = runTest {
         var current: String? = "a:1"
-        val repository = ContractRepository { "42" }
+        val repository = ContractRepository { SaveDraftAsContractResult.Saved("42") }
         val vm = viewModel(repository) { current }
         current = "b:2"
 

@@ -255,6 +255,7 @@ class ChatbotActivity : AppCompatActivity() {
         chatbotDraftGeneration.root.isVisible = showGeneration
         chatbotDraftGeneration.chatbotGenerationLoading.isVisible = state.draftGenerationStatus == DraftGenerationStatus.LOADING
         chatbotDraftGeneration.chatbotGenerationError.isVisible = state.draftGenerationStatus == DraftGenerationStatus.ERROR
+        chatbotDraftGeneration.chatbotGenerationErrorBody.setText(state.draftGenerationErrorRes ?: R.string.chatbot_generation_error)
         chatbotDraftGeneration.chatbotGenerationSuccess.isVisible = state.draftGenerationStatus == DraftGenerationStatus.SUCCESS
         chatbotDraftGeneration.chatbotGenerationSource.text = getString(R.string.chatbot_generation_source, sourceDocumentName(state.contractName))
         chatbotDraftGeneration.chatbotGenerationResultDocument.chatbotSourceName.setText(R.string.chatbot_generation_result_name)

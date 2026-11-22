@@ -142,7 +142,7 @@ object RepositoryModule {
         AppDataMode.REAL -> RemoteDocumentRepository(context.applicationContext, EncryptedTokenStore(context), documentRemote(context), ocrRemote(context))
     }
 
-    fun provideDraftRepository(context: Context): DraftRepository = when (DataModeConfig.current) {
+    fun provideDraftRepository(context: Context, onContractSaved: () -> Unit = {}): DraftRepository = when (DataModeConfig.current) {
         AppDataMode.DEMO -> {
             val appContext = context.applicationContext
             val auth = AuthLocalDataSource(appContext)
@@ -153,14 +153,16 @@ object RepositoryModule {
                     { action -> auth.withSession(scope, action) })
             }
         }
-        AppDataMode.REAL -> remoteDraftRepository(context)
+        AppDataMode.REAL -> remoteDraftRepository(context, onContractSaved)
     }
 
     private fun draftRemote(context: Context) =
         com.example.lagallens.data.datasource.remote.DraftRemoteDataSource(lazy { authenticatedRetrofit(context).create(com.example.lagallens.data.datasource.remote.api.DraftApi::class.java) })
 
-    private fun remoteDraftRepository(context: Context) = com.example.lagallens.data.repository.RemoteDraftRepository(
-        EncryptedTokenStore(context), draftRemote(context), com.example.lagallens.data.repository.SharedPreferencesDraftVersionMarks(context)
+    private fun remoteDraftRepository(context: Context, onContractSaved: () -> Unit) = com.example.lagallens.data.repository.RemoteDraftRepository(
+        EncryptedTokenStore(context), draftRemote(context), com.example.lagallens.data.repository.SharedPreferencesDraftVersionMarks(context),
+        contractKeys = com.example.lagallens.data.repository.SharedPreferencesDraftContractSaveKeys(context),
+        onContractSaved = onContractSaved
     )
 
     fun provideDraftAiRepository(context: Context, drafts: DraftRepository): com.example.lagallens.domain.repository.DraftAiRepository =

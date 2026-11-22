@@ -1,5 +1,6 @@
 package com.example.lagallens.presentation.feature.chatbot.draft.viewmodel
 
+import com.example.lagallens.presentation.common.utils.toDraftAiFailureMessage
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -65,8 +66,10 @@ class ChatbotDraftAiApplyViewModel(application: Application) : AndroidViewModel(
                 if (ownerSession == app.currentSessionKey()) state.update { it.copy(status = ChatbotDraftAiApplyStatus.SUCCESS, draftId = draft.draftId) }
             } catch (cancellationException: CancellationException) {
                 throw cancellationException
-            } catch (_: Exception) {
-                if (ownerSession == app.currentSessionKey()) state.update { it.copy(status = ChatbotDraftAiApplyStatus.ERROR) }
+            } catch (failure: Exception) {
+                if (ownerSession == app.currentSessionKey()) {
+                    state.update { it.copy(status = ChatbotDraftAiApplyStatus.ERROR, errorMessageRes = failure.toDraftAiFailureMessage()) }
+                }
             }
         }
     }

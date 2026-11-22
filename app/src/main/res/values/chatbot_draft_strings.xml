@@ -239,7 +239,7 @@ Các điều khoản còn lại và thông tin trong [ngoặc vuông] không đ�
     <string name="chatbot_draft_copy_view">Xem D3</string>
     <string name="chatbot_draft_copy_version_metadata">Bản sao từ D1 · Chưa lưu</string>
     <string name="draft_save_title">Lưu hợp đồng</string>
-    <string name="draft_default_document_name">Hợp đồng lao động · %1$s</string>
+    <string name="draft_default_document_name">Hợp đồng lao động (bản nháp)</string>
     <string name="draft_save_selected_version">Phiên bản được chọn: %1$s</string>
     <string name="draft_save_name_label">Tên hợp đồng</string>
     <string name="draft_save_default_name">Hợp đồng lao động — bản nháp</string>
@@ -295,8 +295,8 @@ Các điều khoản còn lại và thông tin trong [ngoặc vuông] không đ�
     <string name="draft_pdf_page_header">BẢN NHÁP · LEGALLENS</string>
     <string name="draft_pdf_page_number">Trang %1$d</string>
     <string name="draft_export_unsaved_title">Lưu bản nháp trước khi xuất</string>
-    <string name="draft_export_unsaved_body">Bạn đang chọn D1 · Bản nháp AI, chưa lưu. Hãy lưu thành bản sao mới trước khi xuất PDF. PDF sẽ lấy đúng D1, không lấy hợp đồng gốc. Các mục [ngoặc vuông] vẫn cần rà soát.</string>
-    <string name="draft_export_unsaved_action">Lưu bản sao D1</string>
+    <string name="draft_export_unsaved_body">Bản nháp AI này chưa được lưu. Hãy lưu thành bản sao mới trước khi xuất PDF. PDF sẽ lấy đúng bản nháp này, không lấy hợp đồng gốc. Các mục [ngoặc vuông] vẫn cần rà soát.</string>
+    <string name="draft_export_unsaved_action">Lưu bản sao mới</string>
     <string name="draft_saved_view_button">Xem bản nháp đã lưu</string>
     <string name="chatbot_draft_applied_preview_title_saved">Chi tiết bản D2 đã lưu</string>
     <string name="chatbot_draft_applied_source_line_saved">Bản sao đã lưu · Từ D1 sau khi xác nhận 1 thay đổi</string>

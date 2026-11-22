@@ -11,6 +11,7 @@ import com.example.lagallens.presentation.feature.chatbot.draft.contract.Chatbot
 import com.example.lagallens.presentation.feature.chatbot.draft.contract.ChatbotDraftListUiEvent
 import com.example.lagallens.presentation.feature.chatbot.draft.contract.ChatbotDraftListUiState
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -40,10 +41,14 @@ class ChatbotDraftListViewModel(
         }
     }
 
+    private var loadJob: Job? = null
+
     private fun load() {
+        // A newer load supersedes the one still running, so a slow reply cannot overwrite fresher data.
+        loadJob?.cancel()
         // A refresh keeps the list on screen; only the first load shows the spinner.
         if (_uiState.value.items.isEmpty()) _uiState.update { it.copy(status = ChatbotDraftListStatus.LOADING) }
-        viewModelScope.launch {
+        loadJob = viewModelScope.launch {
             val loaded = try {
                 drafts().getDrafts()
             } catch (cancellation: CancellationException) {
