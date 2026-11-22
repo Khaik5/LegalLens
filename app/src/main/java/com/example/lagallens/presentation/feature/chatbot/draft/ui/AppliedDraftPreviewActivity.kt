@@ -60,7 +60,7 @@ class AppliedDraftPreviewActivity : DraftSessionActivity() {
                 showSaveSheet()
             }
         }
-        binding.draftAppliedManage.setOnClickListener { startActivity(ChatbotDraftVersionsActivity.createIntent(this, hasD3, contractId = contractId)) }
+        binding.draftAppliedManage.setOnClickListener { startActivity(ChatbotDraftVersionsActivity.createIntent(this, hasD3, contractId = contractId, draftId = draftId)) }
         binding.draftAppliedDocumentName.text = getString(R.string.chatbot_draft_document_name, version)
         loadContent(saved, version)
     }

@@ -12,6 +12,10 @@
     <string name="draft_saved_contract_done">Đã lưu vào Hợp đồng của tôi</string>
     <string name="draft_saved_contract_success">Đã lưu thành hợp đồng PDF. Xem trong tab Hợp đồng.</string>
     <string name="draft_saved_contract_failed">Chưa lưu được thành hợp đồng. Vui lòng thử lại.</string>
+    <string name="draft_saved_contract_unavailable">Bản nháp này không thể lưu thành hợp đồng PDF.</string>
+    <string name="draft_saved_contract_rejected">Máy chủ không nhận bản nháp này (ví dụ nội dung đang trống). Hãy kiểm tra nội dung bản nháp.</string>
+    <string name="draft_saved_contract_deleted">Bản nháp này từng được lưu thành hợp đồng nhưng hợp đồng đó đã bị xóa, nên hiện chưa thể lưu lại.</string>
+    <string name="draft_saved_contract_not_latest">Chỉ bản mới nhất của bản nháp mới lưu được thành hợp đồng PDF. Hãy mở bản mới nhất rồi lưu.</string>
     <string name="draft_list_item_updated">Cập nhật %1$s</string>
     <string name="draft_list_item_meta">%1$s · %2$s</string>
     <string name="draft_list_saved">Đã lưu</string>
@@ -19,4 +23,9 @@
     <plurals name="draft_list_version_count">
         <item quantity="other">%1$d phiên bản</item>
     </plurals>
+    <string name="draft_ai_failure_timeout">AI phản hồi quá lâu. Yêu cầu của bạn vẫn được giữ lại, hãy thử lại sau ít phút.</string>
+    <string name="draft_ai_failure_overloaded">Dịch vụ AI đang quá tải. Yêu cầu của bạn vẫn được giữ lại, hãy thử lại sau ít phút.</string>
+    <string name="draft_ai_failure_privacy">Không thể che an toàn thông tin cá nhân trong nội dung này nên yêu cầu chưa được gửi đi. Hãy chỉnh lại nội dung rồi thử lại.</string>
+    <string name="draft_ai_failure_source_unavailable">Chưa có văn bản của hợp đồng gốc. Hãy hoàn tất bước OCR của hợp đồng gốc rồi thử lại.</string>
+    <string name="draft_ai_failure_out_of_date">Bản nháp đã thay đổi sau khi bạn gửi yêu cầu. Hãy mở lại phiên bản mới nhất rồi gửi lại.</string>
 </resources>

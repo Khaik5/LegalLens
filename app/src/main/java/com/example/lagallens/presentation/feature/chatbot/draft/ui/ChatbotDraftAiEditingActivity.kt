@@ -86,6 +86,7 @@ class ChatbotDraftAiEditingActivity : DraftSessionActivity() {
         draftAiScope.text = getString(if (state.scope == com.example.lagallens.presentation.feature.chatbot.draft.contract.ChatbotDraftAiEditUiState.WHOLE_CONTRACT_SCOPE) R.string.chatbot_draft_ai_request_label_whole else R.string.chatbot_draft_ai_request_label_selected)
         draftAiLoading.isVisible = loading
         draftAiError.isVisible = error
+        if (error) draftAiErrorBody.setText(state.errorMessageRes ?: R.string.chatbot_draft_ai_error_body)
         draftAiReady.isVisible = ready
         draftAiRetry.isVisible = error
         draftAiEditRequest.isVisible = error

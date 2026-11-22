@@ -79,6 +79,8 @@ class SaveDraftCopyBottomSheet : BottomSheetDialogFragment() {
     private fun render(state: SaveDraftCopyUiState) = with(binding) {
         saveDraftName.setTextIfDifferent(state.name)
         saveDraftAcknowledge.isChecked = state.acknowledged
+        saveDraftConfirm.isEnabled = state.acknowledged && state.name.isNotBlank()
+        saveDraftConfirm.alpha = if (saveDraftConfirm.isEnabled) 1f else 0.5f
         val form = state.status == SaveDraftCopyStatus.FORM
         saveDraftForm.isVisible = form
         saveDraftLoading.isVisible = state.status == SaveDraftCopyStatus.LOADING

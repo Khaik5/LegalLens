@@ -196,7 +196,7 @@ class DraftPdfExportBottomSheet : BottomSheetDialogFragment() {
     // The generated title only exists after the PDF is built; until then show the title the caller already knows.
     private fun fallbackTitle(): String =
         arguments?.getString(KEY_TITLE)?.takeIf { it.isNotBlank() }
-            ?: getString(R.string.draft_default_document_name, arguments?.getString(KEY_VERSION) ?: ChatbotDraftUiState.APPROVED_AI_VERSION)
+            ?: getString(R.string.draft_default_document_name)
 
     private fun launchSavePicker() {
         if (!viewModel.isOwnerSession()) return

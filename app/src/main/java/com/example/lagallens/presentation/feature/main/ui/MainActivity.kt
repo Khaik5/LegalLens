@@ -59,7 +59,11 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         lifecycleScope.launch {
             app.observeSessionKeys().collect { session ->
-                if (session == null && !passwordChangePending) openAuthentication()
+                if (session != null) app.isUserSigningOut = false
+                if (session == null && !passwordChangePending) {
+                    if (!app.isUserSigningOut) android.widget.Toast.makeText(this@MainActivity, R.string.session_ended_message, android.widget.Toast.LENGTH_LONG).show()
+                    openAuthentication()
+                }
             }
         }
         binding.mainNavHost.applySystemBarAndKeyboardInsets(bottomReserved = { if (binding.bottomNavigationContainer.isVisible) binding.bottomNavigationContainer.height else 0 })

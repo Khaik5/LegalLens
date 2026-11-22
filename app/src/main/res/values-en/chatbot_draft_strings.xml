@@ -239,7 +239,7 @@ This is a proposal in a new D2 copy; D1 and the original contract remain unchang
     <string name="chatbot_draft_copy_view">View D3</string>
     <string name="chatbot_draft_copy_version_metadata">Copy of D1 · Unsaved</string>
     <string name="draft_save_title">Save contract</string>
-    <string name="draft_default_document_name">Employment contract · %1$s</string>
+    <string name="draft_default_document_name">Employment contract (draft)</string>
     <string name="draft_save_selected_version">Selected version: %1$s</string>
     <string name="draft_save_name_label">Contract name</string>
     <string name="draft_save_default_name">Employment contract — draft</string>
@@ -295,8 +295,8 @@ This is a proposal in a new D2 copy; D1 and the original contract remain unchang
     <string name="draft_pdf_page_header">DRAFT · LEGALLENS</string>
     <string name="draft_pdf_page_number">Page %1$d</string>
     <string name="draft_export_unsaved_title">Save draft before exporting</string>
-    <string name="draft_export_unsaved_body">You selected D1 · AI draft, unsaved. Save a new copy before exporting. The PDF will use D1, not the original contract. Review all [bracketed] fields.</string>
-    <string name="draft_export_unsaved_action">Save a copy of D1</string>
+    <string name="draft_export_unsaved_body">This AI draft is not saved yet. Save a new copy before exporting. The PDF will use this draft, not the original contract. Review all [bracketed] fields.</string>
+    <string name="draft_export_unsaved_action">Save a new copy</string>
     <string name="draft_saved_view_button">View saved draft</string>
     <string name="chatbot_draft_applied_preview_title_saved">Saved D2 details</string>
     <string name="chatbot_draft_applied_source_line_saved">Saved copy · From D1 after confirming 1 change</string>

@@ -50,7 +50,7 @@
         </LinearLayout>
         <LinearLayout android:id="@+id/chatbotGenerationError" android:layout_width="match_parent" android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/dp_16" android:orientation="vertical" android:visibility="gone">
-            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:background="@drawable/bg_contract_export_error"
+            <TextView android:id="@+id/chatbotGenerationErrorBody" android:layout_width="match_parent" android:layout_height="wrap_content" android:background="@drawable/bg_contract_export_error"
                 android:drawableStart="@drawable/ic_chatbot_error" android:drawablePadding="@dimen/dp_8" android:gravity="center_vertical"
                 android:fontFamily="@font/manrope" android:padding="@dimen/dp_12" android:text="@string/chatbot_generation_error"
                 android:textColor="@color/legal_lens_secondary_text" android:textSize="@dimen/sp_12" />

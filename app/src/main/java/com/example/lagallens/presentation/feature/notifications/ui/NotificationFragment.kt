@@ -32,6 +32,7 @@ import com.example.lagallens.presentation.feature.notifications.contract.Notific
 import com.example.lagallens.presentation.feature.notifications.contract.NotificationUiState
 import com.example.lagallens.presentation.feature.notifications.viewmodel.NotificationViewModel
 import com.example.lagallens.presentation.feature.contracts.detail.ui.ContractDetailFragment
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class NotificationFragment : Fragment() {
@@ -56,6 +57,7 @@ class NotificationFragment : Fragment() {
         bindView()
         collectUiState()
         collectUiEffect()
+        refreshWhileVisible()
     }
 
     override fun onResume() {
@@ -78,6 +80,18 @@ class NotificationFragment : Fragment() {
         binding.tvFilterAnalysis.setOnClickListener { selectFilter(NotificationFilter.ANALYSIS) }
         binding.tvFilterOcr.setOnClickListener { selectFilter(NotificationFilter.OCR) }
         binding.tvFilterReminder.setOnClickListener { selectFilter(NotificationFilter.REMINDER) }
+    }
+
+    /** Notices sent while the tab is open (for example by an admin) show up without leaving and returning. */
+    private fun refreshWhileVisible() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                while (true) {
+                    delay(REFRESH_INTERVAL_MILLIS)
+                    viewModel.onEvent(NotificationUiEvent.ScreenOpened)
+                }
+            }
+        }
     }
 
     private fun selectFilter(filter: NotificationFilter) {
@@ -209,5 +223,9 @@ class NotificationFragment : Fragment() {
         binding.rvNotifications.adapter = null
         _binding = null
         super.onDestroyView()
+    }
+
+    private companion object {
+        const val REFRESH_INTERVAL_MILLIS = 30_000L
     }
 }
