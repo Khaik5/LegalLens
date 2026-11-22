@@ -23,7 +23,12 @@ import kotlinx.coroutines.launch
 
 class OcrFailureActivity : com.example.lagallens.presentation.feature.ocr.OcrSessionActivity() {
     private lateinit var binding: ActivityOcrFailureBinding
-    private val viewModel by viewModels<OcrFailureViewModel>()
+    private val viewModel by viewModels<OcrFailureViewModel> {
+        val app = application as com.example.lagallens.LegalLensApplication
+        val owner = ownerSession
+        val discard = com.example.lagallens.domain.usecase.DiscardUnsavedUploadUseCase(app.unsavedUploadContracts) { app.contractRepository.forSession(owner) }
+        OcrFailureViewModel.Factory { contractId -> discard(contractId) }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,7 +52,8 @@ class OcrFailureActivity : com.example.lagallens.presentation.feature.ocr.OcrSes
         viewModel.onEvent(
             OcrFailureUiEvent.ScreenOpened(
                 documentName = intent.getStringExtra(EXTRA_DOCUMENT_NAME).orEmpty(),
-                documentDetails = intent.getStringExtra(EXTRA_DOCUMENT_DETAILS).orEmpty()
+                documentDetails = intent.getStringExtra(EXTRA_DOCUMENT_DETAILS).orEmpty(),
+                contractId = intent.getStringExtra(EXTRA_CONTRACT_ID)
             )
         )
     }
@@ -57,6 +63,10 @@ class OcrFailureActivity : com.example.lagallens.presentation.feature.ocr.OcrSes
         ocrFailureBack.setOnClickListener { viewModel.onEvent(OcrFailureUiEvent.BackClicked) }
         ocrFailureReturn.setOnClickListener { viewModel.onEvent(OcrFailureUiEvent.BackClicked) }
         ocrFailureRetry.setOnClickListener { viewModel.onEvent(OcrFailureUiEvent.RetryClicked) }
+        // The system Back gesture abandons the upload like the Back buttons do.
+        onBackPressedDispatcher.addCallback(this@OcrFailureActivity, object : androidx.activity.OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() = viewModel.onEvent(OcrFailureUiEvent.BackClicked)
+        })
     }
 
     private fun observeViewModel() {

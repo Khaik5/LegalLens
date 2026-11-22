@@ -15,6 +15,7 @@ import com.example.lagallens.domain.model.auth.OtpChallenge
 import com.example.lagallens.domain.model.auth.OtpVerification
 import com.example.lagallens.domain.model.auth.OtpPurpose
 import com.example.lagallens.domain.model.auth.SessionRestoreResult
+import com.example.lagallens.domain.repository.AccountDisabledException
 import com.example.lagallens.domain.repository.AccountNotVerifiedException
 import com.example.lagallens.domain.repository.AuthRepository
 import kotlinx.coroutines.CancellationException
@@ -70,7 +71,9 @@ class RemoteAuthRepository(
             remote.login(username, password)
         } catch (error: HttpException) {
             if (error.code() != 401) throw error
-            if (ApiFailureMapper.map(error).details?.code == ACCOUNT_NOT_VERIFIED) throw AccountNotVerifiedException()
+            val code = ApiFailureMapper.map(error).details?.code
+            if (code == ACCOUNT_NOT_VERIFIED) throw AccountNotVerifiedException()
+            if (code == ACCOUNT_DISABLED) throw AccountDisabledException()
             return false
         }
         val token = ApiFailureMapper.requireBody(response.accessToken?.takeIf(String::isNotBlank), "Login access token")
@@ -154,5 +157,6 @@ class RemoteAuthRepository(
 
     private companion object {
         const val ACCOUNT_NOT_VERIFIED = "ACCOUNT_NOT_VERIFIED"
+        const val ACCOUNT_DISABLED = "ACCOUNT_DISABLED"
     }
 }

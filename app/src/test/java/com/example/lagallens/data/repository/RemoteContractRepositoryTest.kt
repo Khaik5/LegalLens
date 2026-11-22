@@ -288,6 +288,7 @@ class RemoteContractRepositoryTest {
             409 to "CONTRACT_DOCUMENT_REQUIRED" to ContractComparisonBlocker.DOCUMENT_MISSING,
             409 to "CONTRACT_OCR_NOT_READY" to ContractComparisonBlocker.OCR_NOT_READY,
             409 to "CONTRACT_DOCUMENT_UNAVAILABLE" to ContractComparisonBlocker.DOCUMENT_UNAVAILABLE,
+            409 to "CONTRACT_SAVED_DRAFT_TEXT_UNAVAILABLE" to ContractComparisonBlocker.SAVED_DRAFT_TEXT_UNAVAILABLE,
             413 to "COMPARISON_CONTENT_TOO_LARGE" to ContractComparisonBlocker.TOO_LARGE,
             404 to "CONTRACT_NOT_FOUND" to ContractComparisonBlocker.NOT_FOUND,
             403 to "CONTRACT_ACCESS_DENIED" to ContractComparisonBlocker.ACCESS_DENIED

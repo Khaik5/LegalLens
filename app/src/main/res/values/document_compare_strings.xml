@@ -99,6 +99,7 @@
     <string name="compare_risk_delta">Chênh lệch điểm (B − A): %1$s</string>
     <string name="compare_error_document_missing">Một trong hai hợp đồng chưa có tài liệu để so sánh.</string>
     <string name="compare_error_ocr_not_ready">Một trong hai hợp đồng chưa nhận dạng xong văn bản. Hãy hoàn tất OCR rồi thử lại.</string>
+    <string name="compare_error_saved_draft_text_unavailable">Hợp đồng được lưu từ bản nháp AI không còn nội dung để so sánh. Hãy mở bản nháp và lưu lại, hoặc chọn hợp đồng khác.</string>
     <string name="compare_error_document_unavailable">Tài liệu của một hợp đồng không còn khả dụng. Hãy tải lên lại.</string>
     <string name="compare_error_too_large">Tài liệu quá lớn để so sánh.</string>
     <string name="compare_error_not_found">Không tìm thấy một trong hai hợp đồng.</string>

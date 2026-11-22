@@ -172,6 +172,7 @@ class RemoteContractRepository private constructor(
             "CONTRACT_DOCUMENT_REQUIRED" -> ContractComparisonBlocker.DOCUMENT_MISSING
             "CONTRACT_OCR_NOT_READY" -> ContractComparisonBlocker.OCR_NOT_READY
             "CONTRACT_DOCUMENT_UNAVAILABLE" -> ContractComparisonBlocker.DOCUMENT_UNAVAILABLE
+            "CONTRACT_SAVED_DRAFT_TEXT_UNAVAILABLE" -> ContractComparisonBlocker.SAVED_DRAFT_TEXT_UNAVAILABLE
             "COMPARISON_CONTENT_TOO_LARGE" -> ContractComparisonBlocker.TOO_LARGE
             "CONTRACT_NOT_FOUND" -> ContractComparisonBlocker.NOT_FOUND
             "CONTRACT_ACCESS_DENIED" -> ContractComparisonBlocker.ACCESS_DENIED

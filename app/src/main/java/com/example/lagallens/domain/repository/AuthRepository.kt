@@ -20,6 +20,7 @@ interface AuthRepository {
     /**
      * Returns false for wrong credentials. Throws [AccountNotVerifiedException] when the password is right
      * but the account's email has not been verified yet.
+     * Throws [AccountDisabledException] when the password is right but an admin disabled the account.
      */
     suspend fun authenticate(username: String, password: String): Boolean
     suspend fun register(fullName: String, email: String, password: String): AuthResult<OtpChallenge?>
@@ -33,3 +34,6 @@ interface AuthRepository {
 
 /** The account exists and the password is right, but its email must be verified before signing in. */
 class AccountNotVerifiedException : Exception("Account email verification is required")
+
+/** The account exists and the password is right, but an admin has disabled it. */
+class AccountDisabledException : Exception("Account is disabled")

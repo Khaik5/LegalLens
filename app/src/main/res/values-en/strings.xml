@@ -18,6 +18,7 @@
     <string name="login_password_required">Please enter your password.</string>
     <string name="login_password_minimum_length">Password must be at least 8 characters.</string>
     <string name="login_invalid_credentials">Incorrect email or password.</string>
+    <string name="login_account_disabled">This account has been disabled. Please contact an administrator.</string>
     <string name="session_ended_message">Your session has ended. The account may have been disabled or the sign-in expired. Please sign in again.</string>
     <string name="login_account_not_verified">Your email is not verified yet. A new code has been sent to your email.</string>
     <string name="login_welcome_back">Welcome back</string>

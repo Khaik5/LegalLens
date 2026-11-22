@@ -66,6 +66,16 @@ class RemoteAuthRepositoryTest {
         assertTrue(failure is AccountNotVerifiedException)
     }
 
+    @Test fun loginOfADisabledAccountIsReportedSeparately() = runTest {
+        val repository = loginRepository(TestSessionStore()) {
+            response(it, 401, """{"success":false,"code":"ACCOUNT_DISABLED","message":"Account is disabled","data":null}""")
+        }
+
+        val failure = runCatching { repository.authenticate("off@example.test", "Correct-123") }.exceptionOrNull()
+
+        assertTrue(failure is com.example.lagallens.domain.repository.AccountDisabledException)
+    }
+
     @Test fun wrongCredentialsStillReturnFalse() = runTest {
         val repository = loginRepository(TestSessionStore()) {
             response(it, 401, """{"success":false,"code":"INVALID_CREDENTIALS","message":"Invalid credentials","data":null}""")

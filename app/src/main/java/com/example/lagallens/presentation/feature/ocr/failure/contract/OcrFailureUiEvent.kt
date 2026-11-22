@@ -3,7 +3,8 @@ package com.example.lagallens.presentation.feature.ocr.failure.contract
 sealed interface OcrFailureUiEvent {
     data class ScreenOpened(
         val documentName: String,
-        val documentDetails: String
+        val documentDetails: String,
+        val contractId: String? = null
     ) : OcrFailureUiEvent
 
     data object BackClicked : OcrFailureUiEvent

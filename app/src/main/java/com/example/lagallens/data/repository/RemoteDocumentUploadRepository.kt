@@ -36,7 +36,8 @@ class RemoteDocumentUploadRepository(
     private val context: Context,
     private val tokens: AuthSessionStore,
     private val contracts: ContractRepository,
-    private val documents: DocumentRemoteDataSource
+    private val documents: DocumentRemoteDataSource,
+    private val unsavedUploads: com.example.lagallens.domain.model.UnsavedUploadContracts = com.example.lagallens.domain.model.UnsavedUploadContracts()
 ) : DocumentUploadRepository {
     override fun upload(request: DocumentUploadRequest): Flow<ProcessingState> = channelFlow {
         val scope = tokens.currentSessionScope()
@@ -97,6 +98,7 @@ class RemoteDocumentUploadRepository(
             if (tokens.currentSessionScope()?.key != scope.key) return@channelFlow
             send(ProcessingState.Running(progressPercent = 100))
             val duplicateTitle = document.duplicateOf?.takeIf { it.contractId?.toString() != contractId }?.contractTitle?.takeIf(String::isNotBlank)
+            unsavedUploads.markUnsaved(contractId)
             send(ProcessingState.Uploaded(contractId, document.id.toString(), duplicateTitle))
         } catch (cancelled: CancellationException) {
             throw cancelled

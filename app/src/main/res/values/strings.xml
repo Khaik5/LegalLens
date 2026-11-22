@@ -18,6 +18,7 @@
     <string name="login_password_required">Vui lòng nhập mật khẩu</string>
     <string name="login_password_minimum_length">Mật khẩu cần ít nhất 8 ký tự</string>
     <string name="login_invalid_credentials">Email hoặc mật khẩu không đúng</string>
+    <string name="login_account_disabled">Tài khoản này đã bị vô hiệu hóa. Vui lòng liên hệ quản trị viên.</string>
     <string name="session_ended_message">Phiên đăng nhập đã kết thúc. Tài khoản có thể đã bị vô hiệu hóa hoặc đăng nhập đã hết hạn. Vui lòng đăng nhập lại.</string>
     <string name="login_account_not_verified">Tài khoản chưa xác thực email. Mã OTP mới đã được gửi tới email của bạn.</string>
     <string name="login_username_hint">ten@example.com</string>
