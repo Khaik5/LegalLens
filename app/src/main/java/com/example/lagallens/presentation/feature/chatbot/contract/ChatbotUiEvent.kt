@@ -25,6 +25,8 @@ sealed interface ChatbotUiEvent {
     data object EditDraftClicked : ChatbotUiEvent
     data class CitationClicked(val referenceId: String?) : ChatbotUiEvent
     data class ErrorRetryClicked(val messageId: Long) : ChatbotUiEvent
+    data class ReferenceClicked(val articleId: Long) : ChatbotUiEvent
+    data object LegalArticleDismissed : ChatbotUiEvent
     data object AttachmentClicked : ChatbotUiEvent
     data object AttachmentCameraClicked : ChatbotUiEvent
     data object AttachmentSavedClicked : ChatbotUiEvent

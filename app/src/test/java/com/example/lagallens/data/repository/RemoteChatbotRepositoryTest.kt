@@ -150,6 +150,13 @@ class RemoteChatbotRepositoryTest {
         assertTrue(api.created.isEmpty())
     }
 
+    @Test fun theFullTextOfACitedArticleIsLoadedWithPlainSpaces() = runTest {
+        val article = repository.legalArticleText(3)
+
+        assertEquals("25 Thời gian thử việc", article?.title)
+        assertEquals("Không quá 60 ngày đối với công việc có chức danh nghề nghiệp.", article?.content)
+    }
+
     @Test fun sendsAQuestionAndReturnsTheGroundedAnswer() = runTest {
         api.onSend = { content ->
             api.messages = listOf(
@@ -166,6 +173,7 @@ class RemoteChatbotRepositoryTest {
         assertEquals("references:1", grounded.referenceSectionTitle)
         assertEquals("25 Thời gian thử việc", grounded.references.single().title)
         assertEquals("không quá 60 ngày", grounded.references.single().excerpt)
+        assertEquals(3L, grounded.references.single().articleId)
         assertEquals(SendChatMessageRequest("Thử việc bao lâu?", "client-1"), api.sent.single())
     }
 
@@ -367,6 +375,6 @@ private class ChatbotFixture : ChatbotApi {
 
     override suspend fun legalArticle(scope: AuthSessionScope, articleId: Long): ApiEnvelope<LegalArticleResponse> {
         if (missingArticles) throw IllegalStateException("Published article not found")
-        return ApiEnvelope(true, LegalArticleResponse(articleId, "25", "Thời gian thử việc"))
+        return ApiEnvelope(true, LegalArticleResponse(articleId, "25", "Thời gian thử việc", "Không quá 60 ngày đối với công việc có chức danh nghề nghiệp."))
     }
 }

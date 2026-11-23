@@ -779,6 +779,10 @@
     <string name="chatbot_help_unavailable">Trợ giúp sẽ khả dụng khi trung tâm hỗ trợ được kết nối.</string>
     <string name="chatbot_history_title">Lịch sử trò chuyện</string>
     <string name="chatbot_history_delete_description">Xóa cuộc trò chuyện</string>
+    <string name="chatbot_article_close">Đóng</string>
+    <string name="chatbot_article_title_loading">Đang tải điều luật…</string>
+    <string name="chatbot_article_unavailable">Điều luật này không còn khả dụng.</string>
+    <string name="chatbot_article_failed">Không tải được điều luật. Vui lòng thử lại.</string>
     <string name="chatbot_history_delete_title">Xóa cuộc trò chuyện?</string>
     <string name="chatbot_history_delete_message">Cuộc trò chuyện này sẽ bị xóa vĩnh viễn. Hợp đồng liên quan không bị ảnh hưởng.</string>
     <string name="chatbot_history_delete_confirm">Xóa</string>

@@ -60,6 +60,8 @@ interface ChatbotRepository {
     suspend fun getMessages(conversationId: String): List<ChatbotTranscriptMessage> = emptyList()
     suspend fun saveMessages(conversationId: String, contractId: String?, contractName: String, contractType: String, messages: List<ChatbotTranscriptMessage>) = Unit
     fun deleteConversation(conversationId: String) = Unit
+    /** The full text of a legal article cited in an answer; null when it is not available any more. */
+    suspend fun legalArticleText(articleId: Long): com.example.lagallens.domain.model.chatbot.LegalArticleText? = null
     suspend fun deleteConversationsForContract(contractId: String) = Unit
     suspend fun renameContract(contractId: String, title: String) = Unit
     fun clearSessionData() = Unit

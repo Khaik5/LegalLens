@@ -23,6 +23,8 @@ import com.example.lagallens.presentation.feature.chatbot.contract.ChatbotUiEffe
 import com.example.lagallens.presentation.feature.chatbot.contract.ChatbotUiEvent
 import com.example.lagallens.presentation.feature.chatbot.contract.ChatbotUiState
 import com.example.lagallens.presentation.feature.chatbot.contract.DraftGenerationStatus
+import com.example.lagallens.presentation.feature.chatbot.contract.LegalArticleSheetState
+import com.example.lagallens.presentation.feature.chatbot.contract.LegalArticleStatus
 import com.example.lagallens.domain.model.chatbot.ChatbotAttachment
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -41,6 +43,7 @@ class ChatbotViewModel(
     private val openConversation: OpenChatbotConversationUseCase,
     private val sendMessage: SendChatbotMessageUseCase,
     private val retryMessage: RetryChatbotMessageUseCase,
+    private val legalArticle: com.example.lagallens.domain.usecase.GetLegalArticleTextUseCase? = null,
     private val isContractDraftingEnabled: Boolean = FeatureFlags.isContractDraftingEnabled,
     private val draftAi: () -> com.example.lagallens.domain.repository.DraftAiRepository
 ) : ViewModel() {
@@ -66,6 +69,7 @@ class ChatbotViewModel(
     private var replyJob: Job? = null
     private var previewDraftError = false
     private var generatedDraftId: String? = null
+    private var articleJob: Job? = null
 
     init {
         viewModelScope.launch {
@@ -75,7 +79,26 @@ class ChatbotViewModel(
         }
     }
 
+    /** Shows the sheet at once and fills it with the article's full text when the backend has it. */
+    private fun openLegalArticle(articleId: Long) {
+        val load = legalArticle ?: return
+        articleJob?.cancel()
+        _uiState.update { it.copy(legalArticle = LegalArticleSheetState(articleId)) }
+        articleJob = launchForSession {
+            val result = try {
+                load(articleId)?.let { LegalArticleSheetState(articleId, LegalArticleStatus.READY, it.title, it.content) }
+                    ?: LegalArticleSheetState(articleId, LegalArticleStatus.UNAVAILABLE)
+            } catch (cancellation: CancellationException) {
+                throw cancellation
+            } catch (_: Exception) {
+                LegalArticleSheetState(articleId, LegalArticleStatus.FAILED)
+            }
+            _uiState.update { state -> if (state.legalArticle?.articleId == articleId) state.copy(legalArticle = result) else state }
+        }
+    }
+
     private fun invalidateSession() {
+        articleJob?.cancel()
         synchronized(sessionJobs) { sessionJobs.toList() }.forEach { it.cancel() }
         draftTransition?.cancel()
         draftGeneration?.cancel()
@@ -116,6 +139,11 @@ class ChatbotViewModel(
                 event.referenceId?.let(ChatbotUiEffect::NavigateToLegalReference) ?: ChatbotUiEffect.ShowMessage(R.string.analysis_citation_unavailable)
             )
             is ChatbotUiEvent.ErrorRetryClicked -> retryMessage(event.messageId)
+            is ChatbotUiEvent.ReferenceClicked -> openLegalArticle(event.articleId)
+            ChatbotUiEvent.LegalArticleDismissed -> {
+                articleJob?.cancel()
+                _uiState.update { it.copy(legalArticle = null) }
+            }
             // The backend call carries no file, so outside DEMO attaching would only pretend the file was read.
             ChatbotUiEvent.AttachmentClicked ->
                 if (isDemoData()) emitEffect(ChatbotUiEffect.OpenAttachmentSheet) else emitEffect(ChatbotUiEffect.ShowMessage(R.string.chatbot_attachment_not_sent))
@@ -478,7 +506,7 @@ class ChatbotViewModel(
         createdAtEpochMillis = createdAtEpochMillis,
         citation = citation?.let { com.example.lagallens.domain.model.chatbot.ChatbotCitation(it.title, it.description, it.actionLabel, it.referenceId) },
         referenceSectionTitle = referenceSectionTitle,
-        references = references.map { com.example.lagallens.domain.model.chatbot.ChatbotReference(it.title, it.excerpt) },
+        references = references.map { com.example.lagallens.domain.model.chatbot.ChatbotReference(it.title, it.excerpt, it.articleId) },
         noEvidenceTitle = noEvidence?.title,
         errorRetryLabel = error?.retryLabel,
         retryQuestion = failedQuestions[id],
@@ -494,7 +522,7 @@ class ChatbotViewModel(
             content = content,
             citation = citation?.let { ChatbotCitation(it.title, it.description, it.actionLabel, it.referenceId) },
             referenceSectionTitle = referenceSectionTitle,
-            references = references.map { ChatbotReference(it.title, it.excerpt) },
+            references = references.map { ChatbotReference(it.title, it.excerpt, it.articleId) },
             noEvidence = noEvidenceTitle?.let { ChatbotNoEvidence(it, content) },
             error = errorRetryLabel?.let { ChatbotError(content, it) },
             showDraftNotice = showDraftNotice,
@@ -521,7 +549,7 @@ class ChatbotViewModel(
             author = ChatbotMessageAuthor.ASSISTANT,
             content = content,
             referenceSectionTitle = referenceSectionTitle,
-            references = references.map { ChatbotReference(it.title, it.excerpt) }
+            references = references.map { ChatbotReference(it.title, it.excerpt, it.articleId) }
         )
 
         is ChatbotReply.NoEvidenceAnswer -> ChatbotMessage(
@@ -553,12 +581,13 @@ class ChatbotViewModel(
         private val openConversation: OpenChatbotConversationUseCase,
         private val sendMessage: SendChatbotMessageUseCase,
         private val retryMessage: RetryChatbotMessageUseCase,
-        private val draftAi: () -> com.example.lagallens.domain.repository.DraftAiRepository
+        private val draftAi: () -> com.example.lagallens.domain.repository.DraftAiRepository,
+        private val legalArticle: com.example.lagallens.domain.usecase.GetLegalArticleTextUseCase? = null
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             require(modelClass.isAssignableFrom(ChatbotViewModel::class.java))
-            return ChatbotViewModel(openConversation, sendMessage, retryMessage, draftAi = draftAi) as T
+            return ChatbotViewModel(openConversation, sendMessage, retryMessage, legalArticle, draftAi = draftAi) as T
         }
     }
 

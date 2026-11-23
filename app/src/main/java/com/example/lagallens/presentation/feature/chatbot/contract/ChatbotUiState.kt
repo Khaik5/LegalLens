@@ -23,5 +23,16 @@ data class ChatbotUiState(
     val isDrawerVisible: Boolean = false,
     val attachmentUri: String? = null,
     val attachmentName: String? = null,
-    val isContractDraftingEnabled: Boolean = true
+    val isContractDraftingEnabled: Boolean = true,
+    /** The legal article opened from an answer's source list; null while none is open. */
+    val legalArticle: LegalArticleSheetState? = null
+)
+
+enum class LegalArticleStatus { LOADING, READY, UNAVAILABLE, FAILED }
+
+data class LegalArticleSheetState(
+    val articleId: Long,
+    val status: LegalArticleStatus = LegalArticleStatus.LOADING,
+    val title: String = "",
+    val content: String = ""
 )

@@ -56,5 +56,6 @@ data class ChatCitationResponse(
 data class LegalArticleResponse(
     val id: Long,
     val articleNumber: String?,
-    val title: String?
+    val title: String?,
+    val content: String? = null
 )

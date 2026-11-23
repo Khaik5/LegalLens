@@ -21,7 +21,8 @@ import com.example.lagallens.presentation.feature.chatbot.contract.ChatbotMessag
 
 class ChatbotMessageAdapter(
     private val onCitationClicked: (String?) -> Unit,
-    private val onRetryClicked: (Long) -> Unit
+    private val onRetryClicked: (Long) -> Unit,
+    private val onReferenceClicked: (Long) -> Unit = {}
 ) : ListAdapter<ChatbotMessage, RecyclerView.ViewHolder>(DiffCallback) {
     override fun getItemViewType(position: Int): Int = when {
         getItem(position).isDraftAction -> VIEW_TYPE_DRAFT_ACTION
@@ -45,7 +46,8 @@ class ChatbotMessageAdapter(
             onCitationClicked
         )
         VIEW_TYPE_ASSISTANT_GROUNDED -> AssistantGroundedMessageViewHolder(
-            ItemChatbotAssistantGroundedMessageBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            ItemChatbotAssistantGroundedMessageBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+            onReferenceClicked
         )
         VIEW_TYPE_ASSISTANT_NO_EVIDENCE -> AssistantNoEvidenceMessageViewHolder(
             ItemChatbotAssistantNoEvidenceMessageBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -110,7 +112,8 @@ class ChatbotMessageAdapter(
     }
 
     private class AssistantGroundedMessageViewHolder(
-        private val binding: ItemChatbotAssistantGroundedMessageBinding
+        private val binding: ItemChatbotAssistantGroundedMessageBinding,
+        private val onReferenceClicked: (Long) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: ChatbotMessage) {
             val firstReference = item.references.firstOrNull() ?: return
@@ -128,7 +131,16 @@ class ChatbotMessageAdapter(
                 chatbotReferenceSecondCard.visibility = if (secondReference == null) android.view.View.GONE else android.view.View.VISIBLE
                 chatbotReferenceSecondTitle.text = secondReference?.title.orEmpty()
                 chatbotReferenceSecondExcerpt.text = secondReference?.excerpt.orEmpty()
+                // A source that names its article opens the full text; the arrow then points to the right.
+                bindReferenceOpen(chatbotReferenceFirstCard, chatbotReferenceFirstChevron, firstReference.articleId)
+                bindReferenceOpen(chatbotReferenceSecondCard, chatbotReferenceSecondChevron, secondReference?.articleId)
             }
+        }
+
+        private fun bindReferenceOpen(card: android.view.View, chevron: android.view.View, articleId: Long?) {
+            chevron.rotation = if (articleId != null) -90f else 0f
+            card.isClickable = articleId != null
+            card.setOnClickListener(if (articleId == null) null else android.view.View.OnClickListener { onReferenceClicked(articleId) })
         }
     }
 

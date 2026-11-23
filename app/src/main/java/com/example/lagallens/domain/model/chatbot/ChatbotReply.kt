@@ -36,5 +36,10 @@ data class ChatbotAttachment(val uri: String, val name: String)
 
 data class ChatbotReference(
     val title: String,
-    val excerpt: String
+    val excerpt: String,
+    /** The stored legal article behind this source, when the backend named it; it lets the full text be opened. */
+    val articleId: Long? = null
 )
+
+/** The full text of one legal article, with the heading to show above it. */
+data class LegalArticleText(val title: String, val content: String)

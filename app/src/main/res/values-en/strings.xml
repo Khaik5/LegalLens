@@ -442,6 +442,10 @@
     <string name="chatbot_help_unavailable">Help will be available when the support centre is connected.</string>
     <string name="chatbot_history_title">Chat history</string>
     <string name="chatbot_history_delete_description">Delete conversation</string>
+    <string name="chatbot_article_close">Close</string>
+    <string name="chatbot_article_title_loading">Loading the article…</string>
+    <string name="chatbot_article_unavailable">This legal article is no longer available.</string>
+    <string name="chatbot_article_failed">Could not load the article. Please try again.</string>
     <string name="chatbot_history_delete_title">Delete this conversation?</string>
     <string name="chatbot_history_delete_message">This conversation will be deleted permanently. The related contract is not affected.</string>
     <string name="chatbot_history_delete_confirm">Delete</string>
