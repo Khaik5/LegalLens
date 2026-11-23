@@ -96,6 +96,19 @@ class RemoteDocumentRepository(
         saveRecognizedText(scope, documentId, content)
     }
 
+    override suspend fun confirmRecognizedText(documentId: String): Unit = inSession { scope ->
+        val latest = ocr.latest(scope, documentId) ?: return@inSession
+        val revision = ocr.viewedRevision(scope, documentId) ?: latest.revision
+        if (latest.status != OCR_COMPLETED || revision == null || latest.reviewStatus == OCR_APPROVED) return@inSession
+        try {
+            ocr.confirm(scope, documentId, revision)
+        } catch (error: kotlinx.coroutines.CancellationException) {
+            throw error
+        } catch (error: Exception) {
+            android.util.Log.w("RemoteDocument", "OCR confirmation deferred to analysis", error)
+        }
+    }
+
     /** False when the document has no finished OCR result to correct. Unchanged text adds no revision. */
     private suspend fun saveRecognizedText(scope: AuthSessionScope, documentId: String, text: String): Boolean {
         // The revision the user edited from. When the server has a newer one, the correction is rejected with a
@@ -119,5 +132,6 @@ class RemoteDocumentRepository(
 
     private companion object {
         const val OCR_COMPLETED = "COMPLETED"
+        const val OCR_APPROVED = "APPROVED"
     }
 }

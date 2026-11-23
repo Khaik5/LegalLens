@@ -26,6 +26,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 
+import com.example.lagallens.presentation.common.utils.withAppLocale
 import com.example.lagallens.presentation.feature.contracts.contract.typeLabel
 import com.example.lagallens.presentation.feature.contracts.contract.toContractListItem
 
@@ -37,6 +38,7 @@ class ContractListViewModel(application: Application) : AndroidViewModel(applica
     val uiEffect = _uiEffect.receiveAsFlow()
     private var sourceContracts: List<ContractListItem> = emptyList()
     private var contractsJob: Job? = null
+    private var hasResumedOnce = false
 
     init {
         observeContracts()
@@ -62,7 +64,7 @@ class ContractListViewModel(application: Application) : AndroidViewModel(applica
     }
 
     private fun toListItem(contract: EmploymentContract): ContractListItem =
-        contract.toContractListItem(contract.typeLabel(getApplication<Application>()))
+        contract.toContractListItem(contract.typeLabel(getApplication<Application>().withAppLocale()))
 
     fun onEvent(event: ContractListUiEvent) {
         when (event) {
@@ -70,6 +72,9 @@ class ContractListViewModel(application: Application) : AndroidViewModel(applica
             is ContractListUiEvent.FilterSelected -> updateContracts(filter = event.filter)
             ContractListUiEvent.FilterClicked -> showFilterBottomSheet()
             ContractListUiEvent.RetryClicked -> if (_uiState.value.hasError) observeContracts()
+            ContractListUiEvent.ScreenResumed -> {
+                if (hasResumedOnce) getApplication<LegalLensApplication>().contractRepository.invalidate() else hasResumedOnce = true
+            }
             is ContractListUiEvent.FiltersApplied -> updateContracts(filterSelection = event.filterSelection)
             is ContractListUiEvent.ContractClicked -> navigateToDetail(event.contract.id)
         }

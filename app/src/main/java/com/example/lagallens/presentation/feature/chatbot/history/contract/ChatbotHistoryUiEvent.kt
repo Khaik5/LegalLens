@@ -6,4 +6,6 @@ sealed interface ChatbotHistoryUiEvent {
     data object SearchClicked : ChatbotHistoryUiEvent
     data class QueryChanged(val query: String) : ChatbotHistoryUiEvent
     data class ConversationClicked(val conversation: ChatbotHistoryConversation) : ChatbotHistoryUiEvent
+    data class DeleteRequested(val conversation: ChatbotHistoryConversation) : ChatbotHistoryUiEvent
+    data class DeleteConfirmed(val conversation: ChatbotHistoryConversation) : ChatbotHistoryUiEvent
 }

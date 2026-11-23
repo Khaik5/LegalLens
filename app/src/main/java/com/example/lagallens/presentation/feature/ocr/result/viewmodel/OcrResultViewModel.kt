@@ -212,6 +212,7 @@ class OcrResultViewModel(
                     contractRepository.updateContract(existing.copy(content = content, updatedAtMillis = timestamp))
                 }
                 check(isOwner())
+                documentRepository.confirmRecognizedText(current.documentId)
                 unsavedUploads.markSaved(contractId)
                 _uiState.update { it.copy(contractId = contractId, isReviewConfirmed = true) }
                 emitEffect(OcrResultUiEffect.NavigateToSaved(current.documentName, current.documentId, contractId))

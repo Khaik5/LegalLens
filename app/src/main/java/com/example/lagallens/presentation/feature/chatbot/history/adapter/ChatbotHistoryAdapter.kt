@@ -11,20 +11,27 @@ import com.example.lagallens.databinding.ItemChatbotHistoryBinding
 import com.example.lagallens.presentation.common.utils.bindPressFeedback
 import com.example.lagallens.presentation.feature.chatbot.history.contract.ChatbotHistoryConversation
 
-class ChatbotHistoryAdapter(private val onClick: (ChatbotHistoryConversation) -> Unit) : ListAdapter<ChatbotHistoryConversation, ChatbotHistoryAdapter.HistoryViewHolder>(DiffCallback) {
+class ChatbotHistoryAdapter(
+    private val onClick: (ChatbotHistoryConversation) -> Unit,
+    private val onDelete: (ChatbotHistoryConversation) -> Unit = {}
+) : ListAdapter<ChatbotHistoryConversation, ChatbotHistoryAdapter.HistoryViewHolder>(DiffCallback) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HistoryViewHolder = HistoryViewHolder(
         ItemChatbotHistoryBinding.inflate(LayoutInflater.from(parent.context), parent, false)
     )
 
     override fun onBindViewHolder(holder: HistoryViewHolder, position: Int) {
-        holder.bind(getItem(position), onClick)
+        holder.bind(getItem(position), onClick, onDelete)
     }
 
     class HistoryViewHolder(
         private val binding: ItemChatbotHistoryBinding
     ) : RecyclerView.ViewHolder(binding.root) {
         init { binding.root.bindPressFeedback() }
-        fun bind(item: ChatbotHistoryConversation, onClick: (ChatbotHistoryConversation) -> Unit) = with(binding) {
+        fun bind(
+            item: ChatbotHistoryConversation,
+            onClick: (ChatbotHistoryConversation) -> Unit,
+            onDelete: (ChatbotHistoryConversation) -> Unit
+        ) = with(binding) {
             chatbotHistoryContractName.text = item.contractName
             chatbotHistoryTimestamp.text = item.timestamp
             chatbotHistoryMessageCount.text = item.messageCountQuantity?.let { count ->
@@ -36,6 +43,8 @@ class ChatbotHistoryAdapter(private val onClick: (ChatbotHistoryConversation) ->
             chatbotHistoryMessageCount.isVisible = item.messageCountQuantity != null || item.messageCount.isNotBlank()
             root.setBackgroundResource(if (item.isDraftRequest) R.drawable.bg_chatbot_draft_review else R.drawable.bg_chatbot_source_document)
             root.setOnClickListener { onClick(item) }
+            root.setOnLongClickListener { onDelete(item); true }
+            chatbotHistoryDelete.setOnClickListener { onDelete(item) }
             chatbotHistoryContinue.setOnClickListener { onClick(item) }
         }
     }

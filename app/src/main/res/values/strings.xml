@@ -505,6 +505,8 @@
     <string name="analysis_processing_check_risks_description">Mô phỏng bước kiểm tra rủi ro; chưa gọi AI</string>
     <string name="analysis_processing_find_legal_basis_title">Tra cứu cơ sở pháp lý</string>
     <string name="analysis_processing_find_legal_basis_description">Chưa tìm kiếm căn cứ pháp lý thực tế</string>
+    <string name="analysis_processing_check_risks_description_real">Đối chiếu từng điều khoản để tìm nội dung có rủi ro</string>
+    <string name="analysis_processing_find_legal_basis_description_real">Tìm điều luật liên quan đến các điều khoản</string>
     <string name="analysis_processing_create_summary_title">Tạo tóm tắt</string>
     <string name="analysis_processing_create_summary_description">Đang tổng hợp luật trong hợp đồng</string>
     <string name="analysis_processing_notice">VUI LÒNG KHÔNG ĐÓNG ỨNG DỤNG</string>
@@ -774,6 +776,13 @@
     <string name="chatbot_drawer_profile_real">Đã đồng bộ với tài khoản LegalLens</string>
     <string name="chatbot_help_unavailable">Trợ giúp sẽ khả dụng khi trung tâm hỗ trợ được kết nối.</string>
     <string name="chatbot_history_title">Lịch sử trò chuyện</string>
+    <string name="chatbot_history_delete_description">Xóa cuộc trò chuyện</string>
+    <string name="chatbot_history_delete_title">Xóa cuộc trò chuyện?</string>
+    <string name="chatbot_history_delete_message">Cuộc trò chuyện này sẽ bị xóa vĩnh viễn. Hợp đồng liên quan không bị ảnh hưởng.</string>
+    <string name="chatbot_history_delete_confirm">Xóa</string>
+    <string name="chatbot_history_delete_cancel">Hủy</string>
+    <string name="chatbot_history_deleted">Đã xóa cuộc trò chuyện</string>
+    <string name="chatbot_history_delete_failed">Không xóa được cuộc trò chuyện. Vui lòng thử lại.</string>
     <string name="chatbot_history_back_content_description">Quay lại trò chuyện</string>
     <string name="chatbot_history_search_content_description">Tìm kiếm lịch sử trò chuyện</string>
     <string name="chatbot_history_search_unavailable">Tìm kiếm sẽ khả dụng khi đồng bộ hội thoại được kết nối.</string>
@@ -802,7 +811,7 @@
     <string name="chatbot_draft_source_status">Hợp đồng gốc · Chỉ đọc</string>
     <string name="chatbot_draft_changes_title">Thay đổi chính</string>
     <string name="chatbot_draft_change_term">• Thời hạn và ngày bắt đầu: theo yêu cầu bạn nhập; hợp đồng gốc được giữ nguyên.</string>
-    <string name="chatbot_draft_change_missing">• Các bên, vị trí công việc, mức lương và địa điểm làm việc để [chưa cung cấp].</string>
+    <string name="chatbot_draft_change_missing">• Thông tin bạn chưa nêu sẽ để [chưa cung cấp]; hợp đồng gốc được giữ nguyên.</string>
     <string name="chatbot_draft_warning">Không sao chép thông tin chưa được xác nhận. Chưa sẵn sàng để ký.</string>
     <string name="chatbot_draft_create_action">Tạo bản nháp</string>
     <string name="chatbot_draft_edit_action">Chỉnh sửa yêu cầu</string>
@@ -898,7 +907,7 @@
     <string name="chatbot_answer_failed">Không thể tạo câu trả lời. Vui lòng thử lại.</string>
     <string name="chatbot_legal_reference_section_title">Căn cứ pháp lý (%1$d)</string>
     <string name="chatbot_legal_reference_article">Điều %1$s</string>
-    <string name="chatbot_legal_reference_unknown">Điều luật #%1$d</string>
+    <string name="chatbot_legal_reference_unknown">Điều luật không còn khả dụng</string>
 +    <string name="credit_store_title">Cửa hàng Credit</string>
     <string name="credit_store_back_description">Quay lại</string>
     <string name="credit_store_wallet_icon_description">Ví Credit</string>
@@ -931,12 +940,12 @@
     <string name="unlock_confirmation_shield_description">Mở khóa kết quả AI</string>
     <string name="unlock_confirmation_info_description">Thông tin về Credit</string>
     <string name="unlock_confirmation_heading">Mở khóa kết quả AI</string>
-    <string name="unlock_confirmation_description">Bạn đã xem 40% miễn phí. Xác nhận để mở toàn bộ 100% kết quả phân tích rủi ro hợp đồng này.</string>
+    <string name="unlock_confirmation_description">Bạn đã xem bản xem trước miễn phí. Xác nhận để mở toàn bộ kết quả phân tích rủi ro hợp đồng này.</string>
     <string name="unlock_confirmation_result_title">Kết quả phân tích rủi ro hợp đồng</string>
-    <string name="unlock_confirmation_result_meta" formatted="false">Đã xem 40% miễn phí</string>
+    <string name="unlock_confirmation_result_meta" formatted="false">Đã xem bản xem trước miễn phí</string>
     <string name="unlock_confirmation_contract_label">Hợp đồng</string>
     <string name="unlock_confirmation_current_label">Hiện tại</string>
-    <string name="unlock_confirmation_current_value" formatted="false">40% nội dung đã mở</string>
+    <string name="unlock_confirmation_current_value" formatted="false">Một phần nội dung đã mở</string>
     <string name="unlock_confirmation_unlocked_label">Mở khóa toàn bộ</string>
     <string name="unlock_confirmation_unlocked_value" formatted="false">100% nội dung</string>
     <string name="unlock_confirmation_payment_title">Thanh toán bằng Credit</string>

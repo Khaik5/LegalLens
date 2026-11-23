@@ -232,10 +232,10 @@ object RepositoryModule {
         retryLabel = context.getString(R.string.chatbot_error_retry),
         noEvidenceTitle = context.getString(R.string.chatbot_no_evidence_title),
         referenceSectionTitle = { count -> context.getString(R.string.chatbot_legal_reference_section_title, count) },
-        articleTitle = { number, title, id ->
+        articleTitle = { number, title, _ ->
             val article = number?.takeIf(String::isNotBlank)?.let { context.getString(R.string.chatbot_legal_reference_article, it) }
             listOfNotNull(article, title?.takeIf(String::isNotBlank)).joinToString(". ")
-                .ifBlank { context.getString(R.string.chatbot_legal_reference_unknown, id) }
+                .ifBlank { context.getString(R.string.chatbot_legal_reference_unknown) }
         }
     )
 

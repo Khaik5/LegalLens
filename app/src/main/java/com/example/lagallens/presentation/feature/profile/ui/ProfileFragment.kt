@@ -16,6 +16,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.example.lagallens.R
 import com.example.lagallens.databinding.FragmentProfileBinding
+import com.example.lagallens.presentation.common.utils.avatarInitials
 import com.example.lagallens.presentation.common.utils.bindPressFeedback
 import com.example.lagallens.databinding.ItemProfileActionBinding
 import com.example.lagallens.presentation.feature.home.ui.HomeActivity
@@ -173,7 +174,7 @@ class ProfileFragment : Fragment() {
         }
         binding.tvProfileName.text = state.name
         binding.tvProfileEmail.text = state.email
-        binding.tvProfileAvatar.text = state.name.initials()
+        binding.tvProfileAvatar.text = state.name.avatarInitials()
         binding.ivProfileAvatar.isVisible = state.photoUri != null
         binding.ivProfileAvatar.setImageURI(state.photoUri?.let(Uri::parse))
         binding.tvProfileStatus.setText(state.statusRes)
@@ -215,9 +216,6 @@ class ProfileFragment : Fragment() {
         )
         requireActivity().finish()
     }
-
-    private fun String.initials(): String =
-        trim().split(" ").filter(String::isNotBlank).takeLast(2).joinToString("") { it.first().toString() }
 
     override fun onDestroyView() {
         _binding = null

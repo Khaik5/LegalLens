@@ -43,7 +43,10 @@ class ChatbotHistoryActivity : AppCompatActivity() {
                 ChatbotHistoryViewModel((application as LegalLensApplication).chatbotRepository) as T
         }
     }
-    private val historyAdapter = ChatbotHistoryAdapter { viewModel.onEvent(ChatbotHistoryUiEvent.ConversationClicked(it)) }
+    private val historyAdapter = ChatbotHistoryAdapter(
+        onClick = { viewModel.onEvent(ChatbotHistoryUiEvent.ConversationClicked(it)) },
+        onDelete = { viewModel.onEvent(ChatbotHistoryUiEvent.DeleteRequested(it)) }
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -137,6 +140,14 @@ class ChatbotHistoryActivity : AppCompatActivity() {
                     )
                 }
             )
+            is ChatbotHistoryUiEffect.ConfirmDelete -> androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle(R.string.chatbot_history_delete_title)
+                .setMessage(R.string.chatbot_history_delete_message)
+                .setNegativeButton(R.string.chatbot_history_delete_cancel, null)
+                .setPositiveButton(R.string.chatbot_history_delete_confirm) { _, _ ->
+                    viewModel.onEvent(ChatbotHistoryUiEvent.DeleteConfirmed(effect.conversation))
+                }
+                .show()
             is ChatbotHistoryUiEffect.ShowMessage -> android.widget.Toast.makeText(
                 this,
                 effect.messageRes,

@@ -91,10 +91,17 @@ class AnalysisProcessingActivity : AppCompatActivity() {
         }
     }
 
+    /** The demo timeline says plainly that a step is simulated; with real data those two steps do run. */
+    private fun withRealDescription(step: com.example.lagallens.presentation.common.model.ProcessingTimelineStep) = when (step.descriptionRes) {
+        R.string.analysis_processing_check_risks_description -> step.copy(descriptionRes = R.string.analysis_processing_check_risks_description_real)
+        R.string.analysis_processing_find_legal_basis_description -> step.copy(descriptionRes = R.string.analysis_processing_find_legal_basis_description_real)
+        else -> step
+    }
+
     private fun render(state: AnalysisProcessingUiState) = with(binding) {
         analysisProcessingDocumentName.text = state.documentName
         analysisProcessingDocumentMetadata.text = state.documentMetadata
-        stepAdapter.submitList(state.steps)
+        stepAdapter.submitList(if (isDemoData()) state.steps else state.steps.map(::withRealDescription))
         state.completion?.let { completion ->
             if ((application as com.example.lagallens.LegalLensApplication).currentSessionKey() == intent.getStringExtra(EXTRA_SESSION_KEY)) {
                 handleEffect(completion)

@@ -130,6 +130,7 @@
                 android:textStyle="bold" />
 
             <TextView android:fontFamily="@font/manrope"
+                android:id="@+id/chatbotDraftChangeTerm"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/dp_12"

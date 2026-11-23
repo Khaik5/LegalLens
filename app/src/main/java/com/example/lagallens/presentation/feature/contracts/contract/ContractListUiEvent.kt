@@ -5,6 +5,7 @@ sealed interface ContractListUiEvent {
     data class FilterSelected(val filter: ContractFilter) : ContractListUiEvent
     data object FilterClicked : ContractListUiEvent
     data object RetryClicked : ContractListUiEvent
+    data object ScreenResumed : ContractListUiEvent
     data class FiltersApplied(val filterSelection: ContractFilterSelection) : ContractListUiEvent
     data class ContractClicked(val contract: ContractListItem) : ContractListUiEvent
 }

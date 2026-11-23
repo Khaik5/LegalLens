@@ -158,6 +158,20 @@ class RemoteChatbotRepository(
         }
     }
 
+    override suspend fun deleteConversationForSession(sessionKey: String?, conversationId: String): Boolean = inSession { scope ->
+        check(scope.key == sessionKey) { "Session changed" }
+        // A chat that was never stored has nothing on the server to delete.
+        if (pendingConversations.remove(conversationId) != null) return@inSession true
+        val id = conversationId.toLongOrNull() ?: createdConversations[conversationId] ?: return@inSession true
+        try {
+            remote.delete(scope, id)
+        } catch (error: retrofit2.HttpException) {
+            if (error.code() != 404) throw error
+        }
+        createdConversations.remove(conversationId)
+        true
+    }
+
     override suspend fun getMessages(conversationId: String): List<ChatbotTranscriptMessage> = inSession { scope ->
         val id = conversationId.toLongOrNull() ?: createdConversations[conversationId] ?: return@inSession emptyList()
         transcript(scope, remote.messages(scope, id))

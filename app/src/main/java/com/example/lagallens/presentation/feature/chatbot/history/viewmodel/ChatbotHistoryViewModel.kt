@@ -3,6 +3,7 @@ package com.example.lagallens.presentation.feature.chatbot.history.viewmodel
 import com.example.lagallens.core.utils.matchesSearch
 
 import androidx.lifecycle.ViewModel
+import com.example.lagallens.R
 import androidx.lifecycle.viewModelScope
 import com.example.lagallens.presentation.feature.chatbot.history.contract.ChatbotHistoryConversation
 import com.example.lagallens.presentation.feature.chatbot.history.contract.ChatbotHistoryUiEffect
@@ -87,6 +88,28 @@ class ChatbotHistoryViewModel(private val repository: ChatbotRepository? = null)
             ChatbotHistoryUiEvent.SearchClicked -> _uiState.update { it.copy(isSearchVisible = true) }
             is ChatbotHistoryUiEvent.QueryChanged -> filter(event.query)
             is ChatbotHistoryUiEvent.ConversationClicked -> emitEffect(ChatbotHistoryUiEffect.OpenConversation(event.conversation))
+            is ChatbotHistoryUiEvent.DeleteRequested -> emitEffect(ChatbotHistoryUiEffect.ConfirmDelete(event.conversation))
+            is ChatbotHistoryUiEvent.DeleteConfirmed -> deleteConversation(event.conversation)
+        }
+    }
+
+    private fun deleteConversation(conversation: ChatbotHistoryConversation) {
+        launchForOwner {
+            val deleted = try {
+                repository?.deleteConversationForSession(ownerSession, conversation.id) ?: true
+            } catch (error: CancellationException) {
+                throw error
+            } catch (_: Exception) {
+                false
+            }
+            if (!isCurrent()) return@launchForOwner
+            if (deleted) {
+                allConversations = allConversations.filterNot { it.id == conversation.id }
+                filter(_uiState.value.query)
+                emitEffect(ChatbotHistoryUiEffect.ShowMessage(R.string.chatbot_history_deleted))
+            } else {
+                emitEffect(ChatbotHistoryUiEffect.ShowMessage(R.string.chatbot_history_delete_failed))
+            }
         }
     }
 

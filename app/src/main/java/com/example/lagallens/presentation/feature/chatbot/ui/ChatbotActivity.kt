@@ -32,6 +32,7 @@ import com.example.lagallens.presentation.feature.chatbot.adapter.ChatbotMessage
 import com.example.lagallens.presentation.feature.main.ui.MainActivity
 import com.example.lagallens.presentation.feature.chatbot.contract.ChatbotUiEffect
 import com.example.lagallens.presentation.feature.chatbot.contract.ChatbotUiEvent
+import com.example.lagallens.presentation.feature.chatbot.contract.ChatbotMessageAuthor
 import com.example.lagallens.presentation.feature.chatbot.contract.ChatbotUiState
 import com.example.lagallens.presentation.feature.chatbot.contract.DraftGenerationStatus
 import com.example.lagallens.presentation.feature.chatbot.history.ui.ChatbotHistoryActivity
@@ -239,6 +240,7 @@ class ChatbotActivity : AppCompatActivity() {
         chatbotDrawerActiveChat.text = state.contractName
         chatbotSourceDocument.chatbotSourceName.text = sourceDocumentName(state.contractName)
         chatbotDraftReview.chatbotDraftSourceName.text = sourceDocumentName(state.contractName)
+        chatbotDraftReview.chatbotDraftChangeTerm.text = draftRequestSummary(state)
         val canOpenSourceContract = state.sourceContractId != null
         chatbotSourceDocument.root.isClickable = canOpenSourceContract
         chatbotSourceDocument.chatbotSourceOpen.isVisible = canOpenSourceContract
@@ -345,6 +347,15 @@ class ChatbotActivity : AppCompatActivity() {
         dialog.show()
     }
 
+    /** The requests the user actually wrote, so the review lists what the draft is built from. */
+    private fun draftRequestSummary(state: ChatbotUiState): String {
+        val requests = state.messages
+            .filter { it.author == ChatbotMessageAuthor.USER && it.content.isNotBlank() }
+            .takeLast(MAX_REQUEST_LINES)
+            .map { "• " + it.content.trim().replace(Regex("""\s+"""), " ").take(MAX_REQUEST_LENGTH).let { text -> if (text.length == MAX_REQUEST_LENGTH) "$text…" else text } }
+        return if (requests.isEmpty()) getString(R.string.chatbot_draft_change_term) else requests.joinToString("\n")
+    }
+
     private fun sourceDocumentName(contractName: String): String = if (contractName == getString(R.string.chatbot_default_contract_name)) {
         getString(R.string.chatbot_default_source_name)
     } else {
@@ -379,6 +390,8 @@ class ChatbotActivity : AppCompatActivity() {
     }
 
     companion object {
+        private const val MAX_REQUEST_LINES = 6
+        private const val MAX_REQUEST_LENGTH = 160
         private const val EXTRA_CONTRACT_NAME = "chatbot_contract_name"
         private const val EXTRA_SESSION_KEY = "chatbot_session_key"
         private const val EXTRA_FROM_CONTRACT_DETAIL = "chatbot_from_contract_detail"

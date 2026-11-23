@@ -18,7 +18,7 @@ class AnalysisRiskCountsTest {
     /** Eight HIGH findings and one LOW, as a finished analysis returns them. */
     private fun fullDetail() = detail((1..8).map { finding("f$it", AnalysisSeverity.HIGH) } + finding("f9", AnalysisSeverity.LOW))
 
-    /** The server sends the first four; the mapper pads the rest with empty placeholders typed LOW. */
+    /** The server sends the first four of nine (40% rounded up); the mapper pads the rest with empty placeholders typed LOW. */
     private fun lockedDetail() = detail(
         (1..4).map { finding("f$it", AnalysisSeverity.HIGH) } + (0 until 5).map { finding("locked-finding-$it", AnalysisSeverity.LOW) }
     )
@@ -32,8 +32,8 @@ class AnalysisRiskCountsTest {
 
         val state = viewModel.uiState.value
         assertEquals(9, state.totalRiskCount)
-        assertEquals(6, state.lockedRiskCount)
-        assertEquals(3, state.highRiskCount)
+        assertEquals(5, state.lockedRiskCount)
+        assertEquals(4, state.highRiskCount)
         assertEquals(0, state.mediumRiskCount)
         assertEquals(0, state.lowRiskCount)
     }
@@ -77,9 +77,9 @@ class AnalysisRiskCountsTest {
         viewModel.setResult(identity, lockedDetail(), isUnlocked = false)
 
         val state = viewModel.uiState.value
-        assertEquals(3, state.allCount)
-        assertEquals(3, state.highCount)
+        assertEquals(4, state.allCount)
+        assertEquals(4, state.highCount)
         assertEquals(0, state.lowCount)
-        assertEquals(6, state.lockedCount)
+        assertEquals(5, state.lockedCount)
     }
 }

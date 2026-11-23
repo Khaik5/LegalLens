@@ -19,6 +19,7 @@ import androidx.navigation.fragment.findNavController
 import com.example.lagallens.LegalLensApplication
 import com.example.lagallens.R
 import com.example.lagallens.databinding.FragmentProfileEditBinding
+import com.example.lagallens.presentation.common.utils.avatarInitials
 import com.example.lagallens.presentation.common.utils.bindPressFeedback
 import com.example.lagallens.presentation.feature.profile.contract.ProfileUiEffect
 import com.example.lagallens.presentation.feature.profile.contract.ProfileUiEvent
@@ -151,7 +152,7 @@ class ProfileEditFragment : Fragment() {
     }
 
     private fun render(state: ProfileEditUiState) {
-        binding.tvProfileEditAvatar.text = state.name.initials()
+        binding.tvProfileEditAvatar.text = state.name.avatarInitials()
         binding.ivProfileEditAvatar.isVisible = state.photoUri != null
         binding.btnRemovePhoto.visibility = if (state.photoUri != null) View.VISIBLE else View.INVISIBLE
         binding.ivProfileEditAvatar.setImageURI(state.photoUri?.let(Uri::parse))
@@ -179,9 +180,6 @@ class ProfileEditFragment : Fragment() {
     private fun saveProfile(effect: ProfileEditUiEffect.ProfileSaved) {
         profileViewModel.onEvent(ProfileUiEvent.ProfileUpdated(effect.name, effect.phone, effect.photoUri))
     }
-
-    private fun String.initials(): String =
-        trim().split(" ").filter(String::isNotBlank).takeLast(2).joinToString("") { it.first().toString() }
 
     override fun onDestroyView() {
         _binding = null
