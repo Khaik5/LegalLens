@@ -9,6 +9,7 @@ import com.example.lagallens.R
 import com.example.lagallens.domain.model.auth.AuthFailure
 import com.example.lagallens.domain.model.auth.AuthResult
 import com.example.lagallens.domain.model.auth.OtpPurpose
+import com.example.lagallens.domain.repository.AccountDisabledException
 import com.example.lagallens.domain.repository.AccountNotVerifiedException
 import com.example.lagallens.domain.usecase.AuthenticateUserUseCase
 import com.example.lagallens.domain.usecase.ResendOtpUseCase
@@ -83,6 +84,9 @@ class LoginViewModel(
                 authenticateUser(username, password)
             } catch (cancellation: CancellationException) {
                 throw cancellation
+            } catch (_: AccountDisabledException) {
+                _uiState.update { it.copy(passwordErrorResId = R.string.login_account_disabled, isLoading = false) }
+                return@launch
             } catch (_: AccountNotVerifiedException) {
                 requestAccountVerification(username)
                 return@launch

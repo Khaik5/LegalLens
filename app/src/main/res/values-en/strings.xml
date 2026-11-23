@@ -18,7 +18,8 @@
     <string name="login_password_required">Please enter your password.</string>
     <string name="login_password_minimum_length">Password must be at least 8 characters.</string>
     <string name="login_invalid_credentials">Incorrect email or password.</string>
-    <string name="session_ended_message">Your session has ended. The account may have been disabled or the sign-in expired. Please sign in again.</string>
+    <string name="login_account_disabled">This account has been disabled. Please contact an administrator.</string>
+    <string name="session_ended_message">Your account was disabled or the session expired. Please sign in again.</string>
     <string name="login_account_not_verified">Your email is not verified yet. A new code has been sent to your email.</string>
     <string name="login_welcome_back">Welcome back</string>
     <string name="login_subtitle">Sign in to continue accessing your secure data.</string>
@@ -330,6 +331,9 @@
     <string name="ocr_failure_back_content_description">Back</string>
     <string name="ocr_failure_heading">OCR failed</string>
     <string name="ocr_failure_message">Unable to extract text information from your document.</string>
+    <string name="ocr_failure_message_service">The text recognition service is having a problem; it is not caused by your document. Please try again later.</string>
+    <string name="ocr_failure_message_timeout">Recognition took too long. Try again or use a shorter document.</string>
+    <string name="ocr_failure_message_file">The file is unsupported, too large or was changed. Please upload it again.</string>
     <string name="ocr_failure_reasons_title">Possible reasons:</string>
     <string name="ocr_failure_reason_quality">• The image quality is too low, blurry or cropped.</string>
     <string name="ocr_failure_reason_lighting">• Lighting is uneven, too bright or too dark.</string>

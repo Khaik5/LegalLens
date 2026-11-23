@@ -14,5 +14,7 @@ data class OcrResultUiState(
     val warnings: List<com.example.lagallens.domain.model.ocr.OcrWarning> = emptyList(),
     val isSampleContent: Boolean = false,
     val isReviewConfirmed: Boolean = false,
+    /** The recognized text was read from the backend, so an empty [documentText] really is empty. */
+    val isTextLoaded: Boolean = false,
     val errorMessageRes: Int? = null
 )

@@ -38,6 +38,7 @@ class OcrResultActivity : com.example.lagallens.presentation.feature.ocr.OcrSess
             app.getOcrResultUseCase,
             app.documentRepository.forSession(owner),
             app.contractRepository.forSession(owner),
+            app.unsavedUploadContracts,
             { owner.isNotBlank() && app.currentSessionKey() == owner }
         )
     }
@@ -103,6 +104,10 @@ class OcrResultActivity : com.example.lagallens.presentation.feature.ocr.OcrSess
     private fun bindEvents() = with(binding) {
         listOf(ocrResultBack, ocrResultEdit, ocrResultReview).forEach { it.bindPressFeedback() }
         ocrResultBack.setOnClickListener { viewModel.onEvent(OcrResultUiEvent.BackClicked) }
+        // The system Back gesture leaves the same way as the toolbar arrow, so an empty upload is cleaned up either way.
+        onBackPressedDispatcher.addCallback(this@OcrResultActivity, object : androidx.activity.OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() = viewModel.onEvent(OcrResultUiEvent.BackClicked)
+        })
         ocrResultEdit.setOnClickListener { viewModel.onEvent(OcrResultUiEvent.EditClicked) }
         ocrResultReview.setOnClickListener { viewModel.onEvent(OcrResultUiEvent.ReviewClicked) }
     }

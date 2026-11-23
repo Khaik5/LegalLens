@@ -9,7 +9,9 @@ sealed interface ProcessingState {
     data class Uploaded(val contractId: String, val documentId: String, val duplicateOfTitle: String? = null) : ProcessingState
     data class Failed(
         val isRetryable: Boolean = true,
-        val reason: UploadFailure = UploadFailure.UNKNOWN
+        val reason: UploadFailure = UploadFailure.UNKNOWN,
+        /** Set only when text recognition failed and the backend named a cause. */
+        val ocrReason: com.example.lagallens.domain.model.ocr.OcrFailureReason? = null
     ) : ProcessingState
 }
 

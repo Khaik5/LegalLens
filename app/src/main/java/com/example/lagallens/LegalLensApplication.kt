@@ -61,7 +61,9 @@ class LegalLensApplication : Application() {
     }
     val chatbotRepository: ChatbotRepository by lazy { RepositoryModule.provideChatbotRepository(applicationContext) }
     val ocrRepository: OcrRepository by lazy { RepositoryModule.provideOcrRepository(applicationContext) }
-    val documentUploadRepository by lazy { RepositoryModule.provideDocumentUploadRepository(applicationContext, contractRepository) }
+    /** Contracts created for an upload that is not saved yet; shared by the upload and OCR result screens. */
+    val unsavedUploadContracts = com.example.lagallens.domain.model.UnsavedUploadContracts()
+    val documentUploadRepository by lazy { RepositoryModule.provideDocumentUploadRepository(applicationContext, contractRepository, unsavedUploadContracts) }
     val analysisRepository: AnalysisRepository by lazy { RepositoryModule.provideAnalysisRepository(applicationContext) }
     private val onboardingRepository: OnboardingRepository by lazy {
         RepositoryModule.provideOnboardingRepository(applicationContext)

@@ -3,6 +3,7 @@ package com.example.lagallens.presentation.feature.camera.ocr.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.lagallens.domain.model.ocr.OcrFailureReason
 import com.example.lagallens.domain.model.processing.DocumentUploadRequest
 import com.example.lagallens.domain.model.processing.ProcessingState
 import com.example.lagallens.domain.repository.DocumentUploadRepository
@@ -11,6 +12,10 @@ import com.example.lagallens.presentation.feature.camera.ocr.contract.OcrProcess
 import com.example.lagallens.presentation.feature.camera.ocr.contract.OcrProcessingUiEvent
 import com.example.lagallens.presentation.feature.camera.ocr.contract.OcrProcessingUiState
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,7 +26,8 @@ import kotlinx.coroutines.launch
 
 class OcrProcessingViewModel(
     private val ocrRepository: OcrRepository,
-    private val uploadRepository: DocumentUploadRepository
+    private val uploadRepository: DocumentUploadRepository,
+    private val discardUnsavedUpload: suspend (String?) -> Unit = {}
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(OcrProcessingUiState())
     val uiState = _uiState.asStateFlow()
@@ -30,10 +36,14 @@ class OcrProcessingViewModel(
     val uiEffect = _uiEffect.receiveAsFlow()
 
     private var hasStarted = false
+    private var processingJob: Job? = null
+    private var recognitionFailure: ProcessingState.Failed? = null
+    private var contractId: String? = null
 
     fun onEvent(event: OcrProcessingUiEvent) {
         when (event) {
             is OcrProcessingUiEvent.ScreenOpened -> start(event)
+            OcrProcessingUiEvent.BackClicked -> abandon()
         }
     }
 
@@ -49,7 +59,8 @@ class OcrProcessingViewModel(
     private fun start(event: OcrProcessingUiEvent.ScreenOpened) {
         if (hasStarted) return
         hasStarted = true
-        viewModelScope.launch {
+        contractId = event.contractId
+        processingJob = viewModelScope.launch {
             val succeeded = try {
                 uploadScannedPages(event) && recognizeText(event.documentId)
             } catch (cancellation: CancellationException) {
@@ -60,8 +71,28 @@ class OcrProcessingViewModel(
             val state = _uiState.value
             _uiEffect.send(
                 if (succeeded) OcrProcessingUiEffect.NavigateToOcrResult(state.documentName, state.documentDetails)
-                else OcrProcessingUiEffect.NavigateToOcrFailure(state.documentName, state.documentDetails)
+                else OcrProcessingUiEffect.NavigateToOcrFailure(
+                    state.documentName, state.documentDetails,
+                    reason = recognitionFailure?.ocrReason ?: OcrFailureReason.UNREADABLE,
+                    isRetryable = recognitionFailure?.isRetryable ?: true
+                )
             )
+        }
+    }
+
+    /**
+     * Leaving while recognition runs: stop the backend job first, then remove the contract this upload created.
+     * The removal outlives the screen, which is closing.
+     */
+    private fun abandon() {
+        val running = processingJob
+        val abandoned = contractId
+        contractId = null
+        viewModelScope.launch {
+            withContext(NonCancellable) {
+                running?.cancelAndJoin()
+                discardUnsavedUpload(abandoned)
+            }
         }
     }
 
@@ -78,7 +109,8 @@ class OcrProcessingViewModel(
             when (state) {
                 is ProcessingState.Running -> state.stage?.let { stage -> _uiState.update { it.withActiveStep(stage) } }
                 ProcessingState.Completed -> succeeded = true
-                is ProcessingState.Failed, is ProcessingState.Uploaded -> succeeded = false
+                is ProcessingState.Failed -> { succeeded = false; recognitionFailure = state }
+                is ProcessingState.Uploaded -> succeeded = false
             }
         }
         return succeeded
@@ -86,10 +118,11 @@ class OcrProcessingViewModel(
 
     class Factory(
         private val ocrRepository: OcrRepository,
-        private val uploadRepository: DocumentUploadRepository
+        private val uploadRepository: DocumentUploadRepository,
+        private val discardUnsavedUpload: suspend (String?) -> Unit = {}
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T = OcrProcessingViewModel(ocrRepository, uploadRepository) as T
+        override fun <T : ViewModel> create(modelClass: Class<T>): T = OcrProcessingViewModel(ocrRepository, uploadRepository, discardUnsavedUpload) as T
     }
 
     private companion object {

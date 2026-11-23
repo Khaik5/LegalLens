@@ -31,7 +31,9 @@ class OcrProcessingActivity : com.example.lagallens.presentation.feature.ocr.Ocr
     private val binding by lazy { ActivityOcrProcessingBinding.inflate(layoutInflater) }
     private val viewModel by viewModels<OcrProcessingViewModel> {
         val app = application as com.example.lagallens.LegalLensApplication
-        OcrProcessingViewModel.Factory(app.ocrRepository, app.documentUploadRepository)
+        val owner = ownerSession
+        val discard = com.example.lagallens.domain.usecase.DiscardUnsavedUploadUseCase(app.unsavedUploadContracts) { app.contractRepository.forSession(owner) }
+        OcrProcessingViewModel.Factory(app.ocrRepository, app.documentUploadRepository) { contractId -> discard(contractId) }
     }
     private val stepAdapter = ProcessingTimelineStepAdapter()
 
@@ -55,7 +57,8 @@ class OcrProcessingActivity : com.example.lagallens.presentation.feature.ocr.Ocr
         viewModel.onEvent(
             OcrProcessingUiEvent.ScreenOpened(
                 documentId = intent.getStringExtra(EXTRA_DOCUMENT_ID).orEmpty(),
-                pagePaths = intent.getStringArrayListExtra(EXTRA_PAGE_PATHS).orEmpty()
+                pagePaths = intent.getStringArrayListExtra(EXTRA_PAGE_PATHS).orEmpty(),
+                contractId = intent.getStringExtra(EXTRA_CONTRACT_ID)
             )
         )
     }
@@ -80,7 +83,16 @@ class OcrProcessingActivity : com.example.lagallens.presentation.feature.ocr.Ocr
     }
 
     private fun bindView() {
-        binding.ocrProcessingBack.setOnClickListener { finish() }
+        binding.ocrProcessingBack.setOnClickListener { leave() }
+        onBackPressedDispatcher.addCallback(this@OcrProcessingActivity, object : androidx.activity.OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() = leave()
+        })
+    }
+
+    /** Back while recognition runs abandons the upload; the screen then closes. */
+    private fun leave() {
+        viewModel.onEvent(OcrProcessingUiEvent.BackClicked)
+        finish()
     }
 
     private fun bindTimeline() = with(binding.ocrProcessingTimeline) {
@@ -130,7 +142,9 @@ class OcrProcessingActivity : com.example.lagallens.presentation.feature.ocr.Ocr
                         documentUri = intent.getStringExtra(EXTRA_DOCUMENT_URI),
                         pagePaths = intent.getStringArrayListExtra(EXTRA_PAGE_PATHS).orEmpty(),
                         mimeType = intent.getStringExtra(EXTRA_MIME_TYPE).orEmpty(),
-                        contractId = intent.getStringExtra(EXTRA_CONTRACT_ID)
+                        contractId = intent.getStringExtra(EXTRA_CONTRACT_ID),
+                        failureReason = effect.reason,
+                        isRetryable = effect.isRetryable
                     )
                 )
                 finish()

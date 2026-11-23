@@ -120,7 +120,10 @@ class RemoteOcrRepository(
             }
             when (job?.status) {
                 COMPLETED -> return ProcessingState.Completed
-                FAILED -> return ProcessingState.Failed(isRetryable = job.retryable != false)
+                FAILED -> return ProcessingState.Failed(
+                    isRetryable = job.retryable != false,
+                    ocrReason = job.errorCode?.let(com.example.lagallens.domain.model.ocr.OcrFailureReason::fromCode)
+                )
                 CANCELLED, null -> return ProcessingState.Failed()
             }
         }

@@ -259,11 +259,15 @@ object RepositoryModule {
     private fun documentRemote(context: Context) =
         DocumentRemoteDataSource(lazy { transferRetrofit(context).create(DocumentApi::class.java) })
 
-    fun provideDocumentUploadRepository(context: Context, contracts: ContractRepository): DocumentUploadRepository =
+    fun provideDocumentUploadRepository(
+        context: Context,
+        contracts: ContractRepository,
+        unsavedUploads: com.example.lagallens.domain.model.UnsavedUploadContracts = com.example.lagallens.domain.model.UnsavedUploadContracts()
+    ): DocumentUploadRepository =
         when (DataModeConfig.current) {
             AppDataMode.DEMO -> FakeDocumentUploadRepository()
             AppDataMode.REAL -> RemoteDocumentUploadRepository(
-                context.applicationContext, EncryptedTokenStore(context), contracts, documentRemote(context)
+                context.applicationContext, EncryptedTokenStore(context), contracts, documentRemote(context), unsavedUploads
             )
         }
 

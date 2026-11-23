@@ -205,6 +205,7 @@
                 android:textStyle="bold" />
 
             <View
+                android:id="@+id/ocr_failure_button_gap"
                 android:layout_width="@dimen/ocr_failure_button_gap"
                 android:layout_height="match_parent" />
 

@@ -91,6 +91,7 @@ class CompareResultViewModel(application: Application) : AndroidViewModel(applic
         ContractComparisonBlocker.DOCUMENT_MISSING -> R.string.compare_error_document_missing
         ContractComparisonBlocker.OCR_NOT_READY -> R.string.compare_error_ocr_not_ready
         ContractComparisonBlocker.DOCUMENT_UNAVAILABLE -> R.string.compare_error_document_unavailable
+        ContractComparisonBlocker.SAVED_DRAFT_TEXT_UNAVAILABLE -> R.string.compare_error_saved_draft_text_unavailable
         ContractComparisonBlocker.TOO_LARGE -> R.string.compare_error_too_large
         ContractComparisonBlocker.NOT_FOUND -> R.string.compare_error_not_found
         ContractComparisonBlocker.ACCESS_DENIED -> R.string.compare_error_access_denied

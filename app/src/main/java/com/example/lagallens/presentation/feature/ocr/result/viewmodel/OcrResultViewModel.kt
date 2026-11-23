@@ -23,6 +23,8 @@ import com.example.lagallens.presentation.feature.ocr.result.contract.OcrResultU
 import com.example.lagallens.presentation.feature.ocr.result.contract.OcrResultUiEvent
 import com.example.lagallens.presentation.feature.ocr.result.contract.OcrResultUiState
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,6 +39,7 @@ class OcrResultViewModel(
     private val documentRepository: DocumentRepository,
     private val contractRepository: ContractRepository,
     private val defaultContractTitle: String = "",
+    private val unsavedUploads: com.example.lagallens.domain.model.UnsavedUploadContracts = com.example.lagallens.domain.model.UnsavedUploadContracts(),
     private val isOwner: () -> Boolean = { true }
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(OcrResultUiState())
@@ -48,7 +51,10 @@ class OcrResultViewModel(
         if (!isOwner()) { _uiState.value = OcrResultUiState(); return }
         when (event) {
             is OcrResultUiEvent.ScreenOpened -> loadResult(event)
-            OcrResultUiEvent.BackClicked -> emitEffect(OcrResultUiEffect.NavigateBack)
+            OcrResultUiEvent.BackClicked -> {
+                discardEmptyUpload()
+                emitEffect(OcrResultUiEffect.NavigateBack)
+            }
             OcrResultUiEvent.EditClicked -> emitEffect(OcrResultUiEffect.NavigateToEdit(_uiState.value.documentText))
             OcrResultUiEvent.ReviewClicked -> emitEffect(OcrResultUiEffect.NavigateToReview)
             is OcrResultUiEvent.DocumentUpdated -> {
@@ -99,6 +105,7 @@ class OcrResultViewModel(
                 _uiState.update {
                     it.copy(
                         documentText = text,
+                        isTextLoaded = true,
                         documentUri = savedDocument.uri,
                         mimeType = savedDocument.mimeType,
                         warnings = ocrResult?.warnings.orEmpty(),
@@ -138,6 +145,24 @@ class OcrResultViewModel(
             } catch (failure: Exception) {
                 if (isOwner()) _uiState.update {
                     it.copy(errorMessageRes = if (failure.isEditConflict()) R.string.ocr_edit_conflict else R.string.ocr_edit_save_failed)
+                }
+            }
+        }
+    }
+
+    /** Leaving with no recognized text removes the contract this upload created, never any other contract. */
+    private fun discardEmptyUpload() {
+        val current = _uiState.value
+        val contractId = current.contractId?.takeIf(String::isNotBlank) ?: return
+        if (!current.isTextLoaded || current.documentText.isNotBlank() || current.errorMessageRes != null) return
+        if (!unsavedUploads.takeIfUnsaved(contractId)) return
+        viewModelScope.launch {
+            // The screen is closing, so the removal must finish even after this scope is cancelled.
+            withContext(NonCancellable) {
+                try {
+                    contractRepository.deleteContract(contractId)
+                } catch (_: Exception) {
+                    android.util.Log.w("OcrResult", "Could not remove the empty upload contract")
                 }
             }
         }
@@ -187,6 +212,7 @@ class OcrResultViewModel(
                     contractRepository.updateContract(existing.copy(content = content, updatedAtMillis = timestamp))
                 }
                 check(isOwner())
+                unsavedUploads.markSaved(contractId)
                 _uiState.update { it.copy(contractId = contractId, isReviewConfirmed = true) }
                 emitEffect(OcrResultUiEffect.NavigateToSaved(current.documentName, current.documentId, contractId))
             } catch (cancellationException: CancellationException) {
@@ -217,6 +243,7 @@ class OcrResultViewModel(
         private val getOcrResult: GetOcrResultUseCase,
         private val documentRepository: DocumentRepository,
         private val contractRepository: ContractRepository,
+        private val unsavedUploads: com.example.lagallens.domain.model.UnsavedUploadContracts = com.example.lagallens.domain.model.UnsavedUploadContracts(),
         private val isOwner: () -> Boolean = { true }
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
@@ -228,7 +255,7 @@ class OcrResultViewModel(
             } ?: application
             return OcrResultViewModel(
                 getOcrResult, documentRepository, contractRepository,
-                context.getString(R.string.ocr_result_default_contract_name), isOwner
+                context.getString(R.string.ocr_result_default_contract_name), unsavedUploads, isOwner
             ) as T
         }
     }
