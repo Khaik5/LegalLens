@@ -678,8 +678,10 @@
     <string name="analysis_obligations_title">Quyền và nghĩa vụ</string>
     <string name="analysis_obligations_rights_tab">Quyền lợi</string>
     <string name="analysis_obligations_duties_tab">Nghĩa vụ</string>
-    <string name="analysis_obligations_employer_heading" translatable="false">Nghĩa vụ của Bên A (Người sử dụng LĐ)</string>
-    <string name="analysis_obligations_employee_heading" translatable="false">Nghĩa vụ của Bên B (Người lao động)</string>
+    <string name="analysis_obligations_employer_heading">Nghĩa vụ của Bên A (Người sử dụng LĐ)</string>
+    <string name="analysis_obligations_employee_heading">Nghĩa vụ của Bên B (Người lao động)</string>
+    <string name="analysis_obligations_employer_rights_heading">Quyền của Bên A (Người sử dụng LĐ)</string>
+    <string name="analysis_obligations_employee_rights_heading">Quyền của Bên B (Người lao động)</string>
     <string name="analysis_obligations_view_source">Điều khoản gốc trong tệp tin</string>
     <string name="analysis_obligations_working_conditions_title" translatable="false">Bảo đảm điều kiện làm việc</string>
     <string name="analysis_obligations_working_conditions_clause" translatable="false">Khoản 1 · Điều 3</string>

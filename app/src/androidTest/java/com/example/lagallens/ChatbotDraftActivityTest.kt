@@ -48,7 +48,7 @@ class ChatbotDraftActivityTest {
             onView(withId(R.id.chatbotDraftReviewAction)).perform(click())
             onView(withId(R.id.chatbotDraftReview)).check(matches(isDisplayed()))
             onView(withId(R.id.chatbotDraftCreate)).check(matches(isDisplayed()))
-            onView(withId(R.id.chatbotDraftCreate)).perform(click())
+            onView(withId(R.id.chatbotDraftCreate)).perform(scrollTo(), click())
             onView(withId(R.id.chatbotGenerationLoading)).check(matches(isDisplayed()))
             SystemClock.sleep(2200)
             onView(withId(R.id.chatbotGenerationSuccess)).check(matches(isDisplayed()))

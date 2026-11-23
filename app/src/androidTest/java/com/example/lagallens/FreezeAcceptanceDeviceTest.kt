@@ -71,7 +71,7 @@ class FreezeAcceptanceDeviceTest {
         val owner = session(); val result = result(owner)
         val screens = listOf(AnalysisRiskDetailActivity::class.java)
         screens.forEach { screen ->
-            ActivityScenario.launch<android.app.Activity>(scope(AnalysisRiskDetailActivity.createIntent(app, "termination-notice"), result.resultId, owner)).use { scenario ->
+            ActivityScenario.launch<android.app.Activity>(scope(AnalysisRiskDetailActivity.createIntent(app, "dispute-resolution"), result.resultId, owner)).use { scenario ->
                 val deadline = android.os.SystemClock.uptimeMillis() + 5000
                 while (scenario.state != Lifecycle.State.DESTROYED && android.os.SystemClock.uptimeMillis() < deadline) android.os.SystemClock.sleep(50)
                 assertEquals(screen.simpleName, Lifecycle.State.DESTROYED, scenario.state)

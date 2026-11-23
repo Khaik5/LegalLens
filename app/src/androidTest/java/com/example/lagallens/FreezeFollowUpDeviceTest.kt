@@ -114,7 +114,7 @@ class FreezeFollowUpDeviceTest {
             onView(withId(R.id.chatbotSend)).perform(click())
             waitUntilDisplayed(R.id.chatbotDraftReviewAction)
             onView(withId(R.id.chatbotDraftReviewAction)).perform(click())
-            onView(withId(R.id.chatbotDraftCreate)).perform(click())
+            onView(withId(R.id.chatbotDraftCreate)).perform(scrollTo(), click())
             waitUntilDisplayed(R.id.chatbotGenerationView)
             onView(withId(R.id.chatbotGenerationView)).perform(click())
             waitUntilDisplayed(R.id.draftContractName)

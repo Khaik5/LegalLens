@@ -1,6 +1,7 @@
 package com.example.lagallens.presentation.feature.contracts.search.viewmodel
 
 import com.example.lagallens.core.utils.matchesSearch
+import com.example.lagallens.presentation.common.utils.withAppLocale
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
@@ -87,7 +88,7 @@ class ContractSearchViewModel(application: Application) : AndroidViewModel(appli
     }
 
     private fun activeResults(): List<ContractSearchResult> {
-        val context = getApplication<Application>()
+        val context = getApplication<Application>().withAppLocale()
         return contracts.map { contract -> contract.toSearchResult(context.getString(contract.type.labelRes())) }
     }
 

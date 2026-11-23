@@ -308,7 +308,9 @@ object RepositoryModule {
                     com.example.lagallens.data.mapper.AnalysisObligationLabels(
                         employer = strings.getString(R.string.analysis_obligations_employer_heading),
                         employee = strings.getString(R.string.analysis_obligations_employee_heading),
-                        other = strings.getString(R.string.analysis_obligations_title)
+                        other = strings.getString(R.string.analysis_obligations_title),
+                        employerRights = strings.getString(R.string.analysis_obligations_employer_rights_heading),
+                        employeeRights = strings.getString(R.string.analysis_obligations_employee_rights_heading)
                     )
                 }
             )

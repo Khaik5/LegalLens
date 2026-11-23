@@ -4,6 +4,7 @@
     <string name="compare_no_text_difference_any">The two contracts have no differing clauses.</string>
     <string name="compare_overview_empty">The two contracts have no differences in key information.</string>
     <string name="compare_clauses_summary">%1$d clauses changed · %2$d added · %3$d removed</string>
+    <string name="compare_clauses_tap_hint">Tap a clause to see the text of both contracts.</string>
     <string name="compare_change_added">Added</string>
     <string name="compare_change_removed">Removed</string>
     <string name="compare_change_modified">Changed</string>

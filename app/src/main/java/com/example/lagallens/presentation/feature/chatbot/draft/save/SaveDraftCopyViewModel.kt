@@ -1,5 +1,6 @@
 package com.example.lagallens.presentation.feature.chatbot.draft.save
 
+import com.example.lagallens.presentation.common.utils.withAppLocale
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -52,7 +53,7 @@ class SaveDraftCopyViewModel(application: Application) : AndroidViewModel(applic
         content = savedContent
         contractId = linkedContractId
         sourceDraftId = parentDraftId
-        state.update { it.copy(name = getApplication<Application>().getString(R.string.draft_default_document_name)) }
+        state.update { it.copy(name = getApplication<Application>().withAppLocale().getString(R.string.draft_default_document_name)) }
     }
 
     fun setName(value: String) { if (ownerSession == app.currentSessionKey()) state.update { it.copy(name = value) } }

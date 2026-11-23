@@ -24,6 +24,7 @@ import com.example.lagallens.LegalLensApplication
 import com.example.lagallens.R
 import com.example.lagallens.databinding.FragmentHomeDashboardBinding
 import com.example.lagallens.presentation.common.utils.MotionTokens
+import com.example.lagallens.presentation.common.utils.avatarInitials
 import com.example.lagallens.presentation.common.utils.animateContentEntrance
 import com.example.lagallens.presentation.common.utils.bindPressFeedback
 import com.example.lagallens.presentation.feature.camera.permission.ui.CameraPermissionActivity
@@ -82,7 +83,7 @@ class HomeDashboardFragment : Fragment() {
 
     private fun render(state: HomeDashboardUiState) = with(binding) {
         tvDashboardUserName.text = state.userName
-        tvDashboardAvatar.text = state.userName.trim().split(" ").filter(String::isNotBlank).takeLast(2).joinToString("") { it.first().toString() }
+        tvDashboardAvatar.text = state.userName.avatarInitials()
         tvDashboardAvatar.contentDescription = state.userName
         ivDashboardAvatar.setImageURI(state.photoUri?.let(Uri::parse))
         ivDashboardAvatar.isVisible = ivDashboardAvatar.drawable != null

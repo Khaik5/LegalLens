@@ -722,6 +722,10 @@
     <string name="analysis_parties_address_label">Permanent address</string>
     <string name="analysis_parties_contact_label">Other contact information</string>
     <string name="analysis_obligations_title">Rights and obligations</string>
+    <string name="analysis_obligations_employer_heading">Obligations of Party A (employer)</string>
+    <string name="analysis_obligations_employee_heading">Obligations of Party B (employee)</string>
+    <string name="analysis_obligations_employer_rights_heading">Rights of Party A (employer)</string>
+    <string name="analysis_obligations_employee_rights_heading">Rights of Party B (employee)</string>
     <string name="analysis_obligations_working_conditions_excerpt">Sample excerpt: Party A provides equipment appropriate for the work.</string>
     <string name="analysis_obligations_salary_excerpt">Sample excerpt: Party A pays the agreed salary on time.</string>
     <string name="analysis_obligations_insurance_excerpt">Sample excerpt: Party A makes the agreed insurance contributions.</string>

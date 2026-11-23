@@ -1,5 +1,6 @@
 package com.example.lagallens.data.mapper
 
+import com.example.lagallens.core.utils.toReadableText
 import com.example.lagallens.data.model.response.AnalysisFindingResponse
 import com.example.lagallens.data.model.response.AnalysisObligationResponse
 import com.example.lagallens.data.model.response.AnalysisOverviewResponse
@@ -19,7 +20,14 @@ import com.example.lagallens.domain.model.analysis.AnalysisSourceExcerpt
 import com.example.lagallens.domain.model.analysis.AnalysisSummaryEntry
 
 /** Titles of the obligation groups, which the backend does not send. */
-class AnalysisObligationLabels(val employer: String, val employee: String, val other: String)
+class AnalysisObligationLabels(
+    val employer: String,
+    val employee: String,
+    val other: String,
+    /** Group titles of the rights tab; they default to the duties titles when a caller has no separate text. */
+    val employerRights: String = employer,
+    val employeeRights: String = employee
+)
 
 /**
  * Shape-only conversion of a backend analysis result.
@@ -95,7 +103,7 @@ object AnalysisResultMapper {
     )
 
     private fun source(source: AnalysisSourceResponse) =
-        AnalysisSourceExcerpt(source.reference.orEmpty(), source.title.orEmpty(), source.excerpt.orEmpty())
+        AnalysisSourceExcerpt(source.reference.orEmpty(), source.title.orEmpty(), source.excerpt.orEmpty().toReadableText())
 
     private fun obligations(
         items: List<AnalysisObligationResponse>,
@@ -112,7 +120,11 @@ object AnalysisResultMapper {
             inTab.groupBy { it.value.party?.uppercase() }.forEach { (party, group) ->
                 result += AnalysisObligationEntry.Section(
                     "section-${currentTab.name.lowercase()}-${party.orEmpty().lowercase()}",
-                    when (party) { "EMPLOYER" -> labels.employer; "EMPLOYEE" -> labels.employee; else -> labels.other },
+                    when (party) {
+                        "EMPLOYER" -> if (currentTab == AnalysisObligationTab.RIGHTS) labels.employerRights else labels.employer
+                        "EMPLOYEE" -> if (currentTab == AnalysisObligationTab.RIGHTS) labels.employeeRights else labels.employee
+                        else -> labels.other
+                    },
                     currentTab
                 )
                 group.forEach { (index, item) ->

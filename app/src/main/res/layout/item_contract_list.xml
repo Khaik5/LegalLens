@@ -46,11 +46,11 @@
             <TextView
                 android:id="@+id/tvSubtitle"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/dp_18"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/dp_2"
                 android:ellipsize="end"
                 android:includeFontPadding="false"
-                android:maxLines="1"
+                android:maxLines="2"
                 android:textColor="@color/legal_lens_secondary_text"
                 android:textSize="@dimen/sp_13" />
         </LinearLayout>
