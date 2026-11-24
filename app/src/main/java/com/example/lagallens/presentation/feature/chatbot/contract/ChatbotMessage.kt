@@ -29,7 +29,8 @@ data class ChatbotCitation(
 
 data class ChatbotReference(
     val title: String,
-    val excerpt: String
+    val excerpt: String,
+    val articleId: Long? = null
 )
 
 data class ChatbotNoEvidence(

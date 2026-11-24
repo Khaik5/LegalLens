@@ -321,6 +321,53 @@ class ChatbotViewModelTest {
         )
     }
 
+    private fun viewModelWithArticle(load: suspend (Long) -> com.example.lagallens.domain.model.chatbot.LegalArticleText?): ChatbotViewModel {
+        val base = FakeChatbotRepository()
+        val repository = object : com.example.lagallens.domain.repository.ChatbotRepository by base {
+            override suspend fun legalArticleText(articleId: Long) = load(articleId)
+        }
+        return ChatbotViewModel(
+            openConversation = OpenChatbotConversationUseCase(base),
+            sendMessage = SendChatbotMessageUseCase(base),
+            retryMessage = RetryChatbotMessageUseCase(base),
+            legalArticle = com.example.lagallens.domain.usecase.GetLegalArticleTextUseCase(repository),
+            draftAi = { com.example.lagallens.TestDraftAiRepository() }
+        )
+    }
+
+    @Test
+    fun openingASourceShowsTheFullArticleText() = runTest {
+        val viewModel = viewModelWithArticle { com.example.lagallens.domain.model.chatbot.LegalArticleText("Điều 25. Thời gian thử việc", "Nội dung đầy đủ") }
+        openScreen(viewModel)
+        advanceUntilIdle()
+
+        viewModel.onEvent(ChatbotUiEvent.ReferenceClicked(298))
+        advanceUntilIdle()
+
+        val sheet = viewModel.uiState.value.legalArticle
+        assertEquals(com.example.lagallens.presentation.feature.chatbot.contract.LegalArticleStatus.READY, sheet?.status)
+        assertEquals("Nội dung đầy đủ", sheet?.content)
+        viewModel.onEvent(ChatbotUiEvent.LegalArticleDismissed)
+        assertEquals(null, viewModel.uiState.value.legalArticle)
+    }
+
+    @Test
+    fun aSourceThatIsGoneAndALoadFailureAreTold() = runTest {
+        var fail = false
+        val viewModel = viewModelWithArticle { if (fail) error("offline") else null }
+        openScreen(viewModel)
+        advanceUntilIdle()
+
+        viewModel.onEvent(ChatbotUiEvent.ReferenceClicked(1))
+        advanceUntilIdle()
+        assertEquals(com.example.lagallens.presentation.feature.chatbot.contract.LegalArticleStatus.UNAVAILABLE, viewModel.uiState.value.legalArticle?.status)
+
+        fail = true
+        viewModel.onEvent(ChatbotUiEvent.ReferenceClicked(2))
+        advanceUntilIdle()
+        assertEquals(com.example.lagallens.presentation.feature.chatbot.contract.LegalArticleStatus.FAILED, viewModel.uiState.value.legalArticle?.status)
+    }
+
     private fun openScreen(viewModel: ChatbotViewModel) {
         viewModel.onEvent(
             ChatbotUiEvent.ScreenOpened(

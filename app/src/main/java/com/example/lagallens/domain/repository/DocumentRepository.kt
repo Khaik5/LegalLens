@@ -13,4 +13,6 @@ interface DocumentRepository {
     suspend fun saveDocument(document: EmploymentDocument): EmploymentDocument
     suspend fun updateDocumentContent(documentId: String, contractId: String?, content: String): Boolean
     suspend fun deleteDocument(documentId: String): Boolean
+    /** Marks the recognized text the user just reviewed as confirmed on the server. Best effort: analysis confirms again. */
+    suspend fun confirmRecognizedText(documentId: String) = Unit
 }

@@ -49,6 +49,7 @@
             </LinearLayout>
             <LinearLayout android:id="@+id/compareClausesContent" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:visibility="gone">
                 <TextView android:id="@+id/compareClausesSummary" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/dp_16" android:background="@drawable/bg_contract_search_result" android:padding="@dimen/dp_16" android:textColor="@color/legal_lens_primary" android:textSize="@dimen/sp_14" android:textStyle="bold" />
+                <TextView android:id="@+id/compareClausesHint" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/dp_8" android:text="@string/compare_clauses_tap_hint" android:textColor="@color/legal_lens_secondary_text" android:textSize="@dimen/sp_12" />
                 <LinearLayout android:id="@+id/compareClausesList" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" />
                 <TextView android:id="@+id/compareClausesEmpty" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/dp_12" android:background="@drawable/bg_compare_notice" android:padding="@dimen/dp_16" android:text="@string/compare_no_text_difference_any" android:textColor="@color/legal_lens_secondary_text" android:textSize="@dimen/sp_13" android:visibility="gone" />
             </LinearLayout>

@@ -1,5 +1,6 @@
 package com.example.lagallens.presentation.feature.compare.select.viewmodel
 
+import com.example.lagallens.presentation.common.utils.withAppLocale
 import com.example.lagallens.core.utils.matchesSearch
 
 import android.app.Application
@@ -83,7 +84,7 @@ class CompareSelectViewModel(application: Application) : AndroidViewModel(applic
     }
 
     private fun toCompareContract(contract: EmploymentContract): CompareContract =
-        CompareContract(contract.id, contract.title, getApplication<Application>().getString(contract.type.labelRes()))
+        CompareContract(contract.id, contract.title, getApplication<Application>().withAppLocale().getString(contract.type.labelRes()))
 
     private fun emit(effect: CompareSelectUiEffect) { viewModelScope.launch { effects.send(effect) } }
 }

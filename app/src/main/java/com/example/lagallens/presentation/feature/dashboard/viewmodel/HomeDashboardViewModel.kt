@@ -37,6 +37,7 @@ class HomeDashboardViewModel(
     val uiEffect = _uiEffect.receiveAsFlow()
     private var contractsJob: Job? = null
     private var profileJob: Job? = null
+    private var hasResumedOnce = false
 
     init {
         observeContracts()
@@ -44,7 +45,11 @@ class HomeDashboardViewModel(
 
     fun onEvent(event: HomeDashboardUiEvent) {
         when (event) {
-            HomeDashboardUiEvent.ScreenResumed -> loadProfile()
+            HomeDashboardUiEvent.ScreenResumed -> {
+                loadProfile()
+                // Coming back to the screen picks up changes made elsewhere, such as on the web; the first show just loaded.
+                if (hasResumedOnce) contracts.invalidate() else hasResumedOnce = true
+            }
             HomeDashboardUiEvent.RetryClicked -> observeContracts()
             HomeDashboardUiEvent.UploadClicked,
             HomeDashboardUiEvent.AnalyzeClicked -> emitEffect(HomeDashboardUiEffect.NavigateToUploadSource)

@@ -1,5 +1,6 @@
 package com.example.lagallens.presentation.feature.chatbot.draft.viewmodel
 
+import com.example.lagallens.presentation.common.utils.withAppLocale
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -60,7 +61,7 @@ class ChatbotDraftManualEditViewModel(application: Application) : AndroidViewMod
                 val draft = repository.saveDraft(
                     stage = DraftStage.MANUAL_EDIT,
                     isTitleGenerated = true,
-                    title = getApplication<Application>().getString(R.string.chatbot_draft_document_name, DraftStage.MANUAL_EDIT.legacyKey),
+                    title = getApplication<Application>().withAppLocale().getString(R.string.chatbot_draft_document_name, DraftStage.MANUAL_EDIT.legacyKey),
                     content = content,
                     contractId = contractId,
                     sourceDraftId = sourceDraftId ?: DraftStage.ORIGINAL.legacyKey

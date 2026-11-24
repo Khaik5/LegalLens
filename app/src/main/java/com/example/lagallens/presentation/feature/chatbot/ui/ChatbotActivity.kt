@@ -32,7 +32,10 @@ import com.example.lagallens.presentation.feature.chatbot.adapter.ChatbotMessage
 import com.example.lagallens.presentation.feature.main.ui.MainActivity
 import com.example.lagallens.presentation.feature.chatbot.contract.ChatbotUiEffect
 import com.example.lagallens.presentation.feature.chatbot.contract.ChatbotUiEvent
+import com.example.lagallens.presentation.feature.chatbot.contract.ChatbotMessageAuthor
 import com.example.lagallens.presentation.feature.chatbot.contract.ChatbotUiState
+import com.example.lagallens.presentation.feature.chatbot.contract.LegalArticleSheetState
+import com.example.lagallens.presentation.feature.chatbot.contract.LegalArticleStatus
 import com.example.lagallens.presentation.feature.chatbot.contract.DraftGenerationStatus
 import com.example.lagallens.presentation.feature.chatbot.history.ui.ChatbotHistoryActivity
 import com.example.lagallens.presentation.feature.chatbot.help.ui.ChatbotHelpActivity
@@ -63,13 +66,17 @@ class ChatbotActivity : AppCompatActivity() {
             openConversation = app.openChatbotConversationUseCase,
             sendMessage = app.sendChatbotMessageUseCase,
             retryMessage = app.retryChatbotMessageUseCase,
-            draftAi = { app.draftAiRepository(app.currentSessionKey()) }
+            draftAi = { app.draftAiRepository(app.currentSessionKey()) },
+            legalArticle = app.getLegalArticleTextUseCase
         )
     }
     private val messageAdapter = ChatbotMessageAdapter(
         onCitationClicked = { referenceId -> viewModel.onEvent(ChatbotUiEvent.CitationClicked(referenceId)) },
-        onRetryClicked = { messageId -> viewModel.onEvent(ChatbotUiEvent.ErrorRetryClicked(messageId)) }
+        onRetryClicked = { messageId -> viewModel.onEvent(ChatbotUiEvent.ErrorRetryClicked(messageId)) },
+        onReferenceClicked = { articleId -> viewModel.onEvent(ChatbotUiEvent.ReferenceClicked(articleId)) }
     )
+    private var articleSheet: BottomSheetDialog? = null
+    private var articleSheetId: Long? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -230,6 +237,7 @@ class ChatbotActivity : AppCompatActivity() {
     }
 
     private fun render(state: ChatbotUiState) = with(binding) {
+        renderLegalArticle(state.legalArticle)
         val showGeneration = state.draftGenerationStatus != DraftGenerationStatus.NONE
         chatbotAttachmentChip.isVisible = state.attachmentName != null
         chatbotAttachmentChip.text = getString(R.string.chatbot_attachment_selected, state.attachmentName.orEmpty())
@@ -239,6 +247,7 @@ class ChatbotActivity : AppCompatActivity() {
         chatbotDrawerActiveChat.text = state.contractName
         chatbotSourceDocument.chatbotSourceName.text = sourceDocumentName(state.contractName)
         chatbotDraftReview.chatbotDraftSourceName.text = sourceDocumentName(state.contractName)
+        chatbotDraftReview.chatbotDraftChangeTerm.text = draftRequestSummary(state)
         val canOpenSourceContract = state.sourceContractId != null
         chatbotSourceDocument.root.isClickable = canOpenSourceContract
         chatbotSourceDocument.chatbotSourceOpen.isVisible = canOpenSourceContract
@@ -322,6 +331,43 @@ class ChatbotActivity : AppCompatActivity() {
         }
     }
 
+    /** One sheet per opened article; it is filled in as the text arrives and closed when the state is cleared. */
+    private fun renderLegalArticle(article: LegalArticleSheetState?) {
+        if (article == null) {
+            articleSheet?.let { sheet -> articleSheetId = null; articleSheet = null; sheet.dismiss() }
+            return
+        }
+        if (articleSheet == null || articleSheetId != article.articleId) {
+            articleSheet?.setOnDismissListener(null)
+            articleSheet?.dismiss()
+            val sheet = BottomSheetDialog(this)
+            sheet.setContentView(layoutInflater.inflate(R.layout.bottom_sheet_chatbot_legal_article, null))
+            sheet.setOnDismissListener {
+                if (articleSheet === sheet) { articleSheet = null; articleSheetId = null; viewModel.onEvent(ChatbotUiEvent.LegalArticleDismissed) }
+            }
+            sheet.findViewById<android.view.View>(R.id.chatbotArticleClose)?.setOnClickListener { sheet.dismiss() }
+            articleSheet = sheet
+            articleSheetId = article.articleId
+            sheet.show()
+        }
+        val sheet = articleSheet ?: return
+        val ready = article.status == LegalArticleStatus.READY
+        sheet.findViewById<android.widget.TextView>(R.id.chatbotArticleTitle)?.text =
+            if (ready) article.title else getString(R.string.chatbot_article_title_loading)
+        sheet.findViewById<android.view.View>(R.id.chatbotArticleLoading)?.isVisible = article.status == LegalArticleStatus.LOADING
+        sheet.findViewById<android.widget.TextView>(R.id.chatbotArticleContent)?.text = article.content
+        val scroll = sheet.findViewById<android.view.View>(R.id.chatbotArticleScroll)
+        scroll?.isVisible = ready
+        scroll?.post {
+            val limit = (resources.displayMetrics.heightPixels * ARTICLE_MAX_HEIGHT_SHARE).toInt()
+            if (scroll.height > limit) scroll.layoutParams = scroll.layoutParams.apply { height = limit }
+        }
+        sheet.findViewById<android.widget.TextView>(R.id.chatbotArticleMessage)?.apply {
+            isVisible = article.status == LegalArticleStatus.UNAVAILABLE || article.status == LegalArticleStatus.FAILED
+            setText(if (article.status == LegalArticleStatus.FAILED) R.string.chatbot_article_failed else R.string.chatbot_article_unavailable)
+        }
+    }
+
     private fun showAttachmentSheet() {
         val dialog = BottomSheetDialog(this)
         val content = layoutInflater.inflate(R.layout.bottom_sheet_chatbot_attachment, null)
@@ -345,6 +391,15 @@ class ChatbotActivity : AppCompatActivity() {
         dialog.show()
     }
 
+    /** The requests the user actually wrote, so the review lists what the draft is built from. */
+    private fun draftRequestSummary(state: ChatbotUiState): String {
+        val requests = state.messages
+            .filter { it.author == ChatbotMessageAuthor.USER && it.content.isNotBlank() }
+            .takeLast(MAX_REQUEST_LINES)
+            .map { "• " + it.content.trim().replace(Regex("""\s+"""), " ").take(MAX_REQUEST_LENGTH).let { text -> if (text.length == MAX_REQUEST_LENGTH) "$text…" else text } }
+        return if (requests.isEmpty()) getString(R.string.chatbot_draft_change_term) else requests.joinToString("\n")
+    }
+
     private fun sourceDocumentName(contractName: String): String = if (contractName == getString(R.string.chatbot_default_contract_name)) {
         getString(R.string.chatbot_default_source_name)
     } else {
@@ -352,6 +407,9 @@ class ChatbotActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        articleSheet?.setOnDismissListener(null)
+        articleSheet?.dismiss()
+        articleSheet = null
         if (::binding.isInitialized) binding.chatbotMessages.adapter = null
         super.onDestroy()
     }
@@ -379,6 +437,9 @@ class ChatbotActivity : AppCompatActivity() {
     }
 
     companion object {
+        private const val ARTICLE_MAX_HEIGHT_SHARE = 0.5
+        private const val MAX_REQUEST_LINES = 6
+        private const val MAX_REQUEST_LENGTH = 160
         private const val EXTRA_CONTRACT_NAME = "chatbot_contract_name"
         private const val EXTRA_SESSION_KEY = "chatbot_session_key"
         private const val EXTRA_FROM_CONTRACT_DETAIL = "chatbot_from_contract_detail"

@@ -99,7 +99,7 @@ class AnalysisPartiesActivity : com.example.lagallens.presentation.feature.analy
                 }
             }
             card.findViewById<android.widget.TextView>(R.id.analysis_party_title).text = party.title
-            card.findViewById<android.widget.TextView>(R.id.analysis_party_role).text = party.role
+            card.findViewById<android.widget.TextView>(R.id.analysis_party_role).text = partyRoleLabel(party.role)
             val fields = card.findViewById<android.widget.LinearLayout>(R.id.analysis_party_fields)
             party.fields.forEach { field ->
                 val row = layoutInflater.inflate(R.layout.item_analysis_party_field, fields, false)
@@ -114,6 +114,13 @@ class AnalysisPartiesActivity : com.example.lagallens.presentation.feature.analy
             locked.bindLockedPreview(state.lockedCount, validatedUnlockStatus?.cost) { openUnlockConfirmation(state.documentName) }
             analysisPartiesItems.addView(locked.root)
         }
+    }
+
+    /** The backend sends the role as a code; DEMO data already carries display text, which is kept. */
+    private fun partyRoleLabel(role: String): String = when (role.uppercase()) {
+        "EMPLOYER" -> getString(R.string.analysis_parties_employer_role)
+        "EMPLOYEE" -> getString(R.string.analysis_parties_employee_role)
+        else -> role
     }
 
     private fun handleEffect(effect: AnalysisPartiesUiEffect) {

@@ -1,5 +1,6 @@
 package com.example.lagallens.presentation.feature.ocr.result.ui
 
+import com.example.lagallens.core.utils.toReadableText
 import androidx.core.view.isVisible
 import android.graphics.Color
 import android.os.Bundle
@@ -132,7 +133,7 @@ class OcrResultActivity : com.example.lagallens.presentation.feature.ocr.OcrSess
         } else {
             ocrResultConfidenceLabel.text = state.confidenceLabelRes?.let(::getString) ?: state.confidenceLabel
             ocrResultConfidencePercentage.text = state.confidencePercentage
-            ocrResultDocument.text = state.documentText
+            ocrResultDocument.text = state.documentText.toReadableText()
         }
     }
 
@@ -146,7 +147,7 @@ class OcrResultActivity : com.example.lagallens.presentation.feature.ocr.OcrSess
         when (effect) {
             OcrResultUiEffect.NavigateBack -> finish()
             is OcrResultUiEffect.NavigateToEdit -> {
-                ocrEditorLauncher.launch(OcrEditorActivity.createIntent(this, effect.documentText, viewModel.uiState.value.documentId))
+                ocrEditorLauncher.launch(OcrEditorActivity.createIntent(this, effect.documentText.toReadableText(), viewModel.uiState.value.documentId))
             }
             OcrResultUiEffect.NavigateToReview -> {
                 val state = viewModel.uiState.value

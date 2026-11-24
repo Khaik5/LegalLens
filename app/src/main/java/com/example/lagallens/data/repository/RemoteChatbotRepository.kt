@@ -1,5 +1,6 @@
 package com.example.lagallens.data.repository
 
+import com.example.lagallens.core.utils.toReadableText
 import com.example.lagallens.core.network.AuthSessionScope
 import com.example.lagallens.data.datasource.local.datastore.AuthSessionStore
 import com.example.lagallens.data.datasource.local.datastore.currentSessionScope
@@ -158,6 +159,32 @@ class RemoteChatbotRepository(
         }
     }
 
+    override suspend fun deleteConversationForSession(sessionKey: String?, conversationId: String): Boolean = inSession { scope ->
+        check(scope.key == sessionKey) { "Session changed" }
+        // A chat that was never stored has nothing on the server to delete.
+        if (pendingConversations.remove(conversationId) != null) return@inSession true
+        val id = conversationId.toLongOrNull() ?: createdConversations[conversationId] ?: return@inSession true
+        try {
+            remote.delete(scope, id)
+        } catch (error: retrofit2.HttpException) {
+            if (error.code() != 404) throw error
+        }
+        createdConversations.remove(conversationId)
+        true
+    }
+
+    override suspend fun legalArticleText(articleId: Long): com.example.lagallens.domain.model.chatbot.LegalArticleText? = inSession { scope ->
+        val article = try {
+            remote.legalArticle(scope, articleId)
+        } catch (error: retrofit2.HttpException) {
+            if (error.code() == 404) return@inSession null
+            throw error
+        }
+        val content = article.content?.toReadableText()?.trim().orEmpty()
+        if (content.isEmpty()) null
+        else com.example.lagallens.domain.model.chatbot.LegalArticleText(labels().articleTitle(article.articleNumber, article.title, articleId), content)
+    }
+
     override suspend fun getMessages(conversationId: String): List<ChatbotTranscriptMessage> = inSession { scope ->
         val id = conversationId.toLongOrNull() ?: createdConversations[conversationId] ?: return@inSession emptyList()
         transcript(scope, remote.messages(scope, id))
@@ -283,7 +310,7 @@ class RemoteChatbotRepository(
 
     private suspend fun references(scope: AuthSessionScope, answer: ChatAnswerResponse): List<ChatbotReference> =
         answer.citations.orEmpty().map { citation ->
-            ChatbotReference(articleTitle(scope, citation.articleId), citation.excerpt.orEmpty())
+            ChatbotReference(articleTitle(scope, citation.articleId), citation.excerpt.orEmpty(), citation.articleId)
         }
 
     private suspend fun articleTitle(scope: AuthSessionScope, articleId: Long): String =

@@ -18,6 +18,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.lagallens.R
 import com.example.lagallens.databinding.ActivityCompareResultBinding
+import com.example.lagallens.core.utils.toReadableText
 import com.example.lagallens.databinding.ItemCompareClauseBinding
 import com.example.lagallens.databinding.ItemCompareOverviewBinding
 import com.example.lagallens.domain.model.ContractChangeType
@@ -201,6 +202,7 @@ class CompareResultActivity : AppCompatActivity() {
         val changed = comparison.differences.filter { it.changeType != ContractChangeType.UNCHANGED }
         val summary = comparison.summary
         compareClausesSummary.isVisible = !comparison.isSample
+        compareClausesHint.isVisible = !comparison.isSample && changed.isNotEmpty()
         compareClausesSummary.text = getString(
             R.string.compare_clauses_summary, summary.changedSections, summary.addedSections, summary.removedSections
         )
@@ -210,12 +212,12 @@ class CompareResultActivity : AppCompatActivity() {
             val key = "clause:$index"
             val item = ItemCompareClauseBinding.inflate(LayoutInflater.from(this@CompareResultActivity), compareClausesList, false)
             item.compareClauseTitle.text =
-                if (difference.kind == ContractSectionKind.PREAMBLE) getString(R.string.compare_section_preamble) else difference.section
+                if (difference.kind == ContractSectionKind.PREAMBLE) getString(R.string.compare_section_preamble) else difference.section.toReadableText()
             item.compareClauseChange.text = changeText(difference)
             item.compareClauseChange.setTextColor(ContextCompat.getColor(this@CompareResultActivity, changeColor(difference.changeType)))
             item.compareClauseDetails.isVisible = key in expanded
-            item.compareClauseTextA.text = getString(R.string.compare_clause_text_a, difference.firstText.ifBlank { getString(R.string.compare_value_missing) })
-            item.compareClauseTextB.text = getString(R.string.compare_clause_text_b, difference.secondText.ifBlank { getString(R.string.compare_value_missing) })
+            item.compareClauseTextA.text = getString(R.string.compare_clause_text_a, difference.firstText.toReadableText().ifBlank { getString(R.string.compare_value_missing) })
+            item.compareClauseTextB.text = getString(R.string.compare_clause_text_b, difference.secondText.toReadableText().ifBlank { getString(R.string.compare_value_missing) })
             item.compareClauseHeader.bindPressFeedback()
             item.compareClauseHeader.setOnClickListener { viewModel.onEvent(CompareResultUiEvent.SectionClicked(key)) }
             compareClausesList.addView(item.root)

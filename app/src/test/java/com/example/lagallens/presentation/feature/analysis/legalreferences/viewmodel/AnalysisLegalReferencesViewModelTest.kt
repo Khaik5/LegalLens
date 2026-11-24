@@ -12,14 +12,14 @@ class AnalysisLegalReferencesViewModelTest {
         val samples = com.example.lagallens.presentation.feature.analysis.legalreferences.model.DemoLegalReferences.items
         val viewModel = AnalysisLegalReferencesViewModel()
         viewModel.setDemoReferences(samples, false)
-        assertEquals(listOf(samples.first().id), viewModel.uiState.value.references.map { it.id })
-        assertEquals(2, viewModel.uiState.value.lockedCount)
+        assertEquals(samples.take(2).map { it.id }, viewModel.uiState.value.references.map { it.id })
+        assertEquals(1, viewModel.uiState.value.lockedCount)
         viewModel.onEvent(AnalysisLegalReferencesUiEvent.QueryChanged("dân sự"))
-        assertTrue(viewModel.uiState.value.references.isEmpty())
+        assertEquals(listOf(samples[1].id), viewModel.uiState.value.references.map { it.id })
         viewModel.setDemoReferences(samples, true)
         assertEquals(listOf(samples[1].id), viewModel.uiState.value.references.map { it.id })
         assertEquals(0, viewModel.uiState.value.lockedCount)
-        assertFalse(com.example.lagallens.presentation.feature.analysis.legalreferences.model.DemoLegalReferences.canView(samples[1].id, false))
+        assertFalse(com.example.lagallens.presentation.feature.analysis.legalreferences.model.DemoLegalReferences.canView(samples[2].id, false))
         assertTrue(com.example.lagallens.presentation.feature.analysis.legalreferences.model.DemoLegalReferences.canView(samples[1].id, true))
     }
     @Test
