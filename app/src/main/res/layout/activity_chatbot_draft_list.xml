@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/legal_lens_background"
@@ -19,7 +20,8 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/chatbot_draft_back"
             android:padding="@dimen/dp_12"
-            android:src="@drawable/ic_contract_search_back" />
+            android:src="@drawable/ic_back"
+            app:tint="@color/legal_lens_status_text" />
 
         <TextView
             android:layout_width="0dp"

@@ -22,6 +22,7 @@ fun EmploymentContract.toContractListItem(subtitle: String): ContractListItem {
         EmploymentContractStatus.COMPLETE -> ContractProcessingStatus.COMPLETE
         EmploymentContractStatus.PROCESSING -> ContractProcessingStatus.PROCESSING
         EmploymentContractStatus.DRAFT -> ContractProcessingStatus.DRAFT
+        EmploymentContractStatus.PENDING_REVIEW -> ContractProcessingStatus.PENDING_REVIEW
     }
     val riskLevel = when (risk) {
         EmploymentContractRisk.LOW -> ContractRiskLevel.LOW
@@ -34,6 +35,7 @@ fun EmploymentContract.toContractListItem(subtitle: String): ContractListItem {
         ContractProcessingStatus.COMPLETE -> R.string.contract_complete_status
         ContractProcessingStatus.PROCESSING -> R.string.contract_processing_status
         ContractProcessingStatus.DRAFT -> R.string.contract_draft_status
+        ContractProcessingStatus.PENDING_REVIEW -> R.string.contract_pending_review_status
     }
     val riskRes = when (riskLevel) {
         ContractRiskLevel.LOW -> R.string.contract_low_risk
@@ -45,6 +47,7 @@ fun EmploymentContract.toContractListItem(subtitle: String): ContractListItem {
         ContractProcessingStatus.COMPLETE -> R.drawable.bg_contract_status_complete to R.color.contract_complete
         ContractProcessingStatus.PROCESSING -> R.drawable.bg_contract_status_processing to R.color.contract_pending
         ContractProcessingStatus.DRAFT -> R.drawable.bg_contract_status_draft to R.color.legal_lens_auth_accent
+        ContractProcessingStatus.PENDING_REVIEW -> R.drawable.bg_contract_status_processing to R.color.contract_pending
     }
     val isHighRisk = riskLevel == ContractRiskLevel.HIGH || riskLevel == ContractRiskLevel.CRITICAL
     val riskIconRes = when {

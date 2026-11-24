@@ -25,7 +25,8 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/ocr_failure_back_content_description"
             android:padding="@dimen/ocr_failure_back_icon_padding"
-            android:src="@drawable/ic_upload_back" />
+            android:src="@drawable/ic_back"
+            app:tint="@color/upload_navy" />
 
         <TextView
             android:layout_width="0dp"
@@ -68,7 +69,8 @@
         android:layout_width="@dimen/ocr_failure_alert_icon_size"
         android:layout_height="@dimen/ocr_failure_alert_icon_size"
         android:contentDescription="@null"
-        android:src="@drawable/ic_ocr_failure_alert"
+        android:src="@drawable/ic_error"
+        app:tint="@color/contract_risk_high"
         app:layout_constraintBottom_toBottomOf="@id/ocr_failure_alert_seal"
         app:layout_constraintEnd_toEndOf="@id/ocr_failure_alert_seal"
         app:layout_constraintStart_toStartOf="@id/ocr_failure_alert_seal"

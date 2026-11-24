@@ -1,6 +1,7 @@
 package com.example.lagallens.presentation.feature.profile.password.ui
 
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
@@ -116,9 +118,10 @@ class ProfilePasswordFragment : Fragment() {
         requirement: ItemProfilePasswordRequirementBinding,
         isSatisfied: Boolean
     ) {
-        requirement.ivPasswordRequirement.setImageResource(
-            if (isSatisfied) R.drawable.ic_profile_password_check else R.drawable.ic_profile_password_circle
-        )
+        val icon = requirement.ivPasswordRequirement
+        icon.setImageResource(if (isSatisfied) R.drawable.ic_check else R.drawable.ic_circle)
+        val tintRes = if (isSatisfied) R.color.contract_complete else R.color.legal_lens_input_stroke
+        icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(icon.context, tintRes))
     }
 
     private fun handleEffect(effect: ProfilePasswordUiEffect) {

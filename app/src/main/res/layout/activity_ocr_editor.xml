@@ -25,7 +25,8 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/ocr_editor_back_content_description"
             android:padding="@dimen/ocr_review_back_icon_inset"
-            android:src="@drawable/ic_ocr_review_back" />
+            android:src="@drawable/ic_back"
+            app:tint="@color/legal_lens_status_text" />
 
         <TextView
             android:layout_width="0dp"
@@ -81,7 +82,8 @@
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="@string/ocr_editor_bold_content_description"
                     android:padding="@dimen/ocr_review_toolbar_icon_inset"
-                    android:src="@drawable/ic_ocr_review_bold" />
+                    android:src="@drawable/ic_bold"
+                    app:tint="@color/legal_lens_auth_accent" />
 
                 <ImageButton
                     android:id="@+id/ocr_editor_italic"
@@ -91,7 +93,8 @@
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="@string/ocr_editor_italic_content_description"
                     android:padding="@dimen/ocr_review_toolbar_icon_inset"
-                    android:src="@drawable/ic_ocr_review_italic" />
+                    android:src="@drawable/ic_italic"
+                    app:tint="@color/legal_lens_auth_accent" />
 
                 <ImageButton
                     android:id="@+id/ocr_editor_list"
@@ -101,7 +104,8 @@
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="@string/ocr_editor_list_content_description"
                     android:padding="@dimen/ocr_review_toolbar_icon_inset"
-                    android:src="@drawable/ic_ocr_review_list" />
+                    android:src="@drawable/ic_list"
+                    app:tint="@color/legal_lens_auth_accent" />
             </LinearLayout>
 
             <EditText

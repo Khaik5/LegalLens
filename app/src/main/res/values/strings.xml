@@ -282,6 +282,7 @@
     <string name="contract_complete_status">Hoàn thành</string>
     <string name="contract_processing_status">Đang xử lý</string>
     <string name="contract_draft_status">Nháp</string>
+    <string name="contract_pending_review_status">Chờ rà soát</string>
     <string name="contract_low_risk">Rủi ro: Thấp</string>
     <string name="contract_medium_risk">Rủi ro: Trung bình</string>
     <string name="contract_high_risk">Rủi ro: Cao</string>
@@ -435,7 +436,7 @@
     <string name="contract_detail_file_format_value" translatable="false">PDF (Scan)</string>
     <string name="contract_detail_rename">Đổi tên hợp đồng</string>
     <string name="contract_detail_load_failed">Không tải được hợp đồng. Vui lòng thử lại.</string>
-    <string name="analysis_finding_legal_basis_unverified">Chưa có căn cứ pháp lý xác minh</string>
+    <string name="analysis_finding_legal_basis_unverified">Chưa gắn được căn cứ pháp lý</string>
     <string name="upload_duplicate_notice">Tệp này đã được tải lên trước đây trong hợp đồng “%1$s”. Bạn có thể xóa bản trùng nếu không cần.</string>
     <string name="contract_detail_delete_paid_title">Xóa cả kết quả đã mở khóa?</string>
     <string name="contract_detail_delete_paid_message">Hợp đồng này có kết quả phân tích bạn đã mở khóa bằng Credit. Xóa hợp đồng sẽ xóa luôn các kết quả đó và Credit đã dùng không được hoàn lại.</string>
@@ -644,6 +645,7 @@
     <string name="analysis_clause_source_title">Điều khoản gốc</string>
     <string name="analysis_clause_source_subtitle">Trích từ văn bản hợp đồng</string>
     <string name="analysis_clause_source_close">Đóng</string>
+    <string name="analysis_clause_source_excerpt_missing">Chưa lấy được đoạn trích của điều khoản này. Vui lòng xem %1$s trong hợp đồng gốc.</string>
     <string name="analysis_clause_source_notice">Nội dung được trích xuất từ văn bản OCR. Vui lòng đối chiếu với bản hợp đồng gốc.</string>
     <string name="analysis_clause_source_salary_excerpt" translatable="false">... Bên B thực hiện đầy đủ các nghĩa vụ và trách nhiệm được phân công theo quy định. <b>Mức lương chính thức của Người lao động là 12.000.000 VNĐ/tháng.</b> Khoản lương này chưa bao gồm tiền thưởng doanh số định kỳ hàng quý và các trợ cấp ăn trưa, đi lại được duyệt bởi Giám đốc điều hành. ...</string>
     <string name="analysis_parties_title">Bên liên quan</string>
@@ -920,7 +922,7 @@
     <string name="credit_store_intro_title" formatted="false">Credit để mở kết quả 100%</string>
     <string name="credit_store_intro_description">Mua một lần, dùng theo nhu cầu. Credit không hết hạn, không tự động gia hạn.</string>
     <string name="credit_store_step_one" translatable="false">1</string>
-    <string name="credit_store_step_one_description">Xem trước 40% kết quả miễn phí.</string>
+    <string name="credit_store_step_one_description">Xem trước một phần kết quả miễn phí.</string>
     <string name="credit_store_step_two" translatable="false">2</string>
     <string name="credit_store_step_two_description">Dùng Credit để mở 100% khi cần.</string>
     <string name="credit_store_step_three" translatable="false">3</string>
@@ -928,7 +930,7 @@
     <string name="credit_store_balance_label">Số dư hiện tại</string>
     <string name="credit_store_balance_credits">%1$d Credits</string>
     <string name="credit_store_top_up">Nạp thêm</string>
-    <string name="credit_store_footer_note">Credit không hết hạn · Hết Credit vẫn xem trước 40% và dùng mọi chức năng.</string>
+    <string name="credit_store_footer_note">Credit không hết hạn · Hết Credit vẫn xem trước một phần và dùng mọi chức năng.</string>
     <string name="credit_store_top_up_action">Nạp Credit</string>
     <string name="credit_store_select_package">Chọn gói nạp</string>
     <string name="credit_store_package_5_title" translatable="false">5 Credits</string>
@@ -1003,7 +1005,7 @@
     <string name="credit_flow_insufficient_note">Chưa trừ Credit nào. Credit chỉ trừ sau khi bạn xác nhận mở kết quả.</string>
     <string name="credit_flow_risk_warning_title">Cảnh báo rủi ro quan trọng</string>
     <string name="credit_flow_risk_warning_body">Các mục phân tích đang bị khóa có thể chứa rủi ro quan trọng với quyền lợi của bạn. Hãy mở khóa hoặc đọc kỹ hợp đồng gốc.</string>
-    <string name="credit_flow_preview_note" formatted="false">Bạn vẫn dùng tất cả chức năng và xem trước 40% kết quả mới khi hết Credit.</string>
+    <string name="credit_flow_preview_note" formatted="false">Bạn vẫn dùng tất cả chức năng và xem trước một phần kết quả mới khi hết Credit.</string>
     <string name="credit_flow_go_to_store">Đến Cửa hàng Credit</string>
     <string name="credit_flow_continue_free">Tiếp tục xem miễn phí</string>
     <string name="credit_flow_purchase_title">Xác nhận mua Credit</string>
@@ -1061,7 +1063,7 @@
     <string name="credit_flow_transaction_id">Mã giao dịch</string>
     <string name="credit_flow_pending_result">Kết quả đang chờ mở · KQ-1042</string>
     <string name="credit_flow_result_status">Trạng thái</string>
-    <string name="credit_flow_preview_status" formatted="false">Xem trước 40%</string>
+    <string name="credit_flow_preview_status" formatted="false">Xem trước một phần</string>
     <string name="credit_flow_unlock_cost">Chi phí mở kết quả này</string>
     <string name="credit_flow_success_note">Mua Credit không tự mở khóa kết quả. Quay về kết quả phân tích và xác nhận riêng để mở khóa.</string>
     <string name="credit_flow_return_to_unlock">Về kết quả để xác nhận mở</string>
@@ -1082,7 +1084,7 @@
     <string name="locked_results_empty">Không còn kết quả phân tích nào cần mở khóa.</string>
     <string name="locked_results_error">Không tải được danh sách kết quả. Vui lòng thử lại.</string>
     <string name="locked_results_cost">%1$d Credit</string>
-    <string name="credit_hub_info">Bạn được xem miễn phí 40% kết quả phân tích AI. Sử dụng Credit để mở khóa 100% nội dung. Kết quả đã mở khóa có thể xem lại mà không cần trả thêm Credit.</string>
+    <string name="credit_hub_info">Bạn được xem trước miễn phí một phần kết quả phân tích AI. Sử dụng Credit để mở khóa toàn bộ nội dung. Kết quả đã mở khóa có thể xem lại mà không cần trả thêm Credit.</string>
     <string name="credit_hub_payments_title">Lịch sử thanh toán</string>
     <string name="credit_hub_payments_description">Xem các lần mua Credit, kể cả đang chờ hoặc đã hủy</string>
     <string name="payment_history_title">Lịch sử thanh toán</string>

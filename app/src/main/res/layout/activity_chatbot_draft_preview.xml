@@ -21,7 +21,8 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/chatbot_draft_back"
             android:padding="@dimen/dp_12"
-            android:src="@drawable/ic_contract_search_back" />
+            android:src="@drawable/ic_back"
+            app:tint="@color/legal_lens_status_text" />
 
         <TextView
             android:layout_width="0dp"
@@ -41,7 +42,8 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/chatbot_draft_more"
             android:padding="@dimen/dp_12"
-            android:src="@drawable/ic_analysis_risk_overview_more" />
+            android:src="@drawable/ic_more"
+            app:tint="@color/legal_lens_primary" />
     </LinearLayout>
 
     <LinearLayout
@@ -79,7 +81,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/dp_12"
             android:background="@drawable/bg_chatbot_draft_warning"
-            android:drawableStart="@drawable/ic_alert_triangle"
+            android:drawableStart="@drawable/ic_alert"
             android:drawablePadding="@dimen/dp_8"
             android:drawableTint="@color/chatbot_draft_notice_icon"
             android:fontFamily="@font/manrope"
@@ -114,7 +116,8 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/viewer_previous_page"
                 android:padding="@dimen/dp_8"
-                android:src="@drawable/ic_chevron_left" />
+                android:src="@drawable/ic_chevron_left"
+                app:tint="@color/legal_lens_status_text" />
 
             <ImageButton
                 android:id="@+id/draftNext"
@@ -123,7 +126,8 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/viewer_next_page"
                 android:padding="@dimen/dp_8"
-                android:src="@drawable/ic_contract_search_chevron_right" />
+                android:src="@drawable/ic_chevron_right"
+                app:tint="@color/legal_lens_secondary_text" />
 
             <ImageButton
                 android:id="@+id/draftZoomOut"
@@ -132,7 +136,8 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/chatbot_draft_zoom_out"
                 android:padding="@dimen/dp_8"
-                android:src="@drawable/ic_viewer_zoom_out" />
+                android:src="@drawable/ic_minus"
+                app:tint="@color/legal_lens_primary" />
 
             <TextView
                 android:id="@+id/draftZoomLevel"
@@ -149,7 +154,8 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/chatbot_draft_zoom_in"
                 android:padding="@dimen/dp_8"
-                android:src="@drawable/ic_viewer_zoom_in" />
+                android:src="@drawable/ic_add"
+                app:tint="@color/legal_lens_primary" />
         </LinearLayout>
 
         <androidx.viewpager2.widget.ViewPager2

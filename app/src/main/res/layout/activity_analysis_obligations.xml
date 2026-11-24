@@ -14,7 +14,8 @@
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="@string/analysis_key_facts_back_content_description"
         android:padding="@dimen/analysis_back_icon_padding"
-        android:src="@drawable/ic_upload_back"
+        android:src="@drawable/ic_back"
+        app:tint="@color/upload_navy"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
     <TextView
@@ -58,7 +59,8 @@
                 android:layout_height="@dimen/analysis_document_icon_art_size"
                 android:layout_gravity="center"
                 android:contentDescription="@null"
-                android:src="@drawable/ic_ocr_saved_document" />
+                android:src="@drawable/ic_file_text"
+                app:tint="@color/ocr_saved_teal" />
         </FrameLayout>
 
         <LinearLayout

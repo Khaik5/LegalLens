@@ -27,7 +27,8 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/unlock_confirmation_back_description"
             android:padding="@dimen/dp_8"
-            android:src="@drawable/ic_credit_store_back" />
+            android:src="@drawable/ic_back"
+            app:tint="@color/legal_lens_status_text" />
 
         <TextView
             android:layout_width="0dp"
@@ -407,7 +408,8 @@
                     android:layout_width="@dimen/dp_18"
                     android:layout_height="@dimen/dp_18"
                     android:contentDescription="@string/unlock_confirmation_info_description"
-                    android:src="@drawable/ic_unlock_confirmation_info" />
+                    android:src="@drawable/ic_info_circle"
+                    app:tint="@color/legal_lens_auth_accent" />
 
                 <TextView
                     android:layout_width="0dp"

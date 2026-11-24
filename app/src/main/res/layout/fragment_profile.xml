@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/legal_lens_background"
@@ -319,7 +320,8 @@
                 android:layout_width="@dimen/dp_18"
                 android:layout_height="@dimen/dp_18"
                 android:contentDescription="@null"
-                android:src="@drawable/ic_profile_logout" />
+                android:src="@drawable/ic_logout"
+                app:tint="@color/contract_risk_high" />
 
             <TextView
                 android:layout_width="wrap_content"

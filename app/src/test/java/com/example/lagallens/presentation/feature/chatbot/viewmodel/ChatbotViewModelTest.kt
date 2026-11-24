@@ -191,6 +191,63 @@ class ChatbotViewModelTest {
         assertEquals(null, replaced.error)
     }
 
+@Test
+    fun aReplyTheServerCouldNotFinishIsRetriedOnceAutomatically() = runTest {
+        val stored = FakeChatbotRepository()
+        var retries = 0
+        val failing = object : com.example.lagallens.domain.repository.ChatbotRepository by stored {
+            override suspend fun sendForSession(
+                sessionKey: String?, conversationId: String, message: String,
+                attachment: com.example.lagallens.domain.model.chatbot.ChatbotAttachment?
+            ) = com.example.lagallens.domain.model.chatbot.ChatbotReply.RetryableError("Không thể tạo câu trả lời", "Thử lại")
+            override suspend fun retryForSession(
+                sessionKey: String?, conversationId: String, message: String,
+                attachment: com.example.lagallens.domain.model.chatbot.ChatbotAttachment?
+            ): com.example.lagallens.domain.model.chatbot.ChatbotReply {
+                retries++
+                return com.example.lagallens.domain.model.chatbot.ChatbotReply.RetryableError("Không thể tạo câu trả lời", "Thử lại")
+            }
+        }
+        val viewModel = viewModel(failing)
+        openScreen(viewModel)
+        viewModel.onEvent(ChatbotUiEvent.MessageChanged("Lương?"))
+        viewModel.onEvent(ChatbotUiEvent.SendClicked)
+        advanceUntilIdle()
+
+        assertEquals(1, retries)
+        val card = viewModel.uiState.value.messages.last()
+        assertEquals(true, card.error != null)
+        assertEquals(false, card.error?.isRetrying)
+
+        viewModel.onEvent(ChatbotUiEvent.ErrorRetryClicked(card.id))
+        advanceUntilIdle()
+        assertEquals(2, retries)
+    }
+
+    @Test
+    fun theAutomaticRetryShowsTheAnswerWithoutATap() = runTest {
+        val stored = FakeChatbotRepository()
+        val recovering = object : com.example.lagallens.domain.repository.ChatbotRepository by stored {
+            override suspend fun sendForSession(
+                sessionKey: String?, conversationId: String, message: String,
+                attachment: com.example.lagallens.domain.model.chatbot.ChatbotAttachment?
+            ) = com.example.lagallens.domain.model.chatbot.ChatbotReply.RetryableError("Không thể tạo câu trả lời", "Thử lại")
+            override suspend fun retryForSession(
+                sessionKey: String?, conversationId: String, message: String,
+                attachment: com.example.lagallens.domain.model.chatbot.ChatbotAttachment?
+            ) = com.example.lagallens.domain.model.chatbot.ChatbotReply.Answer("10 triệu.")
+        }
+        val viewModel = viewModel(recovering)
+        openScreen(viewModel)
+        viewModel.onEvent(ChatbotUiEvent.MessageChanged("Lương?"))
+        viewModel.onEvent(ChatbotUiEvent.SendClicked)
+        advanceUntilIdle()
+
+        val last = viewModel.uiState.value.messages.last()
+        assertEquals("10 triệu.", last.content)
+        assertEquals(null, last.error)
+    }
+
     @Test
     fun draftingCannotStartWhenItIsDisabled() = runTest {
         val viewModel = ChatbotViewModel(

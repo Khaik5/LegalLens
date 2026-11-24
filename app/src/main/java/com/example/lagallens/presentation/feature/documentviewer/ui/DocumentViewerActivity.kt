@@ -123,7 +123,7 @@ class DocumentViewerActivity : AppCompatActivity() {
         if (remoteContractId != null) {
             binding.viewerHeading.setText(R.string.viewer_remote_title)
             binding.viewerPreviewLabel.setText(R.string.viewer_remote_preview)
-            binding.viewerShare.setImageResource(R.drawable.ic_contract_detail_download)
+            binding.viewerShare.setImageResource(R.drawable.ic_download)
             binding.viewerShare.contentDescription = getString(R.string.viewer_download)
         }
         binding.viewerRetry.setOnClickListener {

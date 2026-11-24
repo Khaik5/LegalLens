@@ -25,7 +25,8 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/upload_back_content_description"
             android:padding="@dimen/upload_back_icon_inset"
-            android:src="@drawable/ic_upload_back" />
+            android:src="@drawable/ic_back"
+            app:tint="@color/upload_navy" />
 
         <TextView
             android:id="@+id/upload_source_title"
@@ -86,7 +87,8 @@
                     android:layout_height="@dimen/upload_icon_container_size"
                     android:background="@drawable/bg_upload_icon_teal"
                     android:padding="@dimen/upload_icon_inset"
-                    android:src="@drawable/ic_upload_pdf" />
+                    android:src="@drawable/ic_file_text"
+                    app:tint="@color/upload_teal" />
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -132,7 +134,8 @@
                     android:layout_height="@dimen/upload_icon_container_size"
                     android:background="@drawable/bg_upload_icon_blue"
                     android:padding="@dimen/upload_icon_inset"
-                    android:src="@drawable/ic_upload_docx" />
+                    android:src="@drawable/ic_file_text"
+                    app:tint="@color/upload_blue" />
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -224,7 +227,8 @@
                     android:layout_height="@dimen/upload_icon_container_size"
                     android:background="@drawable/bg_upload_icon_amber"
                     android:padding="@dimen/upload_icon_inset"
-                    android:src="@drawable/ic_upload_camera" />
+                    android:src="@drawable/ic_camera"
+                    app:tint="@color/upload_amber" />
 
                 <LinearLayout
                     android:layout_width="0dp"

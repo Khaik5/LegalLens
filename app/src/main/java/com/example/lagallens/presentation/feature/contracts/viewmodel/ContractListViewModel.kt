@@ -106,7 +106,7 @@ class ContractListViewModel(application: Application) : AndroidViewModel(applica
         ContractFilter.ANALYZED -> processingStatus == ContractProcessingStatus.COMPLETE
         // "Chờ xử lý" means not analysed yet, so it also lists drafts that have no analysis.
         ContractFilter.PROCESSING -> processingStatus == ContractProcessingStatus.PROCESSING ||
-            processingStatus == ContractProcessingStatus.DRAFT
+            processingStatus == ContractProcessingStatus.DRAFT || processingStatus == ContractProcessingStatus.PENDING_REVIEW
         ContractFilter.HIGH_RISK -> riskLevel == ContractRiskLevel.HIGH || riskLevel == ContractRiskLevel.CRITICAL
     }
 
@@ -116,7 +116,8 @@ class ContractListViewModel(application: Application) : AndroidViewModel(applica
             ContractStatusFilter.ALL -> true
             ContractStatusFilter.COMPLETE -> processingStatus == ContractProcessingStatus.COMPLETE
             ContractStatusFilter.PROCESSING -> processingStatus == ContractProcessingStatus.PROCESSING
-            ContractStatusFilter.DRAFT -> processingStatus == ContractProcessingStatus.DRAFT
+            ContractStatusFilter.DRAFT -> processingStatus == ContractProcessingStatus.DRAFT ||
+                processingStatus == ContractProcessingStatus.PENDING_REVIEW
         }
         val riskMatches = filterSelection.riskLevel == null || riskLevel == filterSelection.riskLevel ||
             (filterSelection.riskLevel == ContractRiskLevel.HIGH && riskLevel == ContractRiskLevel.CRITICAL)

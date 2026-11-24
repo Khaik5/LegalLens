@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/bg_chatbot_draft_confirmation"
@@ -12,7 +13,8 @@
         android:background="@drawable/bg_chatbot_generation_progress"
         android:contentDescription="@null"
         android:padding="@dimen/dp_20"
-        android:src="@drawable/ic_ocr_saved_check" />
+        android:src="@drawable/ic_check"
+        app:tint="@color/ocr_saved_teal" />
 
     <TextView
         android:layout_width="match_parent"
@@ -39,7 +41,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/dp_20"
         android:background="@color/legal_lens_auth_icon_background"
-        android:drawableStart="@drawable/ic_credit_low_info"
+        android:drawableStart="@drawable/ic_info_circle"
+        android:drawableTint="@color/credit_warning"
         android:drawablePadding="@dimen/dp_8"
         android:gravity="center_vertical"
         android:lineSpacingExtra="@dimen/dp_4"

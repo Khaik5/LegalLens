@@ -25,7 +25,8 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/ocr_review_back_content_description"
             android:padding="@dimen/ocr_review_back_icon_inset"
-            android:src="@drawable/ic_ocr_review_back" />
+            android:src="@drawable/ic_back"
+            app:tint="@color/legal_lens_status_text" />
 
         <TextView
             android:layout_width="0dp"
@@ -70,7 +71,8 @@
                     android:layout_width="@dimen/ocr_review_alert_icon_size"
                     android:layout_height="@dimen/ocr_review_alert_icon_size"
                     android:contentDescription="@null"
-                    android:src="@drawable/ic_ocr_review_warning" />
+                    android:src="@drawable/ic_alert"
+                    app:tint="@color/chatbot_draft_notice_icon" />
 
                 <TextView
                     android:layout_width="0dp"

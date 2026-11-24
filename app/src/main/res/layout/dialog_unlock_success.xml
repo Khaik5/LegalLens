@@ -33,7 +33,8 @@
                     android:layout_height="@dimen/dp_28"
                     android:layout_gravity="center"
                     android:contentDescription="@null"
-                    android:src="@drawable/ic_credit_success_check" />
+                    android:src="@drawable/ic_check"
+                    app:tint="@color/legal_lens_auth_accent" />
             </FrameLayout>
         </FrameLayout>
 

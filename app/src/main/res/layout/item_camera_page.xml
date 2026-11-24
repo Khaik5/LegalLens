@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="@dimen/camera_page_thumbnail_width"
     android:layout_height="@dimen/camera_page_thumbnail_height"
     android:layout_marginEnd="@dimen/camera_page_thumbnail_spacing"
@@ -31,7 +32,8 @@
         android:background="@drawable/bg_camera_page_warning"
         android:contentDescription="@string/camera_page_delete_description"
         android:padding="@dimen/camera_permission_button_stroke_width"
-        android:src="@drawable/ic_camera_delete" />
+        android:src="@drawable/ic_delete"
+        app:tint="@color/upload_navy" />
 
     <ImageView
         android:id="@+id/camera_page_warning"

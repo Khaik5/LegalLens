@@ -34,7 +34,8 @@
                 android:layout_height="@dimen/dp_28"
                 android:layout_gravity="center"
                 android:contentDescription="@null"
-                android:src="@drawable/ic_alert_triangle" />
+                android:src="@drawable/ic_alert"
+                app:tint="@color/legal_lens_error" />
         </FrameLayout>
 
         <TextView

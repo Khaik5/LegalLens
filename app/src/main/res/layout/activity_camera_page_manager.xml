@@ -25,7 +25,8 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/camera_permission_back_description"
             android:padding="@dimen/upload_back_icon_inset"
-            android:src="@drawable/ic_upload_back" />
+            android:src="@drawable/ic_back"
+            app:tint="@color/upload_navy" />
 
         <TextView
             android:layout_width="0dp"

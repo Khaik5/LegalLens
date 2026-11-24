@@ -12,7 +12,8 @@
         android:layout_width="@dimen/dp_20"
         android:layout_height="@dimen/dp_20"
         android:contentDescription="@null"
-        android:src="@drawable/ic_contract_search_chevron_right"
+        android:src="@drawable/ic_chevron_right"
+        app:tint="@color/legal_lens_secondary_text"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -25,7 +26,8 @@
         android:background="@drawable/bg_chatbot_history_icon"
         android:contentDescription="@null"
         android:padding="@dimen/dp_10"
-        android:src="@drawable/ic_upload_pdf"
+        android:src="@drawable/ic_file_text"
+        app:tint="@color/upload_teal"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

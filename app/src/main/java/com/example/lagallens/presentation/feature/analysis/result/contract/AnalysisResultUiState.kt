@@ -17,19 +17,19 @@ data class AnalysisResultUiState(
     val unlockCost: Int = 0,
     val items: List<AnalysisResultItem> = listOf(
         AnalysisResultItem(
-            iconRes = R.drawable.ic_ocr_saved_document,
+            iconRes = R.drawable.ic_file_text,
             titleRes = R.string.analysis_result_summary_title,
             descriptionRes = R.string.analysis_result_summary_description,
             destination = AnalysisResultDestination.SUMMARY
         ),
         AnalysisResultItem(
-            iconRes = R.drawable.ic_notification_info,
+            iconRes = R.drawable.ic_info_circle,
             titleRes = R.string.analysis_result_important_information_title,
             descriptionRes = R.string.analysis_result_important_information_description,
             destination = AnalysisResultDestination.KEY_FACTS
         ),
         AnalysisResultItem(
-            iconRes = R.drawable.ic_analysis_result_users,
+            iconRes = R.drawable.ic_users,
             titleRes = R.string.analysis_result_parties_title,
             descriptionRes = R.string.analysis_result_parties_description,
             destination = AnalysisResultDestination.PARTIES
@@ -41,14 +41,14 @@ data class AnalysisResultUiState(
             destination = AnalysisResultDestination.OBLIGATIONS
         ),
         AnalysisResultItem(
-            iconRes = R.drawable.ic_alert_triangle,
+            iconRes = R.drawable.ic_alert,
             titleRes = R.string.analysis_result_risk_title,
             descriptionRes = R.string.analysis_result_risk_description,
             isRisk = true,
             destination = AnalysisResultDestination.RISK_OVERVIEW
         ),
         AnalysisResultItem(
-            iconRes = R.drawable.ic_analysis_result_book,
+            iconRes = R.drawable.ic_book,
             titleRes = R.string.analysis_result_legal_basis_title,
             descriptionRes = R.string.analysis_result_legal_basis_description,
             destination = AnalysisResultDestination.LEGAL_REFERENCES

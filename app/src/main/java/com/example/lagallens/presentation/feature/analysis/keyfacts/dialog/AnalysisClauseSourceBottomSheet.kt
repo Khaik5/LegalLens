@@ -57,7 +57,10 @@ class AnalysisClauseSourceBottomSheet : BottomSheetDialogFragment() {
         if ((activity as? com.example.lagallens.presentation.feature.analysis.keyfacts.contract.AnalysisClauseSourceOwner)?.isVerifiedClause(source) != true) { dismissAllowingStateLoss(); return }
         binding.analysisClauseSourceReference.text = source.reference
         binding.analysisClauseSourceTitle.text = source.title
-        binding.analysisClauseSourceExcerpt.text = source.excerpt
+        // The backend names the clause but does not always have its text; say so instead of showing an empty box.
+        binding.analysisClauseSourceExcerpt.text = source.excerpt.ifBlank {
+            getString(R.string.analysis_clause_source_excerpt_missing, source.reference.ifBlank { source.title })
+        }
         binding.analysisClauseSourceCloseIcon.setOnClickListener { dismiss() }
         binding.analysisClauseSourceCloseButton.setOnClickListener { dismiss() }
     }

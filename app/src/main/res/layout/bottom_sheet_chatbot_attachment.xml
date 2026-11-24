@@ -55,7 +55,7 @@
         android:foreground="?attr/selectableItemBackground"
         android:gravity="center"
         android:orientation="horizontal">
-        <ImageView android:layout_width="@dimen/dp_18" android:layout_height="@dimen/dp_18" android:contentDescription="@null" android:src="@drawable/ic_upload_pdf" app:tint="@color/white" />
+        <ImageView android:layout_width="@dimen/dp_18" android:layout_height="@dimen/dp_18" android:contentDescription="@null" android:src="@drawable/ic_file_text" app:tint="@color/white" />
         <TextView android:fontFamily="@font/manrope" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="@dimen/dp_8" android:text="@string/chatbot_attachment_pdf_action" android:textColor="@color/white" android:textSize="@dimen/sp_15" android:textStyle="bold" />
     </LinearLayout>
 
@@ -70,7 +70,7 @@
         android:foreground="?attr/selectableItemBackground"
         android:gravity="center"
         android:orientation="horizontal">
-        <ImageView android:layout_width="@dimen/dp_18" android:layout_height="@dimen/dp_18" android:contentDescription="@null" android:src="@drawable/ic_upload_camera" app:tint="@color/legal_lens_primary" />
+        <ImageView android:layout_width="@dimen/dp_18" android:layout_height="@dimen/dp_18" android:contentDescription="@null" android:src="@drawable/ic_camera" app:tint="@color/legal_lens_primary" />
         <TextView android:fontFamily="@font/manrope" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="@dimen/dp_8" android:text="@string/chatbot_attachment_camera_action" android:textColor="@color/legal_lens_primary" android:textSize="@dimen/sp_15" android:textStyle="bold" />
     </LinearLayout>
 
@@ -85,7 +85,7 @@
         android:foreground="?attr/selectableItemBackground"
         android:gravity="center"
         android:orientation="horizontal">
-        <ImageView android:layout_width="@dimen/dp_18" android:layout_height="@dimen/dp_18" android:contentDescription="@null" android:src="@drawable/ic_contract_search_document" app:tint="@color/legal_lens_primary" />
+        <ImageView android:layout_width="@dimen/dp_18" android:layout_height="@dimen/dp_18" android:contentDescription="@null" android:src="@drawable/ic_file_text" app:tint="@color/legal_lens_primary" />
         <TextView android:fontFamily="@font/manrope" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="@dimen/dp_8" android:text="@string/chatbot_attachment_saved_action" android:textColor="@color/legal_lens_primary" android:textSize="@dimen/sp_15" android:textStyle="bold" />
     </LinearLayout>
 

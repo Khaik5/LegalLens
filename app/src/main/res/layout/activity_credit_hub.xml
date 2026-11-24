@@ -25,7 +25,8 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/credit_store_back_description"
             android:padding="@dimen/dp_8"
-            android:src="@drawable/ic_credit_store_back" />
+            android:src="@drawable/ic_back"
+            app:tint="@color/legal_lens_status_text" />
 
         <TextView
             android:layout_width="0dp"
@@ -82,7 +83,8 @@
                             android:layout_height="@dimen/dp_24"
                             android:layout_gravity="center"
                             android:contentDescription="@string/credit_store_wallet_icon_description"
-                            android:src="@drawable/ic_credit_store_wallet" />
+                            android:src="@drawable/ic_wallet"
+                            app:tint="@color/legal_lens_auth_accent" />
                     </FrameLayout>
 
                     <LinearLayout
@@ -162,7 +164,8 @@
                         android:layout_height="@dimen/dp_22"
                         android:layout_gravity="center"
                         android:contentDescription="@null"
-                        android:src="@drawable/ic_credit_store_wallet" />
+                        android:src="@drawable/ic_wallet"
+                        app:tint="@color/legal_lens_auth_accent" />
                 </FrameLayout>
 
                 <LinearLayout
@@ -197,7 +200,8 @@
                     android:layout_width="@dimen/dp_20"
                     android:layout_height="@dimen/dp_20"
                     android:contentDescription="@null"
-                    android:src="@drawable/ic_contract_search_chevron_right" />
+                    android:src="@drawable/ic_chevron_right"
+                    app:tint="@color/legal_lens_secondary_text" />
             </LinearLayout>
 
             <LinearLayout
@@ -260,7 +264,8 @@
                     android:layout_width="@dimen/dp_20"
                     android:layout_height="@dimen/dp_20"
                     android:contentDescription="@null"
-                    android:src="@drawable/ic_contract_search_chevron_right" />
+                    android:src="@drawable/ic_chevron_right"
+                    app:tint="@color/legal_lens_secondary_text" />
             </LinearLayout>
 
             <LinearLayout
@@ -286,7 +291,7 @@
                         android:layout_height="@dimen/dp_22"
                         android:layout_gravity="center"
                         android:contentDescription="@null"
-                        android:src="@drawable/ic_credit_store_wallet"
+                        android:src="@drawable/ic_wallet"
                         app:tint="@color/legal_lens_auth_accent" />
                 </FrameLayout>
 
@@ -322,7 +327,8 @@
                     android:layout_width="@dimen/dp_20"
                     android:layout_height="@dimen/dp_20"
                     android:contentDescription="@null"
-                    android:src="@drawable/ic_contract_search_chevron_right" />
+                    android:src="@drawable/ic_chevron_right"
+                    app:tint="@color/legal_lens_secondary_text" />
             </LinearLayout>
 
             <LinearLayout
@@ -348,7 +354,8 @@
                         android:layout_height="@dimen/dp_22"
                         android:layout_gravity="center"
                         android:contentDescription="@null"
-                        android:src="@drawable/ic_credit_store_file_search" />
+                        android:src="@drawable/ic_file_search"
+                        app:tint="@color/legal_lens_auth_accent" />
                 </FrameLayout>
 
                 <LinearLayout
@@ -383,7 +390,8 @@
                     android:layout_width="@dimen/dp_20"
                     android:layout_height="@dimen/dp_20"
                     android:contentDescription="@null"
-                    android:src="@drawable/ic_contract_search_chevron_right" />
+                    android:src="@drawable/ic_chevron_right"
+                    app:tint="@color/legal_lens_secondary_text" />
             </LinearLayout>
 
             <LinearLayout
@@ -399,7 +407,7 @@
                     android:layout_width="@dimen/dp_20"
                     android:layout_height="@dimen/dp_20"
                     android:contentDescription="@null"
-                    android:src="@drawable/ic_profile_info"
+                    android:src="@drawable/ic_info_circle"
                     app:tint="@color/legal_lens_auth_accent" />
 
                 <TextView
