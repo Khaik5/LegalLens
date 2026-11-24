@@ -62,6 +62,7 @@ class ChatbotViewModel(
     private var openJob: Job? = null
     private val failedQuestions = mutableMapOf<Long, String>()
     private val failedAttachments = mutableMapOf<Long, ChatbotAttachment>()
+    private val autoRetriedMessageIds = mutableSetOf<Long>()
     private var newChatSuggestions: List<String> = emptyList()
     private var draftTransition: Job? = null
     private var draftGeneration: Job? = null
@@ -246,7 +247,9 @@ class ChatbotViewModel(
         replyJob = launchForSession {
             try {
                 val reply = sendMessage.forSession(ownerSession, activeConversationId, message, attachment)
-                if (openConversation.currentSessionKey() == ownerSession) appendReply(message, reply, attachment)
+                if (openConversation.currentSessionKey() != ownerSession) return@launchForSession
+                val replyId = appendReply(message, reply, attachment)
+                if (reply is ChatbotReply.RetryableError) retryAutomaticallyOnce(replyId)
             } catch (cancellationException: CancellationException) {
                 throw cancellationException
             } catch (failure: Exception) {
@@ -260,7 +263,12 @@ class ChatbotViewModel(
         }
     }
 
-    private fun appendReply(question: String, reply: ChatbotReply, attachment: ChatbotAttachment? = null) {
+    /** Gives a reply the server could not finish one more try before asking the user to tap Retry. */
+    private fun retryAutomaticallyOnce(messageId: Long) {
+        if (autoRetriedMessageIds.add(messageId)) retryMessage(messageId)
+    }
+
+    private fun appendReply(question: String, reply: ChatbotReply, attachment: ChatbotAttachment? = null): Long {
         val assistantMessage = reply.toMessage(nextMessageId++)
         if (reply is ChatbotReply.RetryableError) {
             failedQuestions[assistantMessage.id] = question
@@ -273,6 +281,7 @@ class ChatbotViewModel(
             )
         }
         persistTranscript()
+        return assistantMessage.id
     }
 
     private fun resetConversation() {
