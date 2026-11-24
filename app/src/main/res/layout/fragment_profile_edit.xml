@@ -24,7 +24,7 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/profile_edit_back_description"
             android:padding="@dimen/dp_10"
-            android:src="@drawable/ic_contract_search_back"
+            android:src="@drawable/ic_back"
             app:tint="@color/legal_lens_primary" />
 
         <TextView
@@ -190,7 +190,8 @@
                         android:layout_gravity="center_vertical|end"
                         android:layout_marginEnd="@dimen/dp_16"
                         android:contentDescription="@null"
-                        android:src="@drawable/ic_profile_edit_lock" />
+                        android:src="@drawable/ic_lock"
+                        app:tint="@color/legal_lens_secondary_text" />
                 </FrameLayout>
 
                 <TextView

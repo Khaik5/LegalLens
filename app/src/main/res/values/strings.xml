@@ -644,6 +644,7 @@
     <string name="analysis_clause_source_title">Điều khoản gốc</string>
     <string name="analysis_clause_source_subtitle">Trích từ văn bản hợp đồng</string>
     <string name="analysis_clause_source_close">Đóng</string>
+    <string name="analysis_clause_source_excerpt_missing">Chưa lấy được đoạn trích của điều khoản này. Vui lòng xem %1$s trong hợp đồng gốc.</string>
     <string name="analysis_clause_source_notice">Nội dung được trích xuất từ văn bản OCR. Vui lòng đối chiếu với bản hợp đồng gốc.</string>
     <string name="analysis_clause_source_salary_excerpt" translatable="false">... Bên B thực hiện đầy đủ các nghĩa vụ và trách nhiệm được phân công theo quy định. <b>Mức lương chính thức của Người lao động là 12.000.000 VNĐ/tháng.</b> Khoản lương này chưa bao gồm tiền thưởng doanh số định kỳ hàng quý và các trợ cấp ăn trưa, đi lại được duyệt bởi Giám đốc điều hành. ...</string>
     <string name="analysis_parties_title">Bên liên quan</string>

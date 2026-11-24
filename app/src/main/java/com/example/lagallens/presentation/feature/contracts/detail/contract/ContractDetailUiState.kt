@@ -65,10 +65,10 @@ enum class ContractAssistantAction(
     @StringRes val titleRes: Int,
     @DrawableRes val iconRes: Int
 ) {
-    VIEW_DOCUMENT(R.string.contract_detail_view_document, R.drawable.ic_contract_search_document),
-    OCR_TEXT(R.string.contract_detail_ocr_text, R.drawable.ic_contract_detail_scan),
-    ANALYZE(R.string.contract_detail_analyze, R.drawable.ic_contract_detail_brain),
-    CHAT(R.string.contract_detail_chat, R.drawable.ic_contract_detail_chat),
-    COMPARE(R.string.contract_detail_compare, R.drawable.ic_contract_detail_compare),
-    EXPORT(R.string.contract_detail_export, R.drawable.ic_contract_detail_download)
+    VIEW_DOCUMENT(R.string.contract_detail_view_document, R.drawable.ic_file_text),
+    OCR_TEXT(R.string.contract_detail_ocr_text, R.drawable.ic_file_search),
+    ANALYZE(R.string.contract_detail_analyze, R.drawable.ic_brain),
+    CHAT(R.string.contract_detail_chat, R.drawable.ic_message_circle),
+    COMPARE(R.string.contract_detail_compare, R.drawable.ic_columns),
+    EXPORT(R.string.contract_detail_export, R.drawable.ic_download)
 }

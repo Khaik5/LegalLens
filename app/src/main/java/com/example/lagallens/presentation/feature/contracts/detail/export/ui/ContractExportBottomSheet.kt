@@ -112,7 +112,7 @@ class ContractExportBottomSheet : BottomSheetDialogFragment() {
         exportRetry.isVisible = state.status == ContractExportStatus.ERROR
         when (state.status) {
             ContractExportStatus.LOADING -> { exportStatus.setBackgroundResource(R.drawable.bg_compare_notice); exportStatusTitle.setText(R.string.contract_export_loading); exportStatusDetail.setText(R.string.contract_export_loading_detail) }
-            ContractExportStatus.ERROR -> { exportStatus.setBackgroundResource(R.drawable.bg_contract_export_error); exportStatusIcon.setImageResource(R.drawable.ic_chatbot_error); exportStatusTitle.setText(R.string.contract_export_error); exportStatusDetail.setText(R.string.contract_export_error_detail) }
+            ContractExportStatus.ERROR -> { exportStatus.setBackgroundResource(R.drawable.bg_contract_export_error); exportStatusIcon.setImageResource(R.drawable.ic_error); exportStatusTitle.setText(R.string.contract_export_error); exportStatusDetail.setText(R.string.contract_export_error_detail) }
             ContractExportStatus.OPTIONS -> Unit
         }
     }

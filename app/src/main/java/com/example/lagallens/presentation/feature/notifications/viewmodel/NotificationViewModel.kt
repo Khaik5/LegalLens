@@ -174,8 +174,8 @@ class NotificationViewModel @JvmOverloads constructor(
         val (iconRes, iconBackgroundRes, iconTintRes) = when (kind) {
             NotificationKind.ANALYSIS -> Triple(R.drawable.ic_shield_check, R.drawable.bg_notification_icon_complete, R.color.contract_complete)
             NotificationKind.OCR -> Triple(R.drawable.ic_camera_warning, R.drawable.bg_notification_icon_pending, R.color.contract_pending)
-            NotificationKind.REMINDER -> Triple(R.drawable.ic_dashboard_calendar, R.drawable.bg_notification_icon_reminder, R.color.notification_blue)
-            NotificationKind.SYSTEM -> Triple(R.drawable.ic_notification_info, R.drawable.bg_notification_icon_system, R.color.legal_lens_secondary_text)
+            NotificationKind.REMINDER -> Triple(R.drawable.ic_calendar, R.drawable.bg_notification_icon_reminder, R.color.notification_blue)
+            NotificationKind.SYSTEM -> Triple(R.drawable.ic_info_circle, R.drawable.bg_notification_icon_system, R.color.legal_lens_secondary_text)
         }
         return NotificationItem(id, contractId, title, description, createdAtMillis, kind.toPresentationCategory(), iconRes, iconBackgroundRes, iconTintRes, isUnread)
     }

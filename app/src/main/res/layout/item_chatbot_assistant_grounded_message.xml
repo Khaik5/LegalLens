@@ -89,7 +89,8 @@
                 android:layout_width="@dimen/chatbot_reference_chevron_size"
                 android:layout_height="@dimen/chatbot_reference_chevron_size"
                 android:contentDescription="@null"
-                android:src="@drawable/ic_chatbot_chevron_down"
+                android:src="@drawable/ic_chevron_down"
+                app:tint="@color/legal_lens_secondary_text"
                 app:layout_constraintBottom_toBottomOf="@id/chatbotReferenceFirstTitle"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@id/chatbotReferenceFirstTitle" />
@@ -139,7 +140,8 @@
                 android:layout_width="@dimen/chatbot_reference_chevron_size"
                 android:layout_height="@dimen/chatbot_reference_chevron_size"
                 android:contentDescription="@null"
-                android:src="@drawable/ic_chatbot_chevron_down"
+                android:src="@drawable/ic_chevron_down"
+                app:tint="@color/legal_lens_secondary_text"
                 app:layout_constraintBottom_toBottomOf="@id/chatbotReferenceSecondTitle"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@id/chatbotReferenceSecondTitle" />

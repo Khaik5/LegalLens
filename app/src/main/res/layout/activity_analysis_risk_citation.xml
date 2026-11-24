@@ -23,7 +23,8 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/analysis_risk_citation_back_content_description"
             android:padding="@dimen/analysis_back_icon_padding"
-            android:src="@drawable/ic_upload_back"
+            android:src="@drawable/ic_back"
+            app:tint="@color/upload_navy"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -50,7 +51,8 @@
             android:layout_height="@dimen/analysis_back_button_size"
             android:contentDescription="@string/analysis_risk_citation_more_content_description"
             android:padding="@dimen/analysis_back_icon_padding"
-            android:src="@drawable/ic_analysis_risk_overview_more"
+            android:src="@drawable/ic_more"
+            app:tint="@color/legal_lens_primary"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -87,7 +89,8 @@
                     android:layout_width="@dimen/dp_18"
                     android:layout_height="@dimen/dp_18"
                     android:contentDescription="@null"
-                    android:src="@drawable/ic_analysis_clause_source_info" />
+                    android:src="@drawable/ic_info_circle"
+                    app:tint="@color/legal_lens_auth_accent" />
 
                 <TextView
                     android:id="@+id/analysisRiskCitationNotice"
@@ -135,7 +138,8 @@
                             android:layout_height="@dimen/dp_20"
                             android:layout_gravity="center"
                             android:contentDescription="@null"
-                            android:src="@drawable/ic_alert_triangle" />
+                            android:src="@drawable/ic_alert"
+                            app:tint="@color/legal_lens_error" />
                     </FrameLayout>
 
                     <LinearLayout
@@ -231,7 +235,8 @@
                         android:layout_width="@dimen/dp_16"
                         android:layout_height="@dimen/dp_16"
                         android:contentDescription="@null"
-                        android:src="@drawable/ic_analysis_risk_citation_back" />
+                        android:src="@drawable/ic_back"
+                        app:tint="@color/white" />
 
                     <TextView
                         android:layout_width="wrap_content"

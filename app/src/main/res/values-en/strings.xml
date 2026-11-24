@@ -710,6 +710,7 @@
     <string name="analysis_clause_source_title">Original clause</string>
     <string name="analysis_clause_source_subtitle">Extracted from the contract document</string>
     <string name="analysis_clause_source_close">Close</string>
+    <string name="analysis_clause_source_excerpt_missing">The text of this clause could not be retrieved. Please see %1$s in the original contract.</string>
     <string name="analysis_clause_source_notice">This content was extracted from an OCR document. Please compare it with the original contract.</string>
     <string name="analysis_parties_title">Parties</string>
     <string name="analysis_parties_back_content_description">Back</string>

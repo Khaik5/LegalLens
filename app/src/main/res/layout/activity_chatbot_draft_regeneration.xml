@@ -20,7 +20,8 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/chatbot_draft_back"
             android:padding="@dimen/dp_12"
-            android:src="@drawable/ic_contract_search_back" />
+            android:src="@drawable/ic_back"
+            app:tint="@color/legal_lens_status_text" />
 
         <TextView
             android:id="@+id/draftRegenerationTitle"
@@ -39,7 +40,8 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/chatbot_draft_more"
             android:padding="@dimen/dp_12"
-            android:src="@drawable/ic_analysis_risk_overview_more" />
+            android:src="@drawable/ic_more"
+            app:tint="@color/legal_lens_primary" />
     </LinearLayout>
 
     <LinearLayout
@@ -64,7 +66,7 @@
                 android:background="@drawable/bg_chatbot_generation_progress"
                 android:contentDescription="@null"
                 android:padding="@dimen/dp_10"
-                android:src="@drawable/ic_contract_search_document"
+                android:src="@drawable/ic_file_text"
                 app:tint="@color/legal_lens_auth_accent" />
 
             <LinearLayout
@@ -164,7 +166,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/dp_32"
                 android:background="@drawable/bg_chatbot_draft_warning"
-                android:drawableStart="@drawable/ic_alert_triangle"
+                android:drawableStart="@drawable/ic_alert"
                 android:drawablePadding="@dimen/dp_8"
                 android:drawableTint="@color/chatbot_draft_notice_icon"
                 android:fontFamily="@font/manrope"
@@ -195,7 +197,7 @@
                     android:layout_height="@dimen/dp_40"
                     android:layout_gravity="center"
                     android:contentDescription="@null"
-                    android:src="@drawable/ic_alert_triangle"
+                    android:src="@drawable/ic_alert"
                     app:tint="@color/legal_lens_error" />
             </FrameLayout>
 
@@ -227,7 +229,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/dp_24"
                 android:background="@color/legal_lens_error_background"
-                android:drawableStart="@drawable/ic_alert_triangle"
+                android:drawableStart="@drawable/ic_alert"
                 android:drawablePadding="@dimen/dp_8"
                 android:drawableTint="@color/legal_lens_error"
                 android:fontFamily="@font/manrope"
@@ -258,7 +260,7 @@
                     android:layout_height="@dimen/dp_32"
                     android:layout_gravity="center"
                     android:contentDescription="@null"
-                    android:src="@drawable/ic_credit_success_check"
+                    android:src="@drawable/ic_check"
                     app:tint="@color/legal_lens_auth_accent" />
             </FrameLayout>
 
@@ -322,7 +324,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/dp_16"
                 android:background="@drawable/bg_chatbot_draft_warning"
-                android:drawableStart="@drawable/ic_alert_triangle"
+                android:drawableStart="@drawable/ic_alert"
                 android:drawablePadding="@dimen/dp_8"
                 android:drawableTint="@color/chatbot_draft_notice_icon"
                 android:fontFamily="@font/manrope"

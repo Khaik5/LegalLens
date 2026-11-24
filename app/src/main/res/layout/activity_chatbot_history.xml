@@ -23,7 +23,8 @@
             android:background="@android:color/transparent"
             android:contentDescription="@string/chatbot_history_back_content_description"
             android:padding="@dimen/upload_back_icon_inset"
-            android:src="@drawable/ic_contract_search_back" />
+            android:src="@drawable/ic_back"
+            app:tint="@color/legal_lens_status_text" />
 
         <TextView android:fontFamily="@font/manrope"
             android:id="@+id/chatbotHistoryTitle"
@@ -48,7 +49,7 @@
             android:background="@android:color/transparent"
             android:contentDescription="@string/chatbot_history_search_content_description"
             android:padding="@dimen/chatbot_header_action_padding"
-            android:src="@drawable/ic_analysis_risk_overview_more"
+            android:src="@drawable/ic_more"
             app:tint="@color/legal_lens_primary" />
     </FrameLayout>
 
@@ -98,7 +99,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_chatbot_grounded_notice"
-                android:drawableStart="@drawable/ic_credit_low_info"
+                android:drawableStart="@drawable/ic_info_circle"
                 android:drawablePadding="@dimen/dp_8"
                 android:drawableTint="@color/legal_lens_auth_accent"
                 android:gravity="center_vertical"
@@ -147,7 +148,7 @@
             android:focusable="true"
             android:gravity="center"
             android:orientation="horizontal">
-            <ImageView android:layout_width="@dimen/dp_18" android:layout_height="@dimen/dp_18" android:contentDescription="@null" android:src="@drawable/ic_chatbot_new_chat_add" app:tint="@color/white" />
+            <ImageView android:layout_width="@dimen/dp_18" android:layout_height="@dimen/dp_18" android:contentDescription="@null" android:src="@drawable/ic_add" app:tint="@color/white" />
             <TextView android:fontFamily="@font/manrope" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="@dimen/dp_8" android:text="@string/chatbot_history_new_conversation" android:textColor="@color/white" android:textSize="@dimen/sp_15" android:textStyle="bold" />
         </LinearLayout>
     </LinearLayout>

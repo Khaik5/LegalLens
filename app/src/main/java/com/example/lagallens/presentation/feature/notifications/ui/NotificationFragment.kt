@@ -184,7 +184,7 @@ class NotificationFragment : Fragment() {
     private inner class SwipeToDeleteCallback : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
         private val background by lazy { ContextCompat.getColor(requireContext(), R.color.contract_risk_high).toDrawable() }
         private val icon by lazy {
-            ContextCompat.getDrawable(requireContext(), R.drawable.ic_camera_delete)?.mutate()?.apply { setTint(Color.WHITE) }
+            ContextCompat.getDrawable(requireContext(), R.drawable.ic_delete)?.mutate()?.apply { setTint(Color.WHITE) }
         }
 
         override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder) = false

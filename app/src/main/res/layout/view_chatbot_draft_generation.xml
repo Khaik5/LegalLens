@@ -51,14 +51,15 @@
         <LinearLayout android:id="@+id/chatbotGenerationError" android:layout_width="match_parent" android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/dp_16" android:orientation="vertical" android:visibility="gone">
             <TextView android:id="@+id/chatbotGenerationErrorBody" android:layout_width="match_parent" android:layout_height="wrap_content" android:background="@drawable/bg_contract_export_error"
-                android:drawableStart="@drawable/ic_chatbot_error" android:drawablePadding="@dimen/dp_8" android:gravity="center_vertical"
+                android:drawableStart="@drawable/ic_error"
+                android:drawableTint="@color/analysis_result_risk" android:drawablePadding="@dimen/dp_8" android:gravity="center_vertical"
                 android:fontFamily="@font/manrope" android:padding="@dimen/dp_12" android:text="@string/chatbot_generation_error"
                 android:textColor="@color/legal_lens_secondary_text" android:textSize="@dimen/sp_12" />
             <LinearLayout android:id="@+id/chatbotGenerationRetry" android:layout_width="match_parent" android:layout_height="@dimen/dp_50"
                 android:layout_marginTop="@dimen/dp_16" android:background="@drawable/bg_chatbot_primary_action" android:clickable="true" android:focusable="true"
                 android:gravity="center" android:orientation="horizontal">
                 <ImageView android:layout_width="@dimen/dp_20" android:layout_height="@dimen/dp_20" android:contentDescription="@null"
-                    android:src="@drawable/ic_chatbot_retry" app:tint="@color/white" />
+                    android:src="@drawable/ic_retry" app:tint="@color/white" />
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="@dimen/dp_8"
                     android:fontFamily="@font/manrope" android:text="@string/chatbot_generation_retry" android:textColor="@color/white"
                     android:textSize="@dimen/sp_15" android:textStyle="bold" />
@@ -74,13 +75,14 @@
         <LinearLayout android:id="@+id/chatbotGenerationSuccess" android:layout_width="match_parent" android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/dp_16" android:orientation="vertical" android:visibility="gone">
             <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:background="@drawable/bg_contract_export_success"
-                android:drawableStart="@drawable/ic_chatbot_draft_success" android:drawablePadding="@dimen/dp_8" android:gravity="center_vertical"
+                android:drawableStart="@drawable/ic_check_circle"
+                android:drawableTint="@color/contract_complete" android:drawablePadding="@dimen/dp_8" android:gravity="center_vertical"
                 android:fontFamily="@font/manrope" android:padding="@dimen/dp_12" android:text="@string/chatbot_generation_success"
                 android:textColor="@color/legal_lens_secondary_text" android:textSize="@dimen/sp_12" />
             <include android:id="@+id/chatbotGenerationResultDocument" layout="@layout/view_chatbot_source_document"
                 android:layout_width="match_parent" android:layout_height="@dimen/chatbot_document_card_height" android:layout_marginTop="@dimen/dp_16" />
             <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/dp_16"
-                android:background="@drawable/bg_chatbot_draft_warning" android:drawableStart="@drawable/ic_alert_triangle"
+                android:background="@drawable/bg_chatbot_draft_warning" android:drawableStart="@drawable/ic_alert"
                 android:drawableTint="@color/chatbot_draft_notice_icon" android:drawablePadding="@dimen/dp_8" android:gravity="center_vertical"
                 android:fontFamily="@font/manrope" android:padding="@dimen/dp_12" android:text="@string/chatbot_generation_result_warning"
                 android:textColor="@color/legal_lens_secondary_text" android:textSize="@dimen/sp_12" />

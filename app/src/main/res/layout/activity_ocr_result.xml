@@ -25,7 +25,8 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/ocr_result_back_content_description"
             android:padding="@dimen/ocr_review_back_icon_inset"
-            android:src="@drawable/ic_ocr_review_back" />
+            android:src="@drawable/ic_back"
+            app:tint="@color/legal_lens_status_text" />
 
         <TextView
             android:layout_width="0dp"

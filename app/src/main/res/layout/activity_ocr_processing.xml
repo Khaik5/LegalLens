@@ -25,7 +25,8 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/camera_permission_back_description"
             android:padding="@dimen/upload_back_icon_inset"
-            android:src="@drawable/ic_upload_back" />
+            android:src="@drawable/ic_back"
+            app:tint="@color/upload_navy" />
 
         <TextView
             android:layout_width="0dp"
@@ -59,7 +60,8 @@
             android:layout_height="@dimen/ocr_processing_document_icon_container_size"
             android:background="@drawable/bg_ocr_processing_document_icon"
             android:padding="@dimen/ocr_processing_document_icon_padding"
-            android:src="@drawable/ic_upload_pdf" />
+            android:src="@drawable/ic_file_text"
+            app:tint="@color/upload_teal" />
 
         <LinearLayout
             android:layout_width="0dp"

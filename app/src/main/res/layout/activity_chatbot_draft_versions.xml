@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/legal_lens_background"
@@ -18,7 +19,8 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/chatbot_draft_back"
             android:padding="@dimen/dp_12"
-            android:src="@drawable/ic_contract_search_back" />
+            android:src="@drawable/ic_back"
+            app:tint="@color/legal_lens_status_text" />
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -35,7 +37,8 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/chatbot_draft_more"
             android:padding="@dimen/dp_12"
-            android:src="@drawable/ic_analysis_risk_overview_more" />
+            android:src="@drawable/ic_more"
+            app:tint="@color/legal_lens_primary" />
     </LinearLayout>
 
     <ScrollView
@@ -297,7 +300,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/dp_16"
                 android:background="@drawable/bg_chatbot_ai_review_after"
-                android:drawableStart="@drawable/ic_credit_low_info"
+                android:drawableStart="@drawable/ic_info_circle"
+                android:drawableTint="@color/credit_warning"
                 android:drawablePadding="@dimen/dp_8"
                 android:gravity="center_vertical"
                 android:padding="@dimen/dp_12"

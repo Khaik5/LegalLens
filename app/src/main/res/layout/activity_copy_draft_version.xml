@@ -17,7 +17,8 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/chatbot_draft_back"
             android:padding="@dimen/dp_12"
-            android:src="@drawable/ic_contract_search_back" />
+            android:src="@drawable/ic_back"
+            app:tint="@color/legal_lens_status_text" />
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -34,7 +35,8 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/chatbot_draft_more"
             android:padding="@dimen/dp_12"
-            android:src="@drawable/ic_analysis_risk_overview_more" />
+            android:src="@drawable/ic_more"
+            app:tint="@color/legal_lens_primary" />
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
@@ -59,7 +61,8 @@
                 android:layout_height="@dimen/analysis_document_icon_art_size"
                 android:layout_gravity="center"
                 android:contentDescription="@null"
-                android:src="@drawable/ic_ocr_saved_document" />
+                android:src="@drawable/ic_file_text"
+                app:tint="@color/ocr_saved_teal" />
         </FrameLayout>
         <LinearLayout
             android:layout_width="0dp"
@@ -161,7 +164,8 @@
                     android:layout_height="@dimen/dp_32"
                     android:layout_gravity="center"
                     android:contentDescription="@null"
-                    android:src="@drawable/ic_chatbot_error" />
+                    android:src="@drawable/ic_error"
+                    app:tint="@color/analysis_result_risk" />
             </FrameLayout>
             <TextView
                 android:layout_width="match_parent"
@@ -211,7 +215,7 @@
                     android:layout_height="@dimen/dp_40"
                     android:layout_gravity="center"
                     android:contentDescription="@null"
-                    android:src="@drawable/ic_credit_success_check"
+                    android:src="@drawable/ic_check"
                     app:tint="#10B981" />
             </FrameLayout>
             <TextView
@@ -258,7 +262,8 @@
         android:layout_marginEnd="@dimen/dp_16"
         android:layout_marginBottom="@dimen/dp_8"
         android:background="@drawable/bg_chatbot_ai_review_after"
-        android:drawableStart="@drawable/ic_credit_low_info"
+        android:drawableStart="@drawable/ic_info_circle"
+        android:drawableTint="@color/credit_warning"
         android:drawablePadding="@dimen/dp_8"
         android:gravity="center_vertical"
         android:padding="@dimen/dp_12"
