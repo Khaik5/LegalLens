@@ -1,6 +1,6 @@
 package com.example.lagallens.domain.model
 
-enum class EmploymentContractStatus { COMPLETE, PROCESSING, DRAFT }
+enum class EmploymentContractStatus { COMPLETE, PROCESSING, DRAFT, PENDING_REVIEW }
 
 enum class EmploymentContractRisk { LOW, MEDIUM, HIGH, CRITICAL, NOT_ANALYZED }
 

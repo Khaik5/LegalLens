@@ -43,7 +43,8 @@ enum class ContractFilter(@StringRes val titleRes: Int) {
 enum class ContractProcessingStatus {
     COMPLETE,
     PROCESSING,
-    DRAFT
+    DRAFT,
+    PENDING_REVIEW
 }
 
 enum class ContractRiskLevel {

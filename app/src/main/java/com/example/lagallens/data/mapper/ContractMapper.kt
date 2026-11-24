@@ -20,7 +20,7 @@ internal fun ContractResponse.toContract() = EmploymentContract(
         "COMPLETED" -> EmploymentContractStatus.COMPLETE
         "FAILED" -> EmploymentContractStatus.DRAFT
         else -> when (status) {
-            "PENDING_REVIEW" -> EmploymentContractStatus.DRAFT
+            "PENDING_REVIEW" -> EmploymentContractStatus.PENDING_REVIEW
             "ACTIVE", "EXPIRED", "TERMINATED" -> EmploymentContractStatus.COMPLETE
             else -> EmploymentContractStatus.DRAFT
         }
