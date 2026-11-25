@@ -42,7 +42,7 @@ class RemoteAnalysisRepository(
         val contract = contractId.toLongOrNull()
         val document = documentId.toLongOrNull()
         if (scope == null || contract == null || document == null) {
-            emit(AnalysisJobState.Failed)
+            emit(AnalysisJobState.Failed())
             return@flow
         }
         var activeJobId: String? = null
@@ -50,14 +50,14 @@ class RemoteAnalysisRepository(
             emit(AnalysisJobState.Running(FIRST_STAGE))
             val revisionId = approvedRevisionId(scope, documentId)
             if (revisionId == null) {
-                emit(AnalysisJobState.Failed)
+                emit(AnalysisJobState.Failed())
                 return@flow
             }
             // The operation ID is the idempotency key, so a retry after process death joins the same job.
             val created = analysis.create(scope, operationId, AnalysisJobRequest(contract, document, revisionId))
             // Retrying reuses the operation ID, so the backend answers with the job that already failed.
             if (created.status == FAILED && !analysis.retry(scope, created.jobId)) {
-                emit(AnalysisJobState.Failed)
+                emit(AnalysisJobState.Failed())
                 return@flow
             }
             activeJobId = created.jobId
@@ -69,9 +69,9 @@ class RemoteAnalysisRepository(
             throw cancelled
         } catch (error: HttpException) {
             error.response()?.errorBody()?.close()
-            emit(AnalysisJobState.Failed)
+            emit(AnalysisJobState.Failed())
         } catch (_: IOException) {
-            emit(AnalysisJobState.Failed)
+            emit(AnalysisJobState.Failed())
         }
     }.flowOn(Dispatchers.IO)
 
@@ -125,7 +125,7 @@ class RemoteAnalysisRepository(
             }
             when (job.status) {
                 "COMPLETED" -> return emit(AnalysisJobState.Completed(jobId))
-                "FAILED", "CANCELLED" -> return emit(AnalysisJobState.Failed)
+                "FAILED", "CANCELLED" -> return emit(AnalysisJobState.Failed(job.errorCode))
             }
             // The timeline has stages FIRST_STAGE..LAST_STAGE; progress 0..100 moves through them.
             val next = (FIRST_STAGE + (job.progress ?: 0).coerceIn(0, 100) * (LAST_STAGE - FIRST_STAGE) / 100)
@@ -137,7 +137,7 @@ class RemoteAnalysisRepository(
         // Nobody waits for this job any more, and the backend allows one active job per contract: left running it
         // would make the next analysis of this contract fail with a conflict.
         cancelJob(scope, jobId)
-        emit(AnalysisJobState.Failed)
+        emit(AnalysisJobState.Failed())
     }
 
     private companion object {

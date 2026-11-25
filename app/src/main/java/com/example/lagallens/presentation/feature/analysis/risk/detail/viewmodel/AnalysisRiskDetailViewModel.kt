@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.lagallens.presentation.feature.analysis.risk.detail.contract.AnalysisRiskDetailUiEffect
 import com.example.lagallens.presentation.feature.analysis.risk.detail.contract.AnalysisRiskDetailUiEvent
 import com.example.lagallens.presentation.feature.analysis.risk.detail.contract.AnalysisRiskDetailUiState
+import com.example.lagallens.presentation.feature.analysis.risk.detail.contract.AnalysisRiskLegalBasis
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,7 +38,12 @@ class AnalysisRiskDetailViewModel : ViewModel() {
             clauseReference = finding.clause,
             clauseExcerpt = finding.description,
             legalExplanation = finding.explanation,
-            recommendation = finding.recommendation
+            recommendation = finding.recommendation,
+            originalExcerpt = finding.clauseExcerpt.orEmpty(),
+            legalBasis = finding.citationIds.mapNotNull { citationId ->
+                detail.citations.firstOrNull { it.id == citationId && it.excerpt.isNotBlank() }
+            }.map { AnalysisRiskLegalBasis(it.id, it.articleNumber, it.documentTitle, it.title, it.excerpt) },
+            isLegalBasisUnverified = finding.isLegalBasisVerified == false
         ) }
         return true
     }

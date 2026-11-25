@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.lagallens.presentation.feature.analysis.failure.contract.AnalysisFailureUiEffect
 import com.example.lagallens.presentation.feature.analysis.failure.contract.AnalysisFailureUiEvent
 import com.example.lagallens.presentation.feature.analysis.failure.contract.AnalysisFailureUiState
+import com.example.lagallens.presentation.feature.analysis.failure.contract.analysisFailureMessageRes
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,7 +25,8 @@ class AnalysisFailureViewModel : ViewModel() {
             is AnalysisFailureUiEvent.ScreenOpened -> _uiState.update {
                 it.copy(
                     documentName = event.documentName,
-                    documentMetadata = event.documentMetadata
+                    documentMetadata = event.documentMetadata,
+                    messageRes = analysisFailureMessageRes(event.errorCode)
                 )
             }
 

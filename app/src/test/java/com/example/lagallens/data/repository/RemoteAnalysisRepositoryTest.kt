@@ -57,7 +57,7 @@ class RemoteAnalysisRepositoryTest {
     private fun ocr(reviewStatus: String?, revisionId: String? = "rev-7") =
         OcrResultResponse("ocr-1", "COMPLETED", 100, null, false, 3, "text", 0.9, null, null, revisionId, reviewStatus)
 
-    private fun job(status: String, progress: Int = 0) = AnalysisJobResponse("job-1", status, progress, null, false)
+    private fun job(status: String, progress: Int = 0, errorCode: String? = null) = AnalysisJobResponse("job-1", status, progress, errorCode, false)
 
     @Test fun anApprovedRevisionIsNotConfirmedAgain() = runTest {
         ocrApi.latest = ocr("APPROVED")
@@ -133,7 +133,7 @@ class RemoteAnalysisRepositoryTest {
         ocrApi.latest = ocr("APPROVED")
         analysisApi.jobs = mutableListOf(job("PROCESSING"), job("FAILED"))
 
-        assertEquals(AnalysisJobState.Failed, repository.process("op-1", "27", "41", "session").toList().last())
+        assertEquals(AnalysisJobState.Failed(), repository.process("op-1", "27", "41", "session").toList().last())
     }
 
     @Test fun aFailedJobIsRetriedWhenTheSameOperationStartsAgain() = runTest {
@@ -147,12 +147,19 @@ class RemoteAnalysisRepositoryTest {
         assertEquals(AnalysisJobState.Completed("job-1"), states.last())
     }
 
+    @Test fun aFailedJobReportsTheErrorCodeTheBackendGave() = runTest {
+        ocrApi.latest = ocr("APPROVED")
+        analysisApi.jobs = mutableListOf(job("PROCESSING"), job("FAILED", errorCode = "ANALYSIS_PROVIDER_UNAVAILABLE"))
+
+        assertEquals(AnalysisJobState.Failed("ANALYSIS_PROVIDER_UNAVAILABLE"), repository.process("op-1", "27", "41", "session").toList().last())
+    }
+
     @Test fun aFailedJobThatCannotBeRetriedStaysFailed() = runTest {
         ocrApi.latest = ocr("APPROVED")
         analysisApi.createdStatus = "FAILED"
         analysisApi.retryable = false
 
-        assertEquals(AnalysisJobState.Failed, repository.process("op-1", "27", "41", "session").toList().last())
+        assertEquals(AnalysisJobState.Failed(), repository.process("op-1", "27", "41", "session").toList().last())
     }
 
     @Test fun leavingTheScreenWhileWaitingCancelsTheJob() = runTest {
@@ -178,13 +185,13 @@ class RemoteAnalysisRepositoryTest {
         ocrApi.latest = ocr("APPROVED")
         analysisApi.createFailure = httpError(503)
 
-        assertEquals(AnalysisJobState.Failed, repository.process("op-1", "27", "41", "session").toList().last())
+        assertEquals(AnalysisJobState.Failed(), repository.process("op-1", "27", "41", "session").toList().last())
     }
 
     @Test fun missingOcrTextFailsWithoutCreatingAJob() = runTest {
         ocrApi.latest = null
 
-        assertEquals(AnalysisJobState.Failed, repository.process("op-1", "27", "41", "session").toList().last())
+        assertEquals(AnalysisJobState.Failed(), repository.process("op-1", "27", "41", "session").toList().last())
         assertTrue(analysisApi.created.isEmpty())
     }
 
@@ -193,7 +200,7 @@ class RemoteAnalysisRepositoryTest {
 
         val states = repository.process("op-1", "27", "41", "someone-else").toList()
 
-        assertEquals(listOf(AnalysisJobState.Failed), states)
+        assertEquals(listOf(AnalysisJobState.Failed()), states)
         assertTrue(analysisApi.created.isEmpty())
     }
 
@@ -201,7 +208,7 @@ class RemoteAnalysisRepositoryTest {
         ocrApi.latest = ocr("APPROVED")
         analysisApi.jobs = MutableList(10) { job("PROCESSING") }
 
-        assertEquals(AnalysisJobState.Failed, repository.process("op-1", "27", "41", "session").toList().last())
+        assertEquals(AnalysisJobState.Failed(), repository.process("op-1", "27", "41", "session").toList().last())
         // The backend allows one active job per contract, so a job left running would block the next analysis.
         assertEquals(listOf("job-1"), analysisApi.cancelled)
     }
@@ -210,7 +217,7 @@ class RemoteAnalysisRepositoryTest {
         ocrApi.latest = ocr("APPROVED")
         analysisApi.jobs = mutableListOf(job("PROCESSING"), job("FAILED"))
 
-        assertEquals(AnalysisJobState.Failed, repository.process("op-1", "27", "41", "session").toList().last())
+        assertEquals(AnalysisJobState.Failed(), repository.process("op-1", "27", "41", "session").toList().last())
         assertTrue(analysisApi.cancelled.isEmpty())
     }
 

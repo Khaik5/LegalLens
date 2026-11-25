@@ -17,6 +17,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.lagallens.databinding.ActivityAnalysisRiskDetailBinding
+import com.example.lagallens.databinding.ItemAnalysisRiskLegalBasisBinding
+import com.example.lagallens.presentation.feature.analysis.legalreferences.detail.ui.AnalysisLegalReferenceDetailActivity
+import com.example.lagallens.presentation.feature.analysis.legalreferences.model.LegalReferenceFormat
 import com.example.lagallens.presentation.common.utils.bindPressFeedback
 import com.example.lagallens.presentation.feature.analysis.risk.citation.ui.AnalysisRiskCitationActivity
 import com.example.lagallens.presentation.feature.analysis.risk.detail.contract.AnalysisRiskDetailUiEffect
@@ -95,9 +98,34 @@ class AnalysisRiskDetailActivity : com.example.lagallens.presentation.feature.an
         analysisRiskDetailLegalReference.isVisible = false
         analysisRiskDetailRecommendationCard.isVisible = state.recommendation != null
         state.legalExplanation?.let { analysisRiskDetailLegalExplanation.text = it }
+        analysisRiskDetailOriginalLabel.isVisible = state.originalExcerpt.isNotBlank()
+        analysisRiskDetailOriginalExcerpt.isVisible = state.originalExcerpt.isNotBlank()
+        analysisRiskDetailOriginalExcerpt.text = state.originalExcerpt
+        renderLegalBasis(state)
         analysisRiskDetailLegalReferenceTitle.setText(state.legalReferenceTitleRes)
         analysisRiskDetailLegalReferenceSubtitle.setText(state.legalReferenceSubtitleRes)
         state.recommendation?.let { analysisRiskDetailRecommendation.text = it }
+    }
+
+    private fun renderLegalBasis(state: AnalysisRiskDetailUiState) = with(binding) {
+        val hasBasis = state.legalBasis.isNotEmpty()
+        analysisRiskDetailLegalBasisHeading.isVisible = hasBasis || state.isLegalBasisUnverified
+        analysisRiskDetailLegalBasisList.isVisible = hasBasis
+        analysisRiskDetailLegalBasisUnverified.isVisible = !hasBasis && state.isLegalBasisUnverified
+        analysisRiskDetailLegalBasisList.removeAllViews()
+        state.legalBasis.forEach { basis ->
+            val card = ItemAnalysisRiskLegalBasisBinding.inflate(layoutInflater, analysisRiskDetailLegalBasisList, false)
+            card.analysisRiskLegalBasisTitle.text = listOfNotNull(
+                basis.articleNumber?.let { LegalReferenceFormat.article(this@AnalysisRiskDetailActivity, it) },
+                basis.documentTitle ?: basis.title.takeIf(String::isNotBlank)
+            ).joinToString(" · ")
+            card.analysisRiskLegalBasisExcerpt.text = basis.excerpt
+            card.root.bindPressFeedback()
+            card.root.setOnClickListener {
+                startActivity(AnalysisLegalReferenceDetailActivity.createIntent(this@AnalysisRiskDetailActivity, basis.id, "", ""))
+            }
+            analysisRiskDetailLegalBasisList.addView(card.root)
+        }
     }
 
     private fun handleEffect(effect: AnalysisRiskDetailUiEffect) {

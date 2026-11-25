@@ -38,20 +38,21 @@ class AnalysisProcessingViewModel(
                 _uiState.update { it.copy(documentName = event.documentName, documentMetadata = event.documentMetadata) }
                 viewModelScope.launch {
                     var resultId: String? = null
+                    var failureCode: String? = null
                     try {
                         analysis.process(event.operationId, event.contractId, event.documentId, event.sessionKey).collect { state ->
                             if (generation != current || repository.sessionKey() != event.sessionKey) return@collect
                             when (state) {
                                 is AnalysisJobState.Running -> _uiState.update { it.withActiveStep(state.stage) }
                                 is AnalysisJobState.Completed -> resultId = state.resultId
-                                AnalysisJobState.Failed -> resultId = null
+                                is AnalysisJobState.Failed -> { resultId = null; failureCode = state.errorCode }
                             }
                         }
                     } catch (failure: CancellationException) { throw failure } catch (_: Exception) { resultId = null }
                     onFinished()
                     if (generation != current || owner != event.sessionKey || repository.sessionKey() != event.sessionKey) return@launch
                     val completion = resultId?.let { AnalysisProcessingUiEffect.NavigateToAnalysisResult(event.documentName, event.documentMetadata, it, event.sessionKey) }
-                        ?: AnalysisProcessingUiEffect.NavigateToAnalysisFailure(event.documentName, event.documentMetadata)
+                        ?: AnalysisProcessingUiEffect.NavigateToAnalysisFailure(event.documentName, event.documentMetadata, failureCode)
                     _uiState.update { it.copy(completion = completion) }
                 }
             }

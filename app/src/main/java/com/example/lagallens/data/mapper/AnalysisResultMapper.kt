@@ -76,7 +76,7 @@ object AnalysisResultMapper {
                 AnalysisCitation(
                     item.id ?: "c${index + 1}", item.legalArticleId, item.documentTitle?.takeIf(String::isNotBlank),
                     item.articleNumber?.takeIf(String::isNotBlank), item.title.orEmpty(), item.topic?.takeIf(String::isNotBlank),
-                    item.excerpt.orEmpty(), item.effectiveDate?.takeIf(String::isNotBlank), item.validityStatus?.takeIf(String::isNotBlank)
+                    item.excerpt.orEmpty().toReadableText(), item.effectiveDate?.takeIf(String::isNotBlank), item.validityStatus?.takeIf(String::isNotBlank)
                 )
             } + List(hidden("citations")) { AnalysisCitation("locked-citation-$it", null, null, null, "", null, "", null, null) }
         )
@@ -94,12 +94,14 @@ object AnalysisResultMapper {
         id = item.id ?: "f${index + 1}",
         severity = severity(item.severity) ?: AnalysisSeverity.MEDIUM,
         clause = item.clause.orEmpty(),
-        title = item.title.orEmpty(),
-        description = item.description.orEmpty(),
-        consequence = item.consequence.orEmpty(),
-        explanation = item.explanation,
-        recommendation = item.recommendation,
-        isLegalBasisVerified = item.legalBasisVerified
+        title = item.title.orEmpty().toReadableText(),
+        description = item.description.orEmpty().toReadableText(),
+        consequence = item.consequence.orEmpty().toReadableText(),
+        explanation = item.explanation?.toReadableText(),
+        recommendation = item.recommendation?.toReadableText(),
+        isLegalBasisVerified = item.legalBasisVerified,
+        clauseExcerpt = item.clauseExcerpt?.toReadableText()?.takeIf(String::isNotBlank),
+        citationIds = item.citationIds.orEmpty()
     )
 
     private fun source(source: AnalysisSourceResponse) =

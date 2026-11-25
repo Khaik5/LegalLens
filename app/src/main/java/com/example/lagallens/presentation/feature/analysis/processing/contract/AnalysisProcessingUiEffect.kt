@@ -10,6 +10,7 @@ sealed interface AnalysisProcessingUiEffect {
 
     data class NavigateToAnalysisFailure(
         val documentName: String,
-        val documentMetadata: String
+        val documentMetadata: String,
+        val errorCode: String? = null
     ) : AnalysisProcessingUiEffect
 }
