@@ -17,5 +17,19 @@ data class AnalysisRiskDetailUiState(
     val legalExplanation: String? = null,
     @StringRes val legalReferenceTitleRes: Int = R.string.analysis_risk_detail_legal_reference_title,
     @StringRes val legalReferenceSubtitleRes: Int = R.string.analysis_risk_detail_legal_reference_subtitle,
-    val recommendation: String? = null
+    val recommendation: String? = null,
+    /** The clause as written in the contract; empty when the backend could not locate it. */
+    val originalExcerpt: String = "",
+    val legalBasis: List<AnalysisRiskLegalBasis> = emptyList(),
+    /** True when the backend found no legal source for this finding. */
+    val isLegalBasisUnverified: Boolean = false
+)
+
+/** One legal article that backs a finding. */
+data class AnalysisRiskLegalBasis(
+    val id: String,
+    val articleNumber: String?,
+    val documentTitle: String?,
+    val title: String,
+    val excerpt: String
 )

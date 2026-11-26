@@ -413,6 +413,8 @@
     <string name="analysis_risk_detail_attention_heading">WHY THIS NEEDS ATTENTION</string>
     <string name="analysis_risk_detail_clause_heading">RELATED CLAUSE</string>
     <string name="analysis_risk_detail_legal_explanation_heading">LEGAL EXPLANATION</string>
+    <string name="analysis_risk_detail_legal_basis_heading">LEGAL BASIS</string>
+    <string name="analysis_risk_detail_original_excerpt_label">Original wording in the contract</string>
     <string name="analysis_risk_detail_recommendation_heading">RECOMMENDED NEGOTIATION APPROACH</string>
     <string name="analysis_result_unavailable">The analysis result is unavailable.</string>
     <string name="analysis_storage_error">Could not read analysis data. Please try again.</string>
@@ -423,7 +425,8 @@
     <string name="analysis_failure_back_content_description">Back</string>
     <string name="analysis_failure_more_content_description">More options</string>
     <string name="analysis_failure_heading">Analysis failed</string>
-    <string name="analysis_failure_message">The system could not extract the document structure. This can occur when the PDF is password-protected, corrupt, or the scan quality is too low.</string>
+    <string name="analysis_failure_message">The system could not analyse this document. You can try again in a few minutes. If the error repeats, check the file: it should not be password-protected, corrupt or blurry.</string>
+    <string name="analysis_failure_message_service_busy">The AI analysis service is busy or temporarily unavailable. Your document is not at fault. Please try again in a few minutes.</string>
     <string name="analysis_failure_error_code_label">SYSTEM ERROR CODE:</string>
     <string name="analysis_failure_retry">Retry analysis</string>
     <string name="analysis_failure_return_home">Back to home</string>
@@ -502,6 +505,7 @@
     <string name="chatbot_generation_result_metadata">AI-drafted</string>
     <string name="chatbot_generation_result_badge">Draft · Not saved</string>
     <string name="chatbot_generation_result_warning">Information is still missing. Review the content before saving or exporting.</string>
+    <string name="chatbot_generation_result_review_warning">This draft was written by AI. Review the content before saving or exporting.</string>
     <string name="chatbot_generation_view_draft">View draft</string>
     <string name="chatbot_generation_preview_title">D1 draft · Sample</string>
     <string name="chatbot_generation_preview_body">This fixed sample does not analyze your input. It is not saved and is not a complete contract.\n\nContract type: Office lease\nProposed term: 24 months from handover\nParties, address, rent and deposit: [not provided]\n\nThe original contract is unchanged.</string>
@@ -752,7 +756,7 @@
     <string name="analysis_obligation_source_unavailable">The original clause excerpt is unavailable.</string>
     <string name="analysis_legal_references_back_content_description">Back to analysis results</string>
     <string name="analysis_legal_references_more_content_description">More options</string>
-    <string name="analysis_legal_references_section_title">Effective reference documents</string>
+    <string name="analysis_legal_references_section_title">Reference documents</string>
     <string name="analysis_legal_references_search_hint">Search provisions or clauses...</string>
     <string name="analysis_legal_references_country_vietnam">Vietnam</string>
     <string name="analysis_legal_references_view_full">View full text</string>

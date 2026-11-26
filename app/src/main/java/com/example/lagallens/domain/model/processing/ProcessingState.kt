@@ -20,7 +20,8 @@ enum class UploadFailure { TOO_LARGE, UNSUPPORTED_FORMAT, NETWORK, UNREADABLE, U
 sealed interface AnalysisJobState {
     data class Running(val stage: Int) : AnalysisJobState
     data class Completed(val resultId: String) : AnalysisJobState
-    data object Failed : AnalysisJobState
+    /** [errorCode] is the code the backend gave for the failed job, when it named one. */
+    data class Failed(val errorCode: String? = null) : AnalysisJobState
 }
 
 /** [sourceUris] holds one file or every scanned page of the document. */

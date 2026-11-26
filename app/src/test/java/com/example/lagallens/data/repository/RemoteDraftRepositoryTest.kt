@@ -123,6 +123,16 @@ class RemoteDraftRepositoryTest {
         assertEquals(listOf("job-1"), api.applied)
     }
 
+    @Test fun regeneratingNamesTheDraftItRedoes() = runTest {
+        val first = ai.generateDraft(DraftGenerationRequest("16", "27", listOf("Thử việc 60 ngày")))
+
+        ai.regenerate(first.draftId, DraftStage.ORIGINAL.legacyKey, "27")
+
+        assertEquals(null, api.jobRequests.first().sourceDraftId)
+        assertEquals(RemoteDraftId.parse(first.draftId)?.first, api.jobRequests.last().sourceDraftId)
+        assertEquals(16L, api.jobRequests.last().conversationId)
+    }
+
     @Test fun aFailedGenerationIsReported() = runTest {
         api.jobStatuses = mutableListOf("FAILED")
 

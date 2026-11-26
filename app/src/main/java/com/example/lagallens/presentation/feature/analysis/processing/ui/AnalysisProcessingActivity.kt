@@ -135,7 +135,8 @@ class AnalysisProcessingActivity : AppCompatActivity() {
                     AnalysisFailureActivity.createIntent(
                         context = this,
                         documentName = effect.documentName,
-                        documentMetadata = effect.documentMetadata
+                        documentMetadata = effect.documentMetadata,
+                        errorCode = effect.errorCode
                     ).putExtra(EXTRA_OPERATION_ID, intent.getStringExtra(EXTRA_OPERATION_ID))
                         .putExtra(EXTRA_SESSION_KEY, intent.getStringExtra(EXTRA_SESSION_KEY))
                         .putExtra(AnalysisStartActivity.EXTRA_CONTRACT_ID, intent.getStringExtra(AnalysisStartActivity.EXTRA_CONTRACT_ID))

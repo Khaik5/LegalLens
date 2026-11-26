@@ -3,6 +3,7 @@ package com.example.lagallens.presentation.feature.chatbot.draft.ui
 import android.app.Dialog
 import android.content.Context
 import android.content.Intent
+import com.example.lagallens.presentation.feature.chatbot.draft.utils.draftWarningRes
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -136,6 +137,7 @@ class ChatbotDraftPreviewActivity : DraftSessionActivity() {
             return@with
         }
         val hasContent = !state.content.isNullOrBlank()
+        draftMissingWarning.setText(draftWarningRes(state.content))
         listOf(draftEdit, draftRegenerate, draftExport, draftAskAi, draftSave).forEach { it.isEnabled = hasContent }
         draftContractName.text = state.title ?: getString(R.string.chatbot_draft_document_name, state.version)
         draftVersion.setText(

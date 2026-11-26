@@ -581,6 +581,8 @@
     <string name="analysis_risk_detail_clause_reference" translatable="false">Trích dẫn Điều 8.2.1:</string>
     <string name="analysis_risk_detail_clause_excerpt" translatable="false" formatted="false">\"Trong trường hợp một trong hai bên đơn phương chấm dứt hợp đồng trái pháp luật, bên vi phạm sẽ chịu mức phạt vi phạm tương đương 15% tổng giá trị hợp đồng.\"</string>
     <string name="analysis_risk_detail_legal_explanation_heading">GIẢI THÍCH PHÁP LÝ</string>
+    <string name="analysis_risk_detail_legal_basis_heading">CĂN CỨ PHÁP LÝ</string>
+    <string name="analysis_risk_detail_original_excerpt_label">Nguyên văn trong hợp đồng</string>
     <string name="analysis_risk_detail_legal_explanation" translatable="false" formatted="false">Chưa có giải thích và căn cứ pháp lý được xác minh cho hợp đồng lao động này.</string>
     <string name="analysis_risk_detail_legal_reference_title" translatable="false">Chưa có căn cứ pháp lý được xác minh</string>
     <string name="analysis_risk_detail_legal_reference_subtitle" translatable="false">Không có trích dẫn để xem</string>
@@ -595,7 +597,8 @@
     <string name="analysis_failure_back_content_description">Quay lại</string>
     <string name="analysis_failure_more_content_description">Thêm tùy chọn</string>
     <string name="analysis_failure_heading">Phân tích thất bại</string>
-    <string name="analysis_failure_message">Hệ thống không thể giải xuất cấu trúc tài liệu. Điều này có thể xảy ra nếu tệp PDF bị bảo vệ bằng mật khẩu, bị hỏng hoặc chất lượng quét ảnh quá thấp.</string>
+    <string name="analysis_failure_message">Hệ thống chưa phân tích được tài liệu này. Bạn có thể thử lại sau ít phút. Nếu lỗi lặp lại, hãy kiểm tra tệp: không bị khóa mật khẩu, không bị hỏng và đủ rõ nét.</string>
+    <string name="analysis_failure_message_service_busy">Dịch vụ phân tích AI đang quá tải hoặc tạm thời không khả dụng. Tài liệu của bạn không có lỗi. Vui lòng thử lại sau ít phút.</string>
     <string name="analysis_failure_error_code_label">MÃ LỖI HỆ THỐNG:</string>
     <string name="analysis_failure_error_code" translatable="false">ERR_PDF_PARSING_FAILED_DECRYPTION_REQUIRED</string>
     <string name="analysis_failure_retry">Thử lại phân tích</string>
@@ -712,7 +715,7 @@
     <string name="analysis_obligation_source_unavailable">Chưa có đoạn trích điều khoản gốc.</string>
     <string name="analysis_legal_references_back_content_description">Quay lại kết quả phân tích</string>
     <string name="analysis_legal_references_more_content_description">Thêm tùy chọn</string>
-    <string name="analysis_legal_references_section_title">Văn bản tham chiếu có hiệu lực</string>
+    <string name="analysis_legal_references_section_title">Văn bản tham chiếu</string>
     <string name="analysis_legal_references_search_hint">Tìm kiếm quy định, điều khoản...</string>
     <string name="analysis_legal_references_country_vietnam">Việt Nam</string>
     <string name="analysis_legal_references_view_full">Xem đầy đủ</string>
@@ -840,6 +843,7 @@
     <string name="chatbot_generation_result_metadata">Bản nháp do AI soạn</string>
     <string name="chatbot_generation_result_badge">Bản nháp · Chưa lưu</string>
     <string name="chatbot_generation_result_warning">Còn thông tin cần bổ sung. Rà soát nội dung trước khi lưu hoặc xuất.</string>
+    <string name="chatbot_generation_result_review_warning">Bản nháp do AI soạn. Rà soát nội dung trước khi lưu hoặc xuất.</string>
     <string name="chatbot_generation_view_draft">Xem bản nháp</string>
     <string name="chatbot_generation_preview_title">Bản nháp D1 · Minh họa</string>
     <string name="chatbot_generation_preview_body">Dữ liệu minh họa cố định, chưa phân tích nội dung bạn nhập. Bản mẫu chưa được lưu và chưa phải hợp đồng hoàn chỉnh.\n\nLoại hợp đồng: Thuê văn phòng\nThời hạn dự kiến: 24 tháng từ ngày bàn giao\nCác bên, địa chỉ, giá thuê và tiền cọc: [chưa cung cấp]\n\nHợp đồng gốc được giữ nguyên.</string>

@@ -3,7 +3,8 @@ package com.example.lagallens.presentation.feature.analysis.failure.contract
 sealed interface AnalysisFailureUiEvent {
     data class ScreenOpened(
         val documentName: String,
-        val documentMetadata: String
+        val documentMetadata: String,
+        val errorCode: String? = null
     ) : AnalysisFailureUiEvent
 
     data object BackClicked : AnalysisFailureUiEvent

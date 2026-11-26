@@ -5,6 +5,7 @@ import androidx.annotation.StringRes
 import com.example.lagallens.R
 import com.example.lagallens.core.utils.foldForSearch
 import com.example.lagallens.domain.model.ContractFieldValue
+import java.text.NumberFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
@@ -29,7 +30,7 @@ class CompareFieldFormatter(private val context: Context) {
         is ContractFieldValue.Text -> when (field) {
             FIELD_CONTRACT_TYPE -> contractTypeRes(value.value)?.let(context::getString) ?: value.value
             FIELD_START_DATE, FIELD_END_DATE -> dateText(value.value)
-            else -> value.value
+            else -> numberText(value.value)
         }
     }
 
@@ -39,6 +40,13 @@ class CompareFieldFormatter(private val context: Context) {
         )
     } catch (_: DateTimeParseException) {
         isoDate
+    }
+
+    /** Numbers come from the backend as "12000000.00" or "84.00"; they are shown as "12.000.000" and "84" in the app's language. Other text is kept as it is. */
+    private fun numberText(raw: String): String {
+        val amount = raw.trim().takeIf { it.matches(PLAIN_NUMBER) }?.toBigDecimalOrNull() ?: return raw
+        val format = NumberFormat.getNumberInstance(context.resources.configuration.locales[0]).apply { maximumFractionDigits = 2 }
+        return format.format(amount.stripTrailingZeros())
     }
 
     /** Words that already name the role inside a party name, in both languages, without marks. */
@@ -88,5 +96,6 @@ class CompareFieldFormatter(private val context: Context) {
         const val FIELD_CONTRACT_TYPE = "contractType"
         const val FIELD_START_DATE = "startDate"
         const val FIELD_END_DATE = "endDate"
+        val PLAIN_NUMBER = Regex("""-?\d+(\.\d+)?""")
     }
 }

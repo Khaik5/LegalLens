@@ -159,6 +159,29 @@
                     android:lineSpacingExtra="@dimen/dp_2"
                     android:textColor="@color/legal_lens_status_text"
                     android:textSize="@dimen/sp_13" />
+
+                <TextView
+                    android:id="@+id/analysisRiskDetailOriginalLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dp_12"
+                    android:includeFontPadding="false"
+                    android:text="@string/analysis_risk_detail_original_excerpt_label"
+                    android:textColor="@color/contract_pending"
+                    android:textSize="@dimen/sp_12"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/analysisRiskDetailOriginalExcerpt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dp_4"
+                    android:includeFontPadding="false"
+                    android:lineSpacingExtra="@dimen/dp_2"
+                    android:textColor="@color/legal_lens_status_text"
+                    android:textSize="@dimen/sp_13"
+                    android:visibility="gone" />
             </LinearLayout>
 
             <TextView
@@ -182,6 +205,38 @@
                 android:lineSpacingExtra="@dimen/dp_2"
                 android:textColor="@color/legal_lens_status_text"
                 android:textSize="@dimen/sp_14" />
+
+            <TextView
+                android:id="@+id/analysisRiskDetailLegalBasisHeading"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/analysis_risk_detail_section_margin_top"
+                android:includeFontPadding="false"
+                android:letterSpacing="0.07"
+                android:text="@string/analysis_risk_detail_legal_basis_heading"
+                android:textColor="@color/legal_lens_secondary_text"
+                android:textSize="@dimen/sp_14"
+                android:textStyle="bold"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:id="@+id/analysisRiskDetailLegalBasisList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/analysisRiskDetailLegalBasisUnverified"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_8"
+                android:includeFontPadding="false"
+                android:lineSpacingExtra="@dimen/dp_2"
+                android:text="@string/analysis_finding_legal_basis_unverified"
+                android:textColor="@color/legal_lens_secondary_text"
+                android:textSize="@dimen/sp_13"
+                android:visibility="gone" />
 
             <LinearLayout
                 android:id="@+id/analysisRiskDetailLegalReference"

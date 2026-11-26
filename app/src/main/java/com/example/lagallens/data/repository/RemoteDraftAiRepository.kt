@@ -52,7 +52,10 @@ class RemoteDraftAiRepository(
     /** A new backend draft written from the same conversation; the source stays as it is. */
     override suspend fun regenerate(sourceDraftId: String?, sourceKey: String, contractId: String?): Draft {
         val source = resolveSource(sourceDraftId, sourceKey, contractId)
-        return generate(source.conversationId, source.contractId ?: contractId, regenerateInstruction(), DraftStage.REGENERATED)
+        return generate(
+            source.conversationId, source.contractId ?: contractId, regenerateInstruction(), DraftStage.REGENERATED,
+            sourceDraftId = RemoteDraftId.parse(source.draftId)?.first
+        )
     }
 
     override suspend fun proposeEdit(request: DraftEditRequest): DraftEditProposal = inSession { scope, _ ->
@@ -86,10 +89,10 @@ class RemoteDraftAiRepository(
         return checkNotNull(drafts.createCopy(source.draftId, "", DraftStage.COPY)) { "Draft copy could not be created" }
     }
 
-    private suspend fun generate(conversationId: String?, contractId: String?, instruction: String, stage: DraftStage): Draft =
+    private suspend fun generate(conversationId: String?, contractId: String?, instruction: String, stage: DraftStage, sourceDraftId: Long? = null): Draft =
         inSession { scope, userId ->
             val conversation = requireNotNull(conversationId?.toLongOrNull()) { "A conversation is required" }
-            val jobRequest = DraftAiJobRequest("GENERATE", instruction, conversationId = conversation, contractId = contractId?.toLongOrNull())
+            val jobRequest = DraftAiJobRequest("GENERATE", instruction, conversationId = conversation, contractId = contractId?.toLongOrNull(), sourceDraftId = sourceDraftId)
             val created = startJob(scope, jobRequest)
             awaitJob(scope, created.jobId)
             // The generated text is written as the next version of the new, still empty draft.

@@ -55,6 +55,22 @@ class SavedDraftCopyDetailViewModelTest {
         assertEquals(listOf<SavedDraftCopyDetailUiEffect>(SavedDraftCopyDetailUiEffect.ShowMessage(R.string.draft_saved_contract_success)), effects)
     }
 
+    @Test fun backAfterSavingGoesToTheContractListAndOtherwiseCloses() = runTest {
+        val vm = viewModel(ContractRepository { SaveDraftAsContractResult.Saved("42") })
+        val effects = mutableListOf<SavedDraftCopyDetailUiEffect>()
+        val collector = launch(UnconfinedTestDispatcher(testScheduler)) { vm.uiEffect.collect { effects += it } }
+
+        vm.onEvent(SavedDraftCopyDetailUiEvent.BackClicked)
+        vm.onEvent(SavedDraftCopyDetailUiEvent.SaveAsContractClicked("5:3"))
+        advanceUntilIdle()
+        vm.onEvent(SavedDraftCopyDetailUiEvent.BackClicked)
+        advanceUntilIdle()
+        collector.cancel()
+
+        assertEquals(SavedDraftCopyDetailUiEffect.Close, effects.first())
+        assertEquals(SavedDraftCopyDetailUiEffect.NavigateToContracts, effects.last())
+    }
+
     @Test fun aFailureAllowsTryingAgain() = runTest {
         var failing = true
         val repository = ContractRepository { if (failing) error("offline") else SaveDraftAsContractResult.Saved("42") }

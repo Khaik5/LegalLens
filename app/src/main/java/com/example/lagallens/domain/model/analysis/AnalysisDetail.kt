@@ -47,7 +47,11 @@ data class AnalysisFinding(
     val explanation: String? = null,
     val recommendation: String? = null,
     /** False when no legal source backs the finding; null when the source does not say (older backend, DEMO). */
-    val isLegalBasisVerified: Boolean? = null
+    val isLegalBasisVerified: Boolean? = null,
+    /** The clause quoted verbatim from the contract; null when the backend could not locate it. */
+    val clauseExcerpt: String? = null,
+    /** IDs of the [AnalysisCitation]s that back this finding. */
+    val citationIds: List<String> = emptyList()
 )
 
 /** One legal article an analysis relies on. Fields the backend has not stored are null. */

@@ -56,6 +56,15 @@ class ChatbotDraftGenerationTest {
         assertEquals(messages, model.uiState.value.messages)
     }
 
+    @Test
+    fun theDraftRequestMarksWhereTheUsersDraftingMessagesStart() = runTest {
+        val model = prepareDraft(previewError = false)
+        val messages = model.uiState.value.messages
+        val requestIndex = messages.indexOfFirst { it.id == model.uiState.value.draftRequestMessageId }
+        assertEquals("Yêu cầu mẫu", messages[requestIndex].content)
+        assertTrue(messages.drop(requestIndex + 1).any { it.content == "Chi tiết mẫu" })
+    }
+
     private fun prepareDraft(previewError: Boolean): ChatbotViewModel {
         val repository = FakeChatbotRepository()
         val model = ChatbotViewModel(OpenChatbotConversationUseCase(repository), SendChatbotMessageUseCase(repository), RetryChatbotMessageUseCase(repository)) { com.example.lagallens.TestDraftAiRepository() }

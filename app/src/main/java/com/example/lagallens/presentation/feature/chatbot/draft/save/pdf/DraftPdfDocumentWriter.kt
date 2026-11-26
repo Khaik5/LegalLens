@@ -9,6 +9,8 @@ import android.graphics.pdf.PdfDocument
 import android.net.Uri
 import androidx.core.content.res.ResourcesCompat
 import com.example.lagallens.R
+import com.example.lagallens.presentation.feature.chatbot.draft.utils.draftPdfWarningRes
+import com.example.lagallens.presentation.feature.chatbot.draft.utils.savedDraftWarningRes
 import java.io.File
 import java.io.FileOutputStream
 
@@ -38,9 +40,9 @@ internal object DraftPdfDocumentWriter {
                 flow.drawText(contractName, 21f, context.getColor(R.color.legal_lens_primary), true, 28f)
                 flow.drawText(context.getString(R.string.draft_pdf_document_metadata), 11f, context.getColor(R.color.legal_lens_secondary_text), false, 16f)
                 flow.drawDivider()
-                flow.drawNotice(context.getString(R.string.draft_pdf_warning))
+                flow.drawNotice(context.getString(draftPdfWarningRes(content)))
                 flow.drawText(content, 11f, context.getColor(R.color.legal_lens_status_text), false, 16f)
-                flow.drawNotice(context.getString(R.string.draft_save_legal_warning))
+                flow.drawNotice(context.getString(savedDraftWarningRes(content)))
                 flow.finishPage()
                 FileOutputStream(output).use(document::writeTo)
             } finally {

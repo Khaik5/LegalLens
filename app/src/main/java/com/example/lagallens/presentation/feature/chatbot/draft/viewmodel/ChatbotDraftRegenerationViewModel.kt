@@ -58,7 +58,7 @@ class ChatbotDraftRegenerationViewModel(application: Application) : AndroidViewM
             try {
                 if (shouldFail) error("Preview failure")
                 val draft = repository.regenerate(originalDraftId, originalVersion, originalContractId)
-                if (ownerSession == app.currentSessionKey()) state.update { it.copy(status = ChatbotDraftRegenerationStatus.SUCCESS, draftId = draft.draftId) }
+                if (ownerSession == app.currentSessionKey()) state.update { it.copy(status = ChatbotDraftRegenerationStatus.SUCCESS, draftId = draft.draftId, content = draft.content) }
             } catch (cancellationException: CancellationException) {
                 throw cancellationException
             } catch (failure: Exception) {

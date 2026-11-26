@@ -1,6 +1,7 @@
 package com.example.lagallens.presentation.feature.chatbot.adapter
 
 import android.view.LayoutInflater
+import android.widget.LinearLayout
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -13,6 +14,7 @@ import com.example.lagallens.databinding.ItemChatbotAssistantCitationMessageBind
 import com.example.lagallens.databinding.ItemChatbotAssistantErrorMessageBinding
 import com.example.lagallens.databinding.ItemChatbotAssistantGroundedMessageBinding
 import com.example.lagallens.databinding.ItemChatbotAssistantNoEvidenceMessageBinding
+import com.example.lagallens.databinding.ItemChatbotReferenceCardBinding
 import com.example.lagallens.databinding.ItemChatbotUserMessageBinding
 import com.example.lagallens.databinding.ItemChatbotDraftActionBinding
 import com.example.lagallens.databinding.ItemChatbotDraftLoadingBinding
@@ -116,24 +118,31 @@ class ChatbotMessageAdapter(
         private val onReferenceClicked: (Long) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: ChatbotMessage) {
-            val firstReference = item.references.firstOrNull() ?: return
-            val secondReference = item.references.getOrNull(1)
+            if (item.references.isEmpty()) return
             with(binding) {
                 chatbotAssistantGroundedMessage.text = item.content
                 chatbotReferenceSectionTitle.text = item.referenceSectionTitle
                 val isSingleSource = item.referenceSectionTitle.isNullOrBlank()
                 chatbotReferenceDivider.isVisible = !isSingleSource
                 chatbotReferenceSectionTitle.isVisible = !isSingleSource
-                chatbotReferenceFirstChevron.isVisible = !isSingleSource
-                chatbotReferenceFirstTitle.setTextColor(ContextCompat.getColor(root.context, if (isSingleSource) R.color.legal_lens_auth_accent else R.color.legal_lens_primary))
-                chatbotReferenceFirstTitle.text = firstReference.title
-                chatbotReferenceFirstExcerpt.text = firstReference.excerpt
-                chatbotReferenceSecondCard.visibility = if (secondReference == null) android.view.View.GONE else android.view.View.VISIBLE
-                chatbotReferenceSecondTitle.text = secondReference?.title.orEmpty()
-                chatbotReferenceSecondExcerpt.text = secondReference?.excerpt.orEmpty()
-                // A source that names its article opens the full text; the arrow then points to the right.
-                bindReferenceOpen(chatbotReferenceFirstCard, chatbotReferenceFirstChevron, firstReference.articleId)
-                bindReferenceOpen(chatbotReferenceSecondCard, chatbotReferenceSecondChevron, secondReference?.articleId)
+                chatbotReferenceList.removeAllViews()
+                val inflater = LayoutInflater.from(root.context)
+                item.references.forEachIndexed { index, reference ->
+                    val card = ItemChatbotReferenceCardBinding.inflate(inflater, chatbotReferenceList, false)
+                    val isLoneFirst = index == 0 && isSingleSource
+                    (card.root.layoutParams as LinearLayout.LayoutParams).topMargin = root.resources.getDimensionPixelSize(
+                        if (index == 0) R.dimen.chatbot_reference_card_margin_top else R.dimen.chatbot_reference_card_spacing
+                    )
+                    card.chatbotReferenceChevron.isVisible = !isLoneFirst
+                    card.chatbotReferenceTitle.setTextColor(
+                        ContextCompat.getColor(root.context, if (isLoneFirst) R.color.legal_lens_auth_accent else R.color.legal_lens_primary)
+                    )
+                    card.chatbotReferenceTitle.text = reference.title
+                    card.chatbotReferenceExcerpt.text = reference.excerpt
+                    // A source that names its article opens the full text; the arrow then points to the right.
+                    bindReferenceOpen(card.root, card.chatbotReferenceChevron, reference.articleId)
+                    chatbotReferenceList.addView(card.root)
+                }
             }
         }
 

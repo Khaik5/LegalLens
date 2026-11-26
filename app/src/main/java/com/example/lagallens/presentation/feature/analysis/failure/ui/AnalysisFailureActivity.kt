@@ -55,7 +55,8 @@ class AnalysisFailureActivity : AppCompatActivity() {
         viewModel.onEvent(
             AnalysisFailureUiEvent.ScreenOpened(
                 documentName = intent.getStringExtra(EXTRA_DOCUMENT_NAME).orEmpty(),
-                documentMetadata = intent.getStringExtra(EXTRA_DOCUMENT_METADATA).orEmpty()
+                documentMetadata = intent.getStringExtra(EXTRA_DOCUMENT_METADATA).orEmpty(),
+                errorCode = intent.getStringExtra(EXTRA_ERROR_CODE)
             )
         )
     }
@@ -76,6 +77,7 @@ class AnalysisFailureActivity : AppCompatActivity() {
     private fun observeViewModel() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch { viewModel.uiState.collect { binding.analysisFailureMessage.setText(it.messageRes) } }
                 launch { viewModel.uiEffect.collect(::handleEffect) }
             }
         }
@@ -114,13 +116,16 @@ class AnalysisFailureActivity : AppCompatActivity() {
     companion object {
         private const val EXTRA_DOCUMENT_NAME = "analysis_failure_document_name"
         private const val EXTRA_DOCUMENT_METADATA = "analysis_failure_document_metadata"
+        private const val EXTRA_ERROR_CODE = "analysis_failure_error_code"
 
         fun createIntent(
             context: Context,
             documentName: String,
-            documentMetadata: String
+            documentMetadata: String,
+            errorCode: String? = null
         ): Intent = Intent(context, AnalysisFailureActivity::class.java)
             .putExtra(EXTRA_DOCUMENT_NAME, documentName)
             .putExtra(EXTRA_DOCUMENT_METADATA, documentMetadata)
+            .putExtra(EXTRA_ERROR_CODE, errorCode)
     }
 }
