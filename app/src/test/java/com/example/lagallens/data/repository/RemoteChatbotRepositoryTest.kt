@@ -177,6 +177,22 @@ class RemoteChatbotRepositoryTest {
         assertEquals(SendChatMessageRequest("Thử việc bao lâu?", "client-1"), api.sent.single())
     }
 
+    @Test fun passagesOfTheSameArticleAreShownAsOneReference() = runTest {
+        api.onSend = { content ->
+            api.messages = listOf(
+                question(10, content, "COMPLETED", """{"answer":"Tối đa 60 ngày.","noEvidence":false,"citations":[{"articleId":3,"excerpt":"không quá 60 ngày"},{"articleId":4,"excerpt":"85% mức lương"},{"articleId":3,"excerpt":"không quá 30 ngày"},{"articleId":3,"excerpt":"không quá 60 ngày"}]}"""),
+                answer(11, "Tối đa 60 ngày.")
+            )
+            ChatRequestResponse(100, 10, "WAITING_PROVIDER", null)
+        }
+
+        val grounded = repository.sendMessage("5", "Thử việc bao lâu?") as ChatbotReply.GroundedAnswer
+
+        assertEquals(listOf(3L, 4L), grounded.references.map { it.articleId })
+        assertEquals("references:2", grounded.referenceSectionTitle)
+        assertEquals("không quá 60 ngày\n\nkhông quá 30 ngày", grounded.references.first().excerpt)
+    }
+
     @Test fun readsAnAnswerStoredAsJsonText() = runTest {
         api.onSend = { content ->
             api.messages = listOf(

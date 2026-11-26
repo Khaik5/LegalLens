@@ -309,8 +309,10 @@ class RemoteChatbotRepository(
     }
 
     private suspend fun references(scope: AuthSessionScope, answer: ChatAnswerResponse): List<ChatbotReference> =
-        answer.citations.orEmpty().map { citation ->
-            ChatbotReference(articleTitle(scope, citation.articleId), citation.excerpt.orEmpty(), citation.articleId)
+        // The server may cite several passages of one article; the user sees the article once, with its passages together.
+        answer.citations.orEmpty().groupBy { it.articleId }.map { (articleId, passages) ->
+            val excerpt = passages.mapNotNull { it.excerpt?.trim()?.takeIf(String::isNotEmpty) }.distinct().joinToString("\n\n")
+            ChatbotReference(articleTitle(scope, articleId), excerpt, articleId)
         }
 
     private suspend fun articleTitle(scope: AuthSessionScope, articleId: Long): String =
