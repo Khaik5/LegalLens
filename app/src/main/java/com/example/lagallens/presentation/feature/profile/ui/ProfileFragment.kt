@@ -77,7 +77,7 @@ class ProfileFragment : Fragment() {
             R.string.profile_settings_title,
             ProfileUiEvent.SettingsClicked
         )
-        bindAction(binding.actionMyDrafts, R.drawable.ic_dashboard_contract, R.string.profile_my_drafts, ProfileUiEvent.MyDraftsClicked)
+        bindAction(binding.actionMyDrafts, R.drawable.ic_draft, R.string.profile_my_drafts, ProfileUiEvent.MyDraftsClicked)
         binding.actionMyDraftsGroup.isVisible = com.example.lagallens.core.constants.FeatureFlags.isContractDraftingEnabled
         bindAction(binding.actionPrivacy, R.drawable.ic_security, R.string.profile_privacy, ProfileUiEvent.PrivacyClicked)
         bindAction(binding.actionAppearance, R.drawable.ic_language, R.string.profile_appearance, ProfileUiEvent.LanguageClicked)
