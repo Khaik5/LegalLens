@@ -9,6 +9,7 @@
     <string name="chatbot_draft_saved_metadata">AI-drafted · Saved</string>
     <string name="chatbot_draft_regenerated_version_metadata">Regenerated AI proposal · Not saved</string>
     <string name="chatbot_draft_missing_warning">Information in [square brackets] is still missing. Complete it and review the draft before signing.</string>
+    <string name="chatbot_draft_review_warning">This draft was written by AI. Review it legally before signing.</string>
     <string name="chatbot_draft_page_count">Content · %1$d / %2$d</string>
     <string name="chatbot_draft_zoom_level">%1$d%%</string>
     <string name="chatbot_draft_zoom_out">Zoom out</string>
@@ -135,6 +136,10 @@ Unsigned · Complete and review all [bracketed] fields.</string>
 D1 · Unsaved AI draft → D2 · New edited version, not saved.
 The original contract is unchanged. D1 is kept.
 The remaining clauses and [bracketed] fields do not change.</string>
+    <string name="chatbot_draft_ai_approval_body_no_placeholders">Apply the selected edit proposal.
+D1 · Unsaved AI draft → D2 · New edited version, not saved.
+The original contract is unchanged. D1 is kept.
+The remaining clauses do not change.</string>
     <string name="chatbot_draft_ai_approval_confirm">Confirm and apply</string>
     <string name="chatbot_draft_manual_version_metadata">Manual edit · Not saved</string>
     <string name="chatbot_draft_ai_version_metadata">AI proposal · D2 not saved</string>
@@ -245,6 +250,7 @@ This is a proposal in a new D2 copy; D1 and the original contract remain unchang
     <string name="draft_save_default_name">Employment contract — draft</string>
     <string name="draft_save_copy_notice">Save as a new copy in your drafts. The original document and D1 will not be overwritten.</string>
     <string name="draft_save_legal_warning">Party, job, salary, and working-hours details in [brackets] still need to be filled in. The saved copy remains a draft and is not ready to sign.</string>
+    <string name="draft_save_review_warning">The saved copy is still an AI draft. It needs a legal review and is not ready to sign.</string>
     <string name="draft_save_acknowledge">I understand this saved copy needs completion and legal review.</string>
     <string name="draft_save_action">Save new copy</string>
     <string name="draft_save_back">Go back and complete</string>
@@ -270,6 +276,7 @@ This is a proposal in a new D2 copy; D1 and the original contract remain unchang
     <string name="draft_pdf_document_metadata">Saved draft</string>
     <string name="draft_pdf_selected_version_note">Export the selected draft PDF, not the original contract PDF.</string>
     <string name="draft_pdf_warning">The PDF keeps all [bracketed] fields and the “Draft” label. Review AI-generated content before using it.</string>
+    <string name="draft_pdf_review_warning">The PDF keeps the “Draft” label. Review the AI content before using it.</string>
     <string name="draft_pdf_create">Create draft PDF</string>
     <string name="draft_pdf_create_share">Create PDF to share</string>
     <string name="draft_pdf_cancel">Cancel</string>

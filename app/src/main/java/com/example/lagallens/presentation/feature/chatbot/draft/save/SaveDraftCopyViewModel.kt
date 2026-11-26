@@ -19,7 +19,9 @@ enum class SaveDraftCopyStatus { FORM, LOADING, ERROR, SUCCESS }
 data class SaveDraftCopyUiState(
     val status: SaveDraftCopyStatus = SaveDraftCopyStatus.FORM,
     val name: String = "",
-    val acknowledged: Boolean = false
+    val acknowledged: Boolean = false,
+    /** The copy the save made; the saved-draft screens open exactly this copy. */
+    val savedDraftId: String? = null
 )
 
 class SaveDraftCopyViewModel(application: Application) : AndroidViewModel(application) {
@@ -70,7 +72,7 @@ class SaveDraftCopyViewModel(application: Application) : AndroidViewModel(applic
         val parentDraft = sourceDraftId
         state.update { it.copy(status = SaveDraftCopyStatus.LOADING) }
         viewModelScope.launch {
-            val saved = try {
+            val savedDraft = try {
                 withContext(Dispatchers.IO) {
                     val stage = DraftStage.fromLegacyKey(draftVersion.orEmpty()) ?: DraftStage.ORIGINAL
                     repository.saveDraft(
@@ -82,13 +84,17 @@ class SaveDraftCopyViewModel(application: Application) : AndroidViewModel(applic
                         isSaved = true
                     )
                 }
-                true
             } catch (cancellationException: CancellationException) {
                 throw cancellationException
             } catch (_: Exception) {
-                false
+                null
             }
-            if (ownerSession == app.currentSessionKey()) state.update { it.copy(status = if (saved) SaveDraftCopyStatus.SUCCESS else SaveDraftCopyStatus.ERROR) }
+            if (ownerSession == app.currentSessionKey()) state.update {
+                it.copy(
+                    status = if (savedDraft != null) SaveDraftCopyStatus.SUCCESS else SaveDraftCopyStatus.ERROR,
+                    savedDraftId = savedDraft?.draftId
+                )
+            }
         }
     }
 

@@ -505,6 +505,7 @@
     <string name="chatbot_generation_result_metadata">AI-drafted</string>
     <string name="chatbot_generation_result_badge">Draft · Not saved</string>
     <string name="chatbot_generation_result_warning">Information is still missing. Review the content before saving or exporting.</string>
+    <string name="chatbot_generation_result_review_warning">This draft was written by AI. Review the content before saving or exporting.</string>
     <string name="chatbot_generation_view_draft">View draft</string>
     <string name="chatbot_generation_preview_title">D1 draft · Sample</string>
     <string name="chatbot_generation_preview_body">This fixed sample does not analyze your input. It is not saved and is not a complete contract.\n\nContract type: Office lease\nProposed term: 24 months from handover\nParties, address, rent and deposit: [not provided]\n\nThe original contract is unchanged.</string>

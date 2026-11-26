@@ -90,6 +90,7 @@
                 android:fontFamily="@font/manrope"
                 android:gravity="center_vertical"
                 android:padding="@dimen/dp_12"
+                android:id="@+id/saveDraftFormWarning"
                 android:text="@string/draft_save_legal_warning"
                 android:textColor="@color/legal_lens_secondary_text"
                 android:textSize="@dimen/sp_12" />
@@ -144,7 +145,7 @@
             <ProgressBar android:layout_width="@dimen/dp_40" android:layout_height="@dimen/dp_40" android:indeterminateTint="@color/legal_lens_auth_accent" />
             <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/dp_16" android:fontFamily="@font/manrope" android:gravity="center" android:text="@string/draft_save_loading_title" android:textColor="@color/legal_lens_primary" android:textSize="@dimen/sp_16" android:textStyle="bold" />
             <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/dp_8" android:fontFamily="@font/manrope" android:gravity="center" android:text="@string/draft_save_loading_body" android:textColor="@color/legal_lens_secondary_text" android:textSize="@dimen/sp_13" />
-            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/dp_16" android:background="@drawable/bg_chatbot_draft_warning" android:padding="@dimen/dp_12" android:text="@string/draft_save_legal_warning" android:textColor="@color/legal_lens_secondary_text" android:textSize="@dimen/sp_12" />
+            <TextView android:id="@+id/saveDraftLoadingWarning" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/dp_16" android:background="@drawable/bg_chatbot_draft_warning" android:padding="@dimen/dp_12" android:text="@string/draft_save_legal_warning" android:textColor="@color/legal_lens_secondary_text" android:textSize="@dimen/sp_12" />
         </LinearLayout>
         <LinearLayout
             android:id="@+id/saveDraftError"
@@ -168,7 +169,7 @@
             android:visibility="gone">
             <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:fontFamily="@font/manrope" android:gravity="center" android:text="@string/draft_save_success_title" android:textColor="@color/legal_lens_primary" android:textSize="@dimen/sp_16" android:textStyle="bold" />
             <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/dp_8" android:fontFamily="@font/manrope" android:gravity="center" android:text="@string/draft_save_success_body" android:textColor="@color/legal_lens_secondary_text" android:textSize="@dimen/sp_13" />
-            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/dp_16" android:background="@drawable/bg_chatbot_draft_warning" android:padding="@dimen/dp_12" android:text="@string/draft_save_legal_warning" android:textColor="@color/legal_lens_secondary_text" android:textSize="@dimen/sp_12" />
+            <TextView android:id="@+id/saveDraftSuccessWarning" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/dp_16" android:background="@drawable/bg_chatbot_draft_warning" android:padding="@dimen/dp_12" android:text="@string/draft_save_legal_warning" android:textColor="@color/legal_lens_secondary_text" android:textSize="@dimen/sp_12" />
             <TextView android:id="@+id/saveDraftViewSaved" android:layout_width="match_parent" android:layout_height="@dimen/dp_50" android:layout_marginTop="@dimen/dp_16" android:background="@drawable/bg_chatbot_primary_action" android:clickable="true" android:focusable="true" android:gravity="center" android:text="@string/draft_save_view_saved" android:textColor="@color/white" android:textSize="@dimen/sp_15" android:textStyle="bold" />
             <TextView android:id="@+id/saveDraftExportPdf" android:layout_width="match_parent" android:layout_height="@dimen/dp_50" android:layout_marginTop="@dimen/dp_12" android:background="@drawable/bg_contract_search_result" android:clickable="true" android:focusable="true" android:gravity="center" android:text="@string/draft_save_export_pdf" android:textColor="@color/legal_lens_primary" android:textSize="@dimen/sp_15" android:textStyle="bold" />
         </LinearLayout>

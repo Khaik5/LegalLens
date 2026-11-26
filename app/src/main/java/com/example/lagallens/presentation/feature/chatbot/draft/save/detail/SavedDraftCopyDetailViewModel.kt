@@ -30,6 +30,12 @@ class SavedDraftCopyDetailViewModel(
         if (ownerSession != currentSession()) return
         when (event) {
             is SavedDraftCopyDetailUiEvent.SaveAsContractClicked -> saveAsContract(event.draftId)
+            SavedDraftCopyDetailUiEvent.BackClicked -> viewModelScope.launch {
+                _uiEffect.emit(
+                    if (_uiState.value.saveAsContractStatus == SaveAsContractStatus.SAVED) SavedDraftCopyDetailUiEffect.NavigateToContracts
+                    else SavedDraftCopyDetailUiEffect.Close
+                )
+            }
         }
     }
 

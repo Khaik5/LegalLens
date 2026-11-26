@@ -6,6 +6,8 @@ data class ChatbotDraftRegenerationUiState(
     val status: ChatbotDraftRegenerationStatus = ChatbotDraftRegenerationStatus.LOADING,
     val isInitialized: Boolean = false,
     val draftId: String? = null,
+    /** The new draft's text once it is made; it decides whether the [square bracket] warning applies. */
+    val content: String? = null,
     /** What went wrong, when the backend said; null keeps the screen's generic text. */
     val errorMessageRes: Int? = null
 )

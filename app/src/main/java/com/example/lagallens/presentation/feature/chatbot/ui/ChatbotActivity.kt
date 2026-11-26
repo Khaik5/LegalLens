@@ -1,6 +1,7 @@
 package com.example.lagallens.presentation.feature.chatbot.ui
 
 import android.content.Context
+import com.example.lagallens.presentation.feature.chatbot.draft.utils.hasDraftPlaceholders
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -266,6 +267,10 @@ class ChatbotActivity : AppCompatActivity() {
         chatbotDraftGeneration.chatbotGenerationError.isVisible = state.draftGenerationStatus == DraftGenerationStatus.ERROR
         chatbotDraftGeneration.chatbotGenerationErrorBody.setText(state.draftGenerationErrorRes ?: R.string.chatbot_generation_error)
         chatbotDraftGeneration.chatbotGenerationSuccess.isVisible = state.draftGenerationStatus == DraftGenerationStatus.SUCCESS
+        chatbotDraftGeneration.chatbotGenerationResultWarning.setText(
+            if (state.generatedDraftContent?.hasDraftPlaceholders() == false) R.string.chatbot_generation_result_review_warning
+            else R.string.chatbot_generation_result_warning
+        )
         chatbotDraftGeneration.chatbotGenerationSource.text = getString(R.string.chatbot_generation_source, sourceDocumentName(state.contractName))
         chatbotDraftGeneration.chatbotGenerationResultDocument.chatbotSourceName.setText(R.string.chatbot_generation_result_name)
         chatbotDraftGeneration.chatbotGenerationResultDocument.chatbotSourceMetadata.setText(R.string.chatbot_generation_result_metadata)
@@ -393,7 +398,9 @@ class ChatbotActivity : AppCompatActivity() {
 
     /** The requests the user actually wrote, so the review lists what the draft is built from. */
     private fun draftRequestSummary(state: ChatbotUiState): String {
-        val requests = state.messages
+        // Questions asked before drafting started are not part of the request.
+        val requestIndex = state.messages.indexOfFirst { it.id == state.draftRequestMessageId }
+        val requests = state.messages.drop(requestIndex + 1)
             .filter { it.author == ChatbotMessageAuthor.USER && it.content.isNotBlank() }
             .takeLast(MAX_REQUEST_LINES)
             .map { "• " + it.content.trim().replace(Regex("""\s+"""), " ").take(MAX_REQUEST_LENGTH).let { text -> if (text.length == MAX_REQUEST_LENGTH) "$text…" else text } }

@@ -9,6 +9,7 @@
     <string name="chatbot_draft_saved_metadata">Bản nháp do AI soạn · Đã lưu</string>
     <string name="chatbot_draft_regenerated_version_metadata">Đề xuất AI tạo lại · Chưa lưu</string>
     <string name="chatbot_draft_missing_warning">Còn thông tin trong [ngoặc vuông]. Cần bổ sung và rà soát pháp lý trước khi ký.</string>
+    <string name="chatbot_draft_review_warning">Bản nháp do AI soạn. Cần rà soát pháp lý trước khi ký.</string>
     <string name="chatbot_draft_page_count">Nội dung · %1$d / %2$d</string>
     <string name="chatbot_draft_zoom_level">%1$d%%</string>
     <string name="chatbot_draft_zoom_out">Thu nhỏ</string>
@@ -135,6 +136,10 @@ Chưa ký · Cần hoàn thiện và rà soát các trường trong [ngoặc vu�
 D1 · Bản nháp AI chưa lưu → D2 · Bản chỉnh sửa mới, chưa lưu.
 Hợp đồng gốc không thay đổi. D1 được giữ nguyên.
 Các điều khoản còn lại và thông tin trong [ngoặc vuông] không đổi.</string>
+    <string name="chatbot_draft_ai_approval_body_no_placeholders">Áp dụng đề xuất chỉnh sửa đã chọn.
+D1 · Bản nháp AI chưa lưu → D2 · Bản chỉnh sửa mới, chưa lưu.
+Hợp đồng gốc không thay đổi. D1 được giữ nguyên.
+Các điều khoản còn lại không đổi.</string>
     <string name="chatbot_draft_ai_approval_confirm">Xác nhận áp dụng</string>
     <string name="chatbot_draft_manual_version_metadata">Bản chỉnh sửa thủ công · Chưa lưu</string>
     <string name="chatbot_draft_ai_version_metadata">Đề xuất AI · Bản D2 chưa lưu</string>
@@ -245,6 +250,7 @@ Các điều khoản còn lại và thông tin trong [ngoặc vuông] không đ�
     <string name="draft_save_default_name">Hợp đồng lao động — bản nháp</string>
     <string name="draft_save_copy_notice">Lưu thành bản sao mới trong bản nháp của bạn. Không ghi đè tài liệu gốc hoặc D1.</string>
     <string name="draft_save_legal_warning">Còn thông tin các bên, công việc, tiền lương và thời giờ làm việc trong [ngoặc vuông]. Bản lưu vẫn là bản nháp, chưa sẵn sàng ký.</string>
+    <string name="draft_save_review_warning">Bản lưu vẫn là bản nháp do AI soạn, cần rà soát pháp lý và chưa sẵn sàng ký.</string>
     <string name="draft_save_acknowledge">Tôi hiểu bản lưu cần được bổ sung và rà soát pháp lý.</string>
     <string name="draft_save_action">Lưu bản sao mới</string>
     <string name="draft_save_back">Quay lại bổ sung</string>
@@ -270,6 +276,7 @@ Các điều khoản còn lại và thông tin trong [ngoặc vuông] không đ�
     <string name="draft_pdf_document_metadata">Bản nháp đã lưu</string>
     <string name="draft_pdf_selected_version_note">Xuất PDF của bản nháp đã chọn, không phải PDF của hợp đồng gốc.</string>
     <string name="draft_pdf_warning">PDF giữ nguyên các mục [ngoặc vuông] và nhãn “Bản nháp”. Nội dung AI cần được rà soát trước khi sử dụng.</string>
+    <string name="draft_pdf_review_warning">PDF giữ nhãn “Bản nháp”. Nội dung AI cần được rà soát trước khi sử dụng.</string>
     <string name="draft_pdf_create">Tạo PDF bản nháp</string>
     <string name="draft_pdf_create_share">Tạo PDF để chia sẻ</string>
     <string name="draft_pdf_cancel">Hủy</string>

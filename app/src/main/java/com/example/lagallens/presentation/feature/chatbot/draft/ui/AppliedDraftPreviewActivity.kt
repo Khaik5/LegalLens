@@ -2,6 +2,7 @@ package com.example.lagallens.presentation.feature.chatbot.draft.ui
 
 import android.content.Context
 import android.content.Intent
+import com.example.lagallens.presentation.feature.chatbot.draft.utils.draftWarningRes
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
@@ -81,6 +82,7 @@ class AppliedDraftPreviewActivity : DraftSessionActivity() {
             }
             if (!isOwnerSession()) return@launch
             draftContent = loaded?.content.orEmpty()
+            binding.draftAppliedMissingWarning.setText(draftWarningRes(draftContent.ifBlank { null }))
             draftId = loaded?.draftId
             contractId = loaded?.contractId ?: contractId
             loaded?.title?.let { binding.draftAppliedDocumentName.text = it }

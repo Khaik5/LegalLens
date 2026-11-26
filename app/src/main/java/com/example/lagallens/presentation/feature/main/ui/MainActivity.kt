@@ -93,6 +93,17 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResumeFragments() {
         super.onResumeFragments()
+        if (intent.getBooleanExtra(EXTRA_OPEN_CONTRACT_LIST, false)) {
+            intent.removeExtra(EXTRA_OPEN_CONTRACT_LIST)
+            (supportFragmentManager.findFragmentById(R.id.mainNavHost) as? NavHostFragment)?.navController?.let { navController ->
+                if (!navController.popBackStack(R.id.contractListFragment, false)) {
+                    navigateTo(navController, R.id.contractListFragment)
+                    // Switching tabs restores the contract opened there before; the list itself is wanted.
+                    navController.popBackStack(R.id.contractListFragment, false)
+                }
+            }
+            return
+        }
         val contractId = intent.getStringExtra(EXTRA_UPLOADED_CONTRACT) ?: return
         val session = intent.getStringExtra(EXTRA_UPLOAD_SESSION)
         val replacesDetail = intent.getBooleanExtra(EXTRA_REPLACE_CONTRACT_DETAIL, false)
@@ -248,6 +259,13 @@ class MainActivity : AppCompatActivity() {
         private const val EXTRA_UPLOADED_CONTRACT = "uploaded_contract"
         private const val EXTRA_UPLOAD_SESSION = "upload_owner_session"
         private const val EXTRA_REPLACE_CONTRACT_DETAIL = "replace_contract_detail"
+        private const val EXTRA_OPEN_CONTRACT_LIST = "open_contract_list"
+
+        /** Returns to the main screen on the contract list, closing the screens opened above it. */
+        fun contractListIntent(context: Context): Intent =
+            Intent(context, MainActivity::class.java)
+                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                .putExtra(EXTRA_OPEN_CONTRACT_LIST, true)
 
         fun contractDetailIntent(context: Context, contractId: String, session: String): Intent =
             Intent(context, MainActivity::class.java)

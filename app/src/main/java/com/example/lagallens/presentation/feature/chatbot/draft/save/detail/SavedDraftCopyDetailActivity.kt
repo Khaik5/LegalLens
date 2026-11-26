@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
@@ -27,6 +28,8 @@ import com.example.lagallens.presentation.feature.chatbot.draft.save.pdf.DraftPd
 import com.example.lagallens.presentation.feature.chatbot.draft.ui.AppliedDraftPreviewActivity
 import com.example.lagallens.presentation.feature.chatbot.draft.contract.ChatbotDraftUiState
 import com.example.lagallens.presentation.feature.chatbot.draft.ui.ChatbotDraftPreviewActivity
+import com.example.lagallens.presentation.feature.main.ui.MainActivity
+import com.example.lagallens.presentation.feature.chatbot.draft.utils.savedDraftWarningRes
 
 class SavedDraftCopyDetailActivity : DraftSessionActivity() {
     private lateinit var binding: ActivitySavedDraftCopyDetailBinding
@@ -47,7 +50,8 @@ class SavedDraftCopyDetailActivity : DraftSessionActivity() {
         binding = ActivitySavedDraftCopyDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
         binding.root.applySystemBarInsets()
-        binding.savedDraftBack.setOnClickListener { finish() }
+        binding.savedDraftBack.setOnClickListener { viewModel.onEvent(SavedDraftCopyDetailUiEvent.BackClicked) }
+        onBackPressedDispatcher.addCallback(this) { viewModel.onEvent(SavedDraftCopyDetailUiEvent.BackClicked) }
         val version = intent.getStringExtra(EXTRA_VERSION) ?: ChatbotDraftUiState.APPROVED_AI_VERSION
         val contractId = intent.getStringExtra(EXTRA_CONTRACT_ID)
         draftId = intent.getStringExtra(EXTRA_DRAFT_ID)
@@ -66,6 +70,7 @@ class SavedDraftCopyDetailActivity : DraftSessionActivity() {
             draft?.let {
                 draftId = it.draftId
                 binding.savedDraftTitle.text = it.title
+                binding.savedDraftWarning.setText(savedDraftWarningRes(it.content))
             }
         }
         binding.savedDraftView.setOnClickListener {
@@ -90,8 +95,19 @@ class SavedDraftCopyDetailActivity : DraftSessionActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch { viewModel.uiState.collect { renderSaveAsContract(it) } }
-                launch { viewModel.uiEffect.collect { effect -> if (effect is SavedDraftCopyDetailUiEffect.ShowMessage) Toast.makeText(this@SavedDraftCopyDetailActivity, effect.messageRes, Toast.LENGTH_LONG).show() } }
+                launch { viewModel.uiEffect.collect(::handleEffect) }
             }
+        }
+    }
+
+    private fun handleEffect(effect: SavedDraftCopyDetailUiEffect) {
+        when (effect) {
+            is SavedDraftCopyDetailUiEffect.ShowMessage -> Toast.makeText(this, effect.messageRes, Toast.LENGTH_LONG).show()
+            SavedDraftCopyDetailUiEffect.NavigateToContracts -> {
+                startActivity(MainActivity.contractListIntent(this))
+                finish()
+            }
+            SavedDraftCopyDetailUiEffect.Close -> finish()
         }
     }
 

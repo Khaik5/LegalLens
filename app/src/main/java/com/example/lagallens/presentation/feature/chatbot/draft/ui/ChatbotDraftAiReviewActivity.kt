@@ -1,6 +1,7 @@
 package com.example.lagallens.presentation.feature.chatbot.draft.ui
 
 import android.content.Context
+import com.example.lagallens.presentation.feature.chatbot.draft.utils.hasDraftPlaceholders
 import android.content.Intent
 import android.os.Bundle
 import com.example.lagallens.BuildConfig
@@ -46,7 +47,10 @@ class ChatbotDraftAiReviewActivity : DraftSessionActivity() {
             if (viewModel.uiState.value.accepted && proposal != null) {
                 MaterialAlertDialogBuilder(this@ChatbotDraftAiReviewActivity)
                     .setTitle(R.string.chatbot_draft_ai_approval_title)
-                    .setMessage(R.string.chatbot_draft_ai_approval_body)
+                    .setMessage(
+                        if ((proposal.originalText + proposal.proposedText).hasDraftPlaceholders()) R.string.chatbot_draft_ai_approval_body
+                        else R.string.chatbot_draft_ai_approval_body_no_placeholders
+                    )
                     .setNegativeButton(R.string.chatbot_draft_ai_cancel, null)
                     .setPositiveButton(R.string.chatbot_draft_ai_approval_confirm) { _, _ ->
                         startActivity(

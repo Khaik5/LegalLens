@@ -133,6 +133,7 @@
                 android:drawablePadding="@dimen/dp_8"
                 android:gravity="center_vertical"
                 android:padding="@dimen/dp_12"
+                android:id="@+id/draftAppliedMissingWarning"
                 android:text="@string/chatbot_draft_missing_warning"
                 android:textColor="@color/legal_lens_secondary_text"
                 android:textSize="@dimen/sp_12" />

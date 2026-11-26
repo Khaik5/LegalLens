@@ -4,4 +4,7 @@ import androidx.annotation.StringRes
 
 sealed interface SavedDraftCopyDetailUiEffect {
     data class ShowMessage(@StringRes val messageRes: Int) : SavedDraftCopyDetailUiEffect
+    /** The draft is now a contract, so leaving goes to the contract list where it appears. */
+    data object NavigateToContracts : SavedDraftCopyDetailUiEffect
+    data object Close : SavedDraftCopyDetailUiEffect
 }

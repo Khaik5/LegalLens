@@ -843,6 +843,7 @@
     <string name="chatbot_generation_result_metadata">Bản nháp do AI soạn</string>
     <string name="chatbot_generation_result_badge">Bản nháp · Chưa lưu</string>
     <string name="chatbot_generation_result_warning">Còn thông tin cần bổ sung. Rà soát nội dung trước khi lưu hoặc xuất.</string>
+    <string name="chatbot_generation_result_review_warning">Bản nháp do AI soạn. Rà soát nội dung trước khi lưu hoặc xuất.</string>
     <string name="chatbot_generation_view_draft">Xem bản nháp</string>
     <string name="chatbot_generation_preview_title">Bản nháp D1 · Minh họa</string>
     <string name="chatbot_generation_preview_body">Dữ liệu minh họa cố định, chưa phân tích nội dung bạn nhập. Bản mẫu chưa được lưu và chưa phải hợp đồng hoàn chỉnh.\n\nLoại hợp đồng: Thuê văn phòng\nThời hạn dự kiến: 24 tháng từ ngày bàn giao\nCác bên, địa chỉ, giá thuê và tiền cọc: [chưa cung cấp]\n\nHợp đồng gốc được giữ nguyên.</string>

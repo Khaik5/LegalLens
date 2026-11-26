@@ -28,6 +28,7 @@ import com.example.lagallens.presentation.feature.chatbot.draft.contract.Chatbot
 import com.example.lagallens.LegalLensApplication
 import com.example.lagallens.domain.model.DraftStage
 import com.example.lagallens.presentation.feature.documentviewer.ui.DocumentViewerActivity
+import com.example.lagallens.presentation.feature.chatbot.draft.utils.draftPdfWarningRes
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -45,7 +46,7 @@ import kotlinx.coroutines.ensureActive
 import java.io.File
 
 internal enum class DraftPdfStatus { OPTIONS, LOADING, ERROR, READY }
-internal data class DraftPdfState(val status: DraftPdfStatus = DraftPdfStatus.OPTIONS, val filePath: String? = null, val saving: Boolean = false, val title: String = "", val savedToDevice: Boolean = false)
+internal data class DraftPdfState(val status: DraftPdfStatus = DraftPdfStatus.OPTIONS, val filePath: String? = null, val saving: Boolean = false, val title: String = "", val savedToDevice: Boolean = false, val draftContent: String? = null)
 internal sealed interface DraftPdfEffect {
     data class Share(val filePath: String) : DraftPdfEffect
     data object Saved : DraftPdfEffect
@@ -68,7 +69,28 @@ internal class DraftPdfExportViewModel(application: Application) : AndroidViewMo
         while (effectChannel.tryReceive().isSuccess) { }
     } } } }
 
-    fun setVersion(value: String) { if (isOwnerSession()) draftKey = value }
+    fun setVersion(value: String) {
+        if (!isOwnerSession() || (draftKey == value && state.value.draftContent != null)) return
+        draftKey = value
+        loadDraftContent(value)
+    }
+
+    /** The warning depends on whether the draft still has [square bracket] fields, so the sheet reads the draft before export. */
+    private fun loadDraftContent(key: String) {
+        val repository = try { app.draftRepository.forSession(ownerSession) } catch (_: Exception) { return }
+        viewModelScope.launch {
+            val content = try {
+                withContext(Dispatchers.IO) {
+                    (repository.getDraft(key) ?: DraftStage.fromLegacyKey(key)?.let { repository.getLatestDraft(it) })?.content
+                }
+            } catch (cancellationException: CancellationException) {
+                throw cancellationException
+            } catch (_: Exception) {
+                null
+            }
+            if (isOwnerSession() && draftKey == key) state.update { it.copy(draftContent = content) }
+        }
+    }
 
     fun export(shareWhenReady: Boolean = false) {
         if (!isOwnerSession()) return
@@ -184,6 +206,7 @@ class DraftPdfExportBottomSheet : BottomSheetDialogFragment() {
     private fun render(state: DraftPdfState) = with(binding) {
         if (!viewModel.isOwnerSession()) { dismissAllowingStateLoss(); return@with }
         pdfDocumentTitle.text = state.title.ifBlank { fallbackTitle() }
+        pdfWarning.setText(draftPdfWarningRes(state.draftContent))
         pdfOptions.isVisible = state.status == DraftPdfStatus.OPTIONS
         pdfLoading.isVisible = state.status == DraftPdfStatus.LOADING
         pdfError.isVisible = state.status == DraftPdfStatus.ERROR

@@ -16,6 +16,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.example.lagallens.R
 import com.example.lagallens.databinding.BottomSheetSaveDraftCopyBinding
 import com.example.lagallens.presentation.feature.chatbot.draft.save.detail.SavedDraftCopyDetailActivity
+import com.example.lagallens.presentation.feature.chatbot.draft.utils.savedDraftWarningRes
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -53,6 +54,8 @@ class SaveDraftCopyBottomSheet : BottomSheetDialogFragment() {
             arguments?.getString(KEY_SOURCE_DRAFT_ID)
         )
         binding.saveDraftSelectedVersion.text = getString(R.string.draft_save_selected_version, version)
+        val warningRes = savedDraftWarningRes(arguments?.getString(KEY_CONTENT))
+        listOf(binding.saveDraftFormWarning, binding.saveDraftLoadingWarning, binding.saveDraftSuccessWarning).forEach { it.setText(warningRes) }
         binding.saveDraftName.setText(viewModel.uiState.value.name)
         binding.saveDraftAcknowledge.isChecked = viewModel.uiState.value.acknowledged
         binding.saveDraftName.doAfterTextChangedCompat { viewModel.setName(it) }
@@ -63,18 +66,26 @@ class SaveDraftCopyBottomSheet : BottomSheetDialogFragment() {
         binding.saveDraftReturn.setOnClickListener { dismiss() }
         binding.saveDraftViewSaved.setOnClickListener {
             if ((activity as? com.example.lagallens.presentation.feature.chatbot.draft.ui.DraftSessionActivity)?.isDraftSessionValid() != true) return@setOnClickListener
-            startActivity(SavedDraftCopyDetailActivity.createIntent(requireContext(), version))
+            startActivity(savedDraftIntent(version, openExport = false))
             dismiss()
         }
         binding.saveDraftExportPdf.setOnClickListener {
             if ((activity as? com.example.lagallens.presentation.feature.chatbot.draft.ui.DraftSessionActivity)?.isDraftSessionValid() != true) return@setOnClickListener
-            startActivity(SavedDraftCopyDetailActivity.createIntent(requireContext(), version, openExport = true))
+            startActivity(savedDraftIntent(version, openExport = true))
             dismiss()
         }
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) { viewModel.uiState.collect(::render) }
         }
     }
+
+    private fun savedDraftIntent(version: String, openExport: Boolean) = SavedDraftCopyDetailActivity.createIntent(
+        requireContext(),
+        version,
+        openExport = openExport,
+        draftId = viewModel.uiState.value.savedDraftId,
+        contractId = arguments?.getString(KEY_CONTRACT_ID)
+    )
 
     private fun render(state: SaveDraftCopyUiState) = with(binding) {
         saveDraftName.setTextIfDifferent(state.name)

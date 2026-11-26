@@ -339,6 +339,7 @@ class ChatbotViewModel(
             author = ChatbotMessageAuthor.ASSISTANT,
             content = clarificationText
         )
+        _uiState.update { it.copy(draftRequestMessageId = request.id) }
         if (!previous.isNewConversation && previous.messages.size > 1 && !previous.isDraftConversation) {
             val action = ChatbotMessage(nextMessageId++, ChatbotMessageAuthor.ASSISTANT, "", isDraftAction = true)
             val loading = ChatbotMessage(nextMessageId++, ChatbotMessageAuthor.ASSISTANT, "", isDraftLoading = true)
@@ -438,6 +439,7 @@ class ChatbotViewModel(
             _uiState.update {
                 it.copy(
                     draftGenerationStatus = if (draft == null) DraftGenerationStatus.ERROR else DraftGenerationStatus.SUCCESS,
+                    generatedDraftContent = draft?.content,
                     draftGenerationErrorRes = generationFailure.toDraftAiFailureMessage(),
                     isReplyPending = false
                 )

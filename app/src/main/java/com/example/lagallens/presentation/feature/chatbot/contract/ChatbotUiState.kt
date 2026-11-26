@@ -17,6 +17,10 @@ data class ChatbotUiState(
     val isDraftPreparing: Boolean = false,
     val isDraftReviewReady: Boolean = false,
     val isDraftReviewVisible: Boolean = false,
+    /** The message that started drafting; the review lists only what the user asked after it. */
+    val draftRequestMessageId: Long? = null,
+    /** The text of the draft just made; it decides whether the result card warns about missing information. */
+    val generatedDraftContent: String? = null,
     val draftGenerationStatus: DraftGenerationStatus = DraftGenerationStatus.NONE,
     /** What went wrong when the draft could not be made, if the backend said; null keeps the generic text. */
     val draftGenerationErrorRes: Int? = null,

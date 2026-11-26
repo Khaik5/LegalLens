@@ -2,6 +2,7 @@ package com.example.lagallens.presentation.feature.chatbot.draft.ui
 
 import android.content.Context
 import android.content.Intent
+import com.example.lagallens.presentation.feature.chatbot.draft.utils.draftWarningRes
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -82,6 +83,9 @@ class ChatbotDraftRegenerationActivity : DraftSessionActivity() {
         draftRegenerationError.isVisible = isError
         if (isError) draftRegenerationErrorBody.setText(state.errorMessageRes ?: R.string.chatbot_draft_regeneration_error_body)
         draftRegenerationSuccess.isVisible = isSuccess
+        // While the draft is being made its text is unknown, so only the review reminder is certain.
+        draftRegenerationLoadingWarning.setText(R.string.chatbot_draft_review_warning)
+        draftRegenerationSuccessWarning.setText(draftWarningRes(state.content))
         draftRegenerationRetry.isVisible = isError
         draftRegenerationView.isVisible = isSuccess
         draftRegenerationPendingAction.isVisible = isLoading
