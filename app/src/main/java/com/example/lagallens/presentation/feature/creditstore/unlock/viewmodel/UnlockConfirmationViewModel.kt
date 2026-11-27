@@ -111,7 +111,7 @@ class UnlockConfirmationViewModel(private val creditRepository: CreditRepository
             when (outcome) {
                 is com.example.lagallens.domain.repository.AnalysisUnlockOutcome.Unlocked -> {
                     hasKnownBalance = true
-                    _uiState.update { it.copy(availableCredits = outcome.balance, isBackendUnavailable = false) }
+                    _uiState.update { it.copy(availableCredits = outcome.balance, isBackendUnavailable = false, isUnlocked = true) }
                     // Refresh the shared wallet without delaying or invalidating the successful unlock.
                     refreshBalance(completeAfterUnlock = true)
                     _uiEffect.send(UnlockConfirmationUiEffect.UnlockRequested(state.analysisResultId, state.unlockCost))
