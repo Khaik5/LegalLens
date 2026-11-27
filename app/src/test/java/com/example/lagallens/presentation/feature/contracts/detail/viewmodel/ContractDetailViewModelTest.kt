@@ -44,7 +44,7 @@ class ContractDetailViewModelTest {
         assertEquals(ContractDetailUiEffect.ShowMessage(R.string.contract_action_failed), vm.uiEffect.first())
 
         vm.onEvent(ContractDetailUiEvent.DeleteConfirmed())
-        assertEquals(ContractDetailUiEffect.NavigateBack, vm.uiEffect.first())
+        assertEquals(ContractDetailUiEffect.NavigateBackAfterDelete, vm.uiEffect.first())
         assertEquals(2, attempts)
     }
 
@@ -64,7 +64,7 @@ class ContractDetailViewModelTest {
         assertEquals(ContractDetailUiEffect.ShowPaidResultsDeleteConfirmation, vm.uiEffect.first())
 
         vm.onEvent(ContractDetailUiEvent.DeleteConfirmed(confirmPaidResults = true))
-        assertEquals(ContractDetailUiEffect.NavigateBack, vm.uiEffect.first())
+        assertEquals(ContractDetailUiEffect.NavigateBackAfterDelete, vm.uiEffect.first())
         assertEquals(listOf(false, true), confirmations)
     }
 

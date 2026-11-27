@@ -29,6 +29,7 @@
             app:tint="@color/legal_lens_status_text" />
 
         <TextView
+            android:id="@+id/ocrReviewTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/ocr_review_title_margin_start"
@@ -55,6 +56,7 @@
             android:orientation="vertical">
 
             <LinearLayout
+                android:id="@+id/ocrReviewAlert"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/ocr_review_alert_height"
                 android:layout_marginStart="@dimen/ocr_review_side_padding"
@@ -68,6 +70,7 @@
                 android:paddingEnd="@dimen/ocr_review_alert_horizontal_padding">
 
                 <ImageView
+                    android:id="@+id/ocrReviewAlertIcon"
                     android:layout_width="@dimen/ocr_review_alert_icon_size"
                     android:layout_height="@dimen/ocr_review_alert_icon_size"
                     android:contentDescription="@null"

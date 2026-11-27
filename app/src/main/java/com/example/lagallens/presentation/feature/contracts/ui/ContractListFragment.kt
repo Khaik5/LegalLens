@@ -88,6 +88,9 @@ class ContractListFragment : Fragment() {
     }
 
     private fun bindFilterResult() {
+        parentFragmentManager.setFragmentResultListener(ContractDetailFragment.RESULT_CONTRACT_DELETED, viewLifecycleOwner) { _, _ ->
+            if (!binding.etSearch.text.isNullOrEmpty()) binding.etSearch.text?.clear()
+        }
         parentFragmentManager.setFragmentResultListener(
             ContractFilterBottomSheet.RESULT_KEY,
             viewLifecycleOwner

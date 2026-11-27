@@ -74,7 +74,8 @@ class ChatbotHistoryViewModel(private val repository: ChatbotRepository? = null)
                                 timestamp = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(Date(record.updatedAtEpochMillis)),
                                 messageCountQuantity = record.messageCount,
                                 preview = record.lastMessagePreview,
-                                contractId = record.contractId
+                                contractId = record.contractId,
+                                updatedAtEpochMillis = record.updatedAtEpochMillis
                             )
                         }
                         filter(_uiState.value.query)

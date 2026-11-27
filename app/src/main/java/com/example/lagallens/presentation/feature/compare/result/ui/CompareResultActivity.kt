@@ -1,6 +1,7 @@
 package com.example.lagallens.presentation.feature.compare.result.ui
 
 import android.content.Context
+import com.example.lagallens.presentation.feature.compare.result.utils.toClauseHeading
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -212,7 +213,7 @@ class CompareResultActivity : AppCompatActivity() {
             val key = "clause:$index"
             val item = ItemCompareClauseBinding.inflate(LayoutInflater.from(this@CompareResultActivity), compareClausesList, false)
             item.compareClauseTitle.text =
-                if (difference.kind == ContractSectionKind.PREAMBLE) getString(R.string.compare_section_preamble) else difference.section.toReadableText()
+                if (difference.kind == ContractSectionKind.PREAMBLE) getString(R.string.compare_section_preamble) else difference.section.toReadableText().toClauseHeading()
             item.compareClauseChange.text = changeText(difference)
             item.compareClauseChange.setTextColor(ContextCompat.getColor(this@CompareResultActivity, changeColor(difference.changeType)))
             item.compareClauseDetails.isVisible = key in expanded

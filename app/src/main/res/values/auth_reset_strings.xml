@@ -7,5 +7,7 @@
     <string name="reset_password_failed">Không thể đặt lại mật khẩu cho email này.</string>
     <string name="profile_logout_failed">Không thể đăng xuất. Vui lòng thử lại.</string>
     <string name="credit_hub_unlock_hint">Hãy mở một kết quả phân tích để mở khóa bằng Credit.</string>
-    <string name="contract_page_count_format">%1$d trang</string>
+    <plurals name="contract_page_count">
+        <item quantity="other">%1$d trang</item>
+    </plurals>
 </resources>

@@ -105,7 +105,6 @@ class ChatbotHistoryActivity : AppCompatActivity() {
         historyAdapter.submitList(state.conversations)
         val shouldFocusSearch = state.isSearchVisible && !binding.chatbotHistoryQuery.isVisible
         binding.chatbotHistoryQuery.isVisible = state.isSearchVisible
-        binding.chatbotHistoryTodayLabel.isVisible = !state.isSearchVisible
         binding.chatbotHistoryFooter.isVisible = !state.isSearchVisible
         binding.chatbotHistoryPreservationNotice.isVisible = !state.isSearchVisible
         binding.chatbotHistoryEmpty.isVisible = state.conversations.isEmpty()

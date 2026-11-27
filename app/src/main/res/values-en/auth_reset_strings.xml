@@ -7,5 +7,8 @@
     <string name="reset_password_failed">The password could not be reset for this email.</string>
     <string name="profile_logout_failed">Could not sign out. Please try again.</string>
     <string name="credit_hub_unlock_hint">Open an analysis result to unlock it with Credits.</string>
-    <string name="contract_page_count_format">%1$d pages</string>
+    <plurals name="contract_page_count">
+        <item quantity="one">%1$d page</item>
+        <item quantity="other">%1$d pages</item>
+    </plurals>
 </resources>

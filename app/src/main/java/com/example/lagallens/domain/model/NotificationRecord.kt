@@ -7,7 +7,9 @@ data class NotificationRecord(
     val isUnread: Boolean,
     val title: String,
     val description: String,
-    val createdAtMillis: Long
+    val createdAtMillis: Long,
+    /** An analysis notification that reports high-risk findings rather than a plain completion. */
+    val isHighRisk: Boolean = false
 )
 
 enum class NotificationKind { ANALYSIS, OCR, REMINDER, SYSTEM }

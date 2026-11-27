@@ -33,6 +33,8 @@ import kotlinx.coroutines.launch
 class CameraPermissionActivity : com.example.lagallens.presentation.feature.ocr.OcrSessionActivity() {
     private val binding by lazy { ActivityCameraPermissionBinding.inflate(layoutInflater) }
     private val viewModel by viewModels<CameraPermissionViewModel>()
+    /** Set while the user is in the system Settings, so the grant made there opens the camera on return. */
+    private var isAwaitingSettingsGrant = false
     private val permissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { granted ->
@@ -55,10 +57,25 @@ class CameraPermissionActivity : com.example.lagallens.presentation.feature.ocr.
             isAppearanceLightStatusBars = true
             isAppearanceLightNavigationBars = true
         }
+        isAwaitingSettingsGrant = savedInstanceState?.getBoolean(STATE_AWAITING_SETTINGS_GRANT) == true
         setContentView(binding.root)
         applyWindowInsets()
         bindView()
         collectViewModel()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (!isAwaitingSettingsGrant) return
+        isAwaitingSettingsGrant = false
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+            viewModel.onEvent(CameraPermissionUiEvent.PermissionResult(true))
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean(STATE_AWAITING_SETTINGS_GRANT, isAwaitingSettingsGrant)
     }
 
     private fun applyWindowInsets() {
@@ -79,6 +96,7 @@ class CameraPermissionActivity : com.example.lagallens.presentation.feature.ocr.
                 viewModel.onEvent(CameraPermissionUiEvent.PermissionResult(true))
             } else if (getPreferences(Context.MODE_PRIVATE).getBoolean(CAMERA_PERMISSION_REQUESTED, false) &&
                 !shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
+                isAwaitingSettingsGrant = true
                 startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:$packageName")))
             } else {
                 viewModel.onEvent(CameraPermissionUiEvent.AllowClicked)
@@ -123,6 +141,7 @@ class CameraPermissionActivity : com.example.lagallens.presentation.feature.ocr.
 
     companion object {
         private const val CAMERA_PERMISSION_REQUESTED = "cameraPermissionRequested"
+        private const val STATE_AWAITING_SETTINGS_GRANT = "awaitingSettingsGrant"
         fun createIntent(context: Context): Intent = com.example.lagallens.presentation.feature.ocr.OcrSession.stamp(context, Intent(context, CameraPermissionActivity::class.java))
     }
 }

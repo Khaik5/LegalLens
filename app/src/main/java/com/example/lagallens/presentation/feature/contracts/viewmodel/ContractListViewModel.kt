@@ -26,6 +26,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 
+import com.example.lagallens.presentation.common.utils.toFailureMessage
 import com.example.lagallens.presentation.common.utils.withAppLocale
 import com.example.lagallens.presentation.feature.contracts.contract.typeLabel
 import com.example.lagallens.presentation.feature.contracts.contract.toContractListItem
@@ -55,10 +56,14 @@ class ContractListViewModel(application: Application) : AndroidViewModel(applica
                 }
             } catch (cancellationException: CancellationException) {
                 throw cancellationException
-            } catch (_: Exception) {
-                sourceContracts = emptyList()
-                updateContracts(isLoading = false, hasError = true)
-                _uiEffect.send(ContractListUiEffect.ShowMessage(R.string.dashboard_load_failed))
+            } catch (failure: Exception) {
+                // A failed refresh keeps the contracts already shown; the error screen is only for a list never loaded.
+                updateContracts(isLoading = false, hasError = sourceContracts.isEmpty())
+                _uiEffect.send(
+                    ContractListUiEffect.ShowMessage(
+                        if (sourceContracts.isEmpty()) R.string.dashboard_load_failed else failure.toFailureMessage()
+                    )
+                )
             }
         }
     }
@@ -73,7 +78,12 @@ class ContractListViewModel(application: Application) : AndroidViewModel(applica
             ContractListUiEvent.FilterClicked -> showFilterBottomSheet()
             ContractListUiEvent.RetryClicked -> if (_uiState.value.hasError) observeContracts()
             ContractListUiEvent.ScreenResumed -> {
-                if (hasResumedOnce) getApplication<LegalLensApplication>().contractRepository.invalidate() else hasResumedOnce = true
+                when {
+                    !hasResumedOnce -> hasResumedOnce = true
+                    // The list flow ends when a load fails, so coming back to the screen starts it again.
+                    contractsJob?.isActive != true -> observeContracts()
+                    else -> getApplication<LegalLensApplication>().contractRepository.invalidate()
+                }
             }
             is ContractListUiEvent.FiltersApplied -> updateContracts(filterSelection = event.filterSelection)
             is ContractListUiEvent.ContractClicked -> navigateToDetail(event.contract.id)
