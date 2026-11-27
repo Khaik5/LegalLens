@@ -115,6 +115,21 @@ class UnlockConfirmationRegressionTest {
         } finally { vm.viewModelScope.cancel() }
     }
 
+    @Test fun afterUnlockTheScreenShowsTheBalanceBeforeAndAfterWithoutTakingTheCostTwice() = runTest {
+        val wallet = Wallet(83, cached = true)
+        wallet.refreshAction = { if (wallet.refreshCalls > 1) wallet.balance.value = 81 }
+        val vm = UnlockConfirmationViewModel(wallet, Unlocks { AnalysisUnlockOutcome.Unlocked(81) })
+        try {
+            vm.onEvent(UnlockConfirmationUiEvent.ScreenOpened("result", 83, 2))
+            assertEquals(83, vm.uiState.value.balanceBeforeUnlock)
+            assertEquals(81, vm.uiState.value.remainingCredits)
+            vm.onEvent(UnlockConfirmationUiEvent.ConfirmClicked)
+            vm.uiEffect.first()
+            assertEquals(83, vm.uiState.value.balanceBeforeUnlock)
+            assertEquals(81, vm.uiState.value.remainingCredits)
+        } finally { vm.viewModelScope.cancel() }
+    }
+
     @Test fun failedPostUnlockRefreshDoesNotTurnASuccessfulUnlockIntoAnError() = runTest {
         val wallet = Wallet(5, cached = true)
         wallet.refreshAction = { if (wallet.refreshCalls > 1) throw IOException("offline") }

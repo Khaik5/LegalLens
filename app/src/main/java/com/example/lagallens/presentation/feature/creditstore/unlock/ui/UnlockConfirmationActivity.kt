@@ -111,7 +111,7 @@ class UnlockConfirmationActivity : AppCompatActivity() {
         unlockConfirmationResultMeta.text = getString(R.string.unlock_confirmation_result_meta)
         unlockConfirmationBalanceBefore.text = getString(
             R.string.unlock_confirmation_credit_value,
-            state.availableCredits
+            state.balanceBeforeUnlock
         )
         unlockConfirmationCost.text = getString(
             R.string.unlock_confirmation_credit_deduction,

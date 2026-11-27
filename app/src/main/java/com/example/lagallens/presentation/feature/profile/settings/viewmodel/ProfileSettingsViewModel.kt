@@ -27,6 +27,8 @@ class ProfileSettingsViewModel(
     private val _uiState = MutableStateFlow(ProfileSettingsUiState())
     val uiState = _uiState.asStateFlow()
     private var persistedState = _uiState.value
+    private var hasLoadedSettings = false
+    private var isLanguagePickerPending = false
 
     private val _uiEffect = Channel<ProfileSettingsUiEffect>(Channel.BUFFERED)
     val uiEffect = _uiEffect.receiveAsFlow()
@@ -44,6 +46,12 @@ class ProfileSettingsViewModel(
                     )
                 }
                 persistedState = _uiState.value
+                hasLoadedSettings = true
+                // Opened straight from the profile, the picker must wait for the saved language or it marks the default.
+                if (isLanguagePickerPending) {
+                    isLanguagePickerPending = false
+                    _uiEffect.send(ProfileSettingsUiEffect.ShowLanguagePicker(_uiState.value.language))
+                }
             }
         }
     }
@@ -54,9 +62,11 @@ class ProfileSettingsViewModel(
             is ProfileSettingsUiEvent.EmailToggled -> saveNotifications { it.copy(isEmailEnabled = event.isEnabled) }
             is ProfileSettingsUiEvent.InAppToggled -> saveNotifications { it.copy(isInAppEnabled = event.isEnabled) }
             is ProfileSettingsUiEvent.AppearanceSelected -> updateAppearance(event.appearance)
-            ProfileSettingsUiEvent.LanguageClicked -> emitEffect(
-                ProfileSettingsUiEffect.ShowLanguagePicker(_uiState.value.language)
-            )
+            ProfileSettingsUiEvent.LanguageClicked -> if (hasLoadedSettings) {
+                emitEffect(ProfileSettingsUiEffect.ShowLanguagePicker(_uiState.value.language))
+            } else {
+                isLanguagePickerPending = true
+            }
             is ProfileSettingsUiEvent.LanguageSelected -> saveSetting {
                 updateProfileLanguageUseCase(
                     com.example.lagallens.domain.model.ProfileLanguage.valueOf(event.language.name)
