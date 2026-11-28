@@ -630,7 +630,6 @@
     <dimen name="chatbot_history_footer_padding">16dp</dimen>
     <dimen name="chatbot_history_notice_margin_top">12dp</dimen>
     <dimen name="chatbot_history_notice_padding">12dp</dimen>
-    <dimen name="chatbot_history_today_margin_top">16dp</dimen>
     <dimen name="chatbot_history_continue_margin_top">16dp</dimen>
     <dimen name="chatbot_new_state_side_padding">16dp</dimen>
     <dimen name="chatbot_new_state_mascot_size">40dp</dimen>

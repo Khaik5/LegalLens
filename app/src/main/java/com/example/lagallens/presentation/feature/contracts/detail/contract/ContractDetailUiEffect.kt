@@ -4,6 +4,7 @@ import androidx.annotation.StringRes
 
 sealed interface ContractDetailUiEffect {
     data object NavigateBack : ContractDetailUiEffect
+    data object NavigateBackAfterDelete : ContractDetailUiEffect
     data class NavigateToDocument(val contractId: String, val documentUri: String?, val title: String) : ContractDetailUiEffect
     data class NavigateToCompare(val contractId: String) : ContractDetailUiEffect
     data class NavigateToOcrText(val documentId: String, val contractId: String, val documentName: String, val documentDetails: String, val content: String, val ownerSession: String?) : ContractDetailUiEffect

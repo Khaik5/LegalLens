@@ -146,7 +146,7 @@ class ContractDetailViewModel(
                     if (session != repository.activeSessionKey() || currentContractId != id) return@launch
                     if (deleted) {
                         syncRelatedData { relatedData?.contractDeleted(session, id) }
-                        emitEffect(ContractDetailUiEffect.NavigateBack)
+                        emitEffect(ContractDetailUiEffect.NavigateBackAfterDelete)
                     }
                     else emitEffect(ContractDetailUiEffect.ShowMessage(R.string.contract_detail_delete_unavailable))
                 }

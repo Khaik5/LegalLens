@@ -10,6 +10,7 @@ import android.text.Spannable
 import android.text.style.StyleSpan
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.isVisible
 import androidx.core.view.WindowCompat
@@ -80,6 +81,14 @@ class OcrReviewActivity : com.example.lagallens.presentation.feature.ocr.OcrSess
             confidencePercent == null -> getString(R.string.ocr_review_alert_generic)
             confidencePercent >= HIGH_CONFIDENCE_PERCENT -> getString(R.string.ocr_review_alert_confidence_high, confidence)
             else -> getString(R.string.ocr_review_alert_confidence, confidence)
+        }
+        if (confidencePercent != null && confidencePercent >= HIGH_CONFIDENCE_PERCENT) {
+            val confidentColor = ContextCompat.getColor(this, R.color.contract_complete)
+            binding.ocrReviewTitle.setText(R.string.ocr_review_title_confident)
+            binding.ocrReviewAlert.setBackgroundResource(R.drawable.bg_ocr_review_confident)
+            binding.ocrReviewAlertIcon.setImageResource(R.drawable.ic_shield_check)
+            binding.ocrReviewAlertIcon.imageTintList = android.content.res.ColorStateList.valueOf(confidentColor)
+            binding.ocrReviewAlertText.setTextColor(confidentColor)
         }
         viewModel.onEvent(OcrReviewEvent.ScreenOpened(
             intent.getStringExtra(EXTRA_DOCUMENT_ID).orEmpty(),

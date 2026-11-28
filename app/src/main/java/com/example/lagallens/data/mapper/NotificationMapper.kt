@@ -17,5 +17,6 @@ internal fun NotificationResponse.toNotification(titleFor: (type: String?) -> St
     isUnread = !isRead,
     title = titleFor(type),
     description = message.orEmpty(),
-    createdAtMillis = runCatching { Instant.parse(createdAt).toEpochMilli() }.getOrNull() ?: 0L
+    createdAtMillis = runCatching { Instant.parse(createdAt).toEpochMilli() }.getOrNull() ?: 0L,
+    isHighRisk = type == "HIGH_RISK_FOUND"
 )

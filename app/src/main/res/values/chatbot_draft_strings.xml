@@ -204,8 +204,8 @@ Các điều khoản còn lại không đổi.</string>
     <string name="chatbot_draft_version_view_d3">Xem D3</string>
     <string name="chatbot_draft_version_original_status">HỢP ĐỒNG GỐC · CHỈ ĐỌC</string>
     <string name="chatbot_draft_version_original_title">Hợp đồng gốc</string>
-    <string name="chatbot_draft_version_original_body">Tệp PDF ban đầu</string>
-    <string name="chatbot_draft_version_view_original">Xem PDF gốc</string>
+    <string name="chatbot_draft_version_original_body">Tệp tải lên ban đầu</string>
+    <string name="chatbot_draft_version_view_original">Xem tệp gốc</string>
     <string name="chatbot_draft_versions_optional_note">D1-R và M1 là các nhánh tùy chọn. Hợp đồng gốc luôn được giữ nguyên.</string>
     <string name="chatbot_draft_versions_compare">So sánh D1 và D2</string>
     <string name="chatbot_draft_copy_confirm_title">Tạo bản sao từ D1?</string>
@@ -249,7 +249,7 @@ Các điều khoản còn lại không đổi.</string>
     <string name="draft_save_name_label">Tên hợp đồng</string>
     <string name="draft_save_default_name">Hợp đồng lao động — bản nháp</string>
     <string name="draft_save_copy_notice">Lưu thành bản sao mới trong bản nháp của bạn. Không ghi đè tài liệu gốc hoặc D1.</string>
-    <string name="draft_save_legal_warning">Còn thông tin các bên, công việc, tiền lương và thời giờ làm việc trong [ngoặc vuông]. Bản lưu vẫn là bản nháp, chưa sẵn sàng ký.</string>
+    <string name="draft_save_legal_warning">Còn thông tin trong [ngoặc vuông] cần bổ sung. Bản lưu vẫn là bản nháp, chưa sẵn sàng ký.</string>
     <string name="draft_save_review_warning">Bản lưu vẫn là bản nháp do AI soạn, cần rà soát pháp lý và chưa sẵn sàng ký.</string>
     <string name="draft_save_acknowledge">Tôi hiểu bản lưu cần được bổ sung và rà soát pháp lý.</string>
     <string name="draft_save_action">Lưu bản sao mới</string>

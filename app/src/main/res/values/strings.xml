@@ -517,7 +517,7 @@
     <string name="analysis_result_risk_heading">Đánh giá rủi ro:</string>
     <string name="analysis_result_medium">Trung bình</string>
     <string name="analysis_result_risk_assessment_description">Hợp đồng có một vài điều khoản cần thương thảo lại để đảm bảo quyền lợi tốt nhất.</string>
-    <string name="analysis_result_key_facts">Key Facts</string>
+    <string name="analysis_result_key_facts">Thông tin chính</string>
     <string name="analysis_result_risks">Rủi ro</string>
     <string name="analysis_result_references">Tham chiếu</string>
     <string name="analysis_result_summary_title">Tóm tắt</string>
@@ -856,6 +856,7 @@
     <string name="chatbot_attachment_cancel_action">Hủy</string>
     <string name="chatbot_attachment_saved_unavailable">Chọn hợp đồng đã lưu sẽ khả dụng khi kho hợp đồng được kết nối.</string>
     <string name="chatbot_history_today">Hôm nay</string>
+    <string name="chatbot_history_yesterday">Hôm qua</string>
     <string name="chatbot_history_draft_badge">Yêu cầu tạo bản nháp</string>
     <string name="chatbot_history_draft_preview">Thuê 24 tháng từ ngày bàn giao. Thông tin còn thiếu để trong [ngoặc vuông].</string>
     <string name="chatbot_history_previous_timestamp">Trước đó · Hỏi đáp tài liệu gốc</string>

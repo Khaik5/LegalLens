@@ -204,8 +204,8 @@ This is a proposal in a new D2 copy; D1 and the original contract remain unchang
     <string name="chatbot_draft_version_view_d3">View D3</string>
     <string name="chatbot_draft_version_original_status">ORIGINAL CONTRACT · READ ONLY</string>
     <string name="chatbot_draft_version_original_title">Original contract</string>
-    <string name="chatbot_draft_version_original_body">Original PDF file</string>
-    <string name="chatbot_draft_version_view_original">View original PDF</string>
+    <string name="chatbot_draft_version_original_body">Originally uploaded file</string>
+    <string name="chatbot_draft_version_view_original">View original file</string>
     <string name="chatbot_draft_versions_optional_note">D1-R and M1 are optional branches. The original contract is always preserved.</string>
     <string name="chatbot_draft_versions_compare">Compare D1 and D2</string>
     <string name="chatbot_draft_copy_confirm_title">Create a copy from D1?</string>
@@ -249,7 +249,7 @@ This is a proposal in a new D2 copy; D1 and the original contract remain unchang
     <string name="draft_save_name_label">Contract name</string>
     <string name="draft_save_default_name">Employment contract — draft</string>
     <string name="draft_save_copy_notice">Save as a new copy in your drafts. The original document and D1 will not be overwritten.</string>
-    <string name="draft_save_legal_warning">Party, job, salary, and working-hours details in [brackets] still need to be filled in. The saved copy remains a draft and is not ready to sign.</string>
+    <string name="draft_save_legal_warning">Details in [brackets] still need to be filled in. The saved copy remains a draft and is not ready to sign.</string>
     <string name="draft_save_review_warning">The saved copy is still an AI draft. It needs a legal review and is not ready to sign.</string>
     <string name="draft_save_acknowledge">I understand this saved copy needs completion and legal review.</string>
     <string name="draft_save_action">Save new copy</string>

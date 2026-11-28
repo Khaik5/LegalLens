@@ -107,6 +107,11 @@ class ContractDetailFragment : Fragment() {
                 viewModel.uiEffect.collect { effect ->
                     when (effect) {
                         ContractDetailUiEffect.NavigateBack -> findNavController().navigateUp()
+                        ContractDetailUiEffect.NavigateBackAfterDelete -> {
+                            // The list's search may have been for the contract just deleted; it must not reopen on an empty result.
+                            parentFragmentManager.setFragmentResult(RESULT_CONTRACT_DELETED, Bundle.EMPTY)
+                            findNavController().navigateUp()
+                        }
                         is ContractDetailUiEffect.NavigateToDocument -> startActivity(
                             effect.documentUri?.let { DocumentViewerActivity.createIntent(requireContext(), android.net.Uri.parse(it), effect.title) }
                                 ?: DocumentViewerActivity.createIntent(requireContext(), effect.contractId, effect.title)
@@ -205,7 +210,7 @@ class ContractDetailFragment : Fragment() {
         val dateFormat = java.text.DateFormat.getDateInstance(java.text.DateFormat.MEDIUM)
         binding.tvCreatedAt.text = state.createdAtMillis.takeIf { it > 0 }?.let { dateFormat.format(java.util.Date(it)) } ?: UNKNOWN_VALUE
         binding.tvUpdatedAt.text = state.updatedAtMillis.takeIf { it > 0 }?.let { dateFormat.format(java.util.Date(it)) } ?: UNKNOWN_VALUE
-        binding.tvPageCount.text = state.pageCount?.let { getString(R.string.contract_page_count_format, it) } ?: UNKNOWN_VALUE
+        binding.tvPageCount.text = state.pageCount?.let { resources.getQuantityString(R.plurals.contract_page_count, it, it) } ?: UNKNOWN_VALUE
         binding.tvFileFormat.text = state.fileFormat.ifBlank { UNKNOWN_VALUE }
         binding.tvStatus.setBackgroundResource(state.statusBackgroundRes)
         binding.tvStatus.setTextColor(ContextCompat.getColor(requireContext(), state.statusTextColorRes))
@@ -230,5 +235,6 @@ class ContractDetailFragment : Fragment() {
         private const val UNKNOWN_VALUE = "\u2014"
         private const val ASSISTANT_ACTION_COLUMNS = 3
         const val ARG_CONTRACT_ID = "contractId"
+        const val RESULT_CONTRACT_DELETED = "contract_detail_contract_deleted"
     }
 }

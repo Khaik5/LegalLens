@@ -518,6 +518,7 @@
     <string name="chatbot_attachment_cancel_action">Cancel</string>
     <string name="chatbot_attachment_saved_unavailable">Choosing saved contracts will be available when the contract library is connected.</string>
     <string name="chatbot_history_today">Today</string>
+    <string name="chatbot_history_yesterday">Yesterday</string>
     <string name="chatbot_history_draft_badge">Draft request</string>
     <string name="chatbot_history_draft_preview">24-month lease from handover. Missing details are marked [in square brackets].</string>
     <string name="chatbot_history_previous_timestamp">Earlier · Original contract Q&amp;A</string>
@@ -804,6 +805,7 @@
     <string name="unlock_success_description">You have unlocked the full analysis. This result can be reviewed at any time.</string>
     <string name="unlock_success_view_result">View result</string>
     <string name="ocr_review_title">OCR results need review</string>
+    <string name="ocr_review_title_confident">Review OCR results</string>
     <string name="ocr_review_section_title">FLAGGED TEXT SECTIONS</string>
     <string name="ocr_review_recognized_text">Recognised text: %1$s</string>
     <string name="ocr_review_confirm">Confirm &amp; finish</string>
