@@ -2,7 +2,8 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/analysis_legal_reference_item_height"
+    android:layout_height="wrap_content"
+    android:minHeight="@dimen/analysis_legal_reference_item_height"
     android:layout_marginBottom="@dimen/dp_12"
     android:background="@drawable/bg_analysis_legal_reference_card"
     android:padding="@dimen/dp_16">
@@ -11,11 +12,16 @@
         android:id="@+id/analysisLegalReferenceTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:ellipsize="end"
         android:includeFontPadding="false"
-        android:maxLines="1"
+        android:maxLines="2"
         android:textColor="@color/legal_lens_primary"
         android:textSize="@dimen/sp_15"
         android:textStyle="bold"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toStartOf="@id/analysisLegalReferenceCountry"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -24,6 +30,7 @@
         android:layout_width="wrap_content"
         android:layout_height="@dimen/dp_18"
         android:layout_marginStart="@dimen/dp_8"
+        android:layout_marginEnd="@dimen/dp_8"
         android:background="@drawable/bg_analysis_legal_reference_country"
         android:gravity="center"
         android:includeFontPadding="false"
@@ -33,6 +40,7 @@
         android:textSize="@dimen/sp_10"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@id/analysisLegalReferenceTitle"
+        app:layout_constraintEnd_toStartOf="@id/analysisLegalReferenceArticle"
         app:layout_constraintStart_toEndOf="@id/analysisLegalReferenceTitle"
         app:layout_constraintTop_toTopOf="@id/analysisLegalReferenceTitle" />
 
@@ -105,8 +113,9 @@
         android:includeFontPadding="false"
         android:textColor="@color/legal_lens_secondary_text"
         android:textSize="@dimen/sp_12"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/analysisLegalReferenceFull"
+        app:layout_constraintBottom_toBottomOf="@id/analysisLegalReferenceFull" />
 
     <LinearLayout
         android:id="@+id/analysisLegalReferenceFull"
@@ -116,9 +125,12 @@
         android:clickable="true"
         android:focusable="true"
         android:gravity="center_vertical"
+        android:layout_marginTop="@dimen/dp_8"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/analysisLegalReferenceDivider"
+        app:layout_constraintVertical_bias="1">
 
         <TextView
             android:layout_width="wrap_content"
